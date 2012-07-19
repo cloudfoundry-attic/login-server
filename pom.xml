@@ -7,13 +7,13 @@
 		<groupId>org.cloudfoundry.identity</groupId>
 		<artifactId>cloudfoundry-identity-parent</artifactId>
 		<version>1.1.0.BUILD-SNAPSHOT</version>
-		<relativePath>../..</relativePath>
 	</parent>
 
-	<artifactId>cloudfoundry-identity-login</artifactId>
+    <groupId>com.cloudfoundry.identity</groupId>
+	<artifactId>cloudfoundry-login-server</artifactId>
 	<packaging>war</packaging>
-	<name>User Account and Authentication Service Login</name>
-	<description>User Account and Authentication Service Login Sample App</description>
+	<name>Cloud Foundry Login</name>
+	<description>Cloud Foundry Login App</description>
 
 	<properties>
 		<m2eclipse.wtp.contextRoot>/login</m2eclipse.wtp.contextRoot>
