@@ -105,40 +105,44 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 				</div>
 			</c:if>
 
-			<h2>Please Confirm</h2>
+			<c:if test="${error==null}">
 
-			<div class="confirm">
-				<p>
-					Do you authorize the application '${client.client_id}' at <a
-						href="${redirect_uri}">${redirect_uri}</a> to access your Cloud
-					Foundry resources?
-				</p>
-				<ul>
-					<c:forEach items="${scopes}" var="scope">
-						<li><spring:message code="${scope['code']}"
-								text="${scope['text']}" /></li>
-					</c:forEach>
-				</ul>
-				<p>If you do not recognize the application or the URL in the
-					link above you should deny access.</p>
-			</div>
+				<h2>Please Confirm</h2>
 
-			<form id="confirmationForm" name="confirmationForm"
-				action="${options.confirm.path}" method="POST">
-				<input name="${options.confirm.key}"
-					value="${options.confirm.value}" type="hidden" />
-				<div class="buttons">
-					<button class="orange-button" type="submit">Authorize</button>
+				<div class="confirm">
+					<p>
+						Do you authorize the application '${client.client_id}' at <a
+							href="${redirect_uri}">${redirect_uri}</a> to access your
+						CloudFoundry.com resources?
+					</p>
+					<ul>
+						<c:forEach items="${scopes}" var="scope">
+							<li><spring:message code="${scope['code']}"
+									text="${scope['text']}" /></li>
+						</c:forEach>
+					</ul>
+					<p>If you do not recognize the application or the URL in the
+						link above you should deny access.</p>
 				</div>
-			</form>
-			<form id="denialForm" name="denialForm" action="${options.deny.path}"
-				method="POST">
-				<input name="${options.deny.key}" value="${options.deny.value}"
-					type="hidden" />
-				<div class="buttons">
-					<button class="gray-button" type="submit">Deny</button>
-				</div>
-			</form>
+
+				<form id="confirmationForm" name="confirmationForm"
+					action="${options.confirm.path}" method="POST">
+					<input name="${options.confirm.key}"
+						value="${options.confirm.value}" type="hidden" />
+					<div class="buttons">
+						<button class="orange-button" type="submit">Authorize</button>
+					</div>
+				</form>
+				<form id="denialForm" name="denialForm"
+					action="${options.deny.path}" method="POST">
+					<input name="${options.deny.key}" value="${options.deny.value}"
+						type="hidden" />
+					<div class="buttons">
+						<button class="gray-button" type="submit">Deny</button>
+					</div>
+				</form>
+
+			</c:if>
 
 		</div>
 		<div class="footer"
