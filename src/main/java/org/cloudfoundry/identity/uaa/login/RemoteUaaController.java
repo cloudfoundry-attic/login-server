@@ -8,6 +8,8 @@ import java.net.URLDecoder;
 import java.security.Principal;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -38,6 +40,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.client.DefaultResponseErrorHandler;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.request.ServletWebRequest;
@@ -110,16 +113,20 @@ public class RemoteUaaController {
 	public String prompts(HttpServletRequest request, @RequestHeader HttpHeaders headers, Model model,
 			Principal principal) throws Exception {
 		String path = extractPath(request);
-		@SuppressWarnings("rawtypes")
-		ResponseEntity<Map> response = defaultTemplate.exchange(baseUrl + "/" + path, HttpMethod.GET,
-				new HttpEntity<Void>(null, getRequestHeaders(headers)), Map.class);
-		@SuppressWarnings("unchecked")
-		Map<String, Object> body = (Map<String, Object>) response.getBody();
-		model.addAllAttributes(body);
+		model.addAllAttributes(getLoginInfo(baseUrl + "/" + path, getRequestHeaders(headers)));
 		if (principal == null) {
 			return "login";
 		}
 		return "home";
+	}
+
+	private Map<String, Object> getLoginInfo(String baseUrl, HttpHeaders headers) {
+		@SuppressWarnings("rawtypes")
+		ResponseEntity<Map> response = defaultTemplate.exchange(baseUrl, HttpMethod.GET, new HttpEntity<Void>(null,
+				headers), Map.class);
+		@SuppressWarnings("unchecked")
+		Map<String, Object> body = (Map<String, Object>) response.getBody();
+		return body;
 	}
 
 	@RequestMapping(value = "/oauth/authorize", params = "response_type", method = RequestMethod.GET)
@@ -184,6 +191,23 @@ public class RemoteUaaController {
 		logger.info("OAuth2 error" + e.getSummary());
 		webRequest.getResponse().setStatus(e.getHttpErrorCode());
 		return new ModelAndView("forward:/home", Collections.singletonMap("error", e));
+	}
+
+	@ExceptionHandler(ResourceAccessException.class)
+	public ModelAndView handleRestClientException(ResourceAccessException e) throws Exception {
+		logger.info("Rest client error" + e.getMessage());
+		HttpHeaders headers = new HttpHeaders();
+		headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+		Map<String, Object> model = new HashMap<String, Object>();
+		Map<String,String[]> prompts = new LinkedHashMap<String, String[]>();
+		prompts.put("username", new String[] {"text", "Email"});
+		prompts.put("password", new String[] {"password", "Password"});
+		model.put("prompts", prompts);
+		Map<String, String> error = new LinkedHashMap<String, String>();
+		error.put("error", "rest_client_error");
+		error.put("error_description", e.getMessage());
+		model.put("error", error);
+		return new ModelAndView("login", model);
 	}
 
 	private void saveCookie(HttpHeaders headers, Map<String, Object> model) {
