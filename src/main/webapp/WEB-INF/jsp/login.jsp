@@ -116,7 +116,7 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 			</article>
 		</div>
 		<div class="footer"
-			title="Version: ${version}, Commit: ${commit_id}, Timestamp: ${timestamp}">
+			title="Version: ${app.version}, Commit: ${commit_id}, Timestamp: ${timestamp}, UAA: ${uaa}">
 			Copyright &copy;
 			<fmt:formatDate value="<%=new java.util.Date()%>" pattern="yyyy" />
 			VMware, Inc. All rights reserved.
