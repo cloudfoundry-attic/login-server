@@ -6,17 +6,22 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.security.Principal;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.cloudfoundry.identity.uaa.social.SocialClientUserDetails;
+import org.cloudfoundry.identity.uaa.util.UaaStringUtils;
+import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -69,6 +74,10 @@ public class RemoteUaaController {
 
 	private static String DEFAULT_BASE_UAA_URL = "https://uaa.cloudfoundry.com";
 
+	private Properties gitProperties = new Properties();
+
+	private Properties buildProperties = new Properties();
+
 	private RestTemplate defaultTemplate = new RestTemplate();
 
 	private RestOperations authorizationTemplate = new RestTemplate();
@@ -94,6 +103,18 @@ public class RemoteUaaController {
 			}
 		});
 		setUaaBaseUrl(DEFAULT_BASE_UAA_URL);
+		try {
+			gitProperties = PropertiesLoaderUtils.loadAllProperties("git.properties");
+		}
+		catch (IOException e) {
+			// Ignore
+		}
+		try {
+			buildProperties = PropertiesLoaderUtils.loadAllProperties("build.properties");
+		}
+		catch (IOException e) {
+			// Ignore
+		}
 	}
 
 	/**
@@ -114,10 +135,23 @@ public class RemoteUaaController {
 			Principal principal) throws Exception {
 		String path = extractPath(request);
 		model.addAllAttributes(getLoginInfo(baseUrl + "/" + path, getRequestHeaders(headers)));
+		model.addAllAttributes(getBuildInfo());
 		if (principal == null) {
 			return "login";
 		}
 		return "home";
+	}
+
+	private Map<String, ?> getBuildInfo() {
+		Map<String, Object> model = new HashMap<String, Object>();
+		model.put("commit_id", gitProperties.getProperty("git.commit.id.abbrev", "UNKNOWN"));
+		model.put(
+				"timestamp",
+				gitProperties.getProperty("git.commit.time",
+						new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date())));
+		model.put("app", UaaStringUtils.getMapFromProperties(buildProperties, "build."));
+		model.put("uaa", baseUrl);
+		return model;
 	}
 
 	private Map<String, Object> getLoginInfo(String baseUrl, HttpHeaders headers) {
@@ -199,10 +233,11 @@ public class RemoteUaaController {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
 		Map<String, Object> model = new HashMap<String, Object>();
-		Map<String,String[]> prompts = new LinkedHashMap<String, String[]>();
-		prompts.put("username", new String[] {"text", "Email"});
-		prompts.put("password", new String[] {"password", "Password"});
+		Map<String, String[]> prompts = new LinkedHashMap<String, String[]>();
+		prompts.put("username", new String[] { "text", "Email" });
+		prompts.put("password", new String[] { "password", "Password" });
 		model.put("prompts", prompts);
+		model.putAll(getBuildInfo());
 		Map<String, String> error = new LinkedHashMap<String, String>();
 		error.put("error", "rest_client_error");
 		error.put("error_description", e.getMessage());
