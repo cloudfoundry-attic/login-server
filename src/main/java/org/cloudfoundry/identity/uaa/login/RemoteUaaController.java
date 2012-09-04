@@ -213,7 +213,7 @@ public class RemoteUaaController {
 		return passthru(request, entity, model);
 	}
 
-	@RequestMapping(value = "/oauth/**", method = RequestMethod.POST)
+	@RequestMapping(value = "/oauth/**")
 	@ResponseBody
 	public ResponseEntity<byte[]> post(HttpServletRequest request, HttpEntity<byte[]> entity,
 			Map<String, Object> model, SessionStatus sessionStatus) throws Exception {
@@ -312,8 +312,9 @@ public class RemoteUaaController {
 			requestHeaders.set("Cookie", cookie);
 		}
 
-		ResponseEntity<byte[]> response = defaultTemplate.exchange(baseUrl + "/" + path, HttpMethod.POST,
-				new HttpEntity<byte[]>(entity.getBody(), requestHeaders), byte[].class);
+		ResponseEntity<byte[]> response = defaultTemplate.exchange(baseUrl + "/" + path,
+				HttpMethod.valueOf(request.getMethod()), new HttpEntity<byte[]>(entity.getBody(), requestHeaders),
+				byte[].class);
 		HttpHeaders outgoingHeaders = getResponseHeaders(response.getHeaders());
 		return new ResponseEntity<byte[]>(response.getBody(), outgoingHeaders, response.getStatusCode());
 

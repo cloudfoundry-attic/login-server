@@ -31,6 +31,13 @@
 	<sec:http pattern="/login" security="none" />
 	<sec:http pattern="/login_info" security="none" />
 	<sec:http pattern="/oauth/token" security="none" />
+	<!-- TODO: move all clients of these endpoints to /uaa -->
+	<sec:http pattern="/User/**" security="none" />
+	<sec:http pattern="/Users/**" security="none" />
+	<sec:http pattern="/User" security="none" />
+	<sec:http pattern="/Users" security="none" />
+	<sec:http pattern="/oauth/clients" security="none" />
+	<sec:http pattern="/oauth/clients/**" security="none" />
 
 	<!-- Version of the /authorize endpoint for stateless clients such as VMC -->
 	<http request-matcher-ref="oauthAuthorizeRequestMatcher" create-session="stateless" security="none"
