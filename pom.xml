@@ -11,6 +11,7 @@
 
     <groupId>com.cloudfoundry.identity</groupId>
 	<artifactId>cloudfoundry-login-server</artifactId>
+	<version>1.0.0.BUILD-SNAPSHOT</version>
 	<packaging>war</packaging>
 	<name>Cloud Foundry Login</name>
 	<description>Cloud Foundry Login App</description>
@@ -18,6 +19,7 @@
 	<properties>
 		<m2eclipse.wtp.contextRoot>/login</m2eclipse.wtp.contextRoot>
 		<login.path>/login</login.path>
+		<identity.version>${project.parent.version}</identity.version>
 		<!-- Brain dead install plugin (Maven 3) cannot extract this stuff from its own configuration -->
 		<file>target/${project.artifactId}-${project.version}.war</file>
 		<groupId>${project.groupId}</groupId>
@@ -179,7 +181,7 @@
 		<dependency>
 			<groupId>org.cloudfoundry.identity</groupId>
 			<artifactId>cloudfoundry-identity-common</artifactId>
-			<version>${project.version}</version>
+			<version>${identity.version}</version>
 		</dependency>
 
 		<dependency>
