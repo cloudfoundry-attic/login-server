@@ -220,7 +220,7 @@ public class RemoteUaaController {
 		return passthru(request, entity, model);
 	}
 
-	@RequestMapping(value = { "/varz", "/varz/**", "/healthz" })
+	@RequestMapping(value = { "/varz", "/varz/**", "/healthz", "/Users", "/User" })
 	@ResponseBody
 	public ResponseEntity<byte[]> varz(HttpServletRequest request, HttpEntity<byte[]> entity,
 			Map<String, Object> model, SessionStatus sessionStatus) throws Exception {
