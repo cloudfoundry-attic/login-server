@@ -15,6 +15,7 @@ package org.cloudfoundry.identity.login;
 import static org.junit.Assert.assertNotNull;
 
 import org.cloudfoundry.identity.uaa.config.YamlPropertiesFactoryBean;
+import org.cloudfoundry.identity.uaa.varz.VarzEndpoint;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -50,6 +51,12 @@ public class BootstrapTests {
 	public void testRootContextDefaults() throws Exception {
 		context = getServletContext("file:./src/main/webapp/WEB-INF/spring-servlet.xml");
 		assertNotNull(context.getBean("viewResolver", ViewResolver.class));
+	}
+
+	@Test
+	public void testVarzContextDefaults() throws Exception {
+		context = getServletContext("file:./src/main/webapp/WEB-INF/varz-servlet.xml");
+		assertNotNull(context.getBean("varzEndpoint", VarzEndpoint.class));
 	}
 
 	private GenericXmlApplicationContext getServletContext(String... resources) {
