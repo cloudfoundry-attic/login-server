@@ -220,13 +220,6 @@ public class RemoteUaaController {
 		return passthru(request, entity, model);
 	}
 
-	@RequestMapping(value = { "/varz", "/varz/**", "/healthz", "/Users", "/User" })
-	@ResponseBody
-	public ResponseEntity<byte[]> varz(HttpServletRequest request, HttpEntity<byte[]> entity,
-			Map<String, Object> model, SessionStatus sessionStatus) throws Exception {
-		return passthru(request, entity, model);
-	}
-
 	@ExceptionHandler(OAuth2Exception.class)
 	public ModelAndView handleOAuth2Exception(OAuth2Exception e, ServletWebRequest webRequest) throws Exception {
 		logger.info("OAuth2 error" + e.getSummary());
