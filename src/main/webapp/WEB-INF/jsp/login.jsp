@@ -103,16 +103,18 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 								password.</div>
 						</c:if>
 						<c:forEach items="${prompts}" var="prompt">
+							<spring:message code="prompt.${prompt.key}"
+									text="${prompt.value[1]}" var="text"/>
 							<input id='${prompt.key}' type='${prompt.value[0]}'
-								name='${prompt.key}' placeholder='${prompt.value[1]}' />
+								name='${prompt.key}' placeholder='${text}' />
 						</c:forEach>
 					</div>
 					<button type="submit" class="orange-button">Sign in</button>
 					<span class="button-alt"> <a class="question passwd"
 						target="_blank" href="https://${hostName}/passwd">Forgot your
 							password</a></span><br/><br/>
-					<a class="orange-button" href="https://${hostName}/signup">Register</a>
 				</form>
+				<p>Don't have an account? <a href="https://${hostName}/signup">Register here.</a></p>
 			</article>
 		</div>
 		<div class="footer"
