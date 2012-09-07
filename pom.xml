@@ -6,12 +6,12 @@
 	<parent>
 		<groupId>org.cloudfoundry.identity</groupId>
 		<artifactId>cloudfoundry-identity-parent</artifactId>
-		<version>1.2.0.BUILD-SNAPSHOT</version>
+		<version>1.1.2</version>
 	</parent>
 
     <groupId>com.cloudfoundry.identity</groupId>
 	<artifactId>cloudfoundry-login-server</artifactId>
-	<version>1.0.0.BUILD-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<packaging>war</packaging>
 	<name>Cloud Foundry Login</name>
 	<description>Cloud Foundry Login App</description>
@@ -20,6 +20,7 @@
 		<m2eclipse.wtp.contextRoot>/login</m2eclipse.wtp.contextRoot>
 		<login.path>/login</login.path>
 		<identity.version>${project.parent.version}</identity.version>
+		<spring.version>3.1.2.RELEASE</spring.version>
 		<!-- Brain dead install plugin (Maven 3) cannot extract this stuff from its own configuration -->
 		<file>target/${project.artifactId}-${project.version}.war</file>
 		<groupId>${project.groupId}</groupId>
@@ -295,6 +296,7 @@
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
+			<version>4.2.1</version>
 		</dependency>
 
 		<dependency>
