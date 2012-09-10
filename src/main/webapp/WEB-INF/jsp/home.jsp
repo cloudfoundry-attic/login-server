@@ -94,7 +94,7 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 				<p>Your account login is working and you have authenticated.</p>
 
 				<c:if test="${error!=null}">
-					<div class="error" title="${error}">
+					<div class="error" title="${fn:escapeXml(error)}">
 						<p>But there was an error.</p>
 					</div>
 				</c:if>
