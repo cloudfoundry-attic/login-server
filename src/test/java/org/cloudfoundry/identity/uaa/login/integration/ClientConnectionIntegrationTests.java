@@ -11,7 +11,7 @@
  * subcomponent's license, as noted in the LICENSE file.
  */
 
-package org.cloudfoundry.identity.login.integration;
+package org.cloudfoundry.identity.uaa.login.integration;
 
 import static org.junit.Assert.assertNotNull;
 
