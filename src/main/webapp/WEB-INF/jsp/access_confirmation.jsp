@@ -126,16 +126,14 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 						link above you should deny access.</p>
 				</div>
 
-				<form id="confirmationForm" name="confirmationForm"
-					action="${options.confirm.path}" method="POST">
+				<form id="confirmationForm" name="confirmationForm" method="POST">
 					<input name="${options.confirm.key}"
 						value="${options.confirm.value}" type="hidden" />
 					<div class="buttons">
 						<button class="orange-button" type="submit">Authorize</button>
 					</div>
 				</form>
-				<form id="denialForm" name="denialForm"
-					action="${options.deny.path}" method="POST">
+				<form id="denialForm" name="denialForm" method="POST">
 					<input name="${options.deny.key}" value="${options.deny.value}"
 						type="hidden" />
 					<div class="buttons">
