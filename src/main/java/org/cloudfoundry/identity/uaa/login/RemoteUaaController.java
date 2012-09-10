@@ -213,18 +213,31 @@ public class RemoteUaaController {
 		return passthru(request, entity, model);
 	}
 
+	@RequestMapping(value = "/oauth/authorize", method = RequestMethod.POST, params = "credentials")
+	@ResponseBody
+	public ResponseEntity<byte[]> implicit(HttpServletRequest request, HttpEntity<byte[]> entity,
+			Map<String, Object> model) throws Exception {
+		return passthru(request, entity, model);
+	}
+
+	@RequestMapping(value = { "/oauth/confirm_access", "/oauth/error", "oauth/token" })
+	@ResponseBody
+	public ResponseEntity<byte[]> sundry(HttpServletRequest request, HttpEntity<byte[]> entity,
+			Map<String, Object> model) throws Exception {
+		return passthru(request, entity, model);
+	}
+
 	@RequestMapping(value = "/oauth/**")
 	@ResponseBody
-	public ResponseEntity<byte[]> post(HttpServletRequest request, HttpEntity<byte[]> entity,
-			Map<String, Object> model, SessionStatus sessionStatus) throws Exception {
-		return passthru(request, entity, model);
+	public ResponseEntity<byte[]> invalid() throws Exception {
+		throw new OAuth2Exception("no matching handler for request");
 	}
 
 	@ExceptionHandler(OAuth2Exception.class)
 	public ModelAndView handleOAuth2Exception(OAuth2Exception e, ServletWebRequest webRequest) throws Exception {
 		logger.info("OAuth2 error" + e.getSummary());
 		webRequest.getResponse().setStatus(e.getHttpErrorCode());
-		return new ModelAndView("forward:/home", Collections.singletonMap("error", e));
+		return new ModelAndView("forward:/home", Collections.singletonMap("error", e.getSummary()));
 	}
 
 	@ExceptionHandler(ResourceAccessException.class)
