@@ -31,6 +31,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.client.OAuth2RestTemplate;
 import org.springframework.security.oauth2.common.exceptions.OAuth2Exception;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -182,8 +183,23 @@ public class RemoteUaaController {
 		requestHeaders.remove("Cookie");
 
 		@SuppressWarnings("rawtypes")
-		ResponseEntity<Map> response = authorizationTemplate.exchange(baseUrl + "/" + path, HttpMethod.POST,
-				new HttpEntity<MultiValueMap<String, String>>(map, requestHeaders), Map.class);
+		ResponseEntity<Map> response;
+
+		try {
+			response = authorizationTemplate.exchange(baseUrl + "/" + path, HttpMethod.POST,
+					new HttpEntity<MultiValueMap<String, String>>(map, requestHeaders), Map.class);
+		}
+		catch (RuntimeException e) {
+			// Defensive workaround for SECOAUTH-335
+			if (authorizationTemplate instanceof OAuth2RestTemplate) {
+				((OAuth2RestTemplate) authorizationTemplate).getOAuth2ClientContext().setAccessToken(null);
+				response = authorizationTemplate.exchange(baseUrl + "/" + path, HttpMethod.POST,
+						new HttpEntity<MultiValueMap<String, String>>(map, requestHeaders), Map.class);
+			}
+			else {
+				throw e;
+			}
+		}
 
 		saveCookie(response.getHeaders(), model);
 
@@ -193,6 +209,9 @@ public class RemoteUaaController {
 			// User approval is required
 			logger.debug("Response: " + body);
 			model.putAll(body);
+			if (!body.containsKey("options")) {
+				throw new OAuth2Exception("No options returned from UAA for user approval");
+			}
 			return new ModelAndView("access_confirmation", model);
 		}
 
@@ -215,6 +234,13 @@ public class RemoteUaaController {
 
 	@RequestMapping(value = "/oauth/authorize", method = RequestMethod.POST, params = "credentials")
 	@ResponseBody
+	public ResponseEntity<byte[]> implicitOld(HttpServletRequest request, HttpEntity<byte[]> entity,
+			Map<String, Object> model) throws Exception {
+		return passthru(request, entity, model);
+	}
+
+	@RequestMapping(value = "/oauth/authorize", method = RequestMethod.POST, params = "source=credentials")
+	@ResponseBody
 	public ResponseEntity<byte[]> implicit(HttpServletRequest request, HttpEntity<byte[]> entity,
 			Map<String, Object> model) throws Exception {
 		return passthru(request, entity, model);
@@ -229,8 +255,8 @@ public class RemoteUaaController {
 
 	@RequestMapping(value = "/oauth/**")
 	@ResponseBody
-	public ResponseEntity<byte[]> invalid() throws Exception {
-		throw new OAuth2Exception("no matching handler for request");
+	public ResponseEntity<byte[]> invalid(HttpServletRequest request) throws Exception {
+		throw new OAuth2Exception("no matching handler for request: " + request.getServletPath());
 	}
 
 	@ExceptionHandler(OAuth2Exception.class)
