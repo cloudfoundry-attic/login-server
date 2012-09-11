@@ -31,13 +31,6 @@
 	<sec:http pattern="/login" security="none" />
 	<sec:http pattern="/login_info" security="none" />
 	<sec:http pattern="/oauth/token" security="none" />
-	<!-- TODO: move all clients of these endpoints to /uaa -->
-	<sec:http pattern="/User/**" security="none" />
-	<sec:http pattern="/Users/**" security="none" />
-	<sec:http pattern="/User" security="none" />
-	<sec:http pattern="/Users" security="none" />
-	<sec:http pattern="/oauth/clients" security="none" />
-	<sec:http pattern="/oauth/clients/**" security="none" />
 
 	<!-- Version of the /authorize endpoint for stateless clients such as VMC -->
 	<http request-matcher-ref="oauthAuthorizeRequestMatcher" create-session="stateless" security="none"
@@ -45,7 +38,32 @@
 
 	<bean id="oauthAuthorizeRequestMatcher" class="org.cloudfoundry.identity.uaa.security.web.UaaRequestMatcher">
 		<constructor-arg value="/oauth/authorize" />
-		<property name="accept" value="application/json" />
+		<property name="accept">
+			<list>
+				<value>application/json</value>
+				<value>application/x-www-form-urlencoded</value>
+			</list>
+		</property>
+		<property name="parameters">
+			<map>
+				<entry key="response_type" value="token" />
+				<entry key="source" value="credentials" />
+			</map>
+		</property>
+	</bean>
+
+	<!-- For backwards compatibility to the old way of posting credentials to /authorize endpoint -->
+	<http request-matcher-ref="oauthAuthorizeRequestMatcherOld" create-session="stateless" security="none"
+		xmlns="http://www.springframework.org/schema/security" />
+
+	<bean id="oauthAuthorizeRequestMatcherOld" class="org.cloudfoundry.identity.uaa.security.web.UaaRequestMatcher">
+		<constructor-arg value="/oauth/authorize" />
+		<property name="accept">
+			<list>
+				<value>application/json</value>
+				<value>application/x-www-form-urlencoded</value>
+			</list>
+		</property>
 		<property name="parameters">
 			<map>
 				<entry key="response_type" value="token" />
@@ -59,8 +77,7 @@
 		<intercept-url pattern="/logout.do" access="IS_AUTHENTICATED_ANONYMOUSLY" />
 		<anonymous enabled="true" />
 		<form-login login-page="/login" username-parameter="username" password-parameter="password"
-			login-processing-url="/login.do" authentication-failure-url="/login?error=true"/>
-		<!-- TODO: add form login with remote password authentication -->
+			login-processing-url="/login.do" authentication-failure-url="/login?error=true" />
 		<logout logout-success-url="/" logout-url="/logout.do" />
 	</http>
 
@@ -68,14 +85,14 @@
 		disable-url-rewriting="true">
 		<intercept-url pattern="/**" access="IS_AUTHENTICATED_FULLY" />
 		<anonymous enabled="false" />
-		<logout success-handler-ref="logoutHandler"/>
+		<logout success-handler-ref="logoutHandler" />
 	</http>
 
-	<authentication-manager xmlns="http://www.springframework.org/schema/security"/>
+	<authentication-manager xmlns="http://www.springframework.org/schema/security" />
 
 	<bean id="logoutHandler" class="org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler">
-		<property name="targetUrlParameter" value="redirect"/>
-		<property name="defaultTargetUrl" value="/login"/>
+		<property name="targetUrlParameter" value="redirect" />
+		<property name="defaultTargetUrl" value="/login" />
 	</bean>
 
 	<bean id="loginEntryPoint" class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
@@ -117,6 +134,9 @@
 		<property name="authorizationTemplate">
 			<bean class="org.springframework.security.oauth2.client.OAuth2RestTemplate">
 				<constructor-arg ref="uaa" />
+				<property name="requestFactory">
+					<bean class="org.springframework.http.client.HttpComponentsClientHttpRequestFactory" />
+				</property>
 			</bean>
 		</property>
 	</bean>
