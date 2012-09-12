@@ -250,7 +250,7 @@ public class RemoteUaaController {
 		return passthru(request, entity, model);
 	}
 
-	@RequestMapping(value = { "/oauth/confirm_access", "/oauth/error", "oauth/token" })
+	@RequestMapping(value = { "/oauth/error", "oauth/token" })
 	@ResponseBody
 	public ResponseEntity<byte[]> sundry(HttpServletRequest request, HttpEntity<byte[]> entity,
 			Map<String, Object> model) throws Exception {
@@ -258,6 +258,7 @@ public class RemoteUaaController {
 		return passthru(request, entity, model);
 	}
 
+	// We do not map /oauth/confirm_access because we want to remove the remote session cookie in approveOrDeny
 	@RequestMapping(value = "/oauth/**")
 	@ResponseBody
 	public ResponseEntity<byte[]> invalid(HttpServletRequest request) throws Exception {
