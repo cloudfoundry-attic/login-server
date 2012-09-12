@@ -20,6 +20,7 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 
 <c:url var="baseUrl" value="/resources" />
+<c:url var="authorizeUrl" value="/oauth/authorize" />
 <c:set value="www.cloudfoundry.com" var="hostName" />
 
 <!DOCTYPE html>
@@ -102,7 +103,8 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 			<c:if test="${error!=null}">
 				<div class="error" title="${fn:escapeXml(error)}">
 					<h2>Sorry</h2>
-					<p>There was an error. The request for authorization was invalid.</p>
+					<p>There was an error. The request for authorization was
+						invalid.</p>
 				</div>
 			</c:if>
 
@@ -126,14 +128,16 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 						link above you should deny access.</p>
 				</div>
 
-				<form id="confirmationForm" name="confirmationForm" method="POST">
+				<form id="confirmationForm" name="confirmationForm"
+					action="${authorizeUrl}" method="POST">
 					<input name="${options.confirm.key}"
 						value="${options.confirm.value}" type="hidden" />
 					<div class="buttons">
 						<button class="orange-button" type="submit">Authorize</button>
 					</div>
 				</form>
-				<form id="denialForm" name="denialForm" method="POST">
+				<form id="denialForm" name="denialForm" action="${authorizeUrl}"
+					method="POST">
 					<input name="${options.deny.key}" value="${options.deny.value}"
 						type="hidden" />
 					<div class="buttons">

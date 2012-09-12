@@ -13,7 +13,6 @@
 package org.cloudfoundry.identity.uaa.login.integration;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.net.URI;
@@ -99,10 +98,11 @@ public class AuthorizationCodeGrantIntegrationTests {
 
 		response = serverRunning.getForString(result.getHeaders().getLocation().toString(), headers);
 		if (response.getStatusCode() == HttpStatus.OK) {
+			String body = response.getBody();
 			// The grant access page should be returned
-			assertTrue(response.getBody().contains("Do you authorize"));
-			// Forms should have the default action
-			assertFalse(response.getBody().contains("action="));
+			assertTrue(body.contains("Do you authorize"));
+			// Forms should have the right action
+			assertTrue(body.matches("(?s).*\\saction=\"\\S*oauth/authorize\".*"));
 
 			formData.clear();
 			formData.add("user_oauth_approval", "true");
