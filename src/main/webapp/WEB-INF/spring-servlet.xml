@@ -32,6 +32,71 @@
 	<sec:http pattern="/login_info" security="none" />
 	<sec:http pattern="/oauth/token" security="none" />
 
+	<http pattern="/autologin" create-session="stateless" entry-point-ref="basicAuthenticationEntryPoint"
+		xmlns="http://www.springframework.org/schema/security">
+		<intercept-url pattern="/**" access="IS_AUTHENTICATED_FULLY" />
+		<anonymous enabled="false" />
+		<custom-filter ref="clientAuthenticationFilter" position="BASIC_AUTH_FILTER" />
+	</http>
+
+	<http request-matcher-ref="autologinAuthorizeRequestMatcher" entry-point-ref="loginEntryPoint"
+		xmlns="http://www.springframework.org/schema/security">
+		<!-- TODO: add entry point that can redirect back to client app? -->
+		<anonymous enabled="false" />
+		<custom-filter ref="autologinAuthenticationFilter" position="FORM_LOGIN_FILTER" />
+	</http>
+
+	<bean id="basicAuthenticationEntryPoint" class="org.springframework.security.oauth2.provider.error.OAuth2AuthenticationEntryPoint">
+		<property name="realmName" value="UAA/client" />
+		<property name="typeName" value="Basic" />
+	</bean>
+	
+	<bean id="clientAuthenticationFilter" class="org.cloudfoundry.identity.uaa.login.ClientInfoAuthenticationFilter">
+		<property name="clientInfoUrl" value="${uaa.clientinfo.url:http://localhost:8080/uaa/clientinfo}"/>
+		<property name="allowedGrantTypes" value="authorization_code"/>
+		<property name="authenticationEntryPoint" ref="basicAuthenticationEntryPoint"/>
+	</bean>
+
+	<bean id="autologinAuthenticationFilter" class="org.cloudfoundry.identity.uaa.authentication.AuthzAuthenticationFilter">
+		<constructor-arg ref="autologinAuthenticationManager" />
+		<property name="parameterNames">
+			<list>
+				<value>code</value>
+				<value>response_type</value>
+			</list>
+		</property>
+		<property name="methods">
+			<set>
+				<value>GET</value>
+				<value>POST</value>
+			</set>
+		</property>
+	</bean>
+
+	<bean id="autologinAuthenticationManager" class="org.cloudfoundry.identity.uaa.login.AutologinAuthenticationManager">
+		<property name="codeStore" ref="autologinCodeStore" />
+	</bean>
+
+	<bean id="autologinCodeStore" class="org.cloudfoundry.identity.uaa.login.DefaultAutologinCodeStore">
+		<property name="expireCodeWhenUsed" value="${autologin.expire_when_used:true}" />
+	</bean>
+
+	<bean id="autologinAuthorizeRequestMatcher" class="org.cloudfoundry.identity.uaa.security.web.UaaRequestMatcher">
+		<constructor-arg value="/oauth/authorize" />
+		<property name="accept">
+			<list>
+				<value>application/json</value>
+				<value>application/x-www-form-urlencoded</value>
+			</list>
+		</property>
+		<property name="parameters">
+			<map>
+				<entry key="response_type" value="code" />
+				<entry key="code" value="" />
+			</map>
+		</property>
+	</bean>
+
 	<!-- Version of the /authorize endpoint for stateless clients such as VMC -->
 	<http request-matcher-ref="oauthAuthorizeRequestMatcher" create-session="stateless" security="none"
 		xmlns="http://www.springframework.org/schema/security" />
@@ -128,6 +193,10 @@
 	</bean>
 
 	<bean id="homeController" class="org.cloudfoundry.identity.uaa.login.HomeController" />
+
+	<bean id="autologinController" class="org.cloudfoundry.identity.uaa.login.AutologinController">
+		<property name="codeStore" ref="autologinCodeStore" />
+	</bean>
 
 	<bean id="uaaController" class="org.cloudfoundry.identity.uaa.login.RemoteUaaController">
 		<property name="uaaBaseUrl" value="${uaa.url:http://localhost:8080/uaa}" />

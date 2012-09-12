@@ -30,6 +30,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
 import org.springframework.security.oauth2.common.exceptions.OAuth2Exception;
@@ -174,6 +175,8 @@ public class RemoteUaaController {
 		map.setAll(parameters);
 		if (principal != null) {
 			map.set("login", getLoginCredentials(principal));
+		} else {
+			throw new BadCredentialsException("No principal found in authorize endpoint");
 		}
 
 		HttpHeaders requestHeaders = new HttpHeaders();
@@ -261,7 +264,7 @@ public class RemoteUaaController {
 	// We do not map /oauth/confirm_access because we want to remove the remote session cookie in approveOrDeny
 	@RequestMapping(value = "/oauth/**")
 	@ResponseBody
-	public ResponseEntity<byte[]> invalid(HttpServletRequest request) throws Exception {
+	public void invalid(HttpServletRequest request) throws Exception {
 		throw new OAuth2Exception("no matching handler for request: " + request.getServletPath());
 	}
 
