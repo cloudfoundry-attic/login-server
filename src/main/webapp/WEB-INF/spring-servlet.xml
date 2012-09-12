@@ -78,7 +78,7 @@
 		<anonymous enabled="true" />
 		<form-login login-page="/login" username-parameter="username" password-parameter="password"
 			login-processing-url="/login.do" authentication-failure-url="/login?error=true" />
-		<logout logout-success-url="/" logout-url="/logout.do" />
+		<logout logout-url="/logout.do" success-handler-ref="logoutHandler" />
 	</http>
 
 	<http xmlns="http://www.springframework.org/schema/security" entry-point-ref="loginEntryPoint"
