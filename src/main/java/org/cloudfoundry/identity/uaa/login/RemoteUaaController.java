@@ -212,11 +212,13 @@ public class RemoteUaaController {
 			if (!body.containsKey("options")) {
 				throw new OAuth2Exception("No options returned from UAA for user approval");
 			}
+			logger.info("Approval required in /oauth/authorize for: " + principal.getName());
 			return new ModelAndView("access_confirmation", model);
 		}
 
 		String location = response.getHeaders().getFirst("Location");
 		if (location != null) {
+			logger.info("Redirect in /oauth/authorize for: " + principal.getName());
 			return new ModelAndView(new RedirectView(location));
 		}
 
@@ -236,6 +238,7 @@ public class RemoteUaaController {
 	@ResponseBody
 	public ResponseEntity<byte[]> implicitOld(HttpServletRequest request, HttpEntity<byte[]> entity,
 			Map<String, Object> model) throws Exception {
+		logger.info("Direct authentication request with JSON credentials at /oauth/authorize");
 		return passthru(request, entity, model);
 	}
 
@@ -243,6 +246,7 @@ public class RemoteUaaController {
 	@ResponseBody
 	public ResponseEntity<byte[]> implicit(HttpServletRequest request, HttpEntity<byte[]> entity,
 			Map<String, Object> model) throws Exception {
+		logger.info("Direct authentication request at /oauth/authorize for " + request.getParameter("username"));
 		return passthru(request, entity, model);
 	}
 
@@ -250,6 +254,7 @@ public class RemoteUaaController {
 	@ResponseBody
 	public ResponseEntity<byte[]> sundry(HttpServletRequest request, HttpEntity<byte[]> entity,
 			Map<String, Object> model) throws Exception {
+		logger.info("Pass through request for " + request.getServletPath());
 		return passthru(request, entity, model);
 	}
 
