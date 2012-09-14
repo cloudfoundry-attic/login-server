@@ -15,10 +15,15 @@ package org.cloudfoundry.identity.uaa.login;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.cloudfoundry.identity.uaa.authentication.AuthzAuthenticationRequest;
 import org.cloudfoundry.identity.uaa.social.SocialClientUserDetails;
 import org.cloudfoundry.identity.uaa.user.UaaAuthority;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
+import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -35,6 +40,15 @@ public class AutologinController {
 
 	private AutologinCodeStore codeStore = new DefaultAutologinCodeStore();
 
+	private AuthenticationManager authenticationManager;
+
+	/**
+	 * @param authenticationManager the authenticationManager to set
+	 */
+	public void setAuthenticationManager(AuthenticationManager authenticationManager) {
+		this.authenticationManager = authenticationManager;
+	}
+
 	/**
 	 * @param codeStore the codeStore to set
 	 */
@@ -46,17 +60,27 @@ public class AutologinController {
 	@ResponseBody
 	public AutologinResponse implicit(@RequestBody AutologinRequest request) throws Exception {
 		String username = request.getUsername();
-		if (username==null) {
+		if (username == null) {
 			throw new BadCredentialsException("No username in request");
+		}
+		if (authenticationManager != null) {
+			String password = request.getPassword();
+			if (!StringUtils.hasText(password)) {
+				throw new BadCredentialsException("No password in request");
+			}
+			authenticationManager.authenticate(new AuthzAuthenticationRequest(username, password, null));
 		}
 		logger.info("Autologin authentication request for " + username);
 		SocialClientUserDetails user = new SocialClientUserDetails(username, UaaAuthority.USER_AUTHORITIES);
 		return new AutologinResponse(codeStore.storeUser(user));
 	}
 
+	@JsonSerialize(include = Inclusion.NON_EMPTY)
 	public static class AutologinRequest {
 
 		private String username;
+
+		private String password;
 
 		public String getUsername() {
 			return this.username;
@@ -64,6 +88,19 @@ public class AutologinController {
 
 		public void setUsername(String username) {
 			this.username = username;
+		}
+
+		public String getPassword() {
+			return password;
+		}
+
+		public void setPassword(String password) {
+			this.password = password;
+		}
+
+		@Override
+		public String toString() {
+			return "AutologinRequest [username=" + username + ", password=" + password + "]";
 		}
 
 	}

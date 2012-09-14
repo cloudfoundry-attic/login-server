@@ -41,6 +41,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.provider.BaseClientDetails;
 import org.springframework.security.oauth2.provider.ClientDetails;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint;
@@ -59,9 +60,9 @@ public class ClientInfoAuthenticationFilter implements Filter {
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
-	private Set<String> allowedClients = Collections.singleton("*");
+	private Set<String> allowedClients = Collections.singleton(".*");
 
-	private Set<String> allowedGrantTypes = Collections.singleton("*");
+	private Set<String> allowedGrantTypes = Collections.singleton(".*");
 
 	private RestOperations restTemplate = new RestTemplate();
 
@@ -118,8 +119,8 @@ public class ClientInfoAuthenticationFilter implements Filter {
 
 		try {
 
-			ResponseEntity<ClientDetails> result = restTemplate.exchange(clientInfoUrl, HttpMethod.GET,
-					new HttpEntity<Void>(headers), ClientDetails.class);
+			ResponseEntity<BaseClientDetails> result = restTemplate.exchange(clientInfoUrl, HttpMethod.GET,
+					new HttpEntity<Void>(headers), BaseClientDetails.class);
 
 			ClientDetails client = result.getBody();
 			String clientId = client.getClientId();

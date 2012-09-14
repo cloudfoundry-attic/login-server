@@ -196,6 +196,7 @@
 
 	<bean id="autologinController" class="org.cloudfoundry.identity.uaa.login.AutologinController">
 		<property name="codeStore" ref="autologinCodeStore" />
+		<property name="authenticationManager" ref="remoteAuthenticationManager" />
 	</bean>
 
 	<bean id="uaaController" class="org.cloudfoundry.identity.uaa.login.RemoteUaaController">
