@@ -267,14 +267,14 @@ public class RemoteUaaController {
 
 	@ExceptionHandler(OAuth2Exception.class)
 	public ModelAndView handleOAuth2Exception(OAuth2Exception e, ServletWebRequest webRequest) throws Exception {
-		logger.info("OAuth2 error" + e.getSummary());
+		logger.info(e.getSummary());
 		webRequest.getResponse().setStatus(e.getHttpErrorCode());
 		return new ModelAndView("forward:/home", Collections.singletonMap("error", e.getSummary()));
 	}
 
 	@ExceptionHandler(ResourceAccessException.class)
 	public ModelAndView handleRestClientException(ResourceAccessException e) throws Exception {
-		logger.info("Rest client error" + e.getMessage());
+		logger.info("Rest client error: " + e.getMessage());
 		HttpHeaders headers = new HttpHeaders();
 		headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
 		Map<String, Object> model = new HashMap<String, Object>();
