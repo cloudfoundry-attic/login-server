@@ -32,6 +32,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.client.token.grant.code.AuthorizationCodeResourceDetails;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 /**
  * @author Dave Syer
@@ -62,6 +64,21 @@ public class AutologinContollerIntegrationTests {
 		@SuppressWarnings("rawtypes")
 		ResponseEntity<Map> entity = serverRunning.getRestTemplate().exchange(serverRunning.getUrl("/autologin"),
 				HttpMethod.POST, new HttpEntity<AutologinRequest>(request, headers), Map.class);
+		assertEquals(HttpStatus.OK, entity.getStatusCode());
+		@SuppressWarnings("unchecked")
+		Map<String, Object> result = (Map<String, Object>) entity.getBody();
+		assertNotNull(result.get("code"));
+	}
+
+	@Test
+	public void testGetCodeWithFormEncodedRequest() {
+		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+		MultiValueMap<String,String> request = new LinkedMultiValueMap<String, String>();
+		request.set("username",testAccounts.getUserName());
+		request.set("password", testAccounts.getPassword());
+		@SuppressWarnings("rawtypes")
+		ResponseEntity<Map> entity = serverRunning.getRestTemplate().exchange(serverRunning.getUrl("/autologin"),
+				HttpMethod.POST, new HttpEntity<MultiValueMap>(request, headers), Map.class);
 		assertEquals(HttpStatus.OK, entity.getStatusCode());
 		@SuppressWarnings("unchecked")
 		Map<String, Object> result = (Map<String, Object>) entity.getBody();

@@ -50,11 +50,11 @@
 		<property name="realmName" value="UAA/client" />
 		<property name="typeName" value="Basic" />
 	</bean>
-	
+
 	<bean id="clientAuthenticationFilter" class="org.cloudfoundry.identity.uaa.login.ClientInfoAuthenticationFilter">
-		<property name="clientInfoUrl" value="${uaa.clientinfo.url:http://localhost:8080/uaa/clientinfo}"/>
-		<property name="allowedGrantTypes" value="authorization_code"/>
-		<property name="authenticationEntryPoint" ref="basicAuthenticationEntryPoint"/>
+		<property name="clientInfoUrl" value="${uaa.clientinfo.url:http://localhost:8080/uaa/clientinfo}" />
+		<property name="allowedGrantTypes" value="authorization_code" />
+		<property name="authenticationEntryPoint" ref="basicAuthenticationEntryPoint" />
 	</bean>
 
 	<bean id="autologinAuthenticationFilter" class="org.cloudfoundry.identity.uaa.authentication.AuthzAuthenticationFilter">
@@ -170,7 +170,11 @@
 
 	<mvc:resources location="/" mapping="/**" />
 
-	<mvc:annotation-driven />
+	<mvc:annotation-driven>
+		<mvc:message-converters>
+			<bean class="org.cloudfoundry.identity.uaa.login.AutologinController.AutologinRequestConverter" />
+		</mvc:message-converters>
+	</mvc:annotation-driven>
 
 	<mvc:default-servlet-handler />
 
