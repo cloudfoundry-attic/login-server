@@ -6,15 +6,22 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.security.Principal;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.cloudfoundry.identity.uaa.social.SocialClientUserDetails;
+import org.cloudfoundry.identity.uaa.util.UaaStringUtils;
+import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -24,6 +31,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.client.OAuth2RestTemplate;
 import org.springframework.security.oauth2.common.exceptions.OAuth2Exception;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -38,6 +46,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.client.DefaultResponseErrorHandler;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.request.ServletWebRequest;
@@ -66,6 +75,10 @@ public class RemoteUaaController {
 
 	private static String DEFAULT_BASE_UAA_URL = "https://uaa.cloudfoundry.com";
 
+	private Properties gitProperties = new Properties();
+
+	private Properties buildProperties = new Properties();
+
 	private RestTemplate defaultTemplate = new RestTemplate();
 
 	private RestOperations authorizationTemplate = new RestTemplate();
@@ -91,6 +104,18 @@ public class RemoteUaaController {
 			}
 		});
 		setUaaBaseUrl(DEFAULT_BASE_UAA_URL);
+		try {
+			gitProperties = PropertiesLoaderUtils.loadAllProperties("git.properties");
+		}
+		catch (IOException e) {
+			// Ignore
+		}
+		try {
+			buildProperties = PropertiesLoaderUtils.loadAllProperties("build.properties");
+		}
+		catch (IOException e) {
+			// Ignore
+		}
 	}
 
 	/**
@@ -110,16 +135,33 @@ public class RemoteUaaController {
 	public String prompts(HttpServletRequest request, @RequestHeader HttpHeaders headers, Model model,
 			Principal principal) throws Exception {
 		String path = extractPath(request);
-		@SuppressWarnings("rawtypes")
-		ResponseEntity<Map> response = defaultTemplate.exchange(baseUrl + "/" + path, HttpMethod.GET,
-				new HttpEntity<Void>(null, getRequestHeaders(headers)), Map.class);
-		@SuppressWarnings("unchecked")
-		Map<String, Object> body = (Map<String, Object>) response.getBody();
-		model.addAllAttributes(body);
+		model.addAllAttributes(getLoginInfo(baseUrl + "/" + path, getRequestHeaders(headers)));
+		model.addAllAttributes(getBuildInfo());
 		if (principal == null) {
 			return "login";
 		}
 		return "home";
+	}
+
+	private Map<String, ?> getBuildInfo() {
+		Map<String, Object> model = new HashMap<String, Object>();
+		model.put("commit_id", gitProperties.getProperty("git.commit.id.abbrev", "UNKNOWN"));
+		model.put(
+				"timestamp",
+				gitProperties.getProperty("git.commit.time",
+						new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date())));
+		model.put("app", UaaStringUtils.getMapFromProperties(buildProperties, "build."));
+		model.put("uaa", baseUrl);
+		return model;
+	}
+
+	private Map<String, Object> getLoginInfo(String baseUrl, HttpHeaders headers) {
+		@SuppressWarnings("rawtypes")
+		ResponseEntity<Map> response = defaultTemplate.exchange(baseUrl, HttpMethod.GET, new HttpEntity<Void>(null,
+				headers), Map.class);
+		@SuppressWarnings("unchecked")
+		Map<String, Object> body = (Map<String, Object>) response.getBody();
+		return body;
 	}
 
 	@RequestMapping(value = "/oauth/authorize", params = "response_type", method = RequestMethod.GET)
@@ -141,8 +183,23 @@ public class RemoteUaaController {
 		requestHeaders.remove("Cookie");
 
 		@SuppressWarnings("rawtypes")
-		ResponseEntity<Map> response = authorizationTemplate.exchange(baseUrl + "/" + path, HttpMethod.POST,
-				new HttpEntity<MultiValueMap<String, String>>(map, requestHeaders), Map.class);
+		ResponseEntity<Map> response;
+
+		try {
+			response = authorizationTemplate.exchange(baseUrl + "/" + path, HttpMethod.POST,
+					new HttpEntity<MultiValueMap<String, String>>(map, requestHeaders), Map.class);
+		}
+		catch (RuntimeException e) {
+			// Defensive workaround for SECOAUTH-335
+			if (authorizationTemplate instanceof OAuth2RestTemplate) {
+				((OAuth2RestTemplate) authorizationTemplate).getOAuth2ClientContext().setAccessToken(null);
+				response = authorizationTemplate.exchange(baseUrl + "/" + path, HttpMethod.POST,
+						new HttpEntity<MultiValueMap<String, String>>(map, requestHeaders), Map.class);
+			}
+			else {
+				throw e;
+			}
+		}
 
 		saveCookie(response.getHeaders(), model);
 
@@ -152,11 +209,16 @@ public class RemoteUaaController {
 			// User approval is required
 			logger.debug("Response: " + body);
 			model.putAll(body);
+			if (!body.containsKey("options")) {
+				throw new OAuth2Exception("No options returned from UAA for user approval");
+			}
+			logger.info("Approval required in /oauth/authorize for: " + principal.getName());
 			return new ModelAndView("access_confirmation", model);
 		}
 
 		String location = response.getHeaders().getFirst("Location");
 		if (location != null) {
+			logger.info("Redirect in /oauth/authorize for: " + principal.getName());
 			return new ModelAndView(new RedirectView(location));
 		}
 
@@ -172,18 +234,60 @@ public class RemoteUaaController {
 		return passthru(request, entity, model);
 	}
 
-	@RequestMapping(value = "/oauth/**", method = RequestMethod.POST)
+	@RequestMapping(value = "/oauth/authorize", method = RequestMethod.POST, params = "credentials")
 	@ResponseBody
-	public ResponseEntity<byte[]> post(HttpServletRequest request, HttpEntity<byte[]> entity,
-			Map<String, Object> model, SessionStatus sessionStatus) throws Exception {
+	public ResponseEntity<byte[]> implicitOld(HttpServletRequest request, HttpEntity<byte[]> entity,
+			Map<String, Object> model) throws Exception {
+		logger.info("Direct authentication request with JSON credentials at /oauth/authorize");
 		return passthru(request, entity, model);
+	}
+
+	@RequestMapping(value = "/oauth/authorize", method = RequestMethod.POST, params = "source=credentials")
+	@ResponseBody
+	public ResponseEntity<byte[]> implicit(HttpServletRequest request, HttpEntity<byte[]> entity,
+			Map<String, Object> model) throws Exception {
+		logger.info("Direct authentication request at /oauth/authorize for " + request.getParameter("username"));
+		return passthru(request, entity, model);
+	}
+
+	@RequestMapping(value = { "/oauth/error", "oauth/token" })
+	@ResponseBody
+	public ResponseEntity<byte[]> sundry(HttpServletRequest request, HttpEntity<byte[]> entity,
+			Map<String, Object> model) throws Exception {
+		logger.info("Pass through request for " + request.getServletPath());
+		return passthru(request, entity, model);
+	}
+
+	// We do not map /oauth/confirm_access because we want to remove the remote session cookie in approveOrDeny
+	@RequestMapping(value = "/oauth/**")
+	@ResponseBody
+	public ResponseEntity<byte[]> invalid(HttpServletRequest request) throws Exception {
+		throw new OAuth2Exception("no matching handler for request: " + request.getServletPath());
 	}
 
 	@ExceptionHandler(OAuth2Exception.class)
 	public ModelAndView handleOAuth2Exception(OAuth2Exception e, ServletWebRequest webRequest) throws Exception {
 		logger.info("OAuth2 error" + e.getSummary());
 		webRequest.getResponse().setStatus(e.getHttpErrorCode());
-		return new ModelAndView("forward:/home", Collections.singletonMap("error", e));
+		return new ModelAndView("forward:/home", Collections.singletonMap("error", e.getSummary()));
+	}
+
+	@ExceptionHandler(ResourceAccessException.class)
+	public ModelAndView handleRestClientException(ResourceAccessException e) throws Exception {
+		logger.info("Rest client error" + e.getMessage());
+		HttpHeaders headers = new HttpHeaders();
+		headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+		Map<String, Object> model = new HashMap<String, Object>();
+		Map<String, String[]> prompts = new LinkedHashMap<String, String[]>();
+		prompts.put("username", new String[] { "text", "Email" });
+		prompts.put("password", new String[] { "password", "Password" });
+		model.put("prompts", prompts);
+		model.putAll(getBuildInfo());
+		Map<String, String> error = new LinkedHashMap<String, String>();
+		error.put("error", "rest_client_error");
+		error.put("error_description", e.getMessage());
+		model.put("error", error);
+		return new ModelAndView("login", model);
 	}
 
 	private void saveCookie(HttpHeaders headers, Map<String, Object> model) {
@@ -246,8 +350,9 @@ public class RemoteUaaController {
 			requestHeaders.set("Cookie", cookie);
 		}
 
-		ResponseEntity<byte[]> response = defaultTemplate.exchange(baseUrl + "/" + path, HttpMethod.POST,
-				new HttpEntity<byte[]>(entity.getBody(), requestHeaders), byte[].class);
+		ResponseEntity<byte[]> response = defaultTemplate.exchange(baseUrl + "/" + path,
+				HttpMethod.valueOf(request.getMethod()), new HttpEntity<byte[]>(entity.getBody(), requestHeaders),
+				byte[].class);
 		HttpHeaders outgoingHeaders = getResponseHeaders(response.getHeaders());
 		return new ResponseEntity<byte[]>(response.getBody(), outgoingHeaders, response.getStatusCode());
 

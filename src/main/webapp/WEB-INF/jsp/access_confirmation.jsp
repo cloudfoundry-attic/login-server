@@ -20,6 +20,7 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 
 <c:url var="baseUrl" value="/resources" />
+<c:url var="authorizeUrl" value="/oauth/authorize" />
 <c:set value="www.cloudfoundry.com" var="hostName" />
 
 <!DOCTYPE html>
@@ -44,6 +45,7 @@
 	rel='stylesheet' type='text/css' />
 <link href='${baseUrl}/stylesheets/login.css' media='screen'
 	rel='stylesheet' type='text/css' />
+<!--[if IE 9 ]> <link href="${baseUrl}/stylesheets/ie9.css" media="screen" rel="stylesheet" type="text/css" /> <![endif]-->
 <!--[if lt IE 9 ]> <link href="${baseUrl}/stylesheets/ie.css" media="screen" rel="stylesheet" type="text/css" /> <![endif]-->
 <!--[if lt IE 8 ]> <link href="${baseUrl}/stylesheets/ie7.css" media="screen" rel="stylesheet" type="text/css" /> <![endif]-->
 <style media='screen' type='text/css'>
@@ -99,46 +101,51 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 		</div>
 		<div class="splash-box">
 			<c:if test="${error!=null}">
-				<div class="error">
-					<h2>Sorry there was an error</h2>
-					<p>${error}</p>
+				<div class="error" title="${fn:escapeXml(error)}">
+					<h2>Sorry</h2>
+					<p>There was an error. The request for authorization was
+						invalid.</p>
 				</div>
 			</c:if>
 
-			<h2>Please Confirm</h2>
+			<c:if test="${error==null}">
 
-			<div class="confirm">
-				<p>
-					Do you authorize the application '${client.client_id}' at <a
-						href="${redirect_uri}">${redirect_uri}</a> to access your Cloud
-					Foundry resources?
-				</p>
-				<ul>
-					<c:forEach items="${scopes}" var="scope">
-						<li><spring:message code="${scope['code']}"
-								text="${scope['text']}" /></li>
-					</c:forEach>
-				</ul>
-				<p>If you do not recognize the application or the URL in the
-					link above you should deny access.</p>
-			</div>
+				<h2>Please Confirm</h2>
 
-			<form id="confirmationForm" name="confirmationForm"
-				action="${options.confirm.path}" method="POST">
-				<input name="${options.confirm.key}"
-					value="${options.confirm.value}" type="hidden" />
-				<div class="buttons">
-					<button class="orange-button" type="submit">Authorize</button>
+				<div class="confirm">
+					<p>
+						Do you authorize the application '${client.client_id}' at <a
+							href="${redirect_uri}">${redirect_uri}</a> to access your
+						CloudFoundry.com resources?
+					</p>
+					<ul>
+						<c:forEach items="${scopes}" var="scope">
+							<li><spring:message code="${scope['code']}"
+									text="${scope['text']}" /></li>
+						</c:forEach>
+					</ul>
+					<p>If you do not recognize the application or the URL in the
+						link above you should deny access.</p>
 				</div>
-			</form>
-			<form id="denialForm" name="denialForm" action="${options.deny.path}"
-				method="POST">
-				<input name="${options.deny.key}" value="${options.deny.value}"
-					type="hidden" />
-				<div class="buttons">
-					<button class="gray-button" type="submit">Deny</button>
-				</div>
-			</form>
+
+				<form id="confirmationForm" name="confirmationForm"
+					action="${authorizeUrl}" method="POST">
+					<input name="${options.confirm.key}"
+						value="${options.confirm.value}" type="hidden" />
+					<div class="buttons">
+						<button class="orange-button" type="submit">Authorize</button>
+					</div>
+				</form>
+				<form id="denialForm" name="denialForm" action="${authorizeUrl}"
+					method="POST">
+					<input name="${options.deny.key}" value="${options.deny.value}"
+						type="hidden" />
+					<div class="buttons">
+						<button class="gray-button" type="submit">Deny</button>
+					</div>
+				</form>
+
+			</c:if>
 
 		</div>
 		<div class="footer"

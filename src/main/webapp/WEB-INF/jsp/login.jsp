@@ -45,6 +45,7 @@
 	rel='stylesheet' type='text/css' />
 <link href='${baseUrl}/stylesheets/login.css' media='screen'
 	rel='stylesheet' type='text/css' />
+<!--[if IE 9 ]> <link href="${baseUrl}/stylesheets/ie9.css" media="screen" rel="stylesheet" type="text/css" /> <![endif]-->
 <!--[if lt IE 9 ]> <link href="${baseUrl}/stylesheets/ie.css" media="screen" rel="stylesheet" type="text/css" /> <![endif]-->
 <!--[if lt IE 8 ]> <link href="${baseUrl}/stylesheets/ie7.css" media="screen" rel="stylesheet" type="text/css" /> <![endif]-->
 <style media='screen' type='text/css'>
@@ -102,20 +103,22 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 								password.</div>
 						</c:if>
 						<c:forEach items="${prompts}" var="prompt">
+							<spring:message code="prompt.${prompt.key}"
+									text="${prompt.value[1]}" var="text"/>
 							<input id='${prompt.key}' type='${prompt.value[0]}'
-								name='${prompt.key}' placeholder='${prompt.value[1]}' />
+								name='${prompt.key}' placeholder='${text}' />
 						</c:forEach>
 					</div>
 					<button type="submit" class="orange-button">Sign in</button>
 					<span class="button-alt"> <a class="question passwd"
 						target="_blank" href="https://${hostName}/passwd">Forgot your
-							password</a>
-					</span>
+							password</a></span><br/><br/>
 				</form>
+				<p>Don't have an account? <a href="https://${hostName}/signup">Register here.</a></p>
 			</article>
 		</div>
 		<div class="footer"
-			title="Commit: ${commit_id}, Timestamp: ${timestamp}">
+			title="Version: ${app.version}, Commit: ${commit_id}, Timestamp: ${timestamp}, UAA: ${uaa}">
 			Copyright &copy;
 			<fmt:formatDate value="<%=new java.util.Date()%>" pattern="yyyy" />
 			VMware, Inc. All rights reserved.
