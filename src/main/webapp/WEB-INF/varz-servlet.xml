@@ -18,7 +18,11 @@
 
 	<context:mbean-server id="mbeanServer" />
 	
-	<security:http pattern="/healthz/**" security="none"/>
+	<http pattern="/healthz/**" create-session="stateless" entry-point-ref="authenticationEntryPoint"
+		security-context-repository-ref="securityContextRepository" xmlns="http://www.springframework.org/schema/security">
+		<intercept-url pattern="/**" access="IS_AUTHENTICATED_ANONYMOUSLY" />
+		<anonymous enabled="true" />
+	</http>
 
 	<http pattern="/varz/**" create-session="stateless" entry-point-ref="authenticationEntryPoint"
 		security-context-repository-ref="securityContextRepository" xmlns="http://www.springframework.org/schema/security">
@@ -56,6 +60,8 @@
 		<property name="alwaysUseFullPath" value="true"/>
 		<property name="order" value="-1"/>
 	</bean>
+
+	<bean id="healthzEndpoint" class="org.cloudfoundry.identity.uaa.varz.HealthzEndpoint"/>
 
 	<bean id="varzEndpoint" class="org.cloudfoundry.identity.uaa.varz.VarzEndpoint">
 		<property name="server" ref="mbeanServer" />
