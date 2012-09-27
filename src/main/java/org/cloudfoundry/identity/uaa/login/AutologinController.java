@@ -70,7 +70,7 @@ public class AutologinController {
 
 	@RequestMapping(value = "/autologin", method = RequestMethod.POST)
 	@ResponseBody
-	public AutologinResponse implicit(@RequestBody AutologinRequest request) throws Exception {
+	public AutologinResponse generateAutologinCode(@RequestBody AutologinRequest request) throws Exception {
 		String username = request.getUsername();
 		if (username == null) {
 			throw new BadCredentialsException("No username in request");
@@ -151,9 +151,7 @@ public class AutologinController {
 		@Override
 		protected AutologinRequest readInternal(Class<? extends AutologinRequest> clazz, HttpInputMessage inputMessage)
 				throws IOException, HttpMessageNotReadableException {
-			@SuppressWarnings("unchecked")
-			MultiValueMap<String, String> map = converter.read(
-					(Class<? extends MultiValueMap<String, ?>>) MultiValueMap.class, inputMessage);
+			MultiValueMap<String, String> map = converter.read(null, inputMessage);
 			String username = map.getFirst("username");
 			String password = map.getFirst("password");
 			AutologinRequest result = new AutologinRequest();
