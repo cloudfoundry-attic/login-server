@@ -1,0 +1,6 @@
+uaa:
+  url: http://localhost:8000/uaa
+  token:
+    url: http://localhost:8000/uaa/oauth/token
+  login:
+    url: http://localhost:8000/uaa/login.do
