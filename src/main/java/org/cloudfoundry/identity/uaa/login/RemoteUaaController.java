@@ -14,8 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.cloudfoundry.identity.uaa.openid2.UaaUserDetails;
-import org.cloudfoundry.identity.uaa.user.UaaUser;
+import org.cloudfoundry.identity.uaa.social.SocialClientUserDetails;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -201,10 +200,11 @@ public class RemoteUaaController {
 		appendField(login, "username", principal.getName());
 		if (principal instanceof Authentication) {
 			Object details = ((Authentication) principal).getPrincipal();
-			if (details instanceof UaaUserDetails) {
-				UaaUser user = ((UaaUserDetails) details).getUser();
-				appendField(login, "family_name", user.getFamilyName());
-				appendField(login, "given_name", user.getGivenName());
+			if (details instanceof SocialClientUserDetails) {
+				SocialClientUserDetails user = (SocialClientUserDetails) details;
+				appendField(login, "source", user.getSource());
+				appendField(login, "name", user.getName());
+				appendField(login, "external_id", user.getExternalId());
 				appendField(login, "email", user.getEmail());
 			}
 		}

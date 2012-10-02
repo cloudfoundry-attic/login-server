@@ -19,6 +19,10 @@
 
 	<context:property-placeholder properties-ref="applicationProperties" />
 
+	<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+		<property name="basename" value="messages" />
+	</bean>
+
 	<sec:http pattern="/resources/**" security="none" />
 	<sec:http pattern="/favicon.ico" security="none" />
 	<sec:http pattern="/login" security="none" />
@@ -50,26 +54,23 @@
 		<logout logout-success-url="/" logout-url="/logout.do" />
 	</http>
 
-	<http xmlns="http://www.springframework.org/schema/security">
+	<http xmlns="http://www.springframework.org/schema/security" entry-point-ref="loginEntryPoint"
+		disable-url-rewriting="true">
 		<intercept-url pattern="/**" access="IS_AUTHENTICATED_FULLY" />
-		<openid-login login-page="/login" user-service-ref="openIdUserDetailsService" authentication-failure-url="/login?error=true">
-			<attribute-exchange identifier-match=".*myopenid.com.*">
-				<openid-attribute name="email" type="http://schema.openid.net/contact/email" required="true" />
-				<openid-attribute name="fullname" type="http://schema.openid.net/namePerson" required="true" />
-			</attribute-exchange>
-			<attribute-exchange identifier-match=".*">
-				<openid-attribute name="email" type="http://axschema.org/contact/email" required="true" count="1" />
-				<openid-attribute name="firstname" type="http://axschema.org/namePerson/first" required="true" />
-				<openid-attribute name="lastname" type="http://axschema.org/namePerson/last" required="true" />
-				<openid-attribute name="fullname" type="http://axschema.org/namePerson" required="true" />
-			</attribute-exchange>
-		</openid-login>
 		<anonymous enabled="false" />
+		<logout success-handler-ref="logoutHandler"/>
 	</http>
 
-	<bean id="openIdUserDetailsService" class="org.cloudfoundry.identity.uaa.openid2.OpenIdUserDetailsService" />
-	
 	<authentication-manager xmlns="http://www.springframework.org/schema/security"/>
+
+	<bean id="logoutHandler" class="org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler">
+		<property name="targetUrlParameter" value="redirect"/>
+		<property name="defaultTargetUrl" value="/login"/>
+	</bean>
+
+	<bean id="loginEntryPoint" class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
+		<constructor-arg value="/login" />
+	</bean>
 
 	<bean id="remoteAuthenticationManager" class="org.cloudfoundry.identity.uaa.login.RemoteUaaAuthenticationManager">
 		<property name="loginUrl" value="${uaa.login.url:http://localhost:8080/uaa/login.do}" />
