@@ -19,6 +19,10 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.params.ClientPNames;
+import org.apache.http.client.params.CookiePolicy;
 import org.cloudfoundry.identity.uaa.social.SocialClientUserDetails;
 import org.cloudfoundry.identity.uaa.util.UaaStringUtils;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
@@ -74,6 +78,8 @@ public class RemoteUaaController {
 
 	private static final String HOST = "Host";
 
+	private static final String COOKIE = "Cookie";
+
 	private static String DEFAULT_BASE_UAA_URL = "https://uaa.cloudfoundry.com";
 
 	private Properties gitProperties = new Properties();
@@ -93,11 +99,27 @@ public class RemoteUaaController {
 	 */
 	public void setAuthorizationTemplate(RestOperations authorizationTemplate) {
 		this.authorizationTemplate = authorizationTemplate;
+		if (authorizationTemplate instanceof RestTemplate) {
+			((RestTemplate) authorizationTemplate).setRequestFactory(new HttpComponentsClientHttpRequestFactory() {
+				@Override
+				protected void postProcessHttpRequest(HttpUriRequest request) {
+					super.postProcessHttpRequest(request);
+					request.getParams().setParameter(ClientPNames.COOKIE_POLICY, CookiePolicy.IGNORE_COOKIES);
+				}
+			});
+		}
 	}
 
 	public RemoteUaaController() {
 		// The default java.net client doesn't allow you to handle 4xx responses
-		defaultTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
+		defaultTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory() {
+			@Override
+			public HttpClient getHttpClient() {
+				HttpClient client = super.getHttpClient();
+				client.getParams().setParameter(ClientPNames.COOKIE_POLICY, CookiePolicy.IGNORE_COOKIES);
+				return client;
+			}
+		});
 		defaultTemplate.setErrorHandler(new DefaultResponseErrorHandler() {
 			public boolean hasError(ClientHttpResponse response) throws IOException {
 				HttpStatus statusCode = response.getStatusCode();
@@ -107,14 +129,12 @@ public class RemoteUaaController {
 		setUaaBaseUrl(DEFAULT_BASE_UAA_URL);
 		try {
 			gitProperties = PropertiesLoaderUtils.loadAllProperties("git.properties");
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			// Ignore
 		}
 		try {
 			buildProperties = PropertiesLoaderUtils.loadAllProperties("build.properties");
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			// Ignore
 		}
 	}
@@ -126,8 +146,7 @@ public class RemoteUaaController {
 		this.baseUrl = baseUrl;
 		try {
 			this.uaaHost = new URI(baseUrl).getHost();
-		}
-		catch (URISyntaxException e) {
+		} catch (URISyntaxException e) {
 			throw new IllegalArgumentException("Could not extract host from URI: " + baseUrl);
 		}
 	}
@@ -183,7 +202,8 @@ public class RemoteUaaController {
 		requestHeaders.putAll(getRequestHeaders(headers));
 		requestHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 		requestHeaders.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-		requestHeaders.remove("Cookie");
+		requestHeaders.remove(COOKIE);
+		requestHeaders.remove(COOKIE.toLowerCase());
 
 		@SuppressWarnings("rawtypes")
 		ResponseEntity<Map> response;
@@ -191,15 +211,13 @@ public class RemoteUaaController {
 		try {
 			response = authorizationTemplate.exchange(baseUrl + "/" + path, HttpMethod.POST,
 					new HttpEntity<MultiValueMap<String, String>>(map, requestHeaders), Map.class);
-		}
-		catch (RuntimeException e) {
+		} catch (RuntimeException e) {
 			// Defensive workaround for SECOAUTH-335
 			if (authorizationTemplate instanceof OAuth2RestTemplate) {
 				((OAuth2RestTemplate) authorizationTemplate).getOAuth2ClientContext().setAccessToken(null);
 				response = authorizationTemplate.exchange(baseUrl + "/" + path, HttpMethod.POST,
 						new HttpEntity<MultiValueMap<String, String>>(map, requestHeaders), Map.class);
-			}
-			else {
+			} else {
 				throw e;
 			}
 		}
@@ -327,8 +345,7 @@ public class RemoteUaaController {
 			quote(login, key).append(":");
 			if (value instanceof CharSequence) {
 				quote(login, (CharSequence) value);
-			}
-			else {
+			} else {
 				login.append(value);
 			}
 		}
@@ -346,6 +363,8 @@ public class RemoteUaaController {
 
 		HttpHeaders requestHeaders = new HttpHeaders();
 		requestHeaders.putAll(getRequestHeaders(entity.getHeaders()));
+		requestHeaders.remove(COOKIE);
+		requestHeaders.remove(COOKIE.toLowerCase());
 		// Get back end cookie if saved in session
 		String cookie = (String) model.get("cookie");
 		if (cookie != null) {
@@ -367,9 +386,11 @@ public class RemoteUaaController {
 		outgoingHeaders.putAll(headers);
 		if (headers.getContentLength() >= 0) {
 			outgoingHeaders.remove(CONTENT_LENGTH);
+			outgoingHeaders.remove(CONTENT_LENGTH.toLowerCase());
 		}
 		if (headers.containsKey(TRANSFER_ENCODING)) {
 			outgoingHeaders.remove(TRANSFER_ENCODING);
+			outgoingHeaders.remove(TRANSFER_ENCODING.toLowerCase());
 		}
 		return outgoingHeaders;
 	}
@@ -379,6 +400,7 @@ public class RemoteUaaController {
 		HttpHeaders outgoingHeaders = new HttpHeaders();
 		outgoingHeaders.putAll(headers);
 		outgoingHeaders.remove(HOST);
+		outgoingHeaders.remove(HOST.toLowerCase());
 		outgoingHeaders.set(HOST, uaaHost);
 		logger.debug("Outgoing headers: " + outgoingHeaders);
 		return outgoingHeaders;
@@ -388,8 +410,7 @@ public class RemoteUaaController {
 		String query = request.getQueryString();
 		try {
 			query = query == null ? "" : "?" + URLDecoder.decode(query, "UTF-8");
-		}
-		catch (UnsupportedEncodingException e) {
+		} catch (UnsupportedEncodingException e) {
 			throw new IllegalStateException("Cannot decode query string: " + query);
 		}
 		String path = request.getRequestURI() + query;

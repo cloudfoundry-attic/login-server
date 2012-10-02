@@ -165,7 +165,7 @@
 	</bean>
 
 	<bean id="remoteAuthenticationManager" class="org.cloudfoundry.identity.uaa.login.RemoteUaaAuthenticationManager">
-		<property name="loginUrl" value="${uaa.login.url:http://localhost:8080/uaa/login.do}" />
+		<property name="loginUrl" value="${uaa.login.url:http://localhost:8001/uaa/login.do}" />
 	</bean>
 
 	<mvc:resources location="/" mapping="/**" />
@@ -204,18 +204,15 @@
 	</bean>
 
 	<bean id="uaaController" class="org.cloudfoundry.identity.uaa.login.RemoteUaaController">
-		<property name="uaaBaseUrl" value="${uaa.url:http://localhost:8080/uaa}" />
+		<property name="uaaBaseUrl" value="${uaa.url:http://localhost:8001/uaa}" />
 		<property name="authorizationTemplate">
 			<bean class="org.springframework.security.oauth2.client.OAuth2RestTemplate">
 				<constructor-arg ref="uaa" />
-				<property name="requestFactory">
-					<bean class="org.springframework.http.client.HttpComponentsClientHttpRequestFactory" />
-				</property>
 			</bean>
 		</property>
 	</bean>
 
-	<oauth:resource id="uaa" access-token-uri="${uaa.token.url:http://localhost:8080/uaa/oauth/token}"
+	<oauth:resource id="uaa" access-token-uri="${uaa.token.url:http://localhost:8001/uaa/oauth/token}"
 		client-id="login" client-secret="${LOGIN_SECRET:loginsecret}" type="client_credentials" />
 
 </beans>
