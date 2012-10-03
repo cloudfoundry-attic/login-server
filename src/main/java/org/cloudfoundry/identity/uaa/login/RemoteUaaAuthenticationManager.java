@@ -83,8 +83,6 @@ public class RemoteUaaAuthenticationManager implements AuthenticationManager {
 	@Override
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
 
-		logger.debug("Processing authentication request for " + authentication.getName());
-
 		String username = authentication.getName();
 		String password = (String) authentication.getCredentials();
 
@@ -99,10 +97,12 @@ public class RemoteUaaAuthenticationManager implements AuthenticationManager {
 			String location = response.getHeaders().getLocation().toString();
 			// Successful authentication redirects to the home page with no error
 			if (!location.contains("error=true")) {
+				logger.info("Successful authentication request for " + authentication.getName());
 				return new UsernamePasswordAuthenticationToken(username, password, UaaAuthority.USER_AUTHORITIES);
 			}
 		}
 
+		logger.info("Failed authentication request");
 		throw new BadCredentialsException("Could not authenticate with remote server");
 
 	}

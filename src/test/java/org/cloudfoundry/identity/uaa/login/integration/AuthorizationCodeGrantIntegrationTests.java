@@ -79,9 +79,10 @@ public class AuthorizationCodeGrantIntegrationTests {
 
 		ResponseEntity<String> response = serverRunning.getForString(location, headers);
 		// should be directed to the login screen...
-		assertTrue(response.getBody().contains("/login.do"));
-		assertTrue(response.getBody().contains("username"));
-		assertTrue(response.getBody().contains("password"));
+		String body = response.getBody();
+		assertTrue(body.contains("/login.do"));
+		assertTrue(body.contains("username"));
+		assertTrue(body.contains("password"));
 
 		MultiValueMap<String, String> formData = new LinkedMultiValueMap<String, String>();
 		formData.add("username", testAccounts.getUserName());
@@ -98,7 +99,7 @@ public class AuthorizationCodeGrantIntegrationTests {
 
 		response = serverRunning.getForString(result.getHeaders().getLocation().toString(), headers);
 		if (response.getStatusCode() == HttpStatus.OK) {
-			String body = response.getBody();
+			body = response.getBody();
 			// The grant access page should be returned
 			assertTrue(body.contains("Do you authorize"));
 			// Forms should have the right action
