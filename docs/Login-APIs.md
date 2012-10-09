@@ -156,7 +156,7 @@ or reset user's passwords it is convenient to be able to log them in
 immediately, rather than waiting for them to come back to the Login
 Server and enter the new password explicitly.
 
-1. Client POSTs user credentials and OAuth bearer token to `/autologin`
+1. Client POSTs user credentials to to `/autologin`
 
 2. Login Server responds with autologin code (short-lived, one-time)
 
@@ -177,7 +177,8 @@ logged in for the duration of that session.
 ### Obtain Autologin Code: `POST /autologin`
 
 Gets a short-lived code that can be exchanged for an authentication at
-the Login Server `/oauth/authorize` UI.  The OAuth token
+the Login Server `/oauth/authorize` UI.  The client authenticates
+itself with its secret using an HTTP Basic header.
 
 Request: `POST /autologin`  
 Request Body: Form encoded user credentials  
@@ -186,7 +187,7 @@ Request Body: Form encoded user credentials
 
 Request Headers:  
 
-    Authorization: Bearer <TOKEN>
+    Authorization: Basic <...>
 
 Response Body:
 
