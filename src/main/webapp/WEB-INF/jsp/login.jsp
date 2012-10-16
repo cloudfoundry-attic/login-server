@@ -74,6 +74,13 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 }
 </style>
 <script type="text/javascript" src="${baseUrl}/javascripts/jquery.js"></script>
+<script type="text/javascript" src="${baseUrl}/javascripts/placeholder.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+  $('form:first *:input[type!=hidden]:first').focus();
+
+});
+</script>
 <script type="text/javascript">
 	(function() {
 		// force ssl if cf.com
@@ -103,10 +110,10 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 								password.</div>
 						</c:if>
 						<c:forEach items="${prompts}" var="prompt">
-							<spring:message code="prompt.${prompt.key}"
-									text="${prompt.value[1]}" var="text"/>
-							<input id='${prompt.key}' type='${prompt.value[0]}'
-								name='${prompt.key}' placeholder='${text}' />
+							<label class="input">
+							  <span>${prompt.value[1]}</span>
+							  <input id='${prompt.key}' type='${prompt.value[0]}' name='${prompt.key}' />
+							</label>
 						</c:forEach>
 					</div>
 					<button type="submit" class="orange-button">Sign in</button>
