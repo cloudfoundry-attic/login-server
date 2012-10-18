@@ -129,12 +129,14 @@ public class RemoteUaaController {
 		setUaaBaseUrl(DEFAULT_BASE_UAA_URL);
 		try {
 			gitProperties = PropertiesLoaderUtils.loadAllProperties("git.properties");
-		} catch (IOException e) {
+		}
+		catch (IOException e) {
 			// Ignore
 		}
 		try {
 			buildProperties = PropertiesLoaderUtils.loadAllProperties("build.properties");
-		} catch (IOException e) {
+		}
+		catch (IOException e) {
 			// Ignore
 		}
 	}
@@ -146,7 +148,8 @@ public class RemoteUaaController {
 		this.baseUrl = baseUrl;
 		try {
 			this.uaaHost = new URI(baseUrl).getHost();
-		} catch (URISyntaxException e) {
+		}
+		catch (URISyntaxException e) {
 			throw new IllegalArgumentException("Could not extract host from URI: " + baseUrl);
 		}
 	}
@@ -175,12 +178,28 @@ public class RemoteUaaController {
 		return model;
 	}
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private Map<String, Object> getLoginInfo(String baseUrl, HttpHeaders headers) {
-		@SuppressWarnings("rawtypes")
-		ResponseEntity<Map> response = defaultTemplate.exchange(baseUrl, HttpMethod.GET, new HttpEntity<Void>(null,
-				headers), Map.class);
-		@SuppressWarnings("unchecked")
-		Map<String, Object> body = (Map<String, Object>) response.getBody();
+		ResponseEntity<Map> response = null;
+		try {
+			ResponseEntity<Map> entity = defaultTemplate.exchange(baseUrl, HttpMethod.GET, new HttpEntity<Void>(null,
+					headers), Map.class);
+			response = entity;
+		}
+		catch (Exception e) {
+			// use defaults
+		}
+		Map<String, Object> body = new LinkedHashMap<String, Object>();
+		if (response != null && response.getStatusCode() == HttpStatus.OK) {
+			body.putAll((Map<String, Object>) response.getBody());
+		}
+		else {
+			logger.error("Cannot determine login info from remote server; using defaults");
+			Map<String, String[]> prompts = new LinkedHashMap<String, String[]>();
+			prompts.put("username", new String[] { "text", "Email" });
+			prompts.put("password", new String[] { "password", "Password" });
+			body.put("prompts", prompts);
+		}
 		return body;
 	}
 
@@ -194,7 +213,8 @@ public class RemoteUaaController {
 		map.setAll(parameters);
 		if (principal != null) {
 			map.set("login", getLoginCredentials(principal));
-		} else {
+		}
+		else {
 			throw new BadCredentialsException("No principal found in authorize endpoint");
 		}
 
@@ -211,13 +231,15 @@ public class RemoteUaaController {
 		try {
 			response = authorizationTemplate.exchange(baseUrl + "/" + path, HttpMethod.POST,
 					new HttpEntity<MultiValueMap<String, String>>(map, requestHeaders), Map.class);
-		} catch (RuntimeException e) {
+		}
+		catch (RuntimeException e) {
 			// Defensive workaround for SECOAUTH-335
 			if (authorizationTemplate instanceof OAuth2RestTemplate) {
 				((OAuth2RestTemplate) authorizationTemplate).getOAuth2ClientContext().setAccessToken(null);
 				response = authorizationTemplate.exchange(baseUrl + "/" + path, HttpMethod.POST,
 						new HttpEntity<MultiValueMap<String, String>>(map, requestHeaders), Map.class);
-			} else {
+			}
+			else {
 				throw e;
 			}
 		}
@@ -299,10 +321,7 @@ public class RemoteUaaController {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
 		Map<String, Object> model = new HashMap<String, Object>();
-		Map<String, String[]> prompts = new LinkedHashMap<String, String[]>();
-		prompts.put("username", new String[] { "text", "Email" });
-		prompts.put("password", new String[] { "password", "Password" });
-		model.put("prompts", prompts);
+		model.putAll(getLoginInfo(baseUrl + "/login", getRequestHeaders(headers)));
 		model.putAll(getBuildInfo());
 		Map<String, String> error = new LinkedHashMap<String, String>();
 		error.put("error", "rest_client_error");
@@ -345,7 +364,8 @@ public class RemoteUaaController {
 			quote(login, key).append(":");
 			if (value instanceof CharSequence) {
 				quote(login, (CharSequence) value);
-			} else {
+			}
+			else {
 				login.append(value);
 			}
 		}
@@ -410,7 +430,8 @@ public class RemoteUaaController {
 		String query = request.getQueryString();
 		try {
 			query = query == null ? "" : "?" + URLDecoder.decode(query, "UTF-8");
-		} catch (UnsupportedEncodingException e) {
+		}
+		catch (UnsupportedEncodingException e) {
 			throw new IllegalStateException("Cannot decode query string: " + query);
 		}
 		String path = request.getRequestURI() + query;
