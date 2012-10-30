@@ -154,7 +154,7 @@ public class RemoteUaaController {
 		}
 	}
 
-	@RequestMapping(value = { "/login", "/login_info" }, method = RequestMethod.GET)
+	@RequestMapping(value = { "/login", "/info" }, method = RequestMethod.GET)
 	public String prompts(HttpServletRequest request, @RequestHeader HttpHeaders headers, Model model,
 			Principal principal) throws Exception {
 		String path = extractPath(request);
@@ -212,7 +212,8 @@ public class RemoteUaaController {
 		MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
 		map.setAll(parameters);
 		if (principal != null) {
-			map.set("login", getLoginCredentials(principal));
+			map.set("source", "login");
+			map.setAll(getLoginCredentials(principal));
 		}
 		else {
 			throw new BadCredentialsException("No principal found in authorize endpoint");
@@ -339,41 +340,25 @@ public class RemoteUaaController {
 		}
 	}
 
-	private String getLoginCredentials(Principal principal) {
-		StringBuilder login = new StringBuilder("{");
+	private Map<String, String> getLoginCredentials(Principal principal) {
+		Map<String, String> login = new LinkedHashMap<String, String>();
 		appendField(login, "username", principal.getName());
 		if (principal instanceof Authentication) {
 			Object details = ((Authentication) principal).getPrincipal();
 			if (details instanceof SocialClientUserDetails) {
 				SocialClientUserDetails user = (SocialClientUserDetails) details;
-				appendField(login, "source", user.getSource());
 				appendField(login, "name", user.getName());
 				appendField(login, "external_id", user.getExternalId());
 				appendField(login, "email", user.getEmail());
 			}
 		}
-		login.append("}");
-		return login.toString();
-	}
-
-	private void appendField(StringBuilder login, String key, Object value) {
-		if (value != null) {
-			if (login.length() > 1) {
-				login.append(",");
-			}
-			quote(login, key).append(":");
-			if (value instanceof CharSequence) {
-				quote(login, (CharSequence) value);
-			}
-			else {
-				login.append(value);
-			}
-		}
-	}
-
-	private StringBuilder quote(StringBuilder login, CharSequence string) {
-		login.append("\"").append(string).append("\"");
 		return login;
+	}
+
+	private void appendField(Map<String, String> login, String key, Object value) {
+		if (value != null) {
+			login.put(key, value.toString());
+		}
 	}
 
 	private ResponseEntity<byte[]> passthru(HttpServletRequest request, HttpEntity<byte[]> entity,
