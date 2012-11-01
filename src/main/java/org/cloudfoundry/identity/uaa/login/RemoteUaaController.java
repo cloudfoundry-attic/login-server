@@ -94,6 +94,15 @@ public class RemoteUaaController {
 
 	private String uaaHost;
 
+	private Map<String,String> links = new HashMap<String, String>();
+	
+	/**
+	 * @param links the links to set
+	 */
+	public void setLinks(Map<String, String> links) {
+		this.links = links;
+	}
+
 	/**
 	 * @param authorizationTemplate the authorizationTemplate to set
 	 */
@@ -129,12 +138,14 @@ public class RemoteUaaController {
 		setUaaBaseUrl(DEFAULT_BASE_UAA_URL);
 		try {
 			gitProperties = PropertiesLoaderUtils.loadAllProperties("git.properties");
-		} catch (IOException e) {
+		}
+		catch (IOException e) {
 			// Ignore
 		}
 		try {
 			buildProperties = PropertiesLoaderUtils.loadAllProperties("build.properties");
-		} catch (IOException e) {
+		}
+		catch (IOException e) {
 			// Ignore
 		}
 	}
@@ -146,21 +157,31 @@ public class RemoteUaaController {
 		this.baseUrl = baseUrl;
 		try {
 			this.uaaHost = new URI(baseUrl).getHost();
-		} catch (URISyntaxException e) {
+		}
+		catch (URISyntaxException e) {
 			throw new IllegalArgumentException("Could not extract host from URI: " + baseUrl);
 		}
 	}
 
-	@RequestMapping(value = { "/login", "/login_info" }, method = RequestMethod.GET)
+	@RequestMapping(value = { "/login", "/info" }, method = RequestMethod.GET)
 	public String prompts(HttpServletRequest request, @RequestHeader HttpHeaders headers, Model model,
 			Principal principal) throws Exception {
 		String path = extractPath(request);
 		model.addAllAttributes(getLoginInfo(baseUrl + "/" + path, getRequestHeaders(headers)));
 		model.addAllAttributes(getBuildInfo());
+		model.addAttribute("links", getLinksInfo());
 		if (principal == null) {
 			return "login";
 		}
 		return "home";
+	}
+
+	private Map<String,?> getLinksInfo() {
+		Map<String, Object> model = new HashMap<String, Object>();
+		model.put("uaa", baseUrl);
+		model.put("login", baseUrl.replaceAll("uaa", "login"));
+		model.putAll(links);
+		return model;
 	}
 
 	private Map<String, ?> getBuildInfo() {
@@ -171,16 +192,31 @@ public class RemoteUaaController {
 				gitProperties.getProperty("git.commit.time",
 						new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date())));
 		model.put("app", UaaStringUtils.getMapFromProperties(buildProperties, "build."));
-		model.put("uaa", baseUrl);
 		return model;
 	}
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private Map<String, Object> getLoginInfo(String baseUrl, HttpHeaders headers) {
-		@SuppressWarnings("rawtypes")
-		ResponseEntity<Map> response = defaultTemplate.exchange(baseUrl, HttpMethod.GET, new HttpEntity<Void>(null,
-				headers), Map.class);
-		@SuppressWarnings("unchecked")
-		Map<String, Object> body = (Map<String, Object>) response.getBody();
+		ResponseEntity<Map> response = null;
+		try {
+			ResponseEntity<Map> entity = defaultTemplate.exchange(baseUrl, HttpMethod.GET, new HttpEntity<Void>(null,
+					headers), Map.class);
+			response = entity;
+		}
+		catch (Exception e) {
+			// use defaults
+		}
+		Map<String, Object> body = new LinkedHashMap<String, Object>();
+		if (response != null && response.getStatusCode() == HttpStatus.OK) {
+			body.putAll((Map<String, Object>) response.getBody());
+		}
+		else {
+			logger.error("Cannot determine login info from remote server; using defaults");
+			Map<String, String[]> prompts = new LinkedHashMap<String, String[]>();
+			prompts.put("username", new String[] { "text", "Email" });
+			prompts.put("password", new String[] { "password", "Password" });
+			body.put("prompts", prompts);
+		}
 		return body;
 	}
 
@@ -193,8 +229,10 @@ public class RemoteUaaController {
 		MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
 		map.setAll(parameters);
 		if (principal != null) {
-			map.set("login", getLoginCredentials(principal));
-		} else {
+			map.set("source", "login");
+			map.setAll(getLoginCredentials(principal));
+		}
+		else {
 			throw new BadCredentialsException("No principal found in authorize endpoint");
 		}
 
@@ -211,13 +249,15 @@ public class RemoteUaaController {
 		try {
 			response = authorizationTemplate.exchange(baseUrl + "/" + path, HttpMethod.POST,
 					new HttpEntity<MultiValueMap<String, String>>(map, requestHeaders), Map.class);
-		} catch (RuntimeException e) {
+		}
+		catch (RuntimeException e) {
 			// Defensive workaround for SECOAUTH-335
 			if (authorizationTemplate instanceof OAuth2RestTemplate) {
 				((OAuth2RestTemplate) authorizationTemplate).getOAuth2ClientContext().setAccessToken(null);
 				response = authorizationTemplate.exchange(baseUrl + "/" + path, HttpMethod.POST,
 						new HttpEntity<MultiValueMap<String, String>>(map, requestHeaders), Map.class);
-			} else {
+			}
+			else {
 				throw e;
 			}
 		}
@@ -230,6 +270,7 @@ public class RemoteUaaController {
 			// User approval is required
 			logger.debug("Response: " + body);
 			model.putAll(body);
+			model.put("links", getLinksInfo());
 			if (!body.containsKey("options")) {
 				throw new OAuth2Exception("No options returned from UAA for user approval");
 			}
@@ -299,10 +340,7 @@ public class RemoteUaaController {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
 		Map<String, Object> model = new HashMap<String, Object>();
-		Map<String, String[]> prompts = new LinkedHashMap<String, String[]>();
-		prompts.put("username", new String[] { "text", "Email" });
-		prompts.put("password", new String[] { "password", "Password" });
-		model.put("prompts", prompts);
+		model.putAll(getLoginInfo(baseUrl + "/login", getRequestHeaders(headers)));
 		model.putAll(getBuildInfo());
 		Map<String, String> error = new LinkedHashMap<String, String>();
 		error.put("error", "rest_client_error");
@@ -320,40 +358,25 @@ public class RemoteUaaController {
 		}
 	}
 
-	private String getLoginCredentials(Principal principal) {
-		StringBuilder login = new StringBuilder("{");
+	private Map<String, String> getLoginCredentials(Principal principal) {
+		Map<String, String> login = new LinkedHashMap<String, String>();
 		appendField(login, "username", principal.getName());
 		if (principal instanceof Authentication) {
 			Object details = ((Authentication) principal).getPrincipal();
 			if (details instanceof SocialClientUserDetails) {
 				SocialClientUserDetails user = (SocialClientUserDetails) details;
-				appendField(login, "source", user.getSource());
 				appendField(login, "name", user.getName());
 				appendField(login, "external_id", user.getExternalId());
 				appendField(login, "email", user.getEmail());
 			}
 		}
-		login.append("}");
-		return login.toString();
-	}
-
-	private void appendField(StringBuilder login, String key, Object value) {
-		if (value != null) {
-			if (login.length() > 1) {
-				login.append(",");
-			}
-			quote(login, key).append(":");
-			if (value instanceof CharSequence) {
-				quote(login, (CharSequence) value);
-			} else {
-				login.append(value);
-			}
-		}
-	}
-
-	private StringBuilder quote(StringBuilder login, CharSequence string) {
-		login.append("\"").append(string).append("\"");
 		return login;
+	}
+
+	private void appendField(Map<String, String> login, String key, Object value) {
+		if (value != null) {
+			login.put(key, value.toString());
+		}
 	}
 
 	private ResponseEntity<byte[]> passthru(HttpServletRequest request, HttpEntity<byte[]> entity,
@@ -410,7 +433,8 @@ public class RemoteUaaController {
 		String query = request.getQueryString();
 		try {
 			query = query == null ? "" : "?" + URLDecoder.decode(query, "UTF-8");
-		} catch (UnsupportedEncodingException e) {
+		}
+		catch (UnsupportedEncodingException e) {
 			throw new IllegalStateException("Cannot decode query string: " + query);
 		}
 		String path = request.getRequestURI() + query;

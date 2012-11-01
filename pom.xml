@@ -9,12 +9,47 @@
 		<version>1.2.0</version>
 	</parent>
 
-    <groupId>com.cloudfoundry.identity</groupId>
+	<groupId>com.cloudfoundry.identity</groupId>
 	<artifactId>cloudfoundry-login-server</artifactId>
-	<version>1.1.0</version>
+	<version>1.1.1</version>
 	<packaging>war</packaging>
 	<name>Cloud Foundry Login</name>
 	<description>Cloud Foundry Login App</description>
+
+	<url>http://github.com/vmware-ac/login-server</url>
+
+	<issueManagement>
+		<system>JIRA</system>
+		<url>https://rbcon.atlassian.net/browse/CF</url>
+	</issueManagement>
+
+	<developers>
+		<developer>
+			<id>dsyer</id>
+			<name>Dave Syer</name>
+			<email>dsyer@vmware.com</email>
+		</developer>
+		<developer>
+			<id>tekul</id>
+			<name>Luke Taylor</name>
+			<email>ltaylor@vmware.com</email>
+		</developer>
+		<developer>
+			<id>jdsa</id>
+			<name>Joel D'Sa</name>
+			<email>jdsa@vmware.com</email>
+		</developer>
+		<developer>
+			<id>olds</id>
+			<name>Dale Olds</name>
+			<email>olds@vmware.com</email>
+		</developer>
+		<developer>
+			<id>vidya</id>
+			<name>Vidya Valmikinathan</name>
+			<email>vidya@vmware.com</email>
+		</developer>
+	</developers>
 
 	<properties>
 		<m2eclipse.wtp.contextRoot>/login</m2eclipse.wtp.contextRoot>
@@ -50,13 +85,13 @@
 								</configuration>
 							</execution>
 						</executions>
-                        <configuration>
-                            <systemProperties>
-                                <CLOUD_FOUNDRY_CONFIG_PATH>${CLOUD_FOUNDRY_CONFIG_PATH}</CLOUD_FOUNDRY_CONFIG_PATH>
-                                <UAA_PROFILE>local</UAA_PROFILE>
-                            </systemProperties>
-                            <addContextWarDependencies>true</addContextWarDependencies>
-                        </configuration>
+						<configuration>
+							<systemProperties>
+								<CLOUD_FOUNDRY_CONFIG_PATH>${CLOUD_FOUNDRY_CONFIG_PATH}</CLOUD_FOUNDRY_CONFIG_PATH>
+								<UAA_PROFILE>local</UAA_PROFILE>
+							</systemProperties>
+							<addContextWarDependencies>true</addContextWarDependencies>
+						</configuration>
 					</plugin>
 				</plugins>
 			</build>

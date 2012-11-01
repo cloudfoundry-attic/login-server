@@ -25,11 +25,9 @@
 
 	<sec:http pattern="/resources/**" security="none" />
 	<sec:http pattern="/favicon.ico" security="none" />
-	<sec:http pattern="/varz/**" security="none" />
-	<sec:http pattern="/varz" security="none" />
 	<sec:http pattern="/healthz" security="none" />
 	<sec:http pattern="/login" security="none" />
-	<sec:http pattern="/login_info" security="none" />
+	<sec:http pattern="/info" security="none" />
 	<sec:http pattern="/oauth/token" security="none" />
 
 	<http pattern="/autologin" create-session="stateless" entry-point-ref="basicAuthenticationEntryPoint"
@@ -165,7 +163,7 @@
 	</bean>
 
 	<bean id="remoteAuthenticationManager" class="org.cloudfoundry.identity.uaa.login.RemoteUaaAuthenticationManager">
-		<property name="loginUrl" value="${uaa.login.url:http://localhost:8001/uaa/login.do}" />
+		<property name="loginUrl" value="${uaa.login.url:http://localhost:8080/uaa/login.do}" />
 	</bean>
 
 	<mvc:resources location="/" mapping="/**" />
@@ -195,8 +193,16 @@
 			<bean class="org.springframework.web.servlet.view.json.MappingJacksonJsonView" />
 		</property>
 	</bean>
+	
+	<util:map id="links">
+		<entry key="home" value="${links.home:https://www.cloudfoundry.com}"/>
+		<entry key="passwd" value="${links.passwd:https://www.cloudfoundry.com/passwd}"/>
+		<entry key="register" value="${links.signup:https://www.cloudfoundry.com/signup}"/>
+	</util:map>
 
-	<bean id="homeController" class="org.cloudfoundry.identity.uaa.login.HomeController" />
+	<bean id="homeController" class="org.cloudfoundry.identity.uaa.login.HomeController">
+		<property name="links" ref="links"/>
+	</bean>
 
 	<bean id="autologinController" class="org.cloudfoundry.identity.uaa.login.AutologinController">
 		<property name="codeStore" ref="autologinCodeStore" />
@@ -204,15 +210,16 @@
 	</bean>
 
 	<bean id="uaaController" class="org.cloudfoundry.identity.uaa.login.RemoteUaaController">
-		<property name="uaaBaseUrl" value="${uaa.url:http://localhost:8001/uaa}" />
+		<property name="uaaBaseUrl" value="${uaa.url:http://localhost:8080/uaa}" />
 		<property name="authorizationTemplate">
 			<bean class="org.springframework.security.oauth2.client.OAuth2RestTemplate">
 				<constructor-arg ref="uaa" />
 			</bean>
 		</property>
+		<property name="links" ref="links"/>
 	</bean>
 
-	<oauth:resource id="uaa" access-token-uri="${uaa.token.url:http://localhost:8001/uaa/oauth/token}"
+	<oauth:resource id="uaa" access-token-uri="${uaa.token.url:http://localhost:8080/uaa/oauth/token}"
 		client-id="login" client-secret="${LOGIN_SECRET:loginsecret}" type="client_credentials" />
 
 </beans>
