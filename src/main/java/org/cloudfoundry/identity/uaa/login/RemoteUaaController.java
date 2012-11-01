@@ -94,6 +94,15 @@ public class RemoteUaaController {
 
 	private String uaaHost;
 
+	private Map<String,String> links = new HashMap<String, String>();
+	
+	/**
+	 * @param links the links to set
+	 */
+	public void setLinks(Map<String, String> links) {
+		this.links = links;
+	}
+
 	/**
 	 * @param authorizationTemplate the authorizationTemplate to set
 	 */
@@ -160,10 +169,19 @@ public class RemoteUaaController {
 		String path = extractPath(request);
 		model.addAllAttributes(getLoginInfo(baseUrl + "/" + path, getRequestHeaders(headers)));
 		model.addAllAttributes(getBuildInfo());
+		model.addAttribute("links", getLinksInfo());
 		if (principal == null) {
 			return "login";
 		}
 		return "home";
+	}
+
+	private Map<String,?> getLinksInfo() {
+		Map<String, Object> model = new HashMap<String, Object>();
+		model.put("uaa", baseUrl);
+		model.put("login", baseUrl.replaceAll("uaa", "login"));
+		model.putAll(links);
+		return model;
 	}
 
 	private Map<String, ?> getBuildInfo() {
@@ -174,7 +192,6 @@ public class RemoteUaaController {
 				gitProperties.getProperty("git.commit.time",
 						new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date())));
 		model.put("app", UaaStringUtils.getMapFromProperties(buildProperties, "build."));
-		model.put("uaa", baseUrl);
 		return model;
 	}
 
@@ -253,6 +270,7 @@ public class RemoteUaaController {
 			// User approval is required
 			logger.debug("Response: " + body);
 			model.putAll(body);
+			model.put("links", getLinksInfo());
 			if (!body.containsKey("options")) {
 				throw new OAuth2Exception("No options returned from UAA for user approval");
 			}

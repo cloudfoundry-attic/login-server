@@ -20,7 +20,6 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 
 <c:url var="baseUrl" value="/resources" />
-<c:set value="www.cloudfoundry.com" var="hostName" />
 
 <!DOCTYPE html>
 <!--[if IE]>  <![endif]-->
@@ -76,7 +75,7 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 </head>
 <body id="micro">
 	<div class="splash">
-		<a href='http://${hostName}/'><img
+		<a href='${links.home}'><img
 			alt="Cloud Foundry: The Industry's Open Platform As A Service"
 			class="logo" src='${baseUrl}/images/logo_header_cloudfoundry.png'
 			width='373' height='70'></img> </a>

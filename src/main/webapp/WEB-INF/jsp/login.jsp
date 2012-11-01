@@ -21,7 +21,6 @@
 
 <c:url var="baseUrl" value="/resources" />
 <c:url var="faviconUrl" value="/favicon.ico" />
-<c:set value="www.cloudfoundry.com" var="hostName" />
 
 <!DOCTYPE html>
 <!--[if IE]>  <![endif]-->
@@ -74,12 +73,13 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 }
 </style>
 <script type="text/javascript" src="${baseUrl}/javascripts/jquery.js"></script>
-<script type="text/javascript" src="${baseUrl}/javascripts/placeholder.js"></script>
+<script type="text/javascript"
+	src="${baseUrl}/javascripts/placeholder.js"></script>
 <script type="text/javascript">
-$(document).ready(function() {
-  $('form:first *:input[type!=hidden]:first').focus();
+	$(document).ready(function() {
+		$('form:first *:input[type!=hidden]:first').focus();
 
-});
+	});
 </script>
 <script type="text/javascript">
 	(function() {
@@ -95,7 +95,7 @@ $(document).ready(function() {
 </head>
 <body id="micro">
 	<div class="splash">
-		<a href='http://${hostName}/'><img
+		<a href='${links.home}/'><img
 			alt="Cloud Foundry: The Industry's Open Platform As A Service"
 			class="logo" src='${baseUrl}/images/logo_header_cloudfoundry.png'
 			width='373' height='70'></img> </a>
@@ -110,18 +110,22 @@ $(document).ready(function() {
 								password.</div>
 						</c:if>
 						<c:forEach items="${prompts}" var="prompt">
-							<label class="input">
-							  <span>${prompt.value[1]}</span>
-							  <input id='${prompt.key}' type='${prompt.value[0]}' name='${prompt.key}' />
+							<label class="input"> <span>${prompt.value[1]}</span> <input
+								id='${prompt.key}' type='${prompt.value[0]}'
+								name='${prompt.key}' />
 							</label>
 						</c:forEach>
 					</div>
 					<button type="submit" class="orange-button">Sign in</button>
 					<span class="button-alt"> <a class="question passwd"
-						target="_blank" href="https://${hostName}/passwd">Forgot your
-							password</a></span><br/><br/>
+						target="_blank" href="${links.passwd}">Forgot your password</a></span><br />
+					<br />
 				</form>
-				<p>Don't have an account? <a href="https://${hostName}/signup">Register here.</a></p>
+				<p>
+					Don't have an account? <a href="${links.register}">Register here.</a>
+				</p>
+				<p>Reminder: do not type your Cloud Foundry password into any
+					site except <a href="${links.login}">${links.login}</a>.</p>
 			</article>
 		</div>
 		<div class="footer"
