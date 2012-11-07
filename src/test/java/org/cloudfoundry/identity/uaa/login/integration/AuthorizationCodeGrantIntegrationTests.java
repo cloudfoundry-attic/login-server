@@ -13,6 +13,7 @@
 package org.cloudfoundry.identity.uaa.login.integration;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.net.URI;
@@ -118,6 +119,8 @@ public class AuthorizationCodeGrantIntegrationTests {
 		}
 		assertTrue("Wrong location: " + location,
 				location.matches(resource.getPreEstablishedRedirectUri() + ".*code=.+"));
+		assertFalse("Location should not contain cookie: " + location,
+				location.matches(resource.getPreEstablishedRedirectUri() + ".*cookie=.+"));
 
 		formData.clear();
 		formData.add("client_id", resource.getClientId());

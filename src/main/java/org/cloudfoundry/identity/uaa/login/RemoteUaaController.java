@@ -285,7 +285,8 @@ public class RemoteUaaController {
 		String location = response.getHeaders().getFirst("Location");
 		if (location != null) {
 			logger.info("Redirect in /oauth/authorize for: " + principal.getName());
-			return new ModelAndView(new RedirectView(location));
+			// Don't expose model attributes (cookie) in redirect
+			return new ModelAndView(new RedirectView(location, false, true, false));
 		}
 
 		throw new IllegalStateException("Neither a redirect nor a user approval");
