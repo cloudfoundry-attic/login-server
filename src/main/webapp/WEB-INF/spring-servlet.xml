@@ -25,7 +25,7 @@
 
 	<sec:http pattern="/resources/**" security="none" />
 	<sec:http pattern="/favicon.ico" security="none" />
-	<sec:http pattern="/healthz" security="none" />
+	<sec:http pattern="/healthz/**" security="none" />
 	<sec:http pattern="/login" security="none" />
 	<sec:http pattern="/info" security="none" />
 	<sec:http pattern="/oauth/token" security="none" />
@@ -218,6 +218,8 @@
 		</property>
 		<property name="links" ref="links"/>
 	</bean>
+
+	<bean id="healthzEndpoint" class="org.cloudfoundry.identity.uaa.varz.HealthzEndpoint"/>
 
 	<oauth:resource id="uaa" access-token-uri="${uaa.token.url:http://localhost:8080/uaa/oauth/token}"
 		client-id="login" client-secret="${LOGIN_SECRET:loginsecret}" type="client_credentials" />
