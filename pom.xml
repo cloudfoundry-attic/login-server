@@ -11,7 +11,7 @@
 
 	<groupId>com.cloudfoundry.identity</groupId>
 	<artifactId>cloudfoundry-login-server</artifactId>
-	<version>1.1.1</version>
+	<version>1.1.2</version>
 	<packaging>war</packaging>
 	<name>Cloud Foundry Login</name>
 	<description>Cloud Foundry Login App</description>
@@ -22,6 +22,33 @@
 		<system>JIRA</system>
 		<url>https://rbcon.atlassian.net/browse/CF</url>
 	</issueManagement>
+
+    <repositories>
+      <repository>
+        <id>spring-release</id>
+        <name>Spring Framework Release Repository</name>
+        <url>http://maven.springframework.org/release</url>
+      </repository>
+      <repository>
+        <id>spring-milestone</id>
+        <name>Spring Framework Milestone Repository</name>
+        <url>http://maven.springframework.org/milestone</url>
+      </repository>
+      <repository>
+        <!-- necessary for Spring Security OAuth SNAPSHOT dependency -->
+        <id>spring-snapshost</id>
+        <name>Spring Framework Maven Snapshot Repository</name>
+        <url>http://maven.springframework.org/snapshot</url>
+      </repository>
+      <repository>
+        <id>objectstyle</id>
+        <name>ObjectStyle.org Repository</name>
+        <url>http://objectstyle.org/maven2/</url>
+        <snapshots>
+          <enabled>false</enabled>
+        </snapshots>
+      </repository>
+    </repositories>
 
 	<developers>
 		<developer>
@@ -222,6 +249,16 @@
 			<groupId>org.cloudfoundry.identity</groupId>
 			<artifactId>cloudfoundry-identity-common</artifactId>
 			<version>${identity.version}</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>spring-tx</artifactId>
+					<groupId>org.springframework</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>spring-jdbc</artifactId>
+					<groupId>org.springframework</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<dependency>
@@ -260,11 +297,6 @@
 			<version>${spring.version}</version>
 		</dependency>
 
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-jdbc</artifactId>
-			<version>${spring.version}</version>
-		</dependency>
 
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -272,11 +304,6 @@
 			<version>${spring.version}</version>
 		</dependency>
 
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-tx</artifactId>
-			<version>${spring.version}</version>
-		</dependency>
 
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -290,12 +317,6 @@
 			<artifactId>spring-security-config</artifactId>
 			<version>${spring.security.version}</version>
 			<scope>runtime</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-openid</artifactId>
-			<version>${spring.security.version}</version>
 		</dependency>
 
 		<dependency>

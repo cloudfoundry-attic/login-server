@@ -80,6 +80,10 @@ public class RemoteUaaController {
 
 	private static final String COOKIE = "Cookie";
 
+	private static final String SET_COOKIE = "Set-Cookie";
+
+	private static final String COOKIE_MODEL = "cookie";
+	
 	private static String DEFAULT_BASE_UAA_URL = "https://uaa.cloudfoundry.com";
 
 	private Properties gitProperties = new Properties();
@@ -94,8 +98,8 @@ public class RemoteUaaController {
 
 	private String uaaHost;
 
-	private Map<String,String> links = new HashMap<String, String>();
-	
+	private Map<String, String> links = new HashMap<String, String>();
+
 	/**
 	 * @param links the links to set
 	 */
@@ -176,7 +180,7 @@ public class RemoteUaaController {
 		return "home";
 	}
 
-	private Map<String,?> getLinksInfo() {
+	private Map<String, ?> getLinksInfo() {
 		Map<String, Object> model = new HashMap<String, Object>();
 		model.put("uaa", baseUrl);
 		model.put("login", baseUrl.replaceAll("uaa", "login"));
@@ -281,7 +285,8 @@ public class RemoteUaaController {
 		String location = response.getHeaders().getFirst("Location");
 		if (location != null) {
 			logger.info("Redirect in /oauth/authorize for: " + principal.getName());
-			return new ModelAndView(new RedirectView(location));
+			// Don't expose model attributes (cookie) in redirect
+			return new ModelAndView(new RedirectView(location, false, true, false));
 		}
 
 		throw new IllegalStateException("Neither a redirect nor a user approval");
@@ -350,12 +355,22 @@ public class RemoteUaaController {
 	}
 
 	private void saveCookie(HttpHeaders headers, Map<String, Object> model) {
-		// Save back end cookie for later
-		String cookie = headers.getFirst("Set-Cookie");
-		if (cookie != null) {
-			logger.debug("Saved back end cookie: " + cookie);
-			model.put("cookie", cookie);
+		if (!headers.containsKey(SET_COOKIE)) {
+			return;
 		}
+		StringBuilder cookie = new StringBuilder();
+		// Save back end cookie for later
+		for (String value : headers.get(SET_COOKIE)) {
+			if (value.contains(";")) {
+				value = value.substring(0, value.indexOf(";"));
+			}
+			if (cookie.length()>0) {
+				cookie.append(";");
+			}
+			cookie.append(value);
+		}
+		logger.debug("Saved back end cookies: " + cookie);
+		model.put(COOKIE_MODEL, cookie.toString());
 	}
 
 	private Map<String, String> getLoginCredentials(Principal principal) {
@@ -389,10 +404,12 @@ public class RemoteUaaController {
 		requestHeaders.remove(COOKIE);
 		requestHeaders.remove(COOKIE.toLowerCase());
 		// Get back end cookie if saved in session
-		String cookie = (String) model.get("cookie");
+		String cookie = (String) model.get(COOKIE_MODEL);
 		if (cookie != null) {
-			logger.debug("Found back end cookie: " + cookie);
-			requestHeaders.set("Cookie", cookie);
+			logger.debug("Found back end cookies: " + cookie);
+			for (String value : cookie.split(";")) {
+				requestHeaders.add(COOKIE, value);
+			}
 		}
 
 		ResponseEntity<byte[]> response = defaultTemplate.exchange(baseUrl + "/" + path,
