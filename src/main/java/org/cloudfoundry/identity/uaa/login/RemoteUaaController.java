@@ -36,7 +36,6 @@ import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.oauth2.client.OAuth2RestTemplate;
 import org.springframework.security.oauth2.common.exceptions.OAuth2Exception;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -83,7 +82,7 @@ public class RemoteUaaController {
 	private static final String SET_COOKIE = "Set-Cookie";
 
 	private static final String COOKIE_MODEL = "cookie";
-	
+
 	private static String DEFAULT_BASE_UAA_URL = "https://uaa.cloudfoundry.com";
 
 	private Properties gitProperties = new Properties();
@@ -250,21 +249,8 @@ public class RemoteUaaController {
 		@SuppressWarnings("rawtypes")
 		ResponseEntity<Map> response;
 
-		try {
-			response = authorizationTemplate.exchange(baseUrl + "/" + path, HttpMethod.POST,
-					new HttpEntity<MultiValueMap<String, String>>(map, requestHeaders), Map.class);
-		}
-		catch (RuntimeException e) {
-			// Defensive workaround for SECOAUTH-335
-			if (authorizationTemplate instanceof OAuth2RestTemplate) {
-				((OAuth2RestTemplate) authorizationTemplate).getOAuth2ClientContext().setAccessToken(null);
-				response = authorizationTemplate.exchange(baseUrl + "/" + path, HttpMethod.POST,
-						new HttpEntity<MultiValueMap<String, String>>(map, requestHeaders), Map.class);
-			}
-			else {
-				throw e;
-			}
-		}
+		response = authorizationTemplate.exchange(baseUrl + "/" + path, HttpMethod.POST,
+				new HttpEntity<MultiValueMap<String, String>>(map, requestHeaders), Map.class);
 
 		saveCookie(response.getHeaders(), model);
 
@@ -364,7 +350,7 @@ public class RemoteUaaController {
 			if (value.contains(";")) {
 				value = value.substring(0, value.indexOf(";"));
 			}
-			if (cookie.length()>0) {
+			if (cookie.length() > 0) {
 				cookie.append(";");
 			}
 			cookie.append(value);
