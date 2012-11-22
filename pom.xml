@@ -126,21 +126,21 @@
 				<dependency>
 					<groupId>${project.parent.groupId}</groupId>
 					<artifactId>uaa</artifactId>
-					<version>${project.parent.version}</version>
+					<version>${identity.version}</version>
 					<type>war</type>
 					<scope>tomcat</scope>
 				</dependency>
 				<dependency>
 					<groupId>${project.parent.groupId}</groupId>
 					<artifactId>api</artifactId>
-					<version>${project.parent.version}</version>
+					<version>${identity.version}</version>
 					<type>war</type>
 					<scope>tomcat</scope>
 				</dependency>
 				<dependency>
 					<groupId>${project.parent.groupId}</groupId>
 					<artifactId>app</artifactId>
-					<version>${project.parent.version}</version>
+					<version>${identity.version}</version>
 					<type>war</type>
 					<scope>tomcat</scope>
 				</dependency>
