@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!-- Cloud Foundry 2012.02.03 Beta Copyright (c) [2009-2012] VMware, Inc. All Rights Reserved. This product is licensed to 
-	you under the Apache License, Version 2.0 (the "License"). You may not use this product except in compliance with the License. 
-	This product includes a number of subcomponents with separate copyright notices and license terms. Your use of these subcomponents 
+<!-- Cloud Foundry 2012.02.03 Beta Copyright (c) [2009-2012] VMware, Inc. All Rights Reserved. This product is licensed to
+	you under the Apache License, Version 2.0 (the "License"). You may not use this product except in compliance with the License.
+	This product includes a number of subcomponents with separate copyright notices and license terms. Your use of these subcomponents
 	is subject to the terms and conditions of the subcomponent's license, as noted in the LICENSE file. -->
 <beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mvc="http://www.springframework.org/schema/mvc"
 	xmlns="http://www.springframework.org/schema/beans" xmlns:context="http://www.springframework.org/schema/context"
@@ -26,9 +26,16 @@
 	<sec:http pattern="/resources/**" security="none" />
 	<sec:http pattern="/favicon.ico" security="none" />
 	<sec:http pattern="/healthz/**" security="none" />
-	<sec:http pattern="/login" security="none" />
 	<sec:http pattern="/info" security="none" />
 	<sec:http pattern="/oauth/token" security="none" />
+
+	<bean class="org.cloudfoundry.identity.uaa.security.web.SecurityFilterChainPostProcessor">
+		<property name="requireHttps" value="${require_https:false}" />
+		<property name="dumpRequests" value="${dump_requests:false}" />
+		<property name="redirectToHttps">
+			<list><value>uiSecurity</value></list>
+		</property>
+	</bean>
 
 	<http pattern="/autologin" create-session="stateless" entry-point-ref="basicAuthenticationEntryPoint"
 		xmlns="http://www.springframework.org/schema/security">
@@ -135,20 +142,14 @@
 		</property>
 	</bean>
 
-	<http pattern="/log*.do" xmlns="http://www.springframework.org/schema/security" authentication-manager-ref="remoteAuthenticationManager">
+	<http name="uiSecurity" xmlns="http://www.springframework.org/schema/security"
+		  authentication-manager-ref="remoteAuthenticationManager" disable-url-rewriting="true">
 		<intercept-url pattern="/login.do" access="IS_AUTHENTICATED_ANONYMOUSLY" />
 		<intercept-url pattern="/logout.do" access="IS_AUTHENTICATED_ANONYMOUSLY" />
-		<anonymous enabled="true" />
+		<intercept-url pattern="/**" access="IS_AUTHENTICATED_FULLY" />
 		<form-login login-page="/login" username-parameter="username" password-parameter="password"
 			login-processing-url="/login.do" authentication-failure-url="/login?error=true" />
 		<logout logout-url="/logout.do" success-handler-ref="logoutHandler" />
-	</http>
-
-	<http xmlns="http://www.springframework.org/schema/security" entry-point-ref="loginEntryPoint"
-		disable-url-rewriting="true">
-		<intercept-url pattern="/**" access="IS_AUTHENTICATED_FULLY" />
-		<anonymous enabled="false" />
-		<logout success-handler-ref="logoutHandler" />
 	</http>
 
 	<authentication-manager xmlns="http://www.springframework.org/schema/security" />
@@ -193,7 +194,7 @@
 			<bean class="org.springframework.web.servlet.view.json.MappingJacksonJsonView" />
 		</property>
 	</bean>
-	
+
 	<util:map id="links">
 		<entry key="home" value="${links.home:https://www.cloudfoundry.com}"/>
 		<entry key="passwd" value="${links.passwd:https://www.cloudfoundry.com/passwd}"/>
@@ -219,7 +220,7 @@
 		<property name="links" ref="links"/>
 	</bean>
 
-	<bean id="healthzEndpoint" class="org.cloudfoundry.identity.uaa.varz.HealthzEndpoint"/>
+	<bean id="healthzEndpoint" class="org.cloudfoundry.identity.uaa.web.HealthzEndpoint"/>
 
 	<oauth:resource id="uaa" access-token-uri="${uaa.token.url:http://localhost:8080/uaa/oauth/token}"
 		client-id="login" client-secret="${LOGIN_SECRET:loginsecret}" type="client_credentials" />
