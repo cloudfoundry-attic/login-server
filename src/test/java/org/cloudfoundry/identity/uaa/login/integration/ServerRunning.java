@@ -24,8 +24,8 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.params.ClientPNames;
 import org.apache.http.client.params.CookiePolicy;
-import org.cloudfoundry.identity.uaa.integration.TestProfileEnvironment;
-import org.cloudfoundry.identity.uaa.integration.UrlHelper;
+import org.cloudfoundry.identity.uaa.test.TestProfileEnvironment;
+import org.cloudfoundry.identity.uaa.test.UrlHelper;
 import org.junit.Assume;
 import org.junit.internal.AssumptionViolatedException;
 import org.junit.rules.MethodRule;
@@ -56,22 +56,22 @@ import org.springframework.web.util.UriUtils;
  * the server is not running in the background all the tests here will simply be skipped because of a violated
  * assumption (showing as successful). Usage:
  * </p>
- * 
+ *
  * <pre>
  * &#064;Rule public static ServerRunning brokerIsRunning = ServerRunning.isRunning();
- * 
+ *
  * &#064;Test public void testSendAndReceive() throws Exception { // ... test using server etc. }
  * </pre>
  * <p>
  * The rule can be declared as static so that it only has to check once for all tests in the enclosing test case, but
  * there isn't a lot of overhead in making it non-static.
  * </p>
- * 
+ *
  * @see Assume
  * @see AssumptionViolatedException
- * 
+ *
  * @author Dave Syer
- * 
+ *
  */
 public class ServerRunning implements MethodRule, RestTemplateHolder, UrlHelper {
 
@@ -133,7 +133,7 @@ public class ServerRunning implements MethodRule, RestTemplateHolder, UrlHelper 
 
 	/**
 	 * The context root in the application, e.g. "/uaa" for a local deployment.
-	 * 
+	 *
 	 * @param rootPath the rootPath to set
 	 */
 	public void setRootPath(String rootPath) {
