@@ -16,7 +16,6 @@ package org.cloudfoundry.identity.uaa.login;
 import java.util.Map;
 
 import org.cloudfoundry.identity.uaa.authentication.AuthzAuthenticationRequest;
-import org.cloudfoundry.identity.uaa.social.SocialClientUserDetails;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -48,7 +47,7 @@ public class AutologinAuthenticationManager implements AuthenticationManager {
 		AuthzAuthenticationRequest request = (AuthzAuthenticationRequest) authentication;
 		Map<String, String> info = request.getInfo();
 		String code = info.get("code");
-		SocialClientUserDetails user = codeStore.getUser(code);
+		Authentication user = codeStore.getUser(code);
 		if (user == null) {
 			throw new BadCredentialsException("Cannot redeem provided code for user");
 		}
