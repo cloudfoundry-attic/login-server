@@ -90,6 +90,18 @@ public class ServerRunning implements MethodRule, RestTemplateHolder, UrlHelper 
 
 	private static String DEFAULT_ROOT_PATH = "/login";
 
+	private static String DEFAULT_UAA_HOST = "localhost";
+
+	private static String DEFAULT_UAA_ROOT_PATH = "/uaa";
+	
+	private String protocol = "http";
+
+	private int uaaPort;
+
+	private String uaaHostName = DEFAULT_UAA_HOST;
+
+	private String uaaRootPath = DEFAULT_UAA_ROOT_PATH;
+
 	private int port;
 
 	private String hostName = DEFAULT_HOST;
@@ -108,9 +120,13 @@ public class ServerRunning implements MethodRule, RestTemplateHolder, UrlHelper 
 	private ServerRunning() {
 		this.environment = TestProfileEnvironment.getEnvironment();
 		this.integrationTest = environment.getProperty("uaa.integration.test", Boolean.class, false);
-		setPort(environment.getProperty("uaa.port", Integer.class, DEFAULT_PORT));
-		setRootPath(environment.getProperty("uaa.path", DEFAULT_ROOT_PATH));
-		setHostName(environment.getProperty("uaa.host", DEFAULT_HOST));
+		setPort(environment.getProperty("login.port", Integer.class, DEFAULT_PORT));
+		setRootPath(environment.getProperty("login.path", DEFAULT_ROOT_PATH));
+		setHostName(environment.getProperty("login.host", DEFAULT_HOST));
+		setUaaPort(environment.getProperty("uaa.port", Integer.class, DEFAULT_PORT));
+		setUaaRootPath(environment.getProperty("uaa.path", DEFAULT_UAA_ROOT_PATH));
+		setUaaHostName(environment.getProperty("uaa.host", DEFAULT_UAA_HOST));
+		protocol = environment.getProperty("login.protocol", "http");
 	}
 
 	/**
@@ -146,6 +162,37 @@ public class ServerRunning implements MethodRule, RestTemplateHolder, UrlHelper 
 			}
 		}
 		this.rootPath = rootPath;
+	}
+
+	/**
+	 * @param port the port to set
+	 */
+	public void setUaaPort(int port) {
+		this.uaaPort = port;
+	}
+
+	/**
+	 * @param hostName the hostName to set
+	 */
+	public void setUaaHostName(String hostName) {
+		this.uaaHostName = hostName;
+	}
+
+	/**
+	 * The context root in the application, e.g. "/uaa" for a local deployment.
+	 *
+	 * @param rootPath the rootPath to set
+	 */
+	public void setUaaRootPath(String rootPath) {
+		if (rootPath.equals("/")) {
+			rootPath = "";
+		}
+		else {
+			if (!rootPath.startsWith("/")) {
+				rootPath = "/" + rootPath;
+			}
+		}
+		this.uaaRootPath = rootPath;
 	}
 
 	@Override
@@ -188,8 +235,12 @@ public class ServerRunning implements MethodRule, RestTemplateHolder, UrlHelper 
 
 	}
 
+	public String getBaseUrl(String hostName, int port, String rootPath) {		
+		return protocol + "://" + hostName + (port == 80 ? "" : ":" + port) + rootPath;
+	}
+		
 	public String getBaseUrl() {
-		return "http://" + hostName + (port == 80 ? "" : ":" + port) + rootPath;
+		return getBaseUrl(hostName, port, rootPath);
 	}
 
 	public String getAccessTokenUri() {
@@ -201,15 +252,25 @@ public class ServerRunning implements MethodRule, RestTemplateHolder, UrlHelper 
 	}
 
 	public String getClientsUri() {
-		return getUrl("/oauth/clients");
+		return getUaaUrl("/oauth/clients");
 	}
 
 	public String getUsersUri() {
-		return getUrl("/Users");
+		return getUaaUrl("/Users");
 	}
 
 	public String getUserUri() {
-		return getUrl("/User");
+		return getUaaUrl("/User");
+	}
+
+	private String getUaaUrl(String path) {
+		if (path.startsWith("http")) {
+			return path;
+		}
+		if (!path.startsWith("/")) {
+			path = "/" + path;
+		}
+		return getBaseUrl(uaaHostName, uaaPort, uaaRootPath) + path;
 	}
 
 	public String getUrl(String path) {
