@@ -29,7 +29,7 @@ a {
 }
 
 p {
-	font-size: 14px;
+  font-size: 14px;
 }
 
 .intro-text {
@@ -108,13 +108,13 @@ input::-webkit-input-placeholder {
 }
 
 :focus:-moz-placeholder {
-	color: #666666;
-	font-weight:200;
+  color: #666666;
+  font-weight:200;
 }
 
 :focus::-moz-placeholder {
-	color: #666666;
-	font-weight:200;
+  color: #666666;
+  font-weight:200;
 }
 
 .input {
