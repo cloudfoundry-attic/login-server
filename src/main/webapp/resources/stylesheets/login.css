@@ -29,7 +29,11 @@ a {
 }
 
 p {
-	font-size: 16px;
+  font-size: 14px;
+}
+
+.intro-text {
+  font-size: 16px;
 }
 
 .confirm {
@@ -101,6 +105,16 @@ input::-webkit-input-placeholder {
 :focus::-webkit-input-placeholder {
 	color: #666666;
 	font-weight:200;
+}
+
+:focus:-moz-placeholder {
+  color: #666666;
+  font-weight:200;
+}
+
+:focus::-moz-placeholder {
+  color: #666666;
+  font-weight:200;
 }
 
 .input {
