@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- Cloud Foundry 2012.02.03 Beta Copyright (c) [2009-2012] VMware, Inc. All Rights Reserved. This product is licensed to
+	you under the Apache License, Version 2.0 (the "License"). You may not use this product except in compliance with the License.
+	This product includes a number of subcomponents with separate copyright notices and license terms. Your use of these subcomponents
+	is subject to the terms and conditions of the subcomponent's license, as noted in the LICENSE file. -->
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+			 xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:oauth="http://www.springframework.org/schema/security/oauth2"
+			 xmlns:context="http://www.springframework.org/schema/context" xmlns:sec="http://www.springframework.org/schema/security"
+			 xsi:schemaLocation="http://www.springframework.org/schema/security/oauth2 http://www.springframework.org/schema/security/spring-security-oauth2-1.0.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd
+		http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.1.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+	<!--<sec:http pattern="/logout" security="none" />-->
+	<!--<sec:http pattern="/resources/**" security="none" />-->
+	<!--<sec:http pattern="/favicon.ico" security="none" />-->
+
+	<http pattern="/approvals" entry-point-ref="loginEntryPoint" disable-url-rewriting="true"
+				use-expressions="true" xmlns="http://www.springframework.org/schema/security">
+		<intercept-url pattern="/**" access="hasRole('uaa.user')" />
+		<logout logout-url="/logout.do" success-handler-ref="logoutHandler" />
+		<anonymous enabled="false" />
+		<!-- The filter that uses Oauth2 auth-code flow to acquire an Oauth2 token if the user doesn't already have one -->
+		<custom-filter ref="oauth2ClientFilter" after="EXCEPTION_TRANSLATION_FILTER"/>
+		<!-- The filter that validates an Oauth token and loads an Oauth2Authentication object in the SecurityContextHolder -->
+		<custom-filter ref="oauth2AuthenticationFilter" before="FILTER_SECURITY_INTERCEPTOR"/>
+
+	</http>
+
+	<!--<bean id="loginEntryPoint" class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">-->
+		<!--<constructor-arg value="/login" />-->
+	<!--</bean>-->
+
+	<sec:authentication-manager alias="authenticationManager" />
+
+	<!--apply the oauth client context -->
+	<oauth:client id="oauth2ClientFilter" />
+	<bean id="oauth2AuthenticationFilter"
+				class="org.springframework.security.oauth2.client.filter.OAuth2ClientAuthenticationProcessingFilter">
+		<!-- This should match whatever you have configured in the login entry point above -->
+		<constructor-arg name="defaultFilterProcessesUrl" value="/login"/>
+		<property name="restTemplate" ref="restTemplate"/>
+		<property name="tokenServices" ref="remoteTokenServices"/>
+	</bean>
+	<bean id="remoteTokenServices" class="org.cloudfoundry.identity.uaa.oauth.RemoteTokenServices">
+		<property name="checkTokenEndpointUrl" value="${uaa.checkToken.url:http://localhost:8080/uaa/check_token}"/>
+		<property name="clientId" value="${uaa.approvals.client.id:approvalsUi}"/>
+		<property name="clientSecret" value="${uaa.approvals.client.secret:secret}"/>
+	</bean>
+
+	<oauth:rest-template id="restTemplate" resource="approvals" />
+
+	<!--define an oauth 2 resource for api access -->
+	<oauth:resource id="approvals" type="authorization_code" client-id="${uaa.approvals.client.id:approvalsUi}" client-secret="${uaa.approvals.client.secret:secret}"
+									access-token-uri="${uaa.token.url:http://localhost:8080/uaa/oauth/token}" user-authorization-uri="${uaa.authorize.url:http://localhost:8080/uaa/oauth/authorize}" />
+
+	<oauth:web-expression-handler id="oauthWebExpressionHandler" />
+
+	<bean id="approvalsController" class="org.cloudfoundry.identity.uaa.login.ApprovalsController">
+		<constructor-arg ref="restTemplate" />
+		<property name="approvalsUri" value="${uaa.approvals.url:http://localhost:8080/uaa/approvals}" />
+		<property name="logoutUrl" value="logout.do" />
+	</bean>
+
+</beans>
