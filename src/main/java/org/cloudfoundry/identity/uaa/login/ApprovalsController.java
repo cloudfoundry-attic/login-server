@@ -62,7 +62,16 @@ public class ApprovalsController implements InitializingBean {
 	 */
 	@RequestMapping(value = "/approvals", method = RequestMethod.GET)
 	public String get(Model model) {
-		model.addAttribute("approvals", getCurrentApprovals());
+		Set<Approval> approvals = getCurrentApprovals();
+		Set<Approval> denials = new HashSet<Approval>();
+		for (Approval approval : approvals) {
+			if (approval.getStatus() == Approval.ApprovalStatus.DENIED) {
+				denials.add(approval);
+			}
+		}
+		approvals.removeAll(denials);
+		model.addAttribute("approvals", approvals);
+		model.addAttribute("denials", denials);
 		return "approvals";
 	}
 
