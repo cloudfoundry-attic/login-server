@@ -17,6 +17,8 @@
 	<!-- The data source has to be defined first -->
 	<import resource="env-context.xml" />
 
+	<import resource="approvals.xml" />
+
 	<context:property-placeholder properties-ref="applicationProperties" />
 
 	<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
