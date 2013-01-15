@@ -4,3 +4,11 @@ uaa:
     url: https://devuaa.cloudfoundry.com/oauth/token
   login:
     url: https://devuaa.cloudfoundry.com/login.do
+  clientinfo:
+    url: https://devuaa.cloudfoundry.com/clientinfo
+  approvals:
+    url: https://devuaa.cloudfoundry.com/approvals
+login:
+  authorize:
+    url: https://devlogin.cloudfoundry.com/oauth/authorize
+    

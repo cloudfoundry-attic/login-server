@@ -1,5 +1,12 @@
 package org.cloudfoundry.identity.uaa.login;
 
+import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.cloudfoundry.identity.uaa.oauth.authz.Approval;
@@ -14,14 +21,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestOperations;
 
-import java.io.IOException;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 /**
  * @author Vidya Valmikinathan
  */
@@ -31,8 +30,8 @@ public class ApprovalsController implements InitializingBean {
 
 	private String approvalsUri;
 
-	private String logoutUrl;
-
+	private Map<String,String> links = new HashMap<String, String>();
+	
 	private RestOperations restTemplate;
 
 	public void setMapper(ObjectMapper mapper) {
@@ -53,8 +52,11 @@ public class ApprovalsController implements InitializingBean {
 		this.approvalsUri = approvalsUri;
 	}
 
-	public void setLogoutUrl(String logoutUrl) {
-		this.logoutUrl = logoutUrl;
+	/**
+	 * @param links the links to set
+	 */
+	public void setLinks(Map<String, String> links) {
+		this.links = links;
 	}
 
 	/**
@@ -72,6 +74,7 @@ public class ApprovalsController implements InitializingBean {
 		approvals.removeAll(denials);
 		model.addAttribute("approvals", approvals);
 		model.addAttribute("denials", denials);
+		model.addAttribute("links", links );
 		return "approvals";
 	}
 
@@ -109,6 +112,5 @@ public class ApprovalsController implements InitializingBean {
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull("Supply an approvals URI", approvalsUri);
-		Assert.notNull("Supply a logout URL", logoutUrl);
 	}
 }

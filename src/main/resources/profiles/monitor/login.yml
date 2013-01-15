@@ -4,3 +4,11 @@ uaa:
     url: http://localhost:8000/uaa/oauth/token
   login:
     url: http://localhost:8000/uaa/login.do
+  clientinfo:
+    url: http://localhost:8000/uaa/clientinfo
+  approvals:
+    url: http://localhost:8000/uaa/approvals
+login:
+  authorize:
+    url: http://localhost:8000/login/oauth/authorize
+    
