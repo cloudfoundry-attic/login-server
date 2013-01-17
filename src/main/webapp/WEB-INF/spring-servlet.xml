@@ -147,7 +147,7 @@
 	</bean>
 
 	<bean id="remoteAuthenticationManager" class="org.cloudfoundry.identity.uaa.login.RemoteUaaAuthenticationManager">
-		<property name="loginUrl" value="${uaa.login.url:http://localhost:8080/uaa/login.do}" />
+		<property name="loginUrl" value="${uaa.login.url:http://localhost:8080/uaa/authenticate}" />
 	</bean>
 
 	<mvc:resources location="/" mapping="/**" />
