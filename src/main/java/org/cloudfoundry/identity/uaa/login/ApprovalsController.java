@@ -1,15 +1,15 @@
 package org.cloudfoundry.identity.uaa.login;
 
 import java.io.IOException;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.cloudfoundry.identity.uaa.oauth.authz.Approval;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 import org.springframework.beans.factory.InitializingBean;
@@ -30,8 +30,8 @@ public class ApprovalsController implements InitializingBean {
 
 	private String approvalsUri;
 
-	private Map<String,String> links = new HashMap<String, String>();
-	
+	private Map<String, String> links = new HashMap<String, String>();
+
 	private RestOperations restTemplate;
 
 	public void setMapper(ObjectMapper mapper) {
@@ -64,47 +64,49 @@ public class ApprovalsController implements InitializingBean {
 	 */
 	@RequestMapping(value = "/approvals", method = RequestMethod.GET)
 	public String get(Model model) {
-		Set<Approval> approvals = getCurrentApprovals();
-		Set<Approval> denials = new HashSet<Approval>();
-		for (Approval approval : approvals) {
-			if (approval.getStatus() == Approval.ApprovalStatus.DENIED) {
+		Map<String, Map<String, Object>> approvals = getCurrentApprovals();
+		Set<Map<String, Object>> denials = new HashSet<Map<String, Object>>();
+		for (String key : approvals.keySet()) {
+			Map<String, Object> approval = approvals.get(key);
+			approval.put("key", key);
+			if (approval.get("status") == "DENIED") {
 				denials.add(approval);
+				approvals.remove(key);
 			}
 		}
-		approvals.removeAll(denials);
-		model.addAttribute("approvals", approvals);
+		model.addAttribute("approvals", approvals.values());
 		model.addAttribute("denials", denials);
-		model.addAttribute("links", links );
+		model.addAttribute("links", links);
 		return "approvals";
 	}
 
-	private Set<Approval> getCurrentApprovals() {
-		Set<Approval> approvals = Collections.emptySet();
+	private Map<String, Map<String, Object>> getCurrentApprovals() {
+		Map<String, Map<String, Object>> result = new LinkedHashMap<String, Map<String, Object>>();
 		try {
-			approvals = mapper.readValue(restTemplate.getForObject(approvalsUri, String.class), new TypeReference<Set<Approval>>() {
-			});
-		} catch (IOException e) {
+			Set<Map<String, Object>> approvals = mapper.readValue(restTemplate.getForObject(approvalsUri, String.class),
+					new TypeReference<Set<Map<String, ?>>>() {
+					});
+			for (Map<String, Object> map : approvals) {
+				String key = map.get("clientId") + ":" + map.get("scope");
+				result.put(key, map);
+			}
+		}
+		catch (IOException e) {
 			logger.error("Error parsing response from approvals enpoint", e);
 		}
-		return approvals;
+		return result;
 	}
 
 	/**
 	 * Handle form post for revoking chosen approvals
 	 */
 	@RequestMapping(value = "/approvals", method = RequestMethod.POST)
-	public String post(@RequestParam Map<String, String> params, Model model) {
-		Set<Approval> approvals = getCurrentApprovals();
-		Set<Approval> toRevoke = new HashSet<Approval>();
-		for (Map.Entry<String, String> param : params.entrySet()) {
-			try {
-				toRevoke.add(mapper.readValue(param.getValue(), Approval.class));
-			} catch (IOException e) {
-				logger.warn(String.format("Error parsing request param: [%s] into Approval, moving on to next param", param.getValue()), e);
-			}
+	public String post(@RequestParam Collection<String> revokes, Model model) {
+		Map<String, Map<String, Object>> approvals = getCurrentApprovals();
+		for (String key : revokes) {
+			approvals.remove(key);
 		}
-		approvals.removeAll(toRevoke);
-		restTemplate.put(approvalsUri, approvals);
+		restTemplate.put(approvalsUri, approvals.values());
 
 		return get(model);
 	}

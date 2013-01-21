@@ -113,16 +113,14 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 
 				<form id="revokeApprovalsForm" action="approvals" method="post">
 					<p>Your active approvals:</p>
-					<c:forEach items="${approvals}" var="approval" varStatus="status">
-						<input type="checkbox" name="toRevoke${status.count}"
-							value='{"userName":"${approval.userName}", "clientId":"${approval.clientId}", "status":"${approval.status}", "scope":"${approval.scope}", "expiresAt": ${approval.expiresAt.time}}'>
+					<c:forEach items="${approvals}" var="approval">
+						<input type="checkbox" name="revokes" value="${approval.key}">
             &nbsp;&nbsp;client: ${approval.clientId}, scope: ${approval.scope} <br />
 					</c:forEach>
 
 					<p>Your active denials:</p>
-					<c:forEach items="${denials}" var="denial" varStatus="status">
-						<input type="checkbox" name="toRevoke${status.count}"
-							value='{"userName":"${denial.userName}", "clientId":"${denial.clientId}", "status":"${denial.status}", "scope":"${denial.scope}", "expiresAt": ${denial.expiresAt.time}}'>
+					<c:forEach items="${denials}" var="denial">
+						<input type="checkbox" name="revokes" value="${denial.key}">
         &nbsp;&nbsp;client: ${denial.clientId}, scope: ${denial.scope} <br />
 					</c:forEach>
 
