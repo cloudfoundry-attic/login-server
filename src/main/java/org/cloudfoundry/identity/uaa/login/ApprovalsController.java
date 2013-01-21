@@ -1,6 +1,5 @@
 package org.cloudfoundry.identity.uaa.login;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -8,10 +7,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.type.TypeReference;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -26,19 +21,12 @@ import org.springframework.web.client.RestOperations;
  */
 @Controller
 public class ApprovalsController implements InitializingBean {
-	private static final Log logger = LogFactory.getLog(HomeController.class);
 
 	private String approvalsUri;
 
 	private Map<String, String> links = new HashMap<String, String>();
 
 	private RestOperations restTemplate;
-
-	public void setMapper(ObjectMapper mapper) {
-		this.mapper = mapper;
-	}
-
-	private ObjectMapper mapper;
 
 	public ApprovalsController(RestOperations restTemplate) {
 		this.restTemplate = restTemplate;
@@ -82,17 +70,11 @@ public class ApprovalsController implements InitializingBean {
 
 	private Map<String, Map<String, Object>> getCurrentApprovals() {
 		Map<String, Map<String, Object>> result = new LinkedHashMap<String, Map<String, Object>>();
-		try {
-			Set<Map<String, Object>> approvals = mapper.readValue(restTemplate.getForObject(approvalsUri, String.class),
-					new TypeReference<Set<Map<String, ?>>>() {
-					});
-			for (Map<String, Object> map : approvals) {
-				String key = map.get("clientId") + ":" + map.get("scope");
-				result.put(key, map);
-			}
-		}
-		catch (IOException e) {
-			logger.error("Error parsing response from approvals enpoint", e);
+		@SuppressWarnings("unchecked")
+		Set<Map<String, Object>> approvals = restTemplate.getForObject(approvalsUri, Set.class);
+		for (Map<String, Object> map : approvals) {
+			String key = map.get("clientId") + ":" + map.get("scope");
+			result.put(key, map);
 		}
 		return result;
 	}
