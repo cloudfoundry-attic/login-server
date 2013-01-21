@@ -221,9 +221,6 @@
 
 	<bean id="approvalsController" class="org.cloudfoundry.identity.uaa.login.ApprovalsController">
 		<constructor-arg ref="restTemplate" />
-		<property name="mapper">
-			<bean id="mapper" class="org.codehaus.jackson.map.ObjectMapper" />
-		</property>
 		<property name="approvalsUri" value="${uaa.approvals.url:http://localhost:8080/uaa/approvals}" />
 		<property name="links" ref="links" />
 	</bean>
