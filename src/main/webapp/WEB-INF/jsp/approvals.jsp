@@ -110,22 +110,19 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 			<c:if test="${error==null}">
 
 				<h1>Approvals</h1>
-
+                <p>Checked scopes are approved and unchecked scopes are denied</p>
 				<form id="revokeApprovalsForm" action="approvals" method="post">
-					<p>Your active approvals:</p>
-					<c:forEach items="${approvals}" var="approval">
-						<input type="checkbox" name="revokes" value="${approval.key}">
-            &nbsp;&nbsp;client: ${approval.clientId}, scope: ${approval.scope} <br />
-					</c:forEach>
-
-					<p>Your active denials:</p>
-					<c:forEach items="${denials}" var="denial">
-						<input type="checkbox" name="revokes" value="${denial.key}">
-        &nbsp;&nbsp;client: ${denial.clientId}, scope: ${denial.scope} <br />
-					</c:forEach>
-
+				    <c:forEach items="${approvals}" var="client">
+				        <p>Client: ${client.key}</p>
+                        <p>Your approvals:</p>
+                        <c:forEach items="${client.value}" var="approval">
+	                        <input type="checkbox" name="checkedScopes" value="${approval.clientId}-${approval.scope}" ${approval.status eq 'APPROVED' ? 'checked=checked' : '' }>
+	                                  <spring:message code="scope.${approval.scope}"/> <br />
+                        </c:forEach>
+				    </c:forEach>
+				    
 					<p>
-						<input type="submit" value="Revoke">
+						<input type="submit" value="Update">
 					</p>
 				</form>
 

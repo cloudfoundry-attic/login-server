@@ -1,9 +1,10 @@
 package org.cloudfoundry.identity.uaa.login;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -52,29 +53,28 @@ public class ApprovalsController implements InitializingBean {
 	 */
 	@RequestMapping(value = "/approvals", method = RequestMethod.GET)
 	public String get(Model model) {
-		Map<String, Map<String, Object>> approvals = getCurrentApprovals();
-		Set<Map<String, Object>> denials = new HashSet<Map<String, Object>>();
-		for (String key : approvals.keySet()) {
-			Map<String, Object> approval = approvals.get(key);
-			approval.put("key", key);
-			if (approval.get("status") == "DENIED") {
-				denials.add(approval);
-				approvals.remove(key);
-			}
-		}
-		model.addAttribute("approvals", approvals.values());
-		model.addAttribute("denials", denials);
+		Map<String, List<Object>> approvals = getCurrentApprovals();
+		model.addAttribute("approvals", approvals);
 		model.addAttribute("links", links);
 		return "approvals";
 	}
 
-	private Map<String, Map<String, Object>> getCurrentApprovals() {
-		Map<String, Map<String, Object>> result = new LinkedHashMap<String, Map<String, Object>>();
+	private Map<String, List<Object>> getCurrentApprovals() {
+		//Result will be a map of <clientId, approvalInfo>
+		Map<String, List<Object>> result = new LinkedHashMap<String, List<Object>>();
 		@SuppressWarnings("unchecked")
 		Set<Map<String, Object>> approvals = restTemplate.getForObject(approvalsUri, Set.class);
-		for (Map<String, Object> map : approvals) {
-			String key = map.get("clientId") + ":" + map.get("scope");
-			result.put(key, map);
+		for (Map<String, Object> approvalMap : approvals) {
+			String clientId = (String) approvalMap.get("clientId");
+
+			List<Object> approvalList = result.get(clientId);
+			if (null == approvalList) {
+				approvalList = new ArrayList<Object>();
+			}
+
+			approvalList.add(approvalMap);
+
+			result.put(clientId, approvalList);
 		}
 		return result;
 	}
@@ -83,12 +83,29 @@ public class ApprovalsController implements InitializingBean {
 	 * Handle form post for revoking chosen approvals
 	 */
 	@RequestMapping(value = "/approvals", method = RequestMethod.POST)
-	public String post(@RequestParam Collection<String> revokes, Model model) {
-		Map<String, Map<String, Object>> approvals = getCurrentApprovals();
-		for (String key : revokes) {
-			approvals.remove(key);
+	public String post(@RequestParam(required=false) Collection<String> checkedScopes, Model model) {
+		Map<String, List<Object>> approvals = getCurrentApprovals();
+
+		List<Object> allApprovals = new ArrayList<Object>();
+		for (List<Object> clientApprovals : approvals.values()) {
+			allApprovals.addAll(clientApprovals);
 		}
-		restTemplate.put(approvalsUri, approvals.values());
+
+		List<Object> updatedApprovals = new ArrayList<Object>();
+		for (Object approval : allApprovals) {
+			@SuppressWarnings("unchecked")
+			Map<String, String> approvalToBeUpdated = ((Map<String, String>)approval);
+			if (checkedScopes != null &&
+					checkedScopes.contains(approvalToBeUpdated.get("clientId") + "-" + approvalToBeUpdated.get("scope"))) {
+				approvalToBeUpdated.put("status", "APPROVED");
+			} else {
+				approvalToBeUpdated.put("status", "DENIED");
+			}
+			updatedApprovals.add(approvalToBeUpdated);
+		}
+
+		restTemplate.put(approvalsUri, updatedApprovals);
+
 
 		return get(model);
 	}
