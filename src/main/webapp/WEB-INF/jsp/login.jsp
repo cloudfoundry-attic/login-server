@@ -115,7 +115,7 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 						<c:forEach items="${prompts}" var="prompt">
               <spring:message code="prompt.${prompt.key}"
                 text="${prompt.value[1]}" var="text"/>
-              <input id='${prompt.key}' type='${prompt.value[0]}'
+              <input id='${prompt.key}' type='${prompt.value[0]}' ${prompt.value[0]=='password'?'autocomplete="off"':''}
                 name='${prompt.key}' placeholder='${text}' />
 						</c:forEach>
 					</div>
