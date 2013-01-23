@@ -3,7 +3,7 @@ uaa:
   token:
     url: https://uaa.cloudfoundry.com/oauth/token
   login:
-    url: https://uaa.cloudfoundry.com/login.do
+    url: https://uaa.cloudfoundry.com/authenticate
   clientinfo:
     url: https://uaa.cloudfoundry.com/clientinfo
   approvals:
