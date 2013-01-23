@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class HomeController {
 
 	private Map<String,String> links = new HashMap<String, String>();
-	
+
 	/**
 	 * @param links the links to set
 	 */
@@ -25,6 +25,18 @@ public class HomeController {
 		model.addAttribute("principal", principal);
 		model.addAttribute("links", links );
 		return "home";
+	}
+
+	@RequestMapping("/error500")
+	public String error500(Model model) {
+		model.addAttribute("error", "Something went wrong. Please try again later.");
+		return "error";
+	}
+
+	@RequestMapping("/error404")
+	public String error404(Model model) {
+		model.addAttribute("error", "That page couldn't be found.");
+		return "error";
 	}
 
 }
