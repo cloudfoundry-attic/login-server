@@ -105,6 +105,11 @@ public class RemoteUaaAuthenticationManager implements AuthenticationManager {
 		} else if (response.getStatusCode() == HttpStatus.FORBIDDEN) {
 			logger.info("Failed authentication request");
 			throw new BadCredentialsException("Authentication failed");
+		} else if (response.getStatusCode() == HttpStatus.INTERNAL_SERVER_ERROR) {
+			logger.info("Internal error from UAA. Please Check the UAA logs.");
+		} else {
+			logger.error("Unexpected status code " + response.getStatusCode() + " from the UAA." +
+					" Is a compatible version running?");
 		}
 		throw new RuntimeException("Could not authenticate with remote server");
 	}
