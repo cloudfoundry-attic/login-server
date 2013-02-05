@@ -29,3 +29,4 @@ as well (as long as the UAA project is built and installed first as
 above):
 
     $ mvn test -P integration
+
