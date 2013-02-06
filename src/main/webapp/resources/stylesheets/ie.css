@@ -103,3 +103,7 @@ html {background-color: #7ab4df;background-image: none}
 #loginForm input {
 	line-height: 38px;
 }
+
+input[type=checkbox], input[type=checkbox]:checked {
+  background-image:none;
+}

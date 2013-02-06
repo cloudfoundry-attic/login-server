@@ -17,6 +17,10 @@ img {
 	border: none;
 }
 
+hr {
+	margin: 25px 0;
+}
+
 .super-nav li,.super-nav li a {
 	list-style-type: none;
 	color: #333;
@@ -326,6 +330,10 @@ input#password {
   font-weight: 300;
 }
 
+.bg-content-approvals a:hover {
+	text-decoration: underline;
+}
+
 .content-title-approvals {
   -moz-border-radius: 3px 3px 0 0;
   -webkit-border-radius: 3px 3px 0 0;
@@ -389,7 +397,13 @@ input[type=checkbox] {
   padding: 0 0 0 0px;
   float: right;
   margin: -4px 0 0 0;
- }
+}
+
+
+input[type=checkbox]:hover {
+  cursor: pointer;
+}
+
 
 input[type=checkbox]:checked {
   -webkit-appearance: none;
@@ -487,4 +501,33 @@ input[type=checkbox]:checked {
   text-decoration:none;
   color:#0096d0;
   cursor: pointer;
+}
+
+#vendor {
+	cursor: pointer;
+}
+
+a#vendor:hover {
+	text-decoration: none;
+}
+
+#approvals-list-container {
+	display: none;
+	margin: 0 0 20px 0;
+}
+
+.app-approval-container {
+  background: none repeat scroll 0 0 rgba(255,255,255,0.5);
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
+  overflow: hidden;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.75);
+  color: #333333;
+  padding: 20px 30px 7px 30px;
+  margin: 0 0 10px 0;
+}
+
+.app-approval-title {
+	width: 900px;
 }
