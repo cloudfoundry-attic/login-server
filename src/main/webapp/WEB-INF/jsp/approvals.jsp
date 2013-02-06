@@ -86,45 +86,54 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 </script>
 </head>
 <body id="micro">
-	<div class="splash">
+	<div class="approvals">
 		<a href='${links.home}'><img
 			alt="Cloud Foundry: The Industry's Open Platform As A Service"
-			class="logo" src='${baseUrl}/images/logo_header_cloudfoundry.png'
+			class="logo-approvals" src='${baseUrl}/images/logo_header_cloudfoundry.png'
 			width='373' height='70'></img> </a>
 		<div style="float: right;">
 			<ul class='super-nav'>
-				<li><span>Welcome <strong>${fn:escapeXml(pageContext.request.userPrincipal.name)}</strong></span>
+				<li><span>Welcome <a href="/approvals"><strong>${fn:escapeXml(pageContext.request.userPrincipal.name)}</strong></a></span>
 					/ <c:url value="/logout.do" var="url" /> <a
 					href="${fn:escapeXml(url)}">Logout</a> &nbsp;</li>
 			</ul>
 		</div>
-		<div class="splash-box">
+		<div class="bg-content-approvals">
 			<c:if test="${error!=null}">
 				<div class="error" title="${fn:escapeXml(error)}">
-					<h2>Sorry</h2>
-					<p>There was an error. The request for authorization was
-						invalid.</p>
+					<div class="content-title-approvals">
+					  <h2>Sorry</h2>
+					</div>
+					<div class="content-inner-approvals">
+            <p>There was an error. The request for authorization was
+              invalid.</p>
+          </div>
 				</div>
 			</c:if>
 
 			<c:if test="${error==null}">
 
-				<h1>Approvals</h1>
-                <p>Checked scopes are approved and unchecked scopes are denied</p>
-				<form id="revokeApprovalsForm" action="approvals" method="post">
-				    <c:forEach items="${approvals}" var="client">
-				        <p>Client: ${client.key}</p>
-                        <p>Your approvals:</p>
-                        <c:forEach items="${client.value}" var="approval">
-	                        <input type="checkbox" name="checkedScopes" value="${approval.clientId}-${approval.scope}" ${approval.status eq 'APPROVED' ? 'checked=checked' : '' }>
-	                                  <spring:message code="scope.${approval.scope}"/> <br />
-                        </c:forEach>
-				    </c:forEach>
-				    
-					<p>
-						<input type="submit" value="Update">
-					</p>
-				</form>
+				<div class="content-title-approvals">
+				  <h2>Approvals</h2>
+				</div>
+
+        <div class="content-inner-approvals">
+          <form id="revokeApprovalsForm" action="approvals" method="post">
+              <c:forEach items="${approvals}" var="client">
+                  <p><strong>${client.key}</strong></p>
+                          <c:forEach items="${client.value}" var="approval">
+                            <div class="approvals-list-div">
+                              <input type="checkbox" name="checkedScopes" value="${approval.clientId}-${approval.scope}" ${approval.status eq 'APPROVED' ? 'checked=checked' : '' }>
+                                        <spring:message code="scope.${approval.scope}"/>
+                            </div>
+                          </c:forEach>
+              </c:forEach>
+
+            <p>
+              <input class="btn-primary-medium right" type="submit" value="Update">
+            </p>
+          </form>
+        </div>
 
 			</c:if>
 
