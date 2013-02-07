@@ -136,6 +136,7 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
                     href="${redirect_uri}">${redirect_uri}</a>),
                   you should deny access. The application will not see your password.
                 </p>
+                <br>
                 <c:set var="count" value="0" />
                   <c:if test="${(undecided_scopes != null) && (! empty undecided_scopes)}">
                      <p> <strong>New Requests</strong> </p>
