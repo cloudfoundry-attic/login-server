@@ -107,3 +107,15 @@ html {background-color: #7ab4df;background-image: none}
 input[type=checkbox], input[type=checkbox]:checked {
   background-image:none;
 }
+
+INPUT[type=checkbox] {
+  background:none;
+}
+
+.bg-content-approvals {
+  background-color:#f0f0f0;
+}
+
+a.allrequests {
+	display: none;
+}

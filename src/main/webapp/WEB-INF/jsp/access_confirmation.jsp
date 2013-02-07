@@ -47,42 +47,32 @@
 <!--[if IE 9 ]> <link href="${baseUrl}/stylesheets/ie9.css" media="screen" rel="stylesheet" type="text/css" /> <![endif]-->
 <!--[if lt IE 9 ]> <link href="${baseUrl}/stylesheets/ie.css" media="screen" rel="stylesheet" type="text/css" /> <![endif]-->
 <!--[if lt IE 8 ]> <link href="${baseUrl}/stylesheets/ie7.css" media="screen" rel="stylesheet" type="text/css" /> <![endif]-->
-<style media='screen' type='text/css'>
-.js-hide {
-	display: none;
-}
-
-.js-show {
-	display: block;
-}
-
-.fouc-fix {
-	display: none;
-}
-</style>
 <meta content='' name='Description' />
 <meta content='' name='keywords' />
-<style type='text/css'>
-img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc-branding-img-noclear
-	{
-	display: none;
-}
-
-.gs-result .gs-title,.gs-result .gs-title * {
-	color: #0094d4;
-}
-</style>
 <script type="text/javascript" src="${baseUrl}/javascripts/jquery.js"></script>
 <script type="text/javascript">
-	(function() {
-		// force ssl if cf.com
-		var loc = window.location;
-		if (loc.hostname.indexOf('cloudfoundry.com') >= 0
-				&& loc.protocol == "http:") {
-			window.location = "https://" + loc.host + loc.pathname + loc.search
-					+ loc.hash;
-		}
-	})();
+(function() {
+  // force ssl if cf.com
+  var loc = window.location;
+  if (loc.hostname.indexOf('cloudfoundry.com') >= 0
+      && loc.protocol == "http:") {
+    window.location = "https://" + loc.host + loc.pathname + loc.search
+        + loc.hash;
+  }
+})();
+function toggle(source) {
+  checkboxes = document.getElementsByClassName('requests');
+  for(var i in checkboxes)
+    checkboxes[i].checked = source.checked;
+}
+$('.allrequests').live('click',function(){
+    $(this).children().toggleClass('inactive');
+    if ( $('.individualrequests').children().hasClass('inactive') ) {
+      $('.individualrequests').children().removeClass('inactive').addClass('approvals-list-div');
+      } else if ( $('.individualrequests').children().hasClass('approvals-list-div') ) {
+          $('.individualrequests').children().removeClass('approvals-list-div').addClass('inactive');
+    }
+ });
 </script>
 </head>
 <body id="micro">
@@ -140,11 +130,19 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
                 <c:set var="count" value="0" />
                   <c:if test="${(undecided_scopes != null) && (! empty undecided_scopes)}">
                      <p> <strong>New Requests</strong> </p>
-                     <c:forEach items="${undecided_scopes}" var="scope">
+                       <a class="allrequests">
                          <div class="approvals-list-div">
-                           <input type="checkbox" checked="checked" name="scope.${count}" value="${scope['code']}"><spring:message code="${scope['code']}"
-                                   text="${scope['text']}" />
+                          <input onClick="toggle(this)"  type="checkbox" checked=checked>
+                                    Approve all
                          </div>
+                        </a>
+                     <c:forEach items="${undecided_scopes}" var="scope">
+                         <a class="individualrequests">
+                           <div class="inactive">
+                             <input type="checkbox" class="requests" checked="checked" name="scope.${count}" value="${scope['code']}"><spring:message code="${scope['code']}"
+                                     text="${scope['text']}" />
+                           </div>
+                         </a>
                          <c:set var="count" value="${count + 1}" />
                      </c:forEach>
                   </c:if>

@@ -47,47 +47,24 @@
 <!--[if IE 9 ]> <link href="${baseUrl}/stylesheets/ie9.css" media="screen" rel="stylesheet" type="text/css" /> <![endif]-->
 <!--[if lt IE 9 ]> <link href="${baseUrl}/stylesheets/ie.css" media="screen" rel="stylesheet" type="text/css" /> <![endif]-->
 <!--[if lt IE 8 ]> <link href="${baseUrl}/stylesheets/ie7.css" media="screen" rel="stylesheet" type="text/css" /> <![endif]-->
-<style media='screen' type='text/css'>
-.js-hide {
-	display: none;
-}
-
-.js-show {
-	display: block;
-}
-
-.fouc-fix {
-	display: none;
-}
-</style>
 <meta content='' name='Description' />
 <meta content='' name='keywords' />
-<style type='text/css'>
-img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc-branding-img-noclear
-	{
-	display: none;
-}
-
-.gs-result .gs-title,.gs-result .gs-title * {
-	color: #0094d4;
-}
-</style>
 <script type="text/javascript" src="${baseUrl}/javascripts/jquery.js"></script>
 <script type="text/javascript">
-	(function() {
-		// force ssl if cf.com
-		var loc = window.location;
-		if (loc.hostname.indexOf('cloudfoundry.com') >= 0
-				&& loc.protocol == "http:") {
-			window.location = "https://" + loc.host + loc.pathname + loc.search
-					+ loc.hash;
-		}
-	})();
-  $(document).ready(function(){
-    $("a#vendor").click(function(){
-      $(this).next().slideToggle();
-    });
+(function() {
+  // force ssl if cf.com
+  var loc = window.location;
+  if (loc.hostname.indexOf('cloudfoundry.com') >= 0
+      && loc.protocol == "http:") {
+    window.location = "https://" + loc.host + loc.pathname + loc.search
+        + loc.hash;
+  }
+})();
+$(document).ready(function(){
+  $("a#vendor").click(function(){
+    $(this).next().slideToggle();
   });
+});
 </script>
 </head>
 <body id="micro">

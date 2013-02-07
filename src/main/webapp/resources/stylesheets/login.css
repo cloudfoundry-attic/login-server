@@ -292,7 +292,7 @@ input#password {
 	text-shadow: 0 1px white;
 }
 
-/* Approvals */
+/* Approvals/Access Confirmation */
 
 .approvals {
   background: url('../images/bg-pattern.png') no-repeat;
@@ -332,6 +332,7 @@ input#password {
 
 .bg-content-approvals a:hover {
 	text-decoration: underline;
+  color: #0099D6;
 }
 
 .content-title-approvals {
@@ -444,7 +445,7 @@ input[type=checkbox]:checked {
   -o-border-radius: 4px;
   border-radius: 4px;
   display: inline-block;
-  margin-right: 3px;
+  margin: 0 3px 15px 0;
   text-align: center;
   border: 1px solid #813516;
   color: #fff;
@@ -453,6 +454,7 @@ input[type=checkbox]:checked {
   line-height: 28px;
   padding: 0 12px;
   font-size: 11px;
+  background-color: #f1865b;
 }
 
 .btn-primary-medium:hover {
@@ -509,6 +511,7 @@ input[type=checkbox]:checked {
 
 a#vendor:hover {
 	text-decoration: none;
+  color: #0099D6;
 }
 
 #approvals-list-container {
@@ -524,10 +527,54 @@ a#vendor:hover {
   overflow: hidden;
   text-shadow: 0 1px 0 rgba(255,255,255,0.75);
   color: #333333;
-  padding: 20px 30px 7px 30px;
+  padding: 20px 30px 17px 30px;
   margin: 0 0 10px 0;
 }
 
 .app-approval-title {
 	width: 900px;
+}
+
+.inactive {
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
+  padding: 15px;
+  background: #FEFEFE;
+  margin-bottom: 10px;
+  font-size: 11px;
+  text-transform: uppercase;
+  opacity: 0.3;
+}
+a.allrequests, a.individualrequests{
+  color: #333;
+}
+a.allrequests:hover, a.individualrequests:hover{
+  text-decoration: none;
+  color:#333;
+}
+
+.super-nav li a:hover {
+  text-decoration: underline;
+}
+
+img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc-branding-img-noclear
+	{
+	display: none;
+}
+
+.gs-result .gs-title,.gs-result .gs-title * {
+	color: #0094d4;
+}
+
+.js-hide {
+	display: none;
+}
+
+.js-show {
+	display: block;
+}
+
+.fouc-fix {
+	display: none;
 }
