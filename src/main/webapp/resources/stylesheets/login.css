@@ -529,6 +529,13 @@ a#vendor:hover {
   color: #333333;
   padding: 20px 30px 17px 30px;
   margin: 0 0 10px 0;
+  border: 1px solid transparent;
+}
+
+.app-approval-container:hover {
+  border: 1px solid #0099D6;
+  -webkit-box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
 
 .app-approval-title {
@@ -576,5 +583,9 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 }
 
 .fouc-fix {
+	display: none;
+}
+
+a.allrequests {
 	display: none;
 }

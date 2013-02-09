@@ -105,31 +105,32 @@ $(document).ready(function(){
           <p><strong>Username:</strong> ${fn:escapeXml(pageContext.request.userPrincipal.name)}</p>
           <p><strong>Password:</strong> ********** <a href="http://my.cloudfoundry.com/passwd" target="_blank">Reset password</a></p>
 
-          <hr>
+          <c:if test="${! empty approvals}">
+            <hr>
 
-          <p><strong>Application Approvals</strong></p>
-			    <p>These applications have been granted access to your CloudFoundry.com account. Click them to see what you've approved.</p>
+            <p><strong>Application Approvals</strong></p>
+            <p>These applications have been granted access to your CloudFoundry.com account.</p>
 
-          <form id="revokeApprovalsForm" action="approvals" method="post">
-              <c:forEach items="${approvals}" var="client">
-                  <div class="app-approval-container">
-                    <a id="vendor"><div class="app-approval-title">${client.key}</div></a>
-                      <div id="approvals-list-container">
-                      <br>
-                      <c:forEach items="${client.value}" var="approval">
-                        <div class="approvals-list-div">
-                          <input type="checkbox" name="checkedScopes" value="${approval.clientId}-${approval.scope}" ${approval.status eq 'APPROVED' ? 'checked=checked' : '' }>
-                                    <spring:message code="scope.${approval.scope}"/>
+            <form id="revokeApprovalsForm" action="approvals" method="post">
+                <c:forEach items="${approvals}" var="client">
+                    <div class="app-approval-container">
+                      <a id="vendor"><div class="app-approval-title">${client.key}</div></a>
+                        <div id="approvals-list-container">
+                          <br>
+                          <c:forEach items="${client.value}" var="approval">
+                            <div class="approvals-list-div">
+                              <input type="checkbox" name="checkedScopes" value="${approval.clientId}-${approval.scope}" ${approval.status eq 'APPROVED' ? 'checked=checked' : '' }>
+                                        <spring:message code="scope.${approval.scope}"/>
+                            </div>
+                          </c:forEach>
+                          <p>
+                            <input class="btn-primary-medium right" type="submit" value="Update">
+                          </p>
                         </div>
-                      </c:forEach>
-                      </div>
-                  </div>
-              </c:forEach>
-
-            <p>
-              <input class="btn-primary-medium right" type="submit" value="Update">
-            </p>
-          </form>
+                    </div>
+                </c:forEach>
+            </form>
+          </c:if>
         </div>
 
 			</c:if>

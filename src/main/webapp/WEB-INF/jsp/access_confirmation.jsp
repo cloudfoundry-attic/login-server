@@ -128,8 +128,10 @@ $('.allrequests').live('click',function(){
                 </p>
                 <br>
                 <c:set var="count" value="0" />
-                  <c:if test="${(undecided_scopes != null) && (! empty undecided_scopes)}">
+                  <c:if test="${(! empty undecided_scopes) && (! empty approved_scopes || ! empty denied_scopes)}">
                      <p> <strong>New Requests</strong> </p>
+                  </c:if>
+                  <c:if test="${(! empty undecided_scopes)}">
                        <a class="allrequests">
                          <div class="approvals-list-div">
                           <input onClick="toggle(this)"  type="checkbox" checked=checked>
@@ -138,7 +140,7 @@ $('.allrequests').live('click',function(){
                         </a>
                      <c:forEach items="${undecided_scopes}" var="scope">
                          <a class="individualrequests">
-                           <div class="inactive">
+                           <div class="approvals-list-div">
                              <input type="checkbox" class="requests" checked="checked" name="scope.${count}" value="${scope['code']}"><spring:message code="${scope['code']}"
                                      text="${scope['text']}" />
                            </div>
@@ -146,7 +148,7 @@ $('.allrequests').live('click',function(){
                          <c:set var="count" value="${count + 1}" />
                      </c:forEach>
                   </c:if>
-                  <c:if test="${(approved_scopes != null) || (denied_scopes != null)}">
+                  <c:if test="${(! empty approved_scopes) || (! empty denied_scopes)}">
                       <p> <strong>Existing Permissions</strong> </p>
                   </c:if>
                   <c:if test="${(approved_scopes != null) && (! empty approved_scopes)}">
