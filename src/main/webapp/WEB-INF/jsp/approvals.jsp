@@ -47,84 +47,90 @@
 <!--[if IE 9 ]> <link href="${baseUrl}/stylesheets/ie9.css" media="screen" rel="stylesheet" type="text/css" /> <![endif]-->
 <!--[if lt IE 9 ]> <link href="${baseUrl}/stylesheets/ie.css" media="screen" rel="stylesheet" type="text/css" /> <![endif]-->
 <!--[if lt IE 8 ]> <link href="${baseUrl}/stylesheets/ie7.css" media="screen" rel="stylesheet" type="text/css" /> <![endif]-->
-<style media='screen' type='text/css'>
-.js-hide {
-	display: none;
-}
-
-.js-show {
-	display: block;
-}
-
-.fouc-fix {
-	display: none;
-}
-</style>
 <meta content='' name='Description' />
 <meta content='' name='keywords' />
-<style type='text/css'>
-img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc-branding-img-noclear
-	{
-	display: none;
-}
-
-.gs-result .gs-title,.gs-result .gs-title * {
-	color: #0094d4;
-}
-</style>
 <script type="text/javascript" src="${baseUrl}/javascripts/jquery.js"></script>
 <script type="text/javascript">
-	(function() {
-		// force ssl if cf.com
-		var loc = window.location;
-		if (loc.hostname.indexOf('cloudfoundry.com') >= 0
-				&& loc.protocol == "http:") {
-			window.location = "https://" + loc.host + loc.pathname + loc.search
-					+ loc.hash;
-		}
-	})();
+(function() {
+  // force ssl if cf.com
+  var loc = window.location;
+  if (loc.hostname.indexOf('cloudfoundry.com') >= 0
+      && loc.protocol == "http:") {
+    window.location = "https://" + loc.host + loc.pathname + loc.search
+        + loc.hash;
+  }
+})();
+$(document).ready(function(){
+  $("a#vendor").click(function(){
+    $(this).next().slideToggle();
+  });
+});
 </script>
 </head>
 <body id="micro">
-	<div class="splash">
+	<div class="approvals">
 		<a href='${links.home}'><img
 			alt="Cloud Foundry: The Industry's Open Platform As A Service"
-			class="logo" src='${baseUrl}/images/logo_header_cloudfoundry.png'
+			class="logo-approvals" src='${baseUrl}/images/logo_header_cloudfoundry.png'
 			width='373' height='70'></img> </a>
 		<div style="float: right;">
 			<ul class='super-nav'>
-				<li><span>Welcome <strong>${fn:escapeXml(pageContext.request.userPrincipal.name)}</strong></span>
+				<li><span>Welcome <a href="/approvals"><strong>${fn:escapeXml(pageContext.request.userPrincipal.name)}</strong></a></span>
 					/ <c:url value="/logout.do" var="url" /> <a
 					href="${fn:escapeXml(url)}">Logout</a> &nbsp;</li>
 			</ul>
 		</div>
-		<div class="splash-box">
+		<div class="bg-content-approvals">
 			<c:if test="${error!=null}">
 				<div class="error" title="${fn:escapeXml(error)}">
-					<h2>Sorry</h2>
-					<p>There was an error. The request for authorization was
-						invalid.</p>
+					<div class="content-title-approvals">
+					  <h2>Sorry</h2>
+					</div>
+					<div class="content-inner-approvals">
+            <p>There was an error. The request for authorization was
+              invalid.</p>
+          </div>
 				</div>
 			</c:if>
 
 			<c:if test="${error==null}">
 
-				<h1>Approvals</h1>
-                <p>Checked scopes are approved and unchecked scopes are denied</p>
-				<form id="revokeApprovalsForm" action="approvals" method="post">
-				    <c:forEach items="${approvals}" var="client">
-				        <p>Client: ${client.key}</p>
-                        <p>Your approvals:</p>
-                        <c:forEach items="${client.value}" var="approval">
-	                        <input type="checkbox" name="checkedScopes" value="${approval.clientId}-${approval.scope}" ${approval.status eq 'APPROVED' ? 'checked=checked' : '' }>
-	                                  <spring:message code="scope.${approval.scope}"/> <br />
-                        </c:forEach>
-				    </c:forEach>
-				    
-					<p>
-						<input type="submit" value="Update">
-					</p>
-				</form>
+				<div class="content-title-approvals">
+				  <h2>Account Settings</h2>
+				</div>
+
+        <div class="content-inner-approvals">
+          <p class="right">Looking for <a href="http://micro.cloudfoundry.com" target="_blank">Micro</a> or <a href="http://support.cloudfoundry.com" target="_blank">Support</a> ?</p>
+
+          <p><strong>Username:</strong> ${fn:escapeXml(pageContext.request.userPrincipal.name)}</p>
+          <p><strong>Password:</strong> ********** <a href="http://my.cloudfoundry.com/passwd" target="_blank">Reset password</a></p>
+
+          <hr>
+
+          <p><strong>Application Approvals</strong></p>
+			    <p>These applications have been granted access to your CloudFoundry.com account. Click them to see what you've approved.</p>
+
+          <form id="revokeApprovalsForm" action="approvals" method="post">
+              <c:forEach items="${approvals}" var="client">
+                  <div class="app-approval-container">
+                    <a id="vendor"><div class="app-approval-title">${client.key}</div></a>
+                      <div id="approvals-list-container">
+                      <br>
+                      <c:forEach items="${client.value}" var="approval">
+                        <div class="approvals-list-div">
+                          <input type="checkbox" name="checkedScopes" value="${approval.clientId}-${approval.scope}" ${approval.status eq 'APPROVED' ? 'checked=checked' : '' }>
+                                    <spring:message code="scope.${approval.scope}"/>
+                        </div>
+                      </c:forEach>
+                      </div>
+                  </div>
+              </c:forEach>
+
+            <p>
+              <input class="btn-primary-medium right" type="submit" value="Update">
+            </p>
+          </form>
+        </div>
 
 			</c:if>
 
