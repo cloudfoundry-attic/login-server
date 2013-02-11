@@ -47,127 +47,151 @@
 <!--[if IE 9 ]> <link href="${baseUrl}/stylesheets/ie9.css" media="screen" rel="stylesheet" type="text/css" /> <![endif]-->
 <!--[if lt IE 9 ]> <link href="${baseUrl}/stylesheets/ie.css" media="screen" rel="stylesheet" type="text/css" /> <![endif]-->
 <!--[if lt IE 8 ]> <link href="${baseUrl}/stylesheets/ie7.css" media="screen" rel="stylesheet" type="text/css" /> <![endif]-->
-<style media='screen' type='text/css'>
-.js-hide {
-	display: none;
-}
-
-.js-show {
-	display: block;
-}
-
-.fouc-fix {
-	display: none;
-}
-</style>
 <meta content='' name='Description' />
 <meta content='' name='keywords' />
-<style type='text/css'>
-img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc-branding-img-noclear
-	{
-	display: none;
-}
-
-.gs-result .gs-title,.gs-result .gs-title * {
-	color: #0094d4;
-}
-</style>
 <script type="text/javascript" src="${baseUrl}/javascripts/jquery.js"></script>
 <script type="text/javascript">
-	(function() {
-		// force ssl if cf.com
-		var loc = window.location;
-		if (loc.hostname.indexOf('cloudfoundry.com') >= 0
-				&& loc.protocol == "http:") {
-			window.location = "https://" + loc.host + loc.pathname + loc.search
-					+ loc.hash;
-		}
-	})();
+(function() {
+  // force ssl if cf.com
+  var loc = window.location;
+  if (loc.hostname.indexOf('cloudfoundry.com') >= 0
+      && loc.protocol == "http:") {
+    window.location = "https://" + loc.host + loc.pathname + loc.search
+        + loc.hash;
+  }
+})();
+function toggle(source) {
+  checkboxes = document.getElementsByClassName('requests');
+  for(var i in checkboxes)
+    checkboxes[i].checked = source.checked;
+}
+$('.allrequests').live('click',function(){
+    $(this).children().toggleClass('inactive');
+    if ( $('.individualrequests').children().hasClass('inactive') ) {
+      $('.individualrequests').children().removeClass('inactive').addClass('approvals-list-div');
+      } else if ( $('.individualrequests').children().hasClass('approvals-list-div') ) {
+          $('.individualrequests').children().removeClass('approvals-list-div').addClass('inactive');
+    }
+ });
 </script>
 </head>
 <body id="micro">
-	<div class="splash">
+	<div class="approvals">
 		<a href='${links.home}'><img
 			alt="Cloud Foundry: The Industry's Open Platform As A Service"
-			class="logo" src='${baseUrl}/images/logo_header_cloudfoundry.png'
+			class="logo-approvals" src='${baseUrl}/images/logo_header_cloudfoundry.png'
 			width='373' height='70'></img> </a>
 		<div style="float: right;">
 			<ul class='super-nav'>
-				<li><span>Welcome <strong>${fn:escapeXml(pageContext.request.userPrincipal.name)}</strong></span>
+				<li><span>Welcome <a href="/approvals"><strong>${fn:escapeXml(pageContext.request.userPrincipal.name)}</strong></a></span>
 					/ <c:url value="/logout.do" var="url" /> <a
 					href="${fn:escapeXml(url)}">Logout</a> &nbsp;</li>
 			</ul>
 		</div>
-		<div class="splash-box">
+		<div class="bg-content-approvals">
 			<c:if test="${error!=null}">
 				<div class="error" title="${fn:escapeXml(error)}">
-					<h2>Sorry</h2>
-					<p>There was an error. The request for authorization was
-						invalid.</p>
-				</div>
+					<div class="content-title-approvals">
+					  <h2>Sorry</h2>
+					</div>
+					<div class="content-inner-approvals">
+            <p>There was an error. The request for authorization was
+              invalid.</p>
+          </div>
+        </div>
 			</c:if>
 
 			<c:if test="${error==null}">
 
-				<h2>Please Confirm</h2>
-                <form id="confirmationForm" name="confirmationForm"
-                    action="${authorizeUrl}" method="POST">
-				
-					<div class="confirm">
-						<p>
-							Do you authorize the application '${client_id}' at <a
-								href="${redirect_uri}">${redirect_uri}</a> to access your
-							CloudFoundry.com resources?
-						</p>
-						<c:set var="count" value="0" />
-	                    <c:if test="${(approved_scopes != null) && (! empty approved_scopes)}">
-	                        <p> You have already approved '${client_id}' with access to the following: </p>
-	                        <c:forEach items="${approved_scopes}" var="scope">
-	                            <input type="checkbox" checked="checked" name="scope.${count}" value="${scope['code']}"><spring:message code="${scope['code']}"
-	                                    text="${scope['text']}" /><br/>
-	                            <c:set var="count" value="${count + 1}" />
-	                        </c:forEach>
-	                    </c:if>
-	                    <c:if test="${(denied_scopes != null) && (! empty denied_scopes)}">
-	                        <p> You have already denied '${client_id}' access to the following: </p>
-	                        <c:forEach items="${denied_scopes}" var="scope">
-	                           <input type="checkbox" name="scope.${count}" value="${scope['code']}"><spring:message code="${scope['code']}"
-	                                   text="${scope['text']}" /><br/>
-	                           <c:set var="count" value="${count + 1}" />
-	                       </c:forEach>
-	                    </c:if>
-	                    <c:if test="${(undecided_scopes != null) && (! empty undecided_scopes)}">
-	                       <p> Do you want to allow '${client_id}' to: </p>
-	                       <c:forEach items="${undecided_scopes}" var="scope">
-	                           <input type="checkbox" name="scope.${count}" value="${scope['code']}"><spring:message code="${scope['code']}"
-	                                   text="${scope['text']}" /><br/>
-	                           <c:set var="count" value="${count + 1}" />
-	                       </c:forEach>
-	                    </c:if>
-	                    
-	                    <c:if test="${(approved_scopes != null) && (! empty approved_scopes) || (denied_scopes != null) && (! empty denied_scopes)}">
-	                       <p>Do you wish to change these selections?</p>
-	                    </c:if>
-						<p>If you do not recognize the application or the URL in the
-							link above you should deny access. The application will not be
-							able to see your password.</p>
-					</div>
+				<div class="content-title-approvals">
+          <h2>Application Authorization</h2>
+        </div>
 
-					<input name="${options.confirm.key}"
-						value="${options.confirm.value}" type="hidden" />
-					<div class="buttons">
-						<button class="orange-button" type="submit">Ok</button>
-					</div>
-				</form>
-				<form id="denialForm" name="denialForm" action="${authorizeUrl}"
-					method="POST">
-					<input name="${options.deny.key}" value="${options.deny.value}"
-						type="hidden" />
-					<div class="buttons">
-						<button class="gray-button" type="submit">Cancel</button>
-					</div>
-				</form>
 
+        <div class="content-inner-approvals">
+
+          <div class="left-side-approvals">
+            <strong>${client_id}</strong><br>
+            <a class="break" href="${redirect_uri}">${redirect_uri}</a>
+          </div>
+
+          <div class="right-side-approvals">
+            <form id="confirmationForm" name="confirmationForm"
+                action="${authorizeUrl}" method="POST">
+
+              <div class="confirm">
+                <p>
+                  ${client_id} has requested permission to access your
+                  CloudFoundry.com account. If you do not recognize this application or URL (<a
+                    href="${redirect_uri}">${redirect_uri}</a>),
+                  you should deny access. The application will not see your password.
+                </p>
+                <br>
+                <c:set var="count" value="0" />
+                  <c:if test="${(! empty undecided_scopes) && (! empty approved_scopes || ! empty denied_scopes)}">
+                     <p> <strong>New Requests</strong> </p>
+                  </c:if>
+                  <c:if test="${(! empty undecided_scopes)}">
+                       <a class="allrequests">
+                         <div class="approvals-list-div">
+                          <input onClick="toggle(this)"  type="checkbox" checked=checked>
+                                    Approve all
+                         </div>
+                        </a>
+                     <c:forEach items="${undecided_scopes}" var="scope">
+                         <a class="individualrequests">
+                           <div class="approvals-list-div">
+                             <input type="checkbox" class="requests" checked="checked" name="scope.${count}" value="${scope['code']}"><spring:message code="${scope['code']}"
+                                     text="${scope['text']}" />
+                           </div>
+                         </a>
+                         <c:set var="count" value="${count + 1}" />
+                     </c:forEach>
+                  </c:if>
+                  <c:if test="${(! empty approved_scopes) || (! empty denied_scopes)}">
+                      <p> <strong>Existing Permissions</strong> </p>
+                  </c:if>
+                  <c:if test="${(approved_scopes != null) && (! empty approved_scopes)}">
+                      <c:forEach items="${approved_scopes}" var="scope">
+                          <div class="approvals-list-div">
+                            <input type="checkbox" checked="checked" name="scope.${count}" value="${scope['code']}"><spring:message code="${scope['code']}"
+                                    text="${scope['text']}" />
+                          </div>
+                          <c:set var="count" value="${count + 1}" />
+                      </c:forEach>
+                  </c:if>
+                  <c:if test="${(denied_scopes != null) && (! empty denied_scopes)}">
+                      <c:forEach items="${denied_scopes}" var="scope">
+                         <div class="approvals-list-div">
+                           <input type="checkbox" name="scope.${count}" value="${scope['code']}"><spring:message code="${scope['code']}"
+                                   text="${scope['text']}" />
+                         </div>
+                         <c:set var="count" value="${count + 1}" />
+                     </c:forEach>
+                  </c:if>
+
+                <br>
+                <p>
+                  You can revoke access to any application at any time from your account settings.
+                  By approving access, you agree to ${client_id}'s terms of service and privacy policy.
+                </p>
+              </div>
+              <input name="${options.confirm.key}"
+                value="${options.confirm.value}" type="hidden" />
+              <div class="right spacer">
+                <button class="btn-primary-medium" type="submit">Submit</button>
+              </div>
+            </form>
+            <form id="denialForm" name="denialForm" action="${authorizeUrl}"
+              method="POST">
+              <input name="${options.deny.key}" value="${options.deny.value}"
+                type="hidden" />
+              <div class="right spacer">
+                <button class="btn-secondary-medium" type="submit">Cancel</button>
+              </div>
+            </form>
+          </div>
+        </div>
 			</c:if>
 
 		</div>
