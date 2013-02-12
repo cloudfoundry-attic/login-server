@@ -8,7 +8,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.Assert;
@@ -29,6 +33,8 @@ public class ApprovalsController implements InitializingBean {
 
 	private RestOperations restTemplate;
 
+	private final Log logger = LogFactory.getLog(getClass());
+
 	public ApprovalsController(RestOperations restTemplate) {
 		this.restTemplate = restTemplate;
 	}
@@ -46,6 +52,18 @@ public class ApprovalsController implements InitializingBean {
 	 */
 	public void setLinks(Map<String, String> links) {
 		this.links = links;
+	}
+
+
+	/**
+	 * Handle form post for revoking chosen approvals
+	 */
+	@RequestMapping(value = "/approvals/delete", method = RequestMethod.POST)
+	public String deleteApprovalsForClient(Model model, @RequestParam(required=true) String clientId) {
+		ResponseEntity<String> response = restTemplate.exchange(approvalsUri + "?clientId=" + clientId, HttpMethod.DELETE, null, String.class);
+		logger.debug("Delete approvals request resulted in " + response);
+
+		return get(model);
 	}
 
 	/**

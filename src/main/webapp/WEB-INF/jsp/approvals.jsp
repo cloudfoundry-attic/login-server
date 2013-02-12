@@ -65,6 +65,9 @@ $(document).ready(function(){
     $(this).next().slideToggle();
   });
 });
+function deleteApprovalsFor(client){
+	$('<form action="approvals/delete" method="post"><input name="clientId" value="' + client + '"></input></form>').submit();
+}
 </script>
 </head>
 <body id="micro">
@@ -115,6 +118,7 @@ $(document).ready(function(){
                 <c:forEach items="${approvals}" var="client">
                     <div class="app-approval-container">
                       <a id="vendor"><div class="app-approval-title">${client.key}</div></a>
+                      <div align="right"><input type='button' name="deleteClient" value='Delete' onclick="deleteApprovalsFor('${client.key}')" /></div>
                         <div id="approvals-list-container">
                           <br>
                           <c:forEach items="${client.value}" var="approval">
