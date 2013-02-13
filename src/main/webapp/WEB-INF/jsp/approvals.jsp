@@ -32,7 +32,7 @@
 <html class='no-js' dir='ltr' lang='en'>
 <!-- <![endif] -->
 <head>
-<title>Access Confirmation | Cloud Foundry</title>
+<title>Account Settings | Cloud Foundry</title>
 <meta charset='utf-8'>
 <meta content='IE=edge,chrome=1' http-equiv='X-UA-Compatible'>
 <meta content='VMware' name='author' />
@@ -118,7 +118,6 @@ function deleteApprovalsFor(client){
                 <c:forEach items="${approvals}" var="client">
                     <div class="app-approval-container">
                       <a id="vendor"><div class="app-approval-title">${client.key}</div></a>
-                      <div align="right"><input type='button' name="deleteClient" value='Delete' onclick="deleteApprovalsFor('${client.key}')" /></div>
                         <div id="approvals-list-container">
                           <br>
                           <c:forEach items="${client.value}" var="approval">
@@ -129,6 +128,7 @@ function deleteApprovalsFor(client){
                           </c:forEach>
                           <p>
                             <input class="btn-primary-medium right" type="submit" value="Update">
+                            <input class="btn-secondary-medium right" type='button' name="deleteClient" value='Delete' onclick="deleteApprovalsFor('${client.key}')" />
                           </p>
                         </div>
                     </div>
