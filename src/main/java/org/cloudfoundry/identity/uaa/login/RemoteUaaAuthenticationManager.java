@@ -13,15 +13,18 @@
 
 package org.cloudfoundry.identity.uaa.login;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.cloudfoundry.identity.uaa.user.UaaAuthority;
-import org.springframework.http.*;
-import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -92,6 +95,7 @@ public class RemoteUaaAuthenticationManager implements AuthenticationManager {
 		parameters.set("username", username);
 		parameters.set("password", password);
 
+		@SuppressWarnings("rawtypes")
 		ResponseEntity<Map> response = restTemplate.exchange(loginUrl, HttpMethod.POST,
 				new HttpEntity<MultiValueMap<String, Object>>(parameters, headers), Map.class);
 

@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -23,6 +24,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.params.ClientPNames;
 import org.apache.http.client.params.CookiePolicy;
+import org.cloudfoundry.identity.uaa.authentication.login.Prompt;
 import org.cloudfoundry.identity.uaa.client.SocialClientUserDetails;
 import org.cloudfoundry.identity.uaa.util.UaaStringUtils;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
@@ -38,7 +40,6 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.common.exceptions.OAuth2Exception;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -89,7 +90,7 @@ public class RemoteUaaController {
 
 	private Properties buildProperties = new Properties();
 
-	private RestTemplate defaultTemplate = new RestTemplate();
+	private RestOperations defaultTemplate = new RestTemplate();
 
 	private RestOperations authorizationTemplate = new RestTemplate();
 
@@ -99,11 +100,32 @@ public class RemoteUaaController {
 
 	private Map<String, String> links = new HashMap<String, String>();
 
+	private List<Prompt> prompts;
+
+	/**
+	 * Prompts to use if authenticating locally. Set this if you want to override the default behaviour of asking the
+	 * remote UAA for its prompts.
+	 * 
+	 * @param prompts the prompts to set
+	 */
+	public void setPrompts(List<Prompt> prompts) {
+		this.prompts = prompts;
+	}
+
 	/**
 	 * @param links the links to set
 	 */
 	public void setLinks(Map<String, String> links) {
 		this.links = links;
+	}
+
+	/**
+	 * The rest template used to grab prompts and do stuff that doesn't require authentication.
+	 * 
+	 * @param defaultTemplate the defaultTemplate to set
+	 */
+	public void setDefaultTemplate(RestOperations defaultTemplate) {
+		this.defaultTemplate = defaultTemplate;
 	}
 
 	/**
@@ -123,8 +145,9 @@ public class RemoteUaaController {
 	}
 
 	public RemoteUaaController() {
+		RestTemplate template = new RestTemplate();
 		// The default java.net client doesn't allow you to handle 4xx responses
-		defaultTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory() {
+		template.setRequestFactory(new HttpComponentsClientHttpRequestFactory() {
 			@Override
 			public HttpClient getHttpClient() {
 				HttpClient client = super.getHttpClient();
@@ -132,12 +155,13 @@ public class RemoteUaaController {
 				return client;
 			}
 		});
-		defaultTemplate.setErrorHandler(new DefaultResponseErrorHandler() {
+		template.setErrorHandler(new DefaultResponseErrorHandler() {
 			public boolean hasError(ClientHttpResponse response) throws IOException {
 				HttpStatus statusCode = response.getStatusCode();
 				return statusCode.series() == HttpStatus.Series.SERVER_ERROR;
 			}
 		});
+		defaultTemplate = template;
 		setUaaBaseUrl(DEFAULT_BASE_UAA_URL);
 		try {
 			gitProperties = PropertiesLoaderUtils.loadAllProperties("git.properties");
@@ -167,12 +191,12 @@ public class RemoteUaaController {
 	}
 
 	@RequestMapping(value = { "/login", "/info" }, method = RequestMethod.GET)
-	public String prompts(HttpServletRequest request, @RequestHeader HttpHeaders headers, Model model,
+	public String prompts(HttpServletRequest request, @RequestHeader HttpHeaders headers, Map<String, Object> model,
 			Principal principal) throws Exception {
 		String path = extractPath(request);
-		model.addAllAttributes(getLoginInfo(baseUrl + "/" + path, getRequestHeaders(headers)));
-		model.addAllAttributes(getBuildInfo());
-		model.addAttribute("links", getLinksInfo());
+		model.putAll(getLoginInfo(baseUrl + "/" + path, getRequestHeaders(headers)));
+		model.putAll(getBuildInfo());
+		model.put("links", getLinksInfo());
 		if (principal == null) {
 			return "login";
 		}
@@ -200,6 +224,19 @@ public class RemoteUaaController {
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private Map<String, Object> getLoginInfo(String baseUrl, HttpHeaders headers) {
+
+		Map<String, Object> body = new LinkedHashMap<String, Object>();
+		// If prompts are configured explicitly use them
+		if (prompts != null) {
+			Map<String, String[]> map = new LinkedHashMap<String, String[]>();
+			for (Prompt prompt : prompts) {
+				map.put(prompt.getName(), prompt.getDetails());
+			}
+			body.put("prompts", map);
+			return body;
+		}
+
+		// Otherwise fetch prompts from remote UAA
 		ResponseEntity<Map> response = null;
 		try {
 			ResponseEntity<Map> entity = defaultTemplate.exchange(baseUrl, HttpMethod.GET, new HttpEntity<Void>(null,
@@ -209,7 +246,6 @@ public class RemoteUaaController {
 		catch (Exception e) {
 			// use defaults
 		}
-		Map<String, Object> body = new LinkedHashMap<String, Object>();
 		if (response != null && response.getStatusCode() == HttpStatus.OK) {
 			body.putAll((Map<String, Object>) response.getBody());
 		}
@@ -221,6 +257,7 @@ public class RemoteUaaController {
 			body.put("prompts", prompts);
 		}
 		return body;
+
 	}
 
 	@RequestMapping(value = "/oauth/authorize", params = "response_type", method = RequestMethod.GET)
