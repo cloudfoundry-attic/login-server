@@ -102,7 +102,7 @@ public class AuthorizationCodeGrantIntegrationTests {
 		if (response.getStatusCode() == HttpStatus.OK) {
 			body = response.getBody();
 			// The grant access page should be returned
-			assertTrue(body.contains("Do you authorize"));
+			assertTrue(body.contains("Application Authorization"));
 			// Forms should have the right action
 			assertTrue(body.matches("(?s).*\\saction=\"\\S*oauth/authorize\".*"));
 
