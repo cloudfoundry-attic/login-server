@@ -122,9 +122,9 @@ $('.allrequests').live('click',function(){
               <div class="confirm">
                 <p>
                   ${client_id} has requested permission to access your
-                  CloudFoundry.com account. If you do not recognize this application or URL (<a
+                  CloudFoundry.com account. If you do not recognize this application or its URL (<a
                     href="${redirect_uri}">${redirect_uri}</a>),
-                  you should deny access. The application will not see your password.
+                  you should click Cancel below. The application will not see your password.
                 </p>
                 <br>
                 <c:set var="count" value="0" />
@@ -172,7 +172,7 @@ $('.allrequests').live('click',function(){
 
                 <br>
                 <p>
-                  You can revoke access to any application at any time from your account settings.
+                  You can change permissions or revoke access for this application at any time from your account settings.
                   By approving access, you agree to ${client_id}'s terms of service and privacy policy.
                 </p>
               </div>
