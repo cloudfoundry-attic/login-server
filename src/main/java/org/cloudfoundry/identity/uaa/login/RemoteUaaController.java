@@ -260,7 +260,7 @@ public class RemoteUaaController {
 
 	}
 
-	@RequestMapping(value = "/oauth/authorize", params = "response_type", method = RequestMethod.GET)
+	@RequestMapping(value = "/oauth/authorize", params = "response_type")
 	public ModelAndView startAuthorization(HttpServletRequest request, @RequestParam Map<String, String> parameters,
 			Map<String, Object> model, @RequestHeader HttpHeaders headers, Principal principal) throws Exception {
 
@@ -321,22 +321,6 @@ public class RemoteUaaController {
 	public ResponseEntity<byte[]> approveOrDeny(HttpServletRequest request, HttpEntity<byte[]> entity,
 			Map<String, Object> model, SessionStatus sessionStatus) throws Exception {
 		sessionStatus.setComplete();
-		return passthru(request, entity, model);
-	}
-
-	@RequestMapping(value = "/oauth/authorize", method = RequestMethod.POST, params = "credentials")
-	@ResponseBody
-	public ResponseEntity<byte[]> implicitOld(HttpServletRequest request, HttpEntity<byte[]> entity,
-			Map<String, Object> model) throws Exception {
-		logger.info("Direct authentication request with JSON credentials at /oauth/authorize");
-		return passthru(request, entity, model);
-	}
-
-	@RequestMapping(value = "/oauth/authorize", method = RequestMethod.POST, params = "source=credentials")
-	@ResponseBody
-	public ResponseEntity<byte[]> implicit(HttpServletRequest request, HttpEntity<byte[]> entity,
-			Map<String, Object> model) throws Exception {
-		logger.info("Direct authentication request at /oauth/authorize for " + request.getParameter("username"));
 		return passthru(request, entity, model);
 	}
 
