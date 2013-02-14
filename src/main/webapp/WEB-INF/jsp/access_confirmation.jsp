@@ -172,7 +172,7 @@ $('.allrequests').live('click',function(){
 
                 <br>
                 <p>
-                  You can change your approvals or revoke access for this application at any time from account settings.
+                  You can change your approval of permissions or revoke access for this application at any time from account settings.
                   By approving access, you agree to ${client_id}'s terms of service and privacy policy.
                 </p>
               </div>
