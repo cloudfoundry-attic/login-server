@@ -20,7 +20,7 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 
 <c:url var="baseUrl" value="/resources" />
-<c:url var="faviconUrl" value="/favicon.ico" />
+<c:url var="rootUrl" value="" />
 
 <!DOCTYPE html>
 <!--[if IE]>  <![endif]-->
@@ -38,7 +38,7 @@
 <meta content='VMware' name='author' />
 <meta content='Copyright VMware 2011. All Rights Reserved.'
 	name='copyright' />
-<link href='${faviconUrl}' rel='shortcut icon' />
+<link href='${rootUrl}/favicon.ico' rel='shortcut icon' />
 <meta content='all' name='robots' />
 <link href='${baseUrl}/stylesheets/print.css' media='print'
 	rel='stylesheet' type='text/css' />
