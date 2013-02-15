@@ -139,7 +139,7 @@ function deleteApprovalsFor(client){
                       <div id="firstdiv" style="display: block">
                         <div class="app-approval-container1">
                           <div class='row'>
-                            <input class="delete-icon right" type='button' name="deleteClient" value='Delete' onclick="deleteApprovalsFor('${client.key}')" />
+                            <input class="delete-icon right" type='button' name="deleteClient" onclick="deleteApprovalsFor('${client.key}')" />
                             <span class="linklike">${client.key}</span><div class="edit-icon right"></div>
                           </div>
                         </div>
