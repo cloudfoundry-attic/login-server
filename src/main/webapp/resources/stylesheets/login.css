@@ -387,6 +387,7 @@ input#password {
   margin-bottom: 10px;
   font-size: 11px;
   text-transform: uppercase;
+  color:#333;
 }
 
 input[type=checkbox] {
@@ -514,32 +515,9 @@ a#vendor:hover {
   color: #0099D6;
 }
 
-#approvals-list-container {
-	display: none;
-	margin: 0 0 20px 0;
-}
-
-.app-approval-container {
-  background: none repeat scroll 0 0 rgba(255,255,255,0.5);
-  -moz-border-radius: 5px;
-  -webkit-border-radius: 5px;
-  border-radius: 5px;
-  overflow: hidden;
-  text-shadow: 0 1px 0 rgba(255,255,255,0.75);
-  color: #333333;
-  padding: 20px 30px 17px 30px;
-  margin: 0 0 10px 0;
-  border: 1px solid transparent;
-}
-
-.app-approval-container:hover {
-  border: 1px solid #0099D6;
-  -webkit-box-shadow: 0 0 10px rgba(0,0,0,0.1);
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
-}
-
-.app-approval-title {
-	width: 900px;
+.approvals-list-container {
+  float: right;
+  width: 838px;
 }
 
 .inactive {
@@ -588,4 +566,109 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 
 a.allrequests {
 	display: none;
+}
+
+.icon-div {
+  display: none;
+  height:10px;
+  float: right;
+  width: 60px;
+}
+
+.delete-icon {
+  display: none;
+  background: url(../images/icons.png) 0 -1344px no-repeat;
+  width: 22px;
+  height: 21px;
+  cursor: pointer;
+  border: none;
+}
+
+.delete-icon:hover {
+  background: url(../images/icons.png) 0 -1367px no-repeat;
+  width: 22px;
+  height: 21px;
+  cursor: pointer;
+  border: none;
+}
+
+.edit-icon {
+  display: none;
+  background: url(../images/icons.png) 0 -1300px no-repeat;
+  width: 27px;
+  height: 21px;
+  cursor: pointer;
+  border: none;
+}
+
+.edit-icon:hover {
+  background: url(../images/icons.png) 0 -1320px no-repeat;
+  width: 27px;
+  height: 21px;
+  cursor: pointer;
+  border: none;
+}
+
+.none {
+  display: none;
+}
+
+.block {
+  display: block;
+}
+
+.app-approval-container1 {
+  background: none repeat scroll 0 0 rgba(255,255,255,0.5);
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
+  overflow: hidden;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.75);
+  color: #333333;
+  padding: 20px 30px 17px 30px;
+  margin: 0 0 10px 0;
+  border: 1px solid transparent;
+}
+
+.app-approval-container1:hover {
+  border: 1px solid #0099D6;
+  text-decoration: none;
+}
+
+.app-approval-container2 {
+  background: none repeat scroll 0 0 rgba(255,255,255,0.5);
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
+  overflow: hidden;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.75);
+  color: #333333;
+  padding: 20px 30px 17px 30px;
+  margin: 0 0 10px 0;
+  border: 1px solid transparent;
+}
+
+.app-approval-container2:hover {
+  border: 1px solid #0099D6;
+  cursor: pointer;
+}
+
+a#first:hover, a#second:hover {
+  text-decoration: none;
+}
+
+.linklike {
+  color:#0099D6;
+}
+
+#firstlink:hover, .app-approval-container1 a:hover, .app-approval-container2 a:hover {
+  text-decoration: none;
+}
+
+.row {
+  height: 21px;
+}
+
+#firstlink {
+  cursor: pointer;
 }

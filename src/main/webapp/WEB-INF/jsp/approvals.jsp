@@ -62,9 +62,28 @@
   }
 })();
 $(document).ready(function(){
-  $("a#vendor").click(function(){
-    $(this).next().slideToggle();
+  $(".app-approval-container1").mouseenter(function(){
+    $(this).find('.delete-icon').show();
+    $(this).find('.edit-icon').show();
   });
+  $(".app-approval-container1").mouseleave(function(){
+    $(this).find('.delete-icon').hide();
+    $(this).find('.edit-icon').hide();
+  });
+  $('a#firstlink').click(function () {
+    $(this).children().hide();
+    $(this).next().css({display: "block"});
+  });
+  $('a#cancel').click(function () {
+    $(this).parent().parent().parent().css({display: "none"});
+    $(this).parent().parent().parent().prev().children().first().css({display: "block"});
+  });
+  $('.app-approval-container2').click(function () {
+    $(this).parent().css({display: "none"});
+    $(this).parent().prev().children().first().css({display: "block"});
+  });
+  $(".app-approval-container2 input[type=checkbox]").click(function(e) { e.stopPropagation(); });
+  $(".app-approval-container2 input[type=submit]").click(function(e) { e.stopPropagation(); });
 });
 function deleteApprovalsFor(client){
 	$('<form action="approvals/delete" method="post"><input name="clientId" value="' + client + '"></input></form>').submit();
@@ -117,21 +136,35 @@ function deleteApprovalsFor(client){
 
             <form id="revokeApprovalsForm" action="approvals" method="post">
                 <c:forEach items="${approvals}" var="client">
-                    <div class="app-approval-container">
-                      <a id="vendor"><div class="app-approval-title">${client.key}</div></a>
+                    <a href="#" id="firstlink">
+                      <div id="firstdiv" style="display: block">
+                        <div class="app-approval-container1">
+                          <div class='row'>
+                            <input class="delete-icon right" type='button' name="deleteClient" onclick="deleteApprovalsFor('${client.key}')" />
+                            <span class="linklike">${client.key}</span><div class="edit-icon right"></div>
+                          </div>
+                        </div>
+                      </div>
+                    </a>
+                    <div id="seconddiv" style="display: none">
+                      <div class="app-approval-container2">
+                        <input class="btn-secondary-medium right" type='button' value="Delete" name="deleteClient" onclick="deleteApprovalsFor('${client.key}')" />
+                        <span class="linklike">${client.key}</span>
                         <div id="approvals-list-container">
                           <br>
+
                           <c:forEach items="${client.value}" var="approval">
                             <div class="approvals-list-div">
                               <input type="checkbox" name="checkedScopes" value="${approval.clientId}-${approval.scope}" ${approval.status eq 'APPROVED' ? 'checked=checked' : '' }>
                                         <spring:message code="scope.${approval.scope}"/>
                             </div>
                           </c:forEach>
-                          <p>
-                            <input class="btn-primary-medium right" type="submit" value="Update">
-                            <input class="btn-secondary-medium right" type='button' name="deleteClient" value='Delete' onclick="deleteApprovalsFor('${client.key}')" />
-                          </p>
+
+                          <input class="btn-primary-medium right" type="submit" value="Update">
+                          <a id="cancel" style="cursor: pointer"><input class="btn-secondary-medium right" type='button' value="Cancel"/></a>
+
                         </div>
+                      </div>
                     </div>
                 </c:forEach>
             </form>
