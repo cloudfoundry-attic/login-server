@@ -83,6 +83,10 @@ $(document).ready(function(){
   });
   $(".app-approval-container2 input[type=checkbox]").click(function(e) { e.stopPropagation(); });
   $(".app-approval-container2 input[type=submit]").click(function(e) { e.stopPropagation(); });
+
+  $('[title]').tooltip( {
+     tooltipClass: "tooltip"
+  });
 });
 function deleteApprovalsFor(client){
 	$('<form action="approvals/delete" method="post"><input name="clientId" value="' + client + '"></input></form>').submit();
@@ -139,8 +143,8 @@ function deleteApprovalsFor(client){
                       <div id="firstdiv" style="display: block">
                         <div class="app-approval-container1">
                           <div class='row'>
-                            <input class="delete-icon right" type='button' name="deleteClient" onclick="deleteApprovalsFor('${client.key}')" />
-                            <span class="linklike">${client.key}</span><div class="edit-icon right"></div>
+                            <input class="delete-icon right" title="Delete" type='button' name="deleteClient" onclick="deleteApprovalsFor('${client.key}')" />
+                            <span class="linklike">${client.key}</span><div class="edit-icon right" title="Edit "></div>
                           </div>
                         </div>
                       </div>
