@@ -58,8 +58,10 @@ public class RemoteUaaAuthenticationManagerTests {
 		responseHeaders.setLocation(new URI("https://uaa.cloudfoundry.com/"));
 		Map<String,String> response = new HashMap<String, String>();
 		response.put("username", "marissa");
+		@SuppressWarnings("rawtypes")
+		ResponseEntity<Map> expectedResponse = new ResponseEntity<Map>(response, responseHeaders, HttpStatus.OK);
 		when(restTemplate.exchange(endsWith("/authenticate"), eq(HttpMethod.POST), any(HttpEntity.class), eq(Map.class)))
-				.thenReturn(new ResponseEntity<Map>(response, responseHeaders, HttpStatus.OK));
+				.thenReturn(expectedResponse);
 		Authentication result = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken("marissa",
 				"foo"));
 		assertEquals("marissa", result.getName());
