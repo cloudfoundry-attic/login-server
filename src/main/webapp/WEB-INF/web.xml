@@ -28,8 +28,12 @@
 			<param-value>org.cloudfoundry.identity.uaa.config.YamlServletProfileInitializer</param-value>
 		</init-param>
 		<init-param>
-			<param-name>CONFIG_FILE_NAME</param-name>
+			<param-name>environmentConfigDefaults</param-name>
 			<param-value>login.yml</param-value>
+		</init-param>
+		<init-param>
+			<param-name>environmentConfigLocations</param-name>
+			<param-value>${LOGIN_CONFIG_URL},file:${LOGIN_CONFIG_PATH}/login.yml,file:${CLOUDFOUNDRY_CONFIG_PATH}/login.yml</param-value>
 		</init-param>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
