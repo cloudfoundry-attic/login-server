@@ -63,7 +63,7 @@ public class ApprovalsController implements InitializingBean {
 		ResponseEntity<String> response = restTemplate.exchange(approvalsUri + "?clientId=" + clientId, HttpMethod.DELETE, null, String.class);
 		logger.debug("Delete approvals request resulted in " + response);
 
-		return get(model);
+		return "redirect:/approvals";
 	}
 
 	/**
