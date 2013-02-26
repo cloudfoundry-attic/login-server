@@ -22,6 +22,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -36,7 +38,7 @@ import org.springframework.web.client.RestOperations;
 
 /**
  * @author Dave Syer
- * 
+ * @author Luke Taylor
  */
 public class RemoteUaaAuthenticationManagerTests {
 
@@ -54,8 +56,12 @@ public class RemoteUaaAuthenticationManagerTests {
 	@Test
 	public void testAuthenticate() throws Exception {
 		responseHeaders.setLocation(new URI("https://uaa.cloudfoundry.com/"));
-		when(restTemplate.exchange(endsWith("/login.do"), eq(HttpMethod.POST), any(HttpEntity.class), eq(Void.class)))
-				.thenReturn(new ResponseEntity<Void>(null, responseHeaders, HttpStatus.FOUND));
+		Map<String,String> response = new HashMap<String, String>();
+		response.put("username", "marissa");
+		@SuppressWarnings("rawtypes")
+		ResponseEntity<Map> expectedResponse = new ResponseEntity<Map>(response, responseHeaders, HttpStatus.OK);
+		when(restTemplate.exchange(endsWith("/authenticate"), eq(HttpMethod.POST), any(HttpEntity.class), eq(Map.class)))
+				.thenReturn(expectedResponse);
 		Authentication result = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken("marissa",
 				"foo"));
 		assertEquals("marissa", result.getName());

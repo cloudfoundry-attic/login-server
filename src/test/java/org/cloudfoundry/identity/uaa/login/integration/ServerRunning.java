@@ -24,8 +24,8 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.params.ClientPNames;
 import org.apache.http.client.params.CookiePolicy;
-import org.cloudfoundry.identity.uaa.integration.TestProfileEnvironment;
-import org.cloudfoundry.identity.uaa.integration.UrlHelper;
+import org.cloudfoundry.identity.uaa.test.TestProfileEnvironment;
+import org.cloudfoundry.identity.uaa.test.UrlHelper;
 import org.junit.Assume;
 import org.junit.internal.AssumptionViolatedException;
 import org.junit.rules.MethodRule;
@@ -56,22 +56,22 @@ import org.springframework.web.util.UriUtils;
  * the server is not running in the background all the tests here will simply be skipped because of a violated
  * assumption (showing as successful). Usage:
  * </p>
- * 
+ *
  * <pre>
  * &#064;Rule public static ServerRunning brokerIsRunning = ServerRunning.isRunning();
- * 
+ *
  * &#064;Test public void testSendAndReceive() throws Exception { // ... test using server etc. }
  * </pre>
  * <p>
  * The rule can be declared as static so that it only has to check once for all tests in the enclosing test case, but
  * there isn't a lot of overhead in making it non-static.
  * </p>
- * 
+ *
  * @see Assume
  * @see AssumptionViolatedException
- * 
+ *
  * @author Dave Syer
- * 
+ *
  */
 public class ServerRunning implements MethodRule, RestTemplateHolder, UrlHelper {
 
@@ -89,6 +89,18 @@ public class ServerRunning implements MethodRule, RestTemplateHolder, UrlHelper 
 	private static String DEFAULT_HOST = "localhost";
 
 	private static String DEFAULT_ROOT_PATH = "/login";
+
+	private static String DEFAULT_UAA_HOST = "localhost";
+
+	private static String DEFAULT_UAA_ROOT_PATH = "/uaa";
+	
+	private String protocol = "http";
+
+	private int uaaPort;
+
+	private String uaaHostName = DEFAULT_UAA_HOST;
+
+	private String uaaRootPath = DEFAULT_UAA_ROOT_PATH;
 
 	private int port;
 
@@ -108,9 +120,13 @@ public class ServerRunning implements MethodRule, RestTemplateHolder, UrlHelper 
 	private ServerRunning() {
 		this.environment = TestProfileEnvironment.getEnvironment();
 		this.integrationTest = environment.getProperty("uaa.integration.test", Boolean.class, false);
-		setPort(environment.getProperty("uaa.port", Integer.class, DEFAULT_PORT));
-		setRootPath(environment.getProperty("uaa.path", DEFAULT_ROOT_PATH));
-		setHostName(environment.getProperty("uaa.host", DEFAULT_HOST));
+		setPort(environment.getProperty("login.port", Integer.class, DEFAULT_PORT));
+		setRootPath(environment.getProperty("login.path", DEFAULT_ROOT_PATH));
+		setHostName(environment.getProperty("login.host", DEFAULT_HOST));
+		setUaaPort(environment.getProperty("uaa.port", Integer.class, DEFAULT_PORT));
+		setUaaRootPath(environment.getProperty("uaa.path", DEFAULT_UAA_ROOT_PATH));
+		setUaaHostName(environment.getProperty("uaa.host", DEFAULT_UAA_HOST));
+		protocol = environment.getProperty("login.protocol", "http");
 	}
 
 	/**
@@ -133,7 +149,7 @@ public class ServerRunning implements MethodRule, RestTemplateHolder, UrlHelper 
 
 	/**
 	 * The context root in the application, e.g. "/uaa" for a local deployment.
-	 * 
+	 *
 	 * @param rootPath the rootPath to set
 	 */
 	public void setRootPath(String rootPath) {
@@ -146,6 +162,37 @@ public class ServerRunning implements MethodRule, RestTemplateHolder, UrlHelper 
 			}
 		}
 		this.rootPath = rootPath;
+	}
+
+	/**
+	 * @param port the port to set
+	 */
+	public void setUaaPort(int port) {
+		this.uaaPort = port;
+	}
+
+	/**
+	 * @param hostName the hostName to set
+	 */
+	public void setUaaHostName(String hostName) {
+		this.uaaHostName = hostName;
+	}
+
+	/**
+	 * The context root in the application, e.g. "/uaa" for a local deployment.
+	 *
+	 * @param rootPath the rootPath to set
+	 */
+	public void setUaaRootPath(String rootPath) {
+		if (rootPath.equals("/")) {
+			rootPath = "";
+		}
+		else {
+			if (!rootPath.startsWith("/")) {
+				rootPath = "/" + rootPath;
+			}
+		}
+		this.uaaRootPath = rootPath;
 	}
 
 	@Override
@@ -188,8 +235,12 @@ public class ServerRunning implements MethodRule, RestTemplateHolder, UrlHelper 
 
 	}
 
+	public String getBaseUrl(String hostName, int port, String rootPath) {		
+		return protocol + "://" + hostName + (port == 80 ? "" : ":" + port) + rootPath;
+	}
+		
 	public String getBaseUrl() {
-		return "http://" + hostName + (port == 80 ? "" : ":" + port) + rootPath;
+		return getBaseUrl(hostName, port, rootPath);
 	}
 
 	public String getAccessTokenUri() {
@@ -201,15 +252,25 @@ public class ServerRunning implements MethodRule, RestTemplateHolder, UrlHelper 
 	}
 
 	public String getClientsUri() {
-		return getUrl("/oauth/clients");
+		return getUaaUrl("/oauth/clients");
 	}
 
 	public String getUsersUri() {
-		return getUrl("/Users");
+		return getUaaUrl("/Users");
 	}
 
 	public String getUserUri() {
-		return getUrl("/User");
+		return getUaaUrl("/User");
+	}
+
+	private String getUaaUrl(String path) {
+		if (path.startsWith("http")) {
+			return path;
+		}
+		if (!path.startsWith("/")) {
+			path = "/" + path;
+		}
+		return getBaseUrl(uaaHostName, uaaPort, uaaRootPath) + path;
 	}
 
 	public String getUrl(String path) {

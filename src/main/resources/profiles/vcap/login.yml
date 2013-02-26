@@ -3,4 +3,12 @@ uaa:
   token:
     url: http://uaa.vcap.me/oauth/token
   login:
-    url: http://uaa.vcap.me/login.do
+    url: http://uaa.vcap.me/authenticate
+  clientinfo:
+    url: https://uaa.vcap.me/clientinfo
+  approvals:
+    url: https://uaa.vcap.me/approvals
+login:
+  authorize:
+    url: https://login.vcap.me/oauth/authorize
+    

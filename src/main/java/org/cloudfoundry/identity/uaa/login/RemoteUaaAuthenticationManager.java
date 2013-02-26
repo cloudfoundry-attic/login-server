@@ -13,16 +13,18 @@
 
 package org.cloudfoundry.identity.uaa.login;
 
-import java.io.IOException;
+import java.util.Arrays;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.cloudfoundry.identity.uaa.user.UaaAuthority;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -37,11 +39,12 @@ import org.springframework.web.client.RestTemplate;
 
 /**
  * An authentication manager that can be used to login to a remote UAA service with username and password credentials,
- * without the local server needing to know anything about the user accounts. The request to authenticate is simply
- * passed on to the form login endpoint of the remote server and treated as successful if there is no error.
- * 
+ * without the local server needing to know anything about the user accounts. The request is handled by the UAA's
+ * RemoteAuhenticationEndpoint and success or failure is determined by the response code.
+ *
  * @author Dave Syer
- * 
+ * @author Luke Taylor
+ *
  */
 public class RemoteUaaAuthenticationManager implements AuthenticationManager {
 
@@ -49,7 +52,7 @@ public class RemoteUaaAuthenticationManager implements AuthenticationManager {
 
 	private RestOperations restTemplate = new RestTemplate();
 
-	private static String DEFAULT_LOGIN_URL = "http://uaa.cloudfoundry.com/login.do";
+	private static String DEFAULT_LOGIN_URL = "http://uaa.cloudfoundry.com/authenticate";
 
 	private String loginUrl = DEFAULT_LOGIN_URL;
 
@@ -72,8 +75,7 @@ public class RemoteUaaAuthenticationManager implements AuthenticationManager {
 		// The default java.net client doesn't allow you to handle 4xx responses
 		restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
 		restTemplate.setErrorHandler(new DefaultResponseErrorHandler() {
-			public boolean hasError(ClientHttpResponse response) throws IOException {
-				HttpStatus statusCode = response.getStatusCode();
+			protected boolean hasError(HttpStatus statusCode) {
 				return statusCode.series() == HttpStatus.Series.SERVER_ERROR;
 			}
 		});
@@ -82,29 +84,38 @@ public class RemoteUaaAuthenticationManager implements AuthenticationManager {
 
 	@Override
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-
 		String username = authentication.getName();
 		String password = (String) authentication.getCredentials();
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+		headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
 
 		MultiValueMap<String, Object> parameters = new LinkedMultiValueMap<String, Object>();
 		parameters.set("username", username);
 		parameters.set("password", password);
 
-		ResponseEntity<Void> response = restTemplate.exchange(loginUrl, HttpMethod.POST,
-				new HttpEntity<MultiValueMap<String, Object>>(parameters), Void.class);
+		@SuppressWarnings("rawtypes")
+		ResponseEntity<Map> response = restTemplate.exchange(loginUrl, HttpMethod.POST,
+				new HttpEntity<MultiValueMap<String, Object>>(parameters, headers), Map.class);
 
-		if (response.getHeaders().getLocation() != null) {
-			String location = response.getHeaders().getLocation().toString();
-			// Successful authentication redirects to the home page with no error
-			if (!location.contains("error=true")) {
+		if (response.getStatusCode() == HttpStatus.OK) {
+			String userFromUaa = (String) response.getBody().get("username");
+
+			if (userFromUaa.equals(userFromUaa)) {
 				logger.info("Successful authentication request for " + authentication.getName());
-				return new UsernamePasswordAuthenticationToken(username, password, UaaAuthority.USER_AUTHORITIES);
+				return new UsernamePasswordAuthenticationToken(username, null, UaaAuthority.USER_AUTHORITIES);
 			}
+		} else if (response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
+			logger.info("Failed authentication request");
+			throw new BadCredentialsException("Authentication failed");
+		} else if (response.getStatusCode() == HttpStatus.INTERNAL_SERVER_ERROR) {
+			logger.info("Internal error from UAA. Please Check the UAA logs.");
+		} else {
+			logger.error("Unexpected status code " + response.getStatusCode() + " from the UAA." +
+					" Is a compatible version running?");
 		}
-
-		logger.info("Failed authentication request");
-		throw new BadCredentialsException("Could not authenticate with remote server");
-
+		throw new RuntimeException("Could not authenticate with remote server");
 	}
 
 }
