@@ -138,40 +138,42 @@ function deleteApprovalsFor(client){
             <p><strong>Application Approvals</strong></p>
             <p>These applications have been granted access to your CloudFoundry.com account.</p>
 
-            <form id="revokeApprovalsForm" action="approvals" method="post">
-                <c:forEach items="${approvals}" var="client">
-                    <a href="#" id="firstlink">
-                      <div id="firstdiv" style="display: block">
-                        <div class="app-approval-container1">
-                          <div class='row'>
-                            <input class="delete-icon right" title="Delete" type='button' name="deleteClient" onclick="deleteApprovalsFor('${client.key}')" />
-                            <span class="linklike">${client.key}</span><div class="edit-icon right" title="Edit "></div>
-                          </div>
-                        </div>
-                      </div>
-                    </a>
-                    <div id="seconddiv" style="display: none">
-                      <div class="app-approval-container2">
-                        <input class="btn-secondary-medium right" type='button' value="Delete" name="deleteClient" onclick="deleteApprovalsFor('${client.key}')" />
-                        <span class="linklike">${client.key}</span>
-                        <div id="approvals-list-container">
-                          <br>
+            <c:forEach items="${approvals}" var="client">
+	            <form id="revokeApprovalsForm" action="approvals" method="post">
+	            <input type="hidden" name="clientId" value="${client.key}"/>
+	            <a href="#" id="firstlink">
+	              <div id="firstdiv" style="display: block">
+	                <div class="app-approval-container1">
+	                  <div class='row'>
+	                    <input class="delete-icon right" title="Delete" type='submit' name="delete" />
+	                    <span class="linklike">${client.key}</span><div class="edit-icon right" title="Edit "></div>
+	                  </div>
+	                </div>
+	              </div>
+	            </a>
+	            <div id="seconddiv" style="display: none">
+	              <div class="app-approval-container2">
+	                <input class="btn-secondary-medium right" name="delete" type='submit' value="Delete" />
+	                <span class="linklike">${client.key}</span>
+	                <div id="approvals-list-container">
+	                  <br>
+	
+	                  <c:forEach items="${client.value}" var="approval">
+	                    <div class="approvals-list-div">
+	                      <input type="checkbox" name="checkedScopes" value="${approval.clientId}-${approval.scope}" ${approval.status eq 'APPROVED' ? 'checked=checked' : '' }>
+	                                <spring:message code="scope.${approval.scope}"/>
+	                    </div>
+	                  </c:forEach>
+	
+	                  <input class="btn-primary-medium right" name="update" type="submit" value="Update">
+	                  <a id="cancel" style="cursor: pointer"><input class="btn-secondary-medium right" type='button' value="Cancel"/></a>
+	
+	                </div>
+	              </div>
+	            </div>
+	            </form>
+          </c:forEach>
 
-                          <c:forEach items="${client.value}" var="approval">
-                            <div class="approvals-list-div">
-                              <input type="checkbox" name="checkedScopes" value="${approval.clientId}-${approval.scope}" ${approval.status eq 'APPROVED' ? 'checked=checked' : '' }>
-                                        <spring:message code="scope.${approval.scope}"/>
-                            </div>
-                          </c:forEach>
-
-                          <input class="btn-primary-medium right" type="submit" value="Update">
-                          <a id="cancel" style="cursor: pointer"><input class="btn-secondary-medium right" type='button' value="Cancel"/></a>
-
-                        </div>
-                      </div>
-                    </div>
-                </c:forEach>
-            </form>
           </c:if>
         </div>
 

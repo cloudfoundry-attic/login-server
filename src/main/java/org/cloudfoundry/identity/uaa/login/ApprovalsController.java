@@ -54,18 +54,6 @@ public class ApprovalsController implements InitializingBean {
 		this.links = links;
 	}
 
-
-	/**
-	 * Handle form post for revoking chosen approvals
-	 */
-	@RequestMapping(value = "/approvals/delete", method = RequestMethod.POST)
-	public String deleteApprovalsForClient(Model model, @RequestParam(required=true) String clientId) {
-		ResponseEntity<String> response = restTemplate.exchange(approvalsUri + "?clientId=" + clientId, HttpMethod.DELETE, null, String.class);
-		logger.debug("Delete approvals request resulted in " + response);
-
-		return "redirect:/approvals";
-	}
-
 	/**
 	 * Display the current user's approvals
 	 */
@@ -78,7 +66,7 @@ public class ApprovalsController implements InitializingBean {
 	}
 
 	private Map<String, List<Object>> getCurrentApprovals() {
-		//Result will be a map of <clientId, approvalInfo>
+		// Result will be a map of <clientId, approvalInfo>
 		Map<String, List<Object>> result = new LinkedHashMap<String, List<Object>>();
 		@SuppressWarnings("unchecked")
 		Set<Map<String, Object>> approvals = restTemplate.getForObject(approvalsUri, Set.class);
@@ -101,31 +89,47 @@ public class ApprovalsController implements InitializingBean {
 	 * Handle form post for revoking chosen approvals
 	 */
 	@RequestMapping(value = "/approvals", method = RequestMethod.POST)
-	public String post(@RequestParam(required=false) Collection<String> checkedScopes, Model model) {
-		Map<String, List<Object>> approvals = getCurrentApprovals();
+	public String post(@RequestParam(required = false) Collection<String> checkedScopes,
+					   @RequestParam(required = false) String update,
+					   @RequestParam(required = false) String delete,
+					   @RequestParam(required = false) String clientId, Model model) {
 
-		List<Object> allApprovals = new ArrayList<Object>();
-		for (List<Object> clientApprovals : approvals.values()) {
-			allApprovals.addAll(clientApprovals);
-		}
+		if (null != update) {
+			Map<String, List<Object>> approvals = getCurrentApprovals();
 
-		List<Object> updatedApprovals = new ArrayList<Object>();
-		for (Object approval : allApprovals) {
-			@SuppressWarnings("unchecked")
-			Map<String, String> approvalToBeUpdated = ((Map<String, String>)approval);
-			if (checkedScopes != null &&
-					checkedScopes.contains(approvalToBeUpdated.get("clientId") + "-" + approvalToBeUpdated.get("scope"))) {
-				approvalToBeUpdated.put("status", "APPROVED");
-			} else {
-				approvalToBeUpdated.put("status", "DENIED");
+			List<Object> allApprovals = new ArrayList<Object>();
+			for (List<Object> clientApprovals : approvals.values()) {
+				allApprovals.addAll(clientApprovals);
 			}
-			updatedApprovals.add(approvalToBeUpdated);
+
+			List<Object> updatedApprovals = new ArrayList<Object>();
+			for (Object approval : allApprovals) {
+				@SuppressWarnings("unchecked")
+				Map<String, String> approvalToBeUpdated = ((Map<String, String>) approval);
+				if (checkedScopes != null
+						&& checkedScopes.contains(approvalToBeUpdated.get("clientId") + "-"
+								+ approvalToBeUpdated.get("scope"))) {
+					approvalToBeUpdated.put("status", "APPROVED");
+				}
+				else {
+					approvalToBeUpdated.put("status", "DENIED");
+				}
+				updatedApprovals.add(approvalToBeUpdated);
+			}
+
+			restTemplate.put(approvalsUri, updatedApprovals);
 		}
-
-		restTemplate.put(approvalsUri, updatedApprovals);
-
+		else if (null != delete) {
+			deleteApprovalsForClient(clientId);
+		}
 
 		return get(model);
+	}
+
+	private void deleteApprovalsForClient(String clientId) {
+		ResponseEntity<String> response = restTemplate.exchange(approvalsUri + "?clientId=" + clientId,
+				HttpMethod.DELETE, null, String.class);
+		logger.debug("Delete approvals request for client " + clientId + " resulted in " + response);
 	}
 
 	@Override
