@@ -19,7 +19,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 
-import org.cloudfoundry.identity.uaa.integration.UaaTestAccounts;
+import org.cloudfoundry.identity.uaa.test.UaaTestAccounts;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -60,10 +60,9 @@ public class VmcAuthenticationTests {
 
 	@Test
 	public void testDefaultScopes() {
-		params.set(
-				"credentials",
-				String.format("{\"username\":\"%s\",\"password\":\"%s\"}", testAccounts.getUserName(),
-						testAccounts.getPassword()));
+		params.set("source", "credentials");
+		params.set("username", testAccounts.getUserName());
+		params.set("password", testAccounts.getPassword());
 		ResponseEntity<Void> response = serverRunning.postForResponse(serverRunning.getAuthorizationUri(), headers,
 				params);
 		assertEquals(HttpStatus.FOUND, response.getStatusCode());
@@ -73,12 +72,12 @@ public class VmcAuthenticationTests {
 
 	@Test
 	public void testInvalidScopes() {
-		params.set(
-				"credentials",
-				String.format("{\"username\":\"%s\",\"password\":\"%s\"}", testAccounts.getUserName(),
-						testAccounts.getPassword()));
+		params.set("source", "credentials");
+		params.set("username", testAccounts.getUserName());
+		params.set("password", testAccounts.getPassword());
 		params.set("scope", "read");
-		ResponseEntity<Void> response = serverRunning.postForResponse(serverRunning.getAuthorizationUri(), headers, params);
+		ResponseEntity<Void> response = serverRunning.postForResponse(serverRunning.getAuthorizationUri(), headers,
+				params);
 		assertEquals(HttpStatus.FOUND, response.getStatusCode());
 		String location = response.getHeaders().getLocation().toString();
 		// System.err.println(location);

@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.cloudfoundry.identity.uaa.social.SocialClientUserDetails;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.common.util.RandomValueStringGenerator;
 
 /**
@@ -61,7 +61,7 @@ public class DefaultAutologinCodeStore implements AutologinCodeStore {
 	}
 
 	@Override
-	public SocialClientUserDetails getUser(String code) {
+	public Authentication getUser(String code) {
 		flush();
 		TokenExpiry value = codes.remove(code);
 		if (value == null) {
@@ -84,13 +84,13 @@ public class DefaultAutologinCodeStore implements AutologinCodeStore {
 	}
 
 	@Override
-	public String storeUser(SocialClientUserDetails user) {
+	public String storeUser(Authentication user) {
 		flush();
 		String code = generator.generate();
 		TokenExpiry expiry = new TokenExpiry(code, user, new Date(System.currentTimeMillis() + validityPeriod));
 		this.expiryQueue.put(expiry);
 		codes.put(code, expiry);
-		logger.info("Stored user [" + user.getUsername() + "] with code: " + code);
+		logger.info("Stored user [" + user.getName() + "] with code: " + code);
 		return code;
 	}
 
@@ -111,9 +111,9 @@ public class DefaultAutologinCodeStore implements AutologinCodeStore {
 
 		private final String value;
 
-		private final SocialClientUserDetails user;
+		private final Authentication user;
 
-		public TokenExpiry(String value, SocialClientUserDetails user, Date date) {
+		public TokenExpiry(String value, Authentication user, Date date) {
 			this.value = value;
 			this.user = user;
 			this.expiry = date.getTime();
@@ -135,7 +135,7 @@ public class DefaultAutologinCodeStore implements AutologinCodeStore {
 			return value;
 		}
 
-		public SocialClientUserDetails getUser() {
+		public Authentication getUser() {
 			return user;
 		}
 

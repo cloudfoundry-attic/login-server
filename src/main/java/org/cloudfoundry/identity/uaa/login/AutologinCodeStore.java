@@ -13,7 +13,7 @@
 
 package org.cloudfoundry.identity.uaa.login;
 
-import org.cloudfoundry.identity.uaa.social.SocialClientUserDetails;
+import org.springframework.security.core.Authentication;
 
 /**
  * @author Dave Syer
@@ -25,12 +25,12 @@ public interface AutologinCodeStore {
 	 * @param code the code to redeem
 	 * @return a user associated with the code or null
 	 */
-	SocialClientUserDetails getUser(String code);
+	Authentication getUser(String code);
 
 	/**
 	 * @param a user to store
 	 * @return code the code to be redeemed later
 	 */
-	String storeUser(SocialClientUserDetails user);
+	String storeUser(Authentication user);
 
 }

@@ -32,7 +32,7 @@
 <html class='no-js' dir='ltr' lang='en'>
 <!-- <![endif] -->
 <head>
-<title>Login | Cloud Foundry</title>
+<title>Success | Cloud Foundry</title>
 <meta charset='utf-8'>
 <meta content='IE=edge,chrome=1' http-equiv='X-UA-Compatible'>
 <meta content='VMware' name='author' />
@@ -73,105 +73,37 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 }
 </style>
 <script type="text/javascript" src="${baseUrl}/javascripts/jquery.js"></script>
-<script type="text/javascript"
-	src="${baseUrl}/javascripts/placeholder.js"></script>
-<script type="text/javascript">
-	$(document).ready(function() {
-		$('form:first *:input[type!=hidden]:first').focus();
-    Placeholders.init({
-      live: true, //Apply to future and modified elements too
-      hideOnFocus: true //Hide the placeholder when the element receives focus
-    });
-	});
-</script>
-<script type="text/javascript">
-	(function() {
-		// force ssl if cf.com
-		var loc = window.location;
-		if (loc.hostname.indexOf('cloudfoundry.com') >= 0
-				&& loc.protocol == "http:") {
-			window.location = "https://" + loc.host + loc.pathname + loc.search
-					+ loc.hash;
-		}
-	})();
-</script>
 </head>
 <body id="micro">
 	<div class="splash">
-		<a href='${links.home}/'><img
+		<a href='${links.home}'><img
 			alt="Cloud Foundry: The Industry's Open Platform As A Service"
 			class="logo" src='${baseUrl}/images/logo_header_cloudfoundry.png'
 			width='373' height='70'></img> </a>
-		<div class="splash-box">
-			<article class="container">
-				<p class="intro-text">Sign in with your CloudFoundry.com credentials.</p>
-				<form id="loginForm" name="loginForm"
-					action="<c:url value="/login.do"/>" method="POST" novalidate>
-					<div>
-						<c:if test="${not empty param.error}">
-							<div class="flash">Sorry, we couldn't verify your email and
-								password.</div>
-						</c:if>
-						<c:forEach items="${prompts}" var="prompt">
-              <spring:message code="prompt.${prompt.key}"
-                text="${prompt.value[1]}" var="text"/>
-              <input id='${prompt.key}' type='${prompt.value[0]}' ${prompt.value[0]=='password'?'autocomplete="off"':''}
-                name='${prompt.key}' placeholder='${text}' />
-						</c:forEach>
-					</div>
-					<button type="submit" class="orange-button">Sign in</button>
-					<span class="button-alt"> <a class="question passwd"
-						target="_blank" href="${links.passwd}">Forgot your password</a></span><br />
-					<br />
-				</form>
-				<p>
-					Don't have an account? <a href="${links.register}">Register here.</a>
-				</p>
-				<p>Reminder: do not type your Cloud Foundry password into any
-					site except <a href="${links.login}">${links.login}</a>.</p>
-			</article>
+		<div style="float: right;">
+			<ul class='super-nav'>
+				<li><span>Welcome <a href="/approvals"><strong>${fn:escapeXml(pageContext.request.userPrincipal.name)}</strong></a></span>
+					/ <c:url value="/logout.do" var="url" /> <a
+					href="${fn:escapeXml(url)}">Logout</a> &nbsp;</li>
+			</ul>
 		</div>
-		<div class="footer"
-			title="Version: ${app.version}, Commit: ${commit_id}, Timestamp: ${timestamp}, UAA: ${links.uaa}">
+		<div class="splash-box">
+			<div class="container">
+				<h2>Sorry, there was a problem!</h2>
+				<c:if test="${error!=null}">
+					<div class="error">
+						<p>"${fn:escapeXml(error)}"</p>
+					</div>
+				</c:if>
+
+			</div>
+		</div>
+		<div class="footer">
 			Copyright &copy;
 			<fmt:formatDate value="<%=new java.util.Date()%>" pattern="yyyy" />
 			VMware, Inc. All rights reserved.
 		</div>
 	</div>
-
-	<%-- Clear out session scoped attributes, don't leak info --%>
-	<c:if
-		test="${not empty sessionScope['SPRING_SECURITY_LAST_EXCEPTION']}">
-		<c:set scope="session" var="SPRING_SECURITY_LAST_EXCEPTION"
-			value="${null}" />
-	</c:if>
-	<c:if test="${not empty sessionScope['SPRING_SECURITY_LAST_USERNAME']}">
-		<c:set scope="session" var="SPRING_SECURITY_LAST_USERNAME"
-			value="${null}" />
-	</c:if>
-
-	<!--
-								Start of DoubleClick Floodlight Tag: Please do not remove
-								Activity name of this tag: Micro Cloud Foundry - Landing Page Arrival
-								URL of the webpage where the tag is expected to be placed: https://www.cloudfoundry.com/micro
-								This tag must be placed between the <body> and </body> tags, as close as possible to the opening tag.
-								Creation Date: 08/18/2011
-								-->
-	<script type="text/javascript">
-		var axel = Math.random() + "";
-		var a = axel * 10000000000000;
-		document
-				.write('<iframe src="https://fls.doubleclick.net/activityi;src=2645750;type=cloud806;cat=micro467;ord='
-						+ a
-						+ '?" width="1" height="1" frameborder="0" style="display:none"></iframe>');
-	</script>
-	<noscript>
-		<iframe
-			src="https://fls.doubleclick.net/activityi;src=2645750;type=cloud806;cat=micro467;ord=1?"
-			width="1" height="1" frameborder="0" style="display: none"></iframe>
-	</noscript>
-	<!-- End of DoubleClick Floodlight Tag: Please do not remove -->
-
 	<script>
 		var _gaq = _gaq || [];
 		_gaq.push([ '_setAccount', 'UA-22181585-1' ]);

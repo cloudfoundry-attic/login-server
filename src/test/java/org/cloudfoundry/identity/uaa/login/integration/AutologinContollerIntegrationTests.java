@@ -20,8 +20,8 @@ import static org.junit.Assert.assertNull;
 import java.util.Arrays;
 import java.util.Map;
 
-import org.cloudfoundry.identity.uaa.integration.UaaTestAccounts;
 import org.cloudfoundry.identity.uaa.login.AutologinController.AutologinRequest;
+import org.cloudfoundry.identity.uaa.test.UaaTestAccounts;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -37,7 +37,7 @@ import org.springframework.util.MultiValueMap;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 public class AutologinContollerIntegrationTests {
 

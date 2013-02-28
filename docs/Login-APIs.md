@@ -19,7 +19,7 @@
 
 The Login Server:
 
-* is separate from the UAA but needs to be connected to one via HPPT(S)
+* is separate from the UAA but needs to be connected to one via HTTP(S)
 * provides SSO for web applications in the Cloud Foundry platform
 * manages and provides a branded HTML UI for authentication and OAuth
   approval
@@ -35,13 +35,13 @@ Response Codes: `200 - Success`
 
 Browser POSTs to `/login.do` with user credentials (same as UAA).
 Login Server returns a cookie that can be used to authenticate future
-requests (until teh session expires or the user logs out).
+requests (until the session expires or the user logs out).
 
 ## Logout: `GET /logout.do`
 
 The Login Server is a Single Sign On server for the Cloud Foundry
 platform (and possibly user apps as well), so if a user logs out he
-logs out of all the apps.  User's need to be reminded of the
+logs out of all the apps.  Users need to be reminded of the
 consequences of their actions, so the recommendation for application
 authors is to 
 
@@ -72,7 +72,7 @@ HTML.
 ### Start Authorization: `GET /oauth/authorize`
 
 Client applications usually send a redirect to User's browser with the
-request URI approriate to the Client.  Exactly the same as the UAA,
+request URI appropriate to the Client.  Exactly the same as the UAA,
 but the response is rendered differently.
 
 Request: example  
@@ -152,11 +152,11 @@ Response Body:
 ## Autologin
 
 For user-facing account management UIs (e.g. portal) that need to set
-or reset user's passwords it is convenient to be able to log them in
+or reset users' passwords it is convenient to be able to log them in
 immediately, rather than waiting for them to come back to the Login
 Server and enter the new password explicitly.
 
-1. Client POSTs user credentials to to `/autologin`
+1. Client POSTs user credentials to `/autologin`
 
 2. Login Server responds with autologin code (short-lived, one-time)
 
