@@ -52,6 +52,12 @@ public class BootstrapTests {
 		assertNotNull(context.getBean("viewResolver", ViewResolver.class));
 	}
 
+	@Test
+	public void testLdapProfile() throws Exception {
+		context = getServletContext("ldap", "file:./src/main/webapp/WEB-INF/spring-servlet.xml");
+		assertNotNull(context.getBean("viewResolver", ViewResolver.class));
+	}
+
 	private GenericXmlApplicationContext getServletContext(String... resources) {
 		
 		String profiles = null;
