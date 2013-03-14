@@ -74,6 +74,12 @@ public class RemoteUaaController {
 
 	private static final String CONTENT_LENGTH = "Content-Length";
 
+	private static final String CONTENT_TYPE = "Content-Type";
+
+	private static final String ACCEPT = "Accept";
+
+	private static final String AUTHORIZATION = "Authorization";
+
 	private static final String TRANSFER_ENCODING = "Transfer-Encoding";
 
 	private static final String HOST = "Host";
@@ -271,6 +277,7 @@ public class RemoteUaaController {
 		if (principal != null) {
 			map.set("source", "login");
 			map.setAll(getLoginCredentials(principal));
+			map.remove("credentials"); // legacy vmc might break otherwise
 		}
 		else {
 			throw new BadCredentialsException("No principal found in authorize endpoint");
@@ -278,6 +285,9 @@ public class RemoteUaaController {
 
 		HttpHeaders requestHeaders = new HttpHeaders();
 		requestHeaders.putAll(getRequestHeaders(headers));
+		requestHeaders.remove(AUTHORIZATION.toLowerCase());
+		requestHeaders.remove(ACCEPT.toLowerCase());
+		requestHeaders.remove(CONTENT_TYPE.toLowerCase());
 		requestHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 		requestHeaders.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
 		requestHeaders.remove(COOKIE);
