@@ -390,7 +390,7 @@ public class RemoteUaaController {
 		model.put(COOKIE_MODEL, cookie.toString());
 	}
 
-	private Map<String, String> getLoginCredentials(Principal principal) {
+	protected Map<String, String> getLoginCredentials(Principal principal) {
 		Map<String, String> login = new LinkedHashMap<String, String>();
 		appendField(login, "username", principal.getName());
 		if (principal instanceof Authentication) {
@@ -405,7 +405,7 @@ public class RemoteUaaController {
 		return login;
 	}
 
-	private void appendField(Map<String, String> login, String key, Object value) {
+	protected void appendField(Map<String, String> login, String key, Object value) {
 		if (value != null) {
 			login.put(key, value.toString());
 		}
