@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<EntityDescriptor entityID="https://cloudfoundry.horizonlabs.vmware.com/SAAS/API/1.0/GET/metadata/idp.xml" xmlns="urn:oasis:names:tc:SAML:2.0:metadata">
+    <IDPSSODescriptor WantAuthnRequestsSigned="true" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+        <KeyDescriptor use="signing">
+            <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+                <ds:X509Data>
+                    <ds:X509Certificate>
+MIICLDCCAZWgAwIBAgIBATANBgkqhkiG9w0BAQUFADBTMS0wKwYDVQQDEyRIb3Jp
+em9uIFNBTUwgU2VsZi1TaWduZWQgQ2VydGlmaWNhdGUxFTATBgNVBAoTDENMT1VE
+Rk9VTkRSWTELMAkGA1UEBhMCVVMwHhcNMTIwNjI2MTc1NjUyWhcNMjIwNjI0MTc1
+NjUyWjBTMS0wKwYDVQQDEyRIb3Jpem9uIFNBTUwgU2VsZi1TaWduZWQgQ2VydGlm
+aWNhdGUxFTATBgNVBAoTDENMT1VERk9VTkRSWTELMAkGA1UEBhMCVVMwgZ8wDQYJ
+KoZIhvcNAQEBBQADgY0AMIGJAoGBANZLQU4vry/2gO6GlUBQYSjvatTsTwFqYmkn
+slRZieZbrQdJVV49L91Ra6GmEkawl45KFl/FNTVuV933IU9t3Oc9kCLfJQeAtaAB
+su9ecbzLW0mmyjqwPY1OLQQ9XYS7aJtxIJ1bQWX7mVRkgMUIny+fI/IU1jEP5IFK
+pzCGZYRLAgMBAAGjEDAOMAwGA1UdEwQFMAMBAf8wDQYJKoZIhvcNAQEFBQADgYEA
+DPxiPx45mXa6RECvT5F6M5FOj7ANuHLbmBCMU9TL1LFtKL5syihIkEDdpUKkAe3w
+aLpN3yawpN7dDZvUC1thhqjYkO1s+OP7mCRnR2+VuQIdlpL6OT/2XdO/m2Qwhri5
+nlBMyIOLK6jv4CpjakCTrAwSL7+IJYhVFI1E4htYVCk=
+                    </ds:X509Certificate>
+                </ds:X509Data>
+            </ds:KeyInfo>
+        </KeyDescriptor>
+        <SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://cloudfoundry.horizonlabs.vmware.com/SAAS/logoutPortal.do" ResponseLocation="https://cloudfoundry.horizonlabs.vmware.com/SAAS/logoutPortal.do"/>
+        <SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://cloudfoundry.horizonlabs.vmware.com/SAAS/logoutPortal.do" ResponseLocation="https://cloudfoundry.horizonlabs.vmware.com/SAAS/logoutPortal.do"/>
+        <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</NameIDFormat>
+        <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>
+        <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</NameIDFormat>
+        <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</NameIDFormat>
+        <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://cloudfoundry.horizonlabs.vmware.com/SAAS/API/1.0/GET/apps/launch/app/8680"/>
+        <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://cloudfoundry.horizonlabs.vmware.com/SAAS/API/1.0/POST/apps/launch/app/8680"/>
+    </IDPSSODescriptor>
+</EntityDescriptor>

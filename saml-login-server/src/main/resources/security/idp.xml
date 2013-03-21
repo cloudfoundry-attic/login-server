@@ -1,0 +1,56 @@
+<md:EntityDescriptor ID="EMC_CloudFoundry"
+	entityID="http://emc.com/idp/cloudfoundry" xmlns:ds="http://www.w3.org/2000/09/xmldsig#"
+	xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" xmlns:query="urn:oasis:names:tc:SAML:metadata:ext:query"
+	xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" xmlns:xenc="http://www.w3.org/2001/04/xmlenc#">
+	<md:IDPSSODescriptor WantAuthnRequestsSigned="false"
+		protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+		<md:KeyDescriptor use="signing">
+			<ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+				<ds:X509Data>
+					<ds:X509Certificate>
+						MIIFTDCCBDSgAwIBAgIRANv2vgcN9t8PqqLYtDKaTgkwDQYJKoZIhvcNAQEFBQAwgZ4xCzAJBgNV
+						BAYTAlVTMRYwFAYDVQQIEw1NYXNzYWNodXNldHRzMRAwDgYDVQQHEwdCZWRmb3JkMRkwFwYDVQQK
+						ExBSU0EgU2VjdXJpdHkgTExDMSUwIwYDVQQLExxHbG9iYWwgU2VjdXJpdHkgT3JnYW5pemF0aW9u
+						MSMwIQYDVQQDExpSU0EgQ29ycG9yYXRlIFNlcnZlciBDQSB2MjAeFw0xMjA2MTQxNDM4NTlaFw0x
+						NDA2MTQxNDM4NTlaMIGaMQswCQYDVQQGEwJVUzEWMBQGA1UECBMNTWFzc2FjaHVzZXR0czESMBAG
+						A1UEBxMJSG9wa2ludG9uMRgwFgYDVQQKEw9FTUMgQ29ycG9yYXRpb24xJzAlBgNVBAsTHkVudGVy
+						cHJpc2UgVGVjaG5vbG9neSBTZXJ2aWNlczEcMBoGA1UEAxMTZmltdHN0LmlzdXMuZW1jLmNvbTCC
+						ASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAKs2ng6Oz4tq2js6XyI7xy0nNz6VB6AnnQH9
+						c1WnRlLHOFHQOUrMRq9WuOTXec2MQqlhQWXU3vb0dduOViVNramJMdM9oEUKSHHLy7zJGRAOY+OO
+						v1VQ2/xut8wQ0lcdXq+IiN6vko/c/vaF83P8hynRoTYwX0eWZ++bnovwHjZ+q6SNVqRNwFNEWuGr
+						sg84nGf8Z514JKk/eBNs8ZYTCaiv/p2k9J0eM/D3VasPm4O4W9IJrGVV+OhZkhPdm67ml6RfkYfo
+						dsb3cRNDNW3kwJxPoczmpCPe+udrlJmpsXjwcTljqiD7p7ZlITMN7EeUFF2SHSVf0Vf/Wkn3mE/2
+						PfkCAwEAAaOCAYUwggGBMA4GA1UdDwEB/wQEAwIDuDARBglghkgBhvhCAQEEBAMCBsAwHgYDVR0R
+						BBcwFYITZmltdHN0LmlzdXMuZW1jLmNvbTAfBgNVHSMEGDAWgBQp88Jj0/H1C6W/sl3fYRCUNM9H
+						DDCBkQYDVR0gBIGJMIGGMIGDBgkqhkiG9w0FBwUwdjAuBggrBgEFBQcCARYiaHR0cDovL2NhLnJz
+						YXNlY3VyaXR5LmNvbS9DUFMuaHRtbDBEBggrBgEFBQcCAjA4MBcWEFJTQSBTZWN1cml0eSBMTEMw
+						AwIBARodQ1BTIEluY29ycG9yYXRlZCBieSByZWZlcmVuY2UwHQYDVR0lBBYwFAYIKwYBBQUHAwEG
+						CCsGAQUFBwMCMB0GA1UdDgQWBBQ5bHvDUvlHHC0O3yI3Tt9CySCItzBJBgNVHR8EQjBAMD6gPKA6
+						hjhodHRwOi8vY3JsLnJzYXNlY3VyaXR5LmNvbTo4MC9SU0FDb3Jwb3JhdGVTZXJ2ZXJDQXYyLmNy
+						bDANBgkqhkiG9w0BAQUFAAOCAQEAd4Xlr3/6IkY+oW23+kUDZIPyguU0f6trnkFKWSoieAl2oWKP
+						1V1qYHOsedCnX0bI7WC9pH6wquPQ1YEz7970yaKole2wv0kb/I1/we1xo6mmQrrCyFbWmg8+EyLG
+						Jjf1Titr3c/5BJvHLYaF1kZYSa4e1wFbvX1PHgvCdhie6fYKmsb/1cMkwIW3t/tqQ1PK6n3Msl+I
+						9ky1k8D9DzrSw8VdjFL89nvoacXyrP7z7DScKFbhgPcDpUfcBBY5WVCYDpjU37MKSOJI6vC+536J
+						b55KkOvtTyO5Bp8TlJFW/VgfigPAGHXFmCIl5uWqmfYsBTmWLc5eIJrUsq4FZzA83w==
+					</ds:X509Certificate>
+				</ds:X509Data>
+			</ds:KeyInfo>
+		</md:KeyDescriptor>
+		<md:SingleSignOnService
+			Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+			Location="https://fimtst.emc.com/sso/SSO?SPEntityID=https://emc-login.cloudfoundry.com/"></md:SingleSignOnService>
+	</md:IDPSSODescriptor>
+	<md:Organization>
+		<md:OrganizationName xml:lang="en-us">EMC
+		</md:OrganizationName>
+		<md:OrganizationDisplayName xml:lang="en-us">EMC
+		</md:OrganizationDisplayName>
+		<md:OrganizationURL xml:lang="en-us">https://fimtst.emc.com
+		</md:OrganizationURL>
+	</md:Organization>
+	<md:ContactPerson contactType="technical">
+		<md:Company></md:Company>
+		<md:GivenName></md:GivenName>
+		<md:SurName></md:SurName>
+	</md:ContactPerson>
+</md:EntityDescriptor>
