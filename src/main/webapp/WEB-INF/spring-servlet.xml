@@ -265,7 +265,7 @@
 
 	<oauth:web-expression-handler id="oauthWebExpressionHandler" />
 
-	<bean id="approvalsController" class="org.cloudfoundry.identity.uaa.login.ApprovalsController">
+	<bean id="approvalsController" class="org.cloudfoundry.identity.uaa.login.ProfileController">
 		<constructor-arg ref="restTemplate" />
 		<property name="approvalsUri" value="${uaa.approvals.url:http://localhost:8080/uaa/approvals}" />
 		<property name="links" ref="links" />

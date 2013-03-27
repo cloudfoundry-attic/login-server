@@ -25,7 +25,7 @@ import org.springframework.web.client.RestOperations;
  * @author Vidya Valmikinathan
  */
 @Controller
-public class ApprovalsController implements InitializingBean {
+public class ProfileController implements InitializingBean {
 
 	private String approvalsUri;
 
@@ -35,7 +35,7 @@ public class ApprovalsController implements InitializingBean {
 
 	private final Log logger = LogFactory.getLog(getClass());
 
-	public ApprovalsController(RestOperations restTemplate) {
+	public ProfileController(RestOperations restTemplate) {
 		this.restTemplate = restTemplate;
 	}
 
@@ -57,7 +57,7 @@ public class ApprovalsController implements InitializingBean {
 	/**
 	 * Display the current user's approvals
 	 */
-	@RequestMapping(value = "/approvals", method = RequestMethod.GET)
+	@RequestMapping(value = "/profile", method = RequestMethod.GET)
 	public String get(Model model) {
 		Map<String, List<Object>> approvals = getCurrentApprovals();
 		model.addAttribute("approvals", approvals);
@@ -88,7 +88,7 @@ public class ApprovalsController implements InitializingBean {
 	/**
 	 * Handle form post for revoking chosen approvals
 	 */
-	@RequestMapping(value = "/approvals", method = RequestMethod.POST)
+	@RequestMapping(value = "/profile", method = RequestMethod.POST)
 	public String post(@RequestParam(required = false) Collection<String> checkedScopes,
 					   @RequestParam(required = false) String update,
 					   @RequestParam(required = false) String delete,
@@ -105,7 +105,7 @@ public class ApprovalsController implements InitializingBean {
 			List<Object> updatedApprovals = new ArrayList<Object>();
 			for (Object approval : allApprovals) {
 				@SuppressWarnings("unchecked")
-				Map<String, String> approvalToBeUpdated = ((Map<String, String>) approval);
+				Map<String, String> approvalToBeUpdated = new HashMap<String, String>((Map<String, String>) approval);
 				if (checkedScopes != null
 						&& checkedScopes.contains(approvalToBeUpdated.get("clientId") + "-"
 								+ approvalToBeUpdated.get("scope"))) {
