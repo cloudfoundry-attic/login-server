@@ -19,8 +19,8 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 
+<c:url var="rootUrl" value="/" />
 <c:url var="baseUrl" value="/resources" />
-<c:url var="rootUrl" value="" />
 
 <!DOCTYPE html>
 <!--[if IE]>  <![endif]-->
@@ -38,7 +38,7 @@
 <meta content='VMware' name='author' />
 <meta content='Copyright VMware 2011. All Rights Reserved.'
 	name='copyright' />
-<link href='${rootUrl}/favicon.ico' rel='shortcut icon' />
+<link href='${rootUrl}favicon.ico' rel='shortcut icon' />
 <meta content='all' name='robots' />
 <link href='${baseUrl}/stylesheets/print.css' media='print'
 	rel='stylesheet' type='text/css' />
@@ -120,8 +120,7 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 						</c:forEach>
 					</div>
 					<button type="submit" class="orange-button">Sign in</button>
-					<span class="button-alt"> <a class="question passwd"
-						target="_blank" href="${links.passwd}">Forgot your password</a></span><br />
+					<span class="button-alt"> <a class="question passwd" href="${links.passwd}">Forgot your password</a></span><br />
 					<br />
 				</form>
 				<p>

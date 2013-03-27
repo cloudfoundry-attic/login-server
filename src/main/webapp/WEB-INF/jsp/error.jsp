@@ -20,7 +20,7 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 
 <c:url var="baseUrl" value="/resources" />
-<c:url var="rootUrl" value="" />
+<c:url var="rootUrl" value="/" />
 
 <!DOCTYPE html>
 <!--[if IE]>  <![endif]-->
@@ -35,10 +35,10 @@
 <title>Success | Cloud Foundry</title>
 <meta charset='utf-8'>
 <meta content='IE=edge,chrome=1' http-equiv='X-UA-Compatible'>
-<meta content='VMware' name='author' />
+<meta content='VMwarrootUrle' name='author' />
 <meta content='Copyright VMware 2011. All Rights Reserved.'
 	name='copyright' />
-<link href='${rootUrl}/favicon.ico' rel='shortcut icon' />
+<link href='${rootUrl}favicon.ico' rel='shortcut icon' />
 <meta content='all' name='robots' />
 <link href='${baseUrl}/stylesheets/print.css' media='print'
 	rel='stylesheet' type='text/css' />
@@ -82,9 +82,8 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 			width='373' height='70'></img> </a>
 		<div style="float: right;">
 			<ul class='super-nav'>
-				<li><span>Welcome <a href="/profile"><strong>${fn:escapeXml(pageContext.request.userPrincipal.name)}</strong></a></span>
-					/ <c:url value="/logout.do" var="url" /> <a
-					href="${fn:escapeXml(url)}">Logout</a> &nbsp;</li>
+				<li><span>Welcome <a href="${rootUrl}profile"><strong>${fn:escapeXml(pageContext.request.userPrincipal.name)}</strong></a></span>
+					/ <a href="${rootUrl}logout.do">Logout</a> &nbsp;</li>
 			</ul>
 		</div>
 		<div class="splash-box">

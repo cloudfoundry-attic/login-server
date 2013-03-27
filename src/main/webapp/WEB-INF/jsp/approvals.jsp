@@ -20,7 +20,7 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 
 <c:url var="baseUrl" value="/resources" />
-<c:url var="rootUrl" value="" />
+<c:url var="rootUrl" value="/" />
 <c:url var="authorizeUrl" value="/oauth/authorize" />
 
 <!DOCTYPE html>
@@ -39,7 +39,7 @@
 <meta content='VMware' name='author' />
 <meta content='Copyright VMware 2011. All Rights Reserved.'
 	name='copyright' />
-<link href='${rootUrl}/favicon.ico' rel='shortcut icon' />
+<link href='${rootUrl}favicon.ico' rel='shortcut icon' />
 <meta content='all' name='robots' />
 <link href='${baseUrl}/stylesheets/print.css' media='print'
 	rel='stylesheet' type='text/css' />
@@ -52,130 +52,165 @@
 <meta content='' name='keywords' />
 <script type="text/javascript" src="${baseUrl}/javascripts/jquery.js"></script>
 <script type="text/javascript">
-(function() {
-  // force ssl if cf.com
-  var loc = window.location;
-  if (loc.hostname.indexOf('cloudfoundry.com') >= 0
-      && loc.protocol == "http:") {
-    window.location = "https://" + loc.host + loc.pathname + loc.search
-        + loc.hash;
-  }
-})();
-$(document).ready(function(){
-  $(".app-approval-container1").mouseenter(function(){
-    $(this).find('.delete-icon').show();
-    $(this).find('.edit-icon').show();
-  });
-  $(".app-approval-container1").mouseleave(function(){
-    $(this).find('.delete-icon').hide();
-    $(this).find('.edit-icon').hide();
-  });
-  $('a#firstlink').click(function () {
-    $(this).children().hide();
-    $(this).next().css({display: "block"});
-  });
-  $('a#cancel').click(function () {
-    $(this).parent().parent().parent().css({display: "none"});
-    $(this).parent().parent().parent().prev().children().first().css({display: "block"});
-  });
-  $('.app-approval-container2').click(function () {
-    $(this).parent().css({display: "none"});
-    $(this).parent().prev().children().first().css({display: "block"});
-  });
-  $(".app-approval-container2 input[type=checkbox]").click(function(e) { e.stopPropagation(); });
-  $(".app-approval-container2 input[type=submit]").click(function(e) { e.stopPropagation(); });
+	(function() {
+		// force ssl if cf.com
+		var loc = window.location;
+		if (loc.hostname.indexOf('cloudfoundry.com') >= 0
+				&& loc.protocol == "http:") {
+			window.location = "https://" + loc.host + loc.pathname + loc.search
+					+ loc.hash;
+		}
+	})();
+	$(document).ready(function() {
+		$(".app-approval-container1").mouseenter(function() {
+			$(this).find('.delete-icon').show();
+			$(this).find('.edit-icon').show();
+		});
+		$(".app-approval-container1").mouseleave(function() {
+			$(this).find('.delete-icon').hide();
+			$(this).find('.edit-icon').hide();
+		});
+		$('a#firstlink').click(function() {
+			$(this).children().hide();
+			$(this).next().css({
+				display : "block"
+			});
+		});
+		$('a#cancel').click(function() {
+			$(this).parent().parent().parent().css({
+				display : "none"
+			});
+			$(this).parent().parent().parent().prev().children().first().css({
+				display : "block"
+			});
+		});
+		$('.app-approval-container2').click(function() {
+			$(this).parent().css({
+				display : "none"
+			});
+			$(this).parent().prev().children().first().css({
+				display : "block"
+			});
+		});
+		$(".app-approval-container2 input[type=checkbox]").click(function(e) {
+			e.stopPropagation();
+		});
+		$(".app-approval-container2 input[type=submit]").click(function(e) {
+			e.stopPropagation();
+		});
 
-  $('[title]').tooltip( {
-     tooltipClass: "tooltip"
-  });
-});
-function deleteApprovalsFor(client){
-	$('<form action="approvals/delete" method="post"><input name="clientId" value="' + client + '"></input></form>').submit();
-}
+		$('[title]').tooltip({
+			tooltipClass : "tooltip"
+		});
+	});
+	function deleteApprovalsFor(client) {
+		$(
+				'<form action="approvals/delete" method="post"><input name="clientId" value="' + client + '"></input></form>')
+				.submit();
+	}
 </script>
 </head>
 <body id="micro">
 	<div class="approvals">
 		<a href='${links.home}'><img
 			alt="Cloud Foundry: The Industry's Open Platform As A Service"
-			class="logo-approvals" src='${baseUrl}/images/logo_header_cloudfoundry.png'
-			width='373' height='70'></img> </a>
+			class="logo-approvals"
+			src='${baseUrl}/images/logo_header_cloudfoundry.png' width='373'
+			height='70'></img> </a>
 		<div style="float: right;">
 			<ul class='super-nav'>
-				<li><span>Welcome <a href="/profile"><strong>${fn:escapeXml(pageContext.request.userPrincipal.name)}</strong></a></span>
-					/ <c:url value="/logout.do" var="url" /> <a
-					href="${fn:escapeXml(url)}">Logout</a> &nbsp;</li>
+				<li><span>Welcome <a href="${rootUrl}profile"><strong>${fn:escapeXml(pageContext.request.userPrincipal.name)}</strong></a></span>
+					/ <a href="${rootUrl}logout.do">Logout</a> &nbsp;</li>
 			</ul>
 		</div>
 		<div class="bg-content-approvals">
 			<c:if test="${error!=null}">
 				<div class="error" title="${fn:escapeXml(error)}">
 					<div class="content-title-approvals">
-					  <h2>Sorry</h2>
+						<h2>Sorry</h2>
 					</div>
 					<div class="content-inner-approvals">
-            <p>There was an error. The request for authorization was
-              invalid.</p>
-          </div>
+						<p>There was an error. The request for authorization was
+							invalid.</p>
+					</div>
 				</div>
 			</c:if>
 
 			<c:if test="${error==null}">
 
 				<div class="content-title-approvals">
-				  <h2>Account Settings</h2>
+					<h2>Account Settings</h2>
 				</div>
 
-        <div class="content-inner-approvals">
-          <p class="right">Looking for <a href="http://micro.cloudfoundry.com" target="_blank">Micro</a> or <a href="http://support.cloudfoundry.com" target="_blank">Support</a> ?</p>
+				<div class="content-inner-approvals">
+					<p class="right">
+						Looking for <a href="http://micro.cloudfoundry.com">Micro</a> or <a
+							href="http://support.cloudfoundry.com">Support</a> ?
+					</p>
 
-          <p><strong>Username:</strong> ${fn:escapeXml(pageContext.request.userPrincipal.name)}</p>
-          <p><strong>Password:</strong> ********** <a href="http://my.cloudfoundry.com/passwd" target="_blank">Reset password</a></p>
+					<p>
+						<strong>Username:</strong>
+						${fn:escapeXml(pageContext.request.userPrincipal.name)}
+					</p>
+					<p>
+						<strong>Password:</strong> ********** <a href="${links.passwd}">Reset
+							password</a>
+					</p>
 
-          <c:if test="${! empty approvals}">
-            <hr>
+					<c:if test="${! empty approvals}">
+						<hr>
 
-            <p><strong>Application Approvals</strong></p>
-            <p>These applications have been granted access to your CloudFoundry.com account.</p>
+						<p>
+							<strong>Application Approvals</strong>
+						</p>
+						<p>These applications have been granted access to your
+							CloudFoundry.com account.</p>
 
-            <c:forEach items="${approvals}" var="client">
-	            <form id="revokeApprovalsForm" action="approvals" method="post">
-	            <input type="hidden" name="clientId" value="${client.key}"/>
-	            <a href="#" id="firstlink">
-	              <div id="firstdiv" style="display: block">
-	                <div class="app-approval-container1">
-	                  <div class='row'>
-	                    <input class="delete-icon right" title="Delete" type='submit' name="delete" value=""/>
-	                    <span class="linklike">${client.key}</span><div class="edit-icon right" title="Edit "></div>
-	                  </div>
-	                </div>
-	              </div>
-	            </a>
-	            <div id="seconddiv" style="display: none">
-	              <div class="app-approval-container2">
-	                <input class="btn-secondary-medium right" name="delete" type='submit' value="Delete" />
-	                <span class="linklike">${client.key}</span>
-	                <div id="approvals-list-container">
-	                  <br>
-	
-	                  <c:forEach items="${client.value}" var="approval">
-	                    <div class="approvals-list-div">
-	                      <input type="checkbox" name="checkedScopes" value="${approval.clientId}-${approval.scope}" ${approval.status eq 'APPROVED' ? 'checked=checked' : '' }>
-	                                <spring:message code="scope.${approval.scope}"/>
-	                    </div>
-	                  </c:forEach>
-	
-	                  <input class="btn-primary-medium right" name="update" type="submit" value="Update">
-	                  <a id="cancel" style="cursor: pointer"><input class="btn-secondary-medium right" type='button' value="Cancel"/></a>
-	
-	                </div>
-	              </div>
-	            </div>
-	            </form>
-          </c:forEach>
+						<c:forEach items="${approvals}" var="client">
+							<form id="revokeApprovalsForm" action="approvals" method="post">
+								<input type="hidden" name="clientId" value="${client.key}" /> <a
+									href="#" id="firstlink">
+									<div id="firstdiv" style="display: block">
+										<div class="app-approval-container1">
+											<div class='row'>
+												<input class="delete-icon right" title="Delete"
+													type='submit' name="delete" value="" /> <span
+													class="linklike">${client.key}</span>
+												<div class="edit-icon right" title="Edit "></div>
+											</div>
+										</div>
+									</div>
+								</a>
+								<div id="seconddiv" style="display: none">
+									<div class="app-approval-container2">
+										<input class="btn-secondary-medium right" name="delete"
+											type='submit' value="Delete" /> <span class="linklike">${client.key}</span>
+										<div id="approvals-list-container">
+											<br>
 
-          </c:if>
-        </div>
+											<c:forEach items="${client.value}" var="approval">
+												<div class="approvals-list-div">
+													<input type="checkbox" name="checkedScopes"
+														value="${approval.clientId}-${approval.scope}"
+														${approval.status eq 'APPROVED' ? 'checked=checked' : '' }>
+													<spring:message code="scope.${approval.scope}" />
+												</div>
+											</c:forEach>
+
+											<input class="btn-primary-medium right" name="update"
+												type="submit" value="Update"> <a id="cancel"
+												style="cursor: pointer"><input
+												class="btn-secondary-medium right" type='button'
+												value="Cancel" /></a>
+
+										</div>
+									</div>
+								</div>
+							</form>
+						</c:forEach>
+
+					</c:if>
+				</div>
 
 			</c:if>
 
