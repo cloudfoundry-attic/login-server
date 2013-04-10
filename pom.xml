@@ -11,7 +11,7 @@
 
 	<groupId>com.cloudfoundry.identity</groupId>
 	<artifactId>cloudfoundry-login-server</artifactId>
-	<version>1.2.1-SNAPSHOT</version>
+	<version>1.2.1</version>
 	<packaging>war</packaging>
 	<name>Cloud Foundry Login</name>
 	<description>Cloud Foundry Login App</description>
