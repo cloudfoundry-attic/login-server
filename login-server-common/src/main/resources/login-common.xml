@@ -126,13 +126,11 @@
 		<property name="links" ref="links" />
 	</bean>
 
+	<oauth:rest-template id="authorizationTemplate" resource="uaa" />
+
 	<bean id="uaaController" class="org.cloudfoundry.identity.uaa.login.RemoteUaaController">
 		<property name="uaaBaseUrl" value="${uaa.url:http://localhost:8080/uaa}" />
-		<property name="authorizationTemplate">
-			<bean class="org.springframework.security.oauth2.client.OAuth2RestTemplate">
-				<constructor-arg ref="uaa" />
-			</bean>
-		</property>
+		<property name="authorizationTemplate" ref="authorizationTemplate" />
 		<property name="links" ref="links" />
 	</bean>
 

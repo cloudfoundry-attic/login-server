@@ -62,9 +62,9 @@ import org.springframework.web.servlet.view.RedirectView;
  * Controller that manages OAuth authorization via a remote UAA service. Use this in conjunction with the authentication
  * mechanism of your choice (LDAP, Google OpenID etc.) to serve OAuth2 tokens to clients registered in the remote
  * server.
- * 
+ *
  * @author Dave Syer
- * 
+ *
  */
 @Controller
 @SessionAttributes(value = "cookie")
@@ -111,7 +111,7 @@ public class RemoteUaaController {
 	/**
 	 * Prompts to use if authenticating locally. Set this if you want to override the default behaviour of asking the
 	 * remote UAA for its prompts.
-	 * 
+	 *
 	 * @param prompts the prompts to set
 	 */
 	public void setPrompts(List<Prompt> prompts) {
@@ -127,7 +127,7 @@ public class RemoteUaaController {
 
 	/**
 	 * The rest template used to grab prompts and do stuff that doesn't require authentication.
-	 * 
+	 *
 	 * @param defaultTemplate the defaultTemplate to set
 	 */
 	public void setDefaultTemplate(RestOperations defaultTemplate) {
@@ -162,6 +162,7 @@ public class RemoteUaaController {
 			}
 		});
 		template.setErrorHandler(new DefaultResponseErrorHandler() {
+			@Override
 			public boolean hasError(ClientHttpResponse response) throws IOException {
 				HttpStatus statusCode = response.getStatusCode();
 				return statusCode.series() == HttpStatus.Series.SERVER_ERROR;
@@ -194,6 +195,10 @@ public class RemoteUaaController {
 		catch (URISyntaxException e) {
 			throw new IllegalArgumentException("Could not extract host from URI: " + baseUrl);
 		}
+	}
+
+	protected String getUaaBaseUrl() {
+		return baseUrl;
 	}
 
 	@RequestMapping(value = { "/login", "/info" }, method = RequestMethod.GET)
@@ -253,7 +258,7 @@ public class RemoteUaaController {
 			// use defaults
 		}
 		if (response != null && response.getStatusCode() == HttpStatus.OK) {
-			body.putAll((Map<String, Object>) response.getBody());
+			body.putAll(response.getBody());
 		}
 		else {
 			logger.error("Cannot determine login info from remote server; using defaults");
@@ -262,8 +267,8 @@ public class RemoteUaaController {
 			prompts.put("password", new String[] { "password", "Password" });
 			body.put("prompts", prompts);
 		}
-		return body;
 
+		return body;
 	}
 
 	@RequestMapping(value = "/oauth/authorize", params = "response_type")
@@ -302,7 +307,7 @@ public class RemoteUaaController {
 		saveCookie(response.getHeaders(), model);
 
 		@SuppressWarnings("unchecked")
-		Map<String, Object> body = (Map<String, Object>) response.getBody();
+		Map<String, Object> body = response.getBody();
 		if (body != null) {
 			// User approval is required
 			logger.debug("Response: " + body);
