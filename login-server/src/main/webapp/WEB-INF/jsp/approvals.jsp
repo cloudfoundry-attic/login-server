@@ -167,7 +167,7 @@
 							CloudFoundry.com account.</p>
 
 						<c:forEach items="${approvals}" var="client">
-							<form id="revokeApprovalsForm" action="approvals" method="post">
+							<form id="revokeApprovalsForm" action="profile" method="post">
 								<input type="hidden" name="clientId" value="${client.key}" /> <a
 									href="#" id="firstlink">
 									<div id="firstdiv" style="display: block">

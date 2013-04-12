@@ -19,8 +19,8 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 
+<c:url var="rootUrl" value="/" />
 <c:url var="baseUrl" value="/resources" />
-<c:url var="rootUrl" value="" />
 <c:choose>
 	<c:when test="${pageContext.request.userPrincipal.class.name =='org.springframework.security.providers.ExpiringUsernameAuthenticationToken'}">
 		<c:url var="username" value="${fn:escapeXml(pageContext.request.userPrincipal.principal.value)}" />
@@ -46,7 +46,7 @@
 <meta content='VMware' name='author' />
 <meta content='Copyright VMware 2011. All Rights Reserved.'
 	name='copyright' />
-<link href='${rootUrl}/favicon.ico' rel='shortcut icon' />
+<link href='${rootUrl}favicon.ico' rel='shortcut icon' />
 <meta content='all' name='robots' />
 <link href='${baseUrl}/stylesheets/print.css' media='print'
 	rel='stylesheet' type='text/css' />
@@ -90,9 +90,8 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 			width='373' height='70'></img> </a>
 		<div style="float: right;">
 			<ul class='super-nav'>
-				<li><span>Welcome <a href="/approvals"><strong>${username}</strong></a></span>
-					/ <c:url value="/logout.do" var="url" /> <a
-					href="${fn:escapeXml(url)}">Logout</a> &nbsp;</li>
+				<li><span>Welcome <a href="${rootUrl}profile"><strong>${username}</strong></a></span>
+					/ <a href="${rootUrl}logout.do">Logout</a> &nbsp;</li>
 			</ul>
 		</div>
 		<div class="splash-box">
@@ -100,7 +99,9 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 				<h2>Success</h2>
 
 				<p>Your account login is working and you have authenticated.</p>
-				<p>Proceed to your <a href="/approvals">account settings</a>.</p>
+				<p>
+					Proceed to your <a href="${rootUrl}profile">account settings</a>.
+				</p>
 
 				<c:if test="${error!=null}">
 					<div class="error" title="${fn:escapeXml(error)}">
@@ -116,22 +117,23 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 			VMware, Inc. All rights reserved.
 		</div>
 	</div>
+	<cf:if test="${not empty analytics}">
 	<script>
-		var _gaq = _gaq || [];
-		_gaq.push([ '_setAccount', 'UA-22181585-1' ]);
-		_gaq.push([ '_trackPageview' ]);
-		(function() {
-			var ga = document.createElement('script');
-			ga.type = 'text/javascript';
-			ga.async = true;
-			ga.src = ('https:' == document.location.protocol ? 'https://ssl'
-					: 'http://www')
-					+ '.google-analytics.com/ga.js';
-			var s = document.getElementsByTagName('script')[0];
-			s.parentNode.insertBefore(ga, s);
-		})();
+			(function(i, s, o, g, r, a, m) {
+				i['GoogleAnalyticsObject'] = r;
+				i[r] = i[r] || function() {
+					(i[r].q = i[r].q || []).push(arguments)
+				}, i[r].l = 1 * new Date();
+				a = s.createElement(o), m = s.getElementsByTagName(o)[0];
+				a.async = 1;
+				a.src = g;
+				m.parentNode.insertBefore(a, m)
+			})(window, document, 'script',
+					'//www.google-analytics.com/analytics.js', 'ga');
+
+			ga('create', '${analytics.code}', '${analytics.domain}');
+			ga('send', 'pageview');
 	</script>
-	<script type="text/javascript"
-		src="//www.vmware.com/files/templates/inc/s_code_vmw.js"></script>
+	</cf:if>
 </body>
 </html>

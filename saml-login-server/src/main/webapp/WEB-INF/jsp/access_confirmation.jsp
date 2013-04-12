@@ -20,7 +20,7 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 
 <c:url var="baseUrl" value="/resources" />
-<c:url var="rootUrl" value="" />
+<c:url var="rootUrl" value="/" />
 <c:url var="authorizeUrl" value="/oauth/authorize" />
 <c:choose>
 	<c:when test="${pageContext.request.userPrincipal.class.name =='org.springframework.security.providers.ExpiringUsernameAuthenticationToken'}">
@@ -47,7 +47,7 @@
 <meta content='VMware' name='author' />
 <meta content='Copyright VMware 2011. All Rights Reserved.'
 	name='copyright' />
-<link href='${rootUrl}/favicon.ico' rel='shortcut icon' />
+<link href='${rootUrl}favicon.ico' rel='shortcut icon' />
 <meta content='all' name='robots' />
 <link href='${baseUrl}/stylesheets/print.css' media='print'
 	rel='stylesheet' type='text/css' />
@@ -74,12 +74,17 @@ function toggle(source) {
   for(var i in checkboxes)
     checkboxes[i].checked = source.checked;
 }
-$('.allrequests').live('click',function(){
+	$('.allrequests').live(
+			'click',
+			function() {
     $(this).children().toggleClass('inactive');
     if ( $('.individualrequests').children().hasClass('inactive') ) {
-      $('.individualrequests').children().removeClass('inactive').addClass('approvals-list-div');
-      } else if ( $('.individualrequests').children().hasClass('approvals-list-div') ) {
-          $('.individualrequests').children().removeClass('approvals-list-div').addClass('inactive');
+					$('.individualrequests').children().removeClass('inactive')
+							.addClass('approvals-list-div');
+				} else if ($('.individualrequests').children().hasClass(
+						'approvals-list-div')) {
+					$('.individualrequests').children().removeClass(
+							'approvals-list-div').addClass('inactive');
     }
  });
 </script>
@@ -88,13 +93,13 @@ $('.allrequests').live('click',function(){
 	<div class="approvals">
 		<a href='${links.home}'><img
 			alt="Cloud Foundry: The Industry's Open Platform As A Service"
-			class="logo-approvals" src='${baseUrl}/images/logo_header_cloudfoundry.png'
-			width='373' height='70'></img> </a>
+			class="logo-approvals"
+			src='${baseUrl}/images/logo_header_cloudfoundry.png' width='373'
+			height='70'></img> </a>
 		<div style="float: right;">
 			<ul class='super-nav'>
-				<li><span>Welcome <a href="/approvals"><strong>${username}</strong></a></span>
-					/ <c:url value="/logout.do" var="url" /> <a
-					href="${fn:escapeXml(url)}">Logout</a> &nbsp;</li>
+				<li><span>Welcome <a href="${rootUrl}profile"><strong>${username}</strong></a></span>
+					/ <a href="${rootUrl}logout.do">Logout</a> &nbsp;</li>
 			</ul>
 		</div>
 		<div class="bg-content-approvals">
@@ -120,8 +125,8 @@ $('.allrequests').live('click',function(){
         <div class="content-inner-approvals">
 
           <div class="left-side-approvals">
-            <strong>${client_id}</strong><br>
-            <a class="break" href="${redirect_uri}">${redirect_uri}</a>
+						<strong>${client_id}</strong><br> <a class="break"
+							href="${redirect_uri}">${redirect_uri}</a>
           </div>
 
           <div class="right-side-approvals">
@@ -131,14 +136,18 @@ $('.allrequests').live('click',function(){
               <div class="confirm">
                 <p>
                   ${client_id} has requested permission to access your
-                  CloudFoundry.com account. If you do not recognize this application or its URL (<a
-                    href="${redirect_uri}">${redirect_uri}</a>),
-                  you should click Cancel below. The application will not see your password.
+									CloudFoundry.com account. If you do not recognize this
+									application or its URL (<a href="${redirect_uri}">${redirect_uri}</a>),
+									you should click Cancel below. The application will not see
+									your password.
                 </p>
                 <br>
                 <c:set var="count" value="0" />
-                  <c:if test="${(! empty undecided_scopes) && (! empty approved_scopes || ! empty denied_scopes)}">
-                     <p> <strong>New Requests</strong> </p>
+								<c:if
+									test="${(! empty undecided_scopes) && (! empty approved_scopes || ! empty denied_scopes)}">
+									<p>
+										<strong>New Requests</strong>
+									</p>
                   </c:if>
                   <c:if test="${(! empty undecided_scopes)}">
                        <a class="allrequests">
@@ -150,29 +159,40 @@ $('.allrequests').live('click',function(){
                      <c:forEach items="${undecided_scopes}" var="scope">
                          <a class="individualrequests">
                            <div class="approvals-list-div">
-                             <input type="checkbox" class="requests" checked="checked" name="scope.${count}" value="${scope['code']}"><spring:message code="${scope['code']}"
+												<input type="checkbox" class="requests" checked="checked"
+													name="scope.${count}" value="${scope['code']}">
+												<spring:message code="${scope['code']}"
                                      text="${scope['text']}" />
                            </div>
                          </a>
                          <c:set var="count" value="${count + 1}" />
                      </c:forEach>
                   </c:if>
-                  <c:if test="${(! empty approved_scopes) || (! empty denied_scopes)}">
-                      <p> <strong>Existing Permissions</strong> </p>
+								<c:if
+									test="${(! empty approved_scopes) || (! empty denied_scopes)}">
+									<p>
+										<strong>Existing Permissions</strong>
+									</p>
                   </c:if>
-                  <c:if test="${(approved_scopes != null) && (! empty approved_scopes)}">
+								<c:if
+									test="${(approved_scopes != null) && (! empty approved_scopes)}">
                       <c:forEach items="${approved_scopes}" var="scope">
                           <div class="approvals-list-div">
-                            <input type="checkbox" checked="checked" name="scope.${count}" value="${scope['code']}"><spring:message code="${scope['code']}"
+											<input type="checkbox" checked="checked"
+												name="scope.${count}" value="${scope['code']}">
+											<spring:message code="${scope['code']}"
                                     text="${scope['text']}" />
                           </div>
                           <c:set var="count" value="${count + 1}" />
                       </c:forEach>
                   </c:if>
-                  <c:if test="${(denied_scopes != null) && (! empty denied_scopes)}">
+								<c:if
+									test="${(denied_scopes != null) && (! empty denied_scopes)}">
                       <c:forEach items="${denied_scopes}" var="scope">
                          <div class="approvals-list-div">
-                           <input type="checkbox" name="scope.${count}" value="${scope['code']}"><spring:message code="${scope['code']}"
+											<input type="checkbox" name="scope.${count}"
+												value="${scope['code']}">
+											<spring:message code="${scope['code']}"
                                    text="${scope['text']}" />
                          </div>
                          <c:set var="count" value="${count + 1}" />
@@ -180,10 +200,10 @@ $('.allrequests').live('click',function(){
                   </c:if>
 
                 <br>
-                <p>
-                  You can change your approval of permissions or revoke access for this application at any time from account settings.
-                  By approving access, you agree to ${client_id}'s terms of service and privacy policy.
-                </p>
+								<p>You can change your approval of permissions or revoke
+									access for this application at any time from account settings.
+									By approving access, you agree to ${client_id}'s terms of
+									service and privacy policy.</p>
               </div>
               <input name="${options.confirm.key}"
                 value="${options.confirm.value}" type="hidden" />
@@ -210,22 +230,23 @@ $('.allrequests').live('click',function(){
 			VMware, Inc. All rights reserved.
 		</div>
 	</div>
+	<cf:if test="${not empty analytics}">
 	<script>
-		var _gaq = _gaq || [];
-		_gaq.push([ '_setAccount', 'UA-22181585-1' ]);
-		_gaq.push([ '_trackPageview' ]);
-		(function() {
-			var ga = document.createElement('script');
-			ga.type = 'text/javascript';
-			ga.async = true;
-			ga.src = ('https:' == document.location.protocol ? 'https://ssl'
-					: 'http://www')
-					+ '.google-analytics.com/ga.js';
-			var s = document.getElementsByTagName('script')[0];
-			s.parentNode.insertBefore(ga, s);
-		})();
+			(function(i, s, o, g, r, a, m) {
+				i['GoogleAnalyticsObject'] = r;
+				i[r] = i[r] || function() {
+					(i[r].q = i[r].q || []).push(arguments)
+				}, i[r].l = 1 * new Date();
+				a = s.createElement(o), m = s.getElementsByTagName(o)[0];
+				a.async = 1;
+				a.src = g;
+				m.parentNode.insertBefore(a, m)
+			})(window, document, 'script',
+					'//www.google-analytics.com/analytics.js', 'ga');
+
+			ga('create', '${analytics.code}', '${analytics.domain}');
+			ga('send', 'pageview');
 	</script>
-	<script type="text/javascript"
-		src="//www.vmware.com/files/templates/inc/s_code_vmw.js"></script>
+	</cf:if>
 </body>
 </html>
