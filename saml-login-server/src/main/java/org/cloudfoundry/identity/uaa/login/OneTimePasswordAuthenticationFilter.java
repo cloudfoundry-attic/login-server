@@ -38,11 +38,17 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.provider.error.OAuth2AuthenticationEntryPoint;
 import org.springframework.security.web.AuthenticationEntryPoint;
 
+/**
+ * Authentication filter to verify one time passwords with what's
+ * cached in the one time password store.
+ *
+ * @author jdsa
+ *
+ */
 public class OneTimePasswordAuthenticationFilter implements Filter {
 
 	private final Log logger = LogFactory.getLog(getClass());
@@ -69,36 +75,28 @@ public class OneTimePasswordAuthenticationFilter implements Filter {
 		String username = loginInfo.get("username");
 		String password = loginInfo.get("password");
 
-		try {
-			if (loginInfo.isEmpty()) {
-				throw new BadCredentialsException("Request does not contain credentials.");
+		if (loginInfo.isEmpty()) {
+			throw new BadCredentialsException("Request does not contain credentials.");
+		}
+		else {
+			logger.debug("Located credentials in request, with keys: " + loginInfo.keySet());
+			if (methods != null && !methods.contains(req.getMethod().toUpperCase())) {
+				throw new BadCredentialsException("Credentials must be sent by (one of methods): " + methods);
 			}
-			else {
-				logger.debug("Located credentials in request, with keys: " + loginInfo.keySet());
-				if (methods != null && !methods.contains(req.getMethod().toUpperCase())) {
-					throw new BadCredentialsException("Credentials must be sent by (one of methods): " + methods);
-				}
 
-				if (store.validateOneTimePassword(username, password)) {
-					logger.info("Successful authentication request for " + username);
-				}
-				else {
-					throw new BadCredentialsException("Invalid one time password");
-				}
+			if (store.validateOneTimePassword(username, password)) {
+				logger.info("Successful authentication request for " + username);
 
 				Authentication result = new UsernamePasswordAuthenticationToken(username, null,
 						UaaAuthority.USER_AUTHORITIES);
 				SecurityContextHolder.getContext().setAuthentication(result);
 			}
-		}
-		catch (AuthenticationException e) {
-			logger.debug("Authentication failed");
-			authenticationEntryPoint.commence(req, res, e);
-			return;
+			else {
+				authenticationEntryPoint.commence(req, res, new BadCredentialsException("Invalid one time password"));
+			}
 		}
 
 		chain.doFilter(request, response);
-
 	}
 
 	private Map<String, String> getCredentials(HttpServletRequest request) {

@@ -36,6 +36,8 @@ uaa:
     url: http://localhost:8080/uaa/oauth/token
   approvals:
     url: http://localhost:8080/uaa/approvals
+  login:
+    url: http://localhost:8080/uaa/authenticate
     
 # The secret that this login server will use to authenticate to the uaa
 LOGIN_SECRET: loginsecret

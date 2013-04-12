@@ -13,6 +13,12 @@
 
 package org.cloudfoundry.identity.uaa.login;
 
+/**
+ * Interface for the store for one time passwords.
+ *
+ * @author jdsa
+ *
+ */
 public interface OneTimePasswordStore {
 
 	public String getOneTimePassword(String userId);

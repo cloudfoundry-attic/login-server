@@ -24,9 +24,10 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 /**
- * 
+ * One time password store that uses ehcache to cache one time passwords.
+ *
  * @author jdsa
- * 
+ *
  */
 public class CachingOneTimePasswordStore implements OneTimePasswordStore, InitializingBean {
 
