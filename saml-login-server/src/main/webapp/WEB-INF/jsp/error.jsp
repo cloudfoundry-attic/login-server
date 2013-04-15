@@ -23,7 +23,7 @@
 <c:url var="rootUrl" value="/" />
 
 <c:choose>
-	<c:when test="${pageContext.request.userPrincipal.class.name =='org.springframework.security.providers.ExpiringUsernameAuthenticationToken'}">
+	<c:when test="${pageContext.request.userPrincipal['class'].name =='org.springframework.security.providers.ExpiringUsernameAuthenticationToken'}">
 		<c:url var="username" value="${fn:escapeXml(pageContext.request.userPrincipal.principal.value)}" />
 	</c:when>
 	<c:otherwise>
