@@ -172,7 +172,8 @@
 		<property name="defaultProfileOptions">
 			<bean class="org.springframework.security.saml.websso.WebSSOProfileOptions">
 				<property name="includeScoping" value="false" />
-				<property name="nameID" value="urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified"/>
+				<property name="nameID" value="${login.saml.nameID:urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified}"/>
+				<property name="assertionConsumerIndex" value="${login.saml.assertionConsumerIndex:0}"/>
 			</bean>
 		</property>
 	</bean>
