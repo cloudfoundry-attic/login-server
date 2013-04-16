@@ -116,6 +116,12 @@
 				<value>application/x-www-form-urlencoded</value>
 			</list>
 		</property>
+		<property name="parameters">
+			<map>
+				<entry key="response_type" value="code" />
+				<entry key="code" value="" />
+			</map>
+		</property>
 	</bean>
 
 	<mvc:resources location="/" mapping="/**" />
