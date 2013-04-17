@@ -78,10 +78,11 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 <script type="text/javascript">
 	$(document).ready(function() {
 		$('form:first *:input[type!=hidden]:first').focus();
-    Placeholders.init({
-      live: true, //Apply to future and modified elements too
-      hideOnFocus: true //Hide the placeholder when the element receives focus
-    });
+		Placeholders.init({
+			live : true, //Apply to future and modified elements too
+			hideOnFocus : true
+		//Hide the placeholder when the element receives focus
+		});
 	});
 </script>
 <script type="text/javascript">
@@ -104,7 +105,8 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 			width='373' height='70'></img> </a>
 		<div class="splash-box">
 			<article class="container">
-				<p class="intro-text">Sign in with your CloudFoundry.com credentials.</p>
+				<p class="intro-text">Sign in with your CloudFoundry.com
+					credentials.</p>
 				<form id="loginForm" name="loginForm"
 					action="<c:url value="/login.do"/>" method="POST" novalidate>
 					<div>
@@ -113,21 +115,31 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 								password.</div>
 						</c:if>
 						<c:forEach items="${prompts}" var="prompt">
-              <spring:message code="prompt.${prompt.key}"
-                text="${prompt.value[1]}" var="text"/>
-              <input id='${prompt.key}' type='${prompt.value[0]}' ${prompt.value[0]=='password'?'autocomplete="off"':''}
-                name='${prompt.key}' placeholder='${text}' />
+							<spring:message
+								code="prompt.${prompt.key==null ? prompt.name : prompt.key}"
+								text="${prompt.key==null ? prompt.text : prompt.value[1]}"
+								var="text" />
+							<c:set value="${prompt.key==null ? prompt.type : prompt.value[0]}"
+								var="type" />
+							<c:set value="${prompt.key==null ? prompt.name : prompt.key}"
+								var="name" />
+							<input id='${name}' type='${type}'
+								${type=='password'?'autocomplete="off"':''} name='${name}'
+								placeholder='${text}' />
 						</c:forEach>
 					</div>
 					<button type="submit" class="orange-button">Sign in</button>
-					<span class="button-alt"> <a class="question passwd" href="${links.passwd}">Forgot your password</a></span><br />
-					<br />
+					<span class="button-alt"> <a class="question passwd"
+						href="${links.passwd}">Forgot your password</a></span><br /> <br />
 				</form>
 				<p>
-					Don't have an account? <a href="${links.register}">Register here.</a>
+					Don't have an account? <a href="${links.register}">Register
+						here.</a>
 				</p>
-				<p>Reminder: do not type your Cloud Foundry password into any
-					site except <a href="${links.login}">${links.login}</a>.</p>
+				<p>
+					Reminder: do not type your Cloud Foundry password into any site
+					except <a href="${links.login}">${links.login}</a>.
+				</p>
 			</article>
 		</div>
 		<div class="footer"
