@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache>
+    <defaultCache eternal="false" maxElementsInMemory="2000" overflowToDisk="false" timeToLiveSeconds="60"/>
+    <cache name="oneTimePasswordCache" eternal="false" maxElementsInMemory="2000" overflowToDisk="false"  timeToLiveSeconds="60"/>    
+</ehcache>

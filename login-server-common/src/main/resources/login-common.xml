@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- Cloud Foundry 2012.02.03 Beta Copyright (c) [2009-2012] VMware, Inc. All Rights Reserved. This product is licensed to 
+	you under the Apache License, Version 2.0 (the "License"). You may not use this product except in compliance with the License. 
+	This product includes a number of subcomponents with separate copyright notices and license terms. Your use of these subcomponents 
+	is subject to the terms and conditions of the subcomponent's license, as noted in the LICENSE file. -->
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns="http://www.springframework.org/schema/beans" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:sec="http://www.springframework.org/schema/security" xmlns:oauth="http://www.springframework.org/schema/security/oauth2"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/security/oauth2 http://www.springframework.org/schema/security/spring-security-oauth2-1.0.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd
+		http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.1.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+	<!-- The data source has to be defined first -->
+	<import resource="env-context.xml" />
+
+	<context:property-placeholder properties-ref="applicationProperties" />
+
+	<bean id="basicAuthenticationEntryPoint" class="org.springframework.security.oauth2.provider.error.OAuth2AuthenticationEntryPoint">
+		<property name="realmName" value="UAA/client" />
+		<property name="typeName" value="Basic" />
+	</bean>
+
+	<bean id="clientAuthenticationFilter" class="org.cloudfoundry.identity.uaa.login.ClientInfoAuthenticationFilter">
+		<property name="clientInfoUrl" value="${uaa.clientinfo.url:http://localhost:8080/uaa/clientinfo}" />
+		<property name="allowedGrantTypes" value="authorization_code" />
+		<property name="authenticationEntryPoint" ref="basicAuthenticationEntryPoint" />
+	</bean>
+
+	<bean id="oauthAuthorizeRequestMatcherOld" class="org.cloudfoundry.identity.uaa.security.web.UaaRequestMatcher">
+		<constructor-arg value="/oauth/authorize" />
+		<property name="accept">
+			<list>
+				<value>application/json</value>
+				<value>application/x-www-form-urlencoded</value>
+			</list>
+		</property>
+		<property name="parameters">
+			<map>
+				<entry key="response_type" value="token" />
+				<entry key="credentials" value="{" />
+			</map>
+		</property>
+	</bean>
+
+	<bean id="oauthAuthorizeRequestMatcher" class="org.cloudfoundry.identity.uaa.security.web.UaaRequestMatcher">
+		<constructor-arg value="/oauth/authorize" />
+		<property name="accept">
+			<list>
+				<value>application/json</value>
+				<value>application/x-www-form-urlencoded</value>
+			</list>
+		</property>
+		<property name="parameters">
+			<map>
+				<entry key="response_type" value="token" />
+				<entry key="source" value="credentials" />
+			</map>
+		</property>
+	</bean>
+
+	<authentication-manager xmlns="http://www.springframework.org/schema/security" />
+
+	<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+		<property name="basename" value="messages" />
+	</bean>
+
+	<bean id="loginEntryPoint" class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
+		<constructor-arg value="/login" />
+	</bean>
+
+	<bean id="oauthAuthenticationEntryPoint" class="org.springframework.security.oauth2.provider.error.OAuth2AuthenticationEntryPoint">
+		<property name="realmName" value="UAA/oauth" />
+	</bean>
+
+	<bean id="oauthAccessDeniedHandler" class="org.springframework.security.oauth2.provider.error.OAuth2AccessDeniedHandler" />
+
+	<bean id="authzAuthenticationFilter" class="org.cloudfoundry.identity.uaa.authentication.AuthzAuthenticationFilter">
+		<constructor-arg ref="remoteAuthenticationManager" />
+		<property name="parameterNames">
+			<list>
+				<value>username</value>
+				<value>password</value>
+				<value>credentials</value>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="logoutHandler" class="org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler">
+		<property name="targetUrlParameter" value="redirect" />
+		<property name="defaultTargetUrl" value="/login" />
+	</bean>
+
+	<mvc:resources location="/" mapping="/**" />
+
+	<mvc:default-servlet-handler />
+
+	<bean id="viewResolver" class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
+		<property name="mediaTypes">
+			<map>
+				<entry key="html" value="text/html" />
+				<entry key="json" value="application/json" />
+			</map>
+		</property>
+		<property name="viewResolvers">
+			<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+				<property name="prefix" value="/WEB-INF/jsp/" />
+				<property name="suffix" value=".jsp" />
+			</bean>
+		</property>
+		<property name="defaultViews">
+			<bean class="org.springframework.web.servlet.view.json.MappingJacksonJsonView" />
+		</property>
+	</bean>
+
+	<util:map id="links">
+		<entry key="home" value="${links.home:https://www.cloudfoundry.com}" />
+		<entry key="passwd" value="${links.passwd:https://www.cloudfoundry.com/passwd}" />
+		<entry key="register" value="${links.signup:https://www.cloudfoundry.com/signup}" />
+	</util:map>
+
+	<bean id="homeController" class="org.cloudfoundry.identity.uaa.login.HomeController">
+		<property name="links" ref="links" />
+	</bean>
+
+	<oauth:rest-template id="authorizationTemplate" resource="uaa" />
+
+	<bean id="uaaController" class="org.cloudfoundry.identity.uaa.login.RemoteUaaController">
+		<property name="uaaBaseUrl" value="${uaa.url:http://localhost:8080/uaa}" />
+		<property name="authorizationTemplate" ref="authorizationTemplate" />
+		<property name="links" ref="links" />
+	</bean>
+
+	<bean id="healthzEndpoint" class="org.cloudfoundry.identity.uaa.web.HealthzEndpoint" />
+
+	<oauth:resource id="uaa" access-token-uri="${uaa.token.url:http://localhost:8080/uaa/oauth/token}"
+		client-id="login" client-secret="${LOGIN_SECRET:loginsecret}" type="client_credentials" />
+
+	<!--apply the oauth client context -->
+	<oauth:client id="oauth2ClientFilter" />
+
+	<oauth:rest-template id="restTemplate" resource="userApprovals" />
+
+	<!--define an oauth 2 resource for api access -->
+	<oauth:resource id="userApprovals" type="authorization_code" client-id="login" client-secret="${LOGIN_SECRET:loginsecret}"
+		access-token-uri="${uaa.token.url:http://localhost:8080/uaa/oauth/token}" user-authorization-uri="${login.authorize.url:http://localhost:8080/login/oauth/authorize}" />
+
+	<oauth:web-expression-handler id="oauthWebExpressionHandler" />
+
+	<bean id="approvalsController" class="org.cloudfoundry.identity.uaa.login.ProfileController">
+		<constructor-arg ref="restTemplate" />
+		<property name="approvalsUri" value="${uaa.approvals.url:http://localhost:8080/uaa/approvals}" />
+		<property name="links" ref="links" />
+	</bean>
+
+	<beans profile="default">
+		<bean id="remoteAuthenticationManager" class="org.cloudfoundry.identity.uaa.login.RemoteUaaAuthenticationManager">
+			<property name="loginUrl" value="${uaa.login.url:http://localhost:8080/uaa/authenticate}" />
+		</bean>
+	</beans>
+</beans>

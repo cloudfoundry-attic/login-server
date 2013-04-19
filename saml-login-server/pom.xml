@@ -1,0 +1,329 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.cloudfoundry.identity</groupId>
+		<artifactId>cloudfoundry-login-server-parent</artifactId>
+		<version>1.3.0-SNAPSHOT</version>
+		<relativePath>..</relativePath>
+	</parent>
+
+	<artifactId>cloudfoundry-saml-login-server</artifactId>
+	<packaging>war</packaging>
+	<name>Cloud Foundry SAML Login</name>
+	<description>SAML2 Service provider for Cloud Foundry</description>
+
+	<properties>
+		<spring.security.saml.version>1.0.0.RC2</spring.security.saml.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<tomcat.version>6.0.35</tomcat.version>
+
+		<m2eclipse.wtp.contextRoot>/saml-login</m2eclipse.wtp.contextRoot>
+		<login.path>/login</login.path>
+		<file>target/${project.artifactId}-${project.version}.war</file>
+		<groupId>${project.groupId}</groupId>
+		<artifactId>saml-login</artifactId>
+		<version>${project.version}</version>
+		<packaging>war</packaging>
+		<generatePom>true</generatePom>
+	</properties>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>pl.project13.maven</groupId>
+				<artifactId>git-commit-id-plugin</artifactId>
+				<version>1.9</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>revision</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<verbose>true</verbose>
+					<dateFormat>yyyy-MM-dd'T'HH:mm:ssZ</dateFormat>
+					<generateGitPropertiesFile>true</generateGitPropertiesFile>
+					<generateGitPropertiesFilename>src/main/resources/git.properties</generateGitPropertiesFilename>
+					<dotGitDirectory>../.git</dotGitDirectory>
+				</configuration>
+			</plugin>
+		</plugins>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<!--skip deploy by default (sample) -->
+					<artifactId>maven-deploy-plugin</artifactId>
+					<configuration>
+						<skip>true</skip>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>tomcat-maven-plugin</artifactId>
+					<configuration>
+						<path>${login.path}</path>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.tomcat.maven</groupId>
+					<artifactId>tomcat7-maven-plugin</artifactId>
+					<configuration>
+						<path>${login.path}</path>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-install-plugin</artifactId>
+					<version>2.3.1</version>
+					<executions>
+						<execution>
+							<id></id>
+							<phase>install</phase>
+							<goals>
+								<goal>install-file</goal>
+							</goals>
+							<inherited>false</inherited>
+							<configuration>
+								<file>target/${project.artifactId}-${project.version}.war</file>
+								<groupId>${project.groupId}</groupId>
+								<artifactId>saml-login</artifactId>
+								<version>${project.version}</version>
+								<packaging>war</packaging>
+								<generatePom>true</generatePom>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+
+	<profiles>
+		<profile>
+			<id>integration</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>tomcat-maven-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>start-tomcat</id>
+								<phase>process-test-sources</phase>
+								<goals>
+									<goal>run</goal>
+								</goals>
+								<configuration>
+									<fork>true</fork>
+								</configuration>
+							</execution>
+						</executions>
+						<configuration>
+							<systemProperties>
+								<CLOUD_FOUNDRY_CONFIG_PATH>${CLOUD_FOUNDRY_CONFIG_PATH}</CLOUD_FOUNDRY_CONFIG_PATH>
+								<UAA_PROFILE>local</UAA_PROFILE>
+							</systemProperties>
+							<addContextWarDependencies>true</addContextWarDependencies>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+			<dependencies>
+				<dependency>
+					<groupId>org.cloudfoundry.identity</groupId>
+					<artifactId>uaa</artifactId>
+					<version>${identity.version}</version>
+					<type>war</type>
+					<scope>tomcat</scope>
+				</dependency>
+				<dependency>
+					<groupId>${project.parent.groupId}</groupId>
+					<artifactId>cloudfoundry-login-server-common</artifactId>
+					<version>${project.version}</version>
+					<type>jar</type>
+				</dependency>
+				<dependency>
+					<groupId>org.cloudfoundry.identity</groupId>
+					<artifactId>api</artifactId>
+					<version>${identity.version}</version>
+					<type>war</type>
+					<scope>tomcat</scope>
+				</dependency>
+				<dependency>
+					<groupId>org.cloudfoundry.identity</groupId>
+					<artifactId>app</artifactId>
+					<version>${identity.version}</version>
+					<type>war</type>
+					<scope>tomcat</scope>
+				</dependency>
+			</dependencies>
+		</profile>
+	</profiles>
+
+	<repositories>
+		<repository>
+			<id>spring-milestone</id>
+			<name>Spring Framework Milestone Repository</name>
+			<url>http://maven.springframework.org/milestone</url>
+		</repository>
+		<repository>
+			<!-- necessary for Spring Security OAuth SNAPSHOT dependency -->
+			<id>spring-snapshost</id>
+			<name>Spring Framework Maven Snapshot Repository</name>
+			<url>http://maven.springframework.org/snapshot</url>
+		</repository>
+		<repository>
+			<id>objectstyle</id>
+			<name>ObjectStyle.org Repository</name>
+			<url>http://objectstyle.org/maven2/</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+	    <repository>
+	      <id>org.opensaml</id>
+	      <url>https://build.shibboleth.net/nexus/content/repositories/releases</url>
+	    </repository>
+	</repositories>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>org.cloudfoundry.identity</groupId>
+			<artifactId>cloudfoundry-identity-common</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>cloudfoundry-login-server-common</artifactId>
+			<type>jar</type>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-core</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.security.extensions</groupId>
+			<artifactId>spring-security-saml2-core</artifactId>
+			<version>${spring.security.saml.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-web</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-beans</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-expression</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.inject</groupId>
+			<artifactId>javax.inject</artifactId>
+			<version>1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-config</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-web</artifactId>
+			<version>${spring.security.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-openid</artifactId>
+			<version>${spring.security.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.security.oauth</groupId>
+			<artifactId>spring-security-oauth2</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-webmvc</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-aop</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-logging</groupId>
+			<artifactId>commons-logging</artifactId>
+			<version>1.1.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>1.6.3</version>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>jsp-api</artifactId>
+			<version>2.0</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>jstl</artifactId>
+			<version>1.2</version>
+		</dependency>
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.4</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+		</dependency>
+		
+		<dependency>
+		    <groupId>net.sf.ehcache</groupId>
+		    <artifactId>ehcache-core</artifactId>
+		    <version>2.6.5</version>
+		</dependency>
+		
+		<dependency>
+		  <groupId>com.googlecode.ehcache-spring-annotations</groupId>
+		  <artifactId>ehcache-spring-annotations</artifactId>
+		  <version>1.2.0</version>
+		</dependency>
+
+	</dependencies>
+
+</project>
