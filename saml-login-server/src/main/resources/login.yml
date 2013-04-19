@@ -11,6 +11,7 @@
 # subcomponent's license, as noted in the LICENSE file.
 
 login:
+  url: http://localhost:8080/login
   # The entity base url is the location of this application
   # (The host and port of the application that will accept assertions) 
   entityBaseURL: http://localhost:8080/login

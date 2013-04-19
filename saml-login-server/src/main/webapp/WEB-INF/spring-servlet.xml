@@ -27,7 +27,6 @@
               http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring/ehcache-spring-1.1.xsd">
 
 	<context:annotation-config />
-	<context:component-scan base-package="org.cloudfoundry.identity.web" />
 
 	<security:http pattern="/saml/web/**" security="none" />
 	<security:http pattern="/favicon.ico" security="none" />
@@ -400,7 +399,7 @@
 				</bean>
 				<bean class="org.cloudfoundry.identity.uaa.authentication.login.Prompt">
 					<constructor-arg name="name" value="password"/>
-					<constructor-arg name="text" value="One Time Code (Get one at ${uaa.url:http://localhost:8080/uaa}/generate_code)"/>
+					<constructor-arg name="text" value="One Time Code (Get one at ${uaa.url:http://localhost:8080/login}/passcode)"/>
 					<constructor-arg name="type" value="password"/>
 				</bean>
 			</util:list>

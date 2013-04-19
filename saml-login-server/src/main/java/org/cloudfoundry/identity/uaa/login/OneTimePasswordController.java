@@ -35,7 +35,7 @@ public class OneTimePasswordController {
 
 	private OneTimePasswordStore store = null;
 
-	@RequestMapping(value = { "/generate_code" }, method = RequestMethod.GET)
+	@RequestMapping(value = { "/passcode" }, method = RequestMethod.GET)
 	public String generateOneTimePassword(@RequestHeader
 	HttpHeaders headers, Map<String, Object> model, Principal principal) throws NoSuchAlgorithmException {
 
