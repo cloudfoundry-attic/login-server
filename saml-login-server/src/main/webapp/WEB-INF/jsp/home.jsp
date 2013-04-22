@@ -22,8 +22,8 @@
 <c:url var="rootUrl" value="/" />
 <c:url var="baseUrl" value="/resources" />
 <c:choose>
-	<c:when test="${pageContext.request.userPrincipal['class'].name =='org.springframework.security.providers.ExpiringUsernameAuthenticationToken'}">
-		<c:url var="username" value="${fn:escapeXml(pageContext.request.userPrincipal.principal.value)}" />
+	<c:when test="${pageContext.request.userPrincipal['class'].name =='org.cloudfoundry.identity.uaa.login.SAMLUserDetails'}">
+		<c:url var="username" value="${fn:escapeXml(pageContext.request.userPrincipal.principal.username)}" />
 	</c:when>
 	<c:otherwise>
 		<c:url var="username" value="${fn:escapeXml(pageContext.request.userPrincipal.name)}" />

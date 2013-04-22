@@ -79,7 +79,7 @@
 	</developers>
 
 	<properties>
-		<identity.version>1.4.1</identity.version>
+		<identity.version>1.4.3-SNAPSHOT</identity.version>
 		<spring.version>3.1.2.RELEASE</spring.version>
 		<groupId>${project.groupId}</groupId>
 		<version>${project.version}</version>
@@ -406,6 +406,12 @@
 					<groupId>org.springframework</groupId>
 				</exclusion>
 			</exclusions>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.cloudfoundry.identity</groupId>
+			<artifactId>cloudfoundry-identity-scim</artifactId>
+			<version>${identity.version}</version>
 		</dependency>
 		
 		<dependency>

@@ -253,6 +253,11 @@
 		</dependency>
 		
 		<dependency>
+			<groupId>org.cloudfoundry.identity</groupId>
+			<artifactId>cloudfoundry-identity-scim</artifactId>
+		</dependency>
+		
+		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>cloudfoundry-login-server-common</artifactId>
 		</dependency>

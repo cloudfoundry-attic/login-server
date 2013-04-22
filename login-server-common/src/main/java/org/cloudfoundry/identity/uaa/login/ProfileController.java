@@ -31,7 +31,7 @@ public class ProfileController implements InitializingBean {
 
 	private Map<String, String> links = new HashMap<String, String>();
 
-	private RestOperations restTemplate;
+	private final RestOperations restTemplate;
 
 	private final Log logger = LogFactory.getLog(getClass());
 
@@ -72,6 +72,20 @@ public class ProfileController implements InitializingBean {
 		Set<Map<String, Object>> approvals = restTemplate.getForObject(approvalsUri, Set.class);
 		for (Map<String, Object> approvalMap : approvals) {
 			String clientId = (String) approvalMap.get("clientId");
+
+			String scope = (String) approvalMap.get("scope");
+			if (!scope.contains(".")) {
+				approvalMap.put("text", "Access your data with scope '" + scope + "'");
+			}
+			else {
+				String resource = scope.substring(0, scope.lastIndexOf("."));
+				if ("uaa".equals(resource)) {
+					// special case: don't need to prompt for internal uaa scopes
+					continue;
+				}
+				String access = scope.substring(scope.lastIndexOf(".") + 1);
+				approvalMap.put("text", "Access your '" + resource + "' resources with scope '" + access + "'");
+			}
 
 			List<Object> approvalList = result.get(clientId);
 			if (null == approvalList) {
@@ -114,6 +128,7 @@ public class ProfileController implements InitializingBean {
 				else {
 					approvalToBeUpdated.put("status", "DENIED");
 				}
+				approvalToBeUpdated.remove("text");
 				updatedApprovals.add(approvalToBeUpdated);
 			}
 
