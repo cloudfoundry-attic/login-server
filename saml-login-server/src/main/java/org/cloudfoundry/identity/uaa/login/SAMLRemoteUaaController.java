@@ -14,17 +14,19 @@
 package org.cloudfoundry.identity.uaa.login;
 
 import java.security.Principal;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.cloudfoundry.identity.uaa.client.SocialClientUserDetails;
-import org.opensaml.saml2.core.impl.NameIDImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.providers.ExpiringUsernameAuthenticationToken;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -47,8 +49,16 @@ public class SAMLRemoteUaaController extends RemoteUaaController {
 	protected Map<String, String> getLoginCredentials(Principal principal) {
 		Map<String, String> login = new LinkedHashMap<String, String>();
 		if (principal instanceof ExpiringUsernameAuthenticationToken) {
-			appendField(login, "username",
-					((NameIDImpl) ((ExpiringUsernameAuthenticationToken) principal).getPrincipal()).getValue());
+			appendField(login, "username", ((SAMLUserDetails)(((ExpiringUsernameAuthenticationToken) principal).getPrincipal())).getUsername());
+
+			Collection<GrantedAuthority> authorities = ((SAMLUserDetails)(((ExpiringUsernameAuthenticationToken) principal).getPrincipal())).getAuthorities();
+			String[] authorityList = new String[authorities.size()];
+			int i = 0;
+			for (GrantedAuthority authority : authorities) {
+				authorityList[i] = "\"externalGroups." + i + "\": \"" + authority.getAuthority() + "\"";
+				i++;
+			}
+			appendField(login, "authorities", "{" + StringUtils.arrayToCommaDelimitedString(authorityList) + "}");
 		}
 		else {
 			appendField(login, "username", principal.getName());

@@ -23,8 +23,8 @@
 <c:url var="rootUrl" value="/" />
 <c:url var="authorizeUrl" value="/oauth/authorize" />
 <c:choose>
-	<c:when test="${pageContext.request.userPrincipal.class.name =='org.springframework.security.providers.ExpiringUsernameAuthenticationToken'}">
-		<c:url var="username" value="${fn:escapeXml(pageContext.request.userPrincipal.principal.value)}" />
+	<c:when test="${pageContext.request.userPrincipal['class'].name =='org.cloudfoundry.identity.uaa.login.SAMLUserDetails'}">
+		<c:url var="username" value="${fn:escapeXml(pageContext.request.userPrincipal.principal.username)}" />
 	</c:when>
 	<c:otherwise>
 		<c:url var="username" value="${fn:escapeXml(pageContext.request.userPrincipal.name)}" />
@@ -201,7 +201,7 @@
 													<input type="checkbox" name="checkedScopes"
 														value="${approval.clientId}-${approval.scope}"
 														${approval.status eq 'APPROVED' ? 'checked=checked' : '' }>
-													<spring:message code="scope.${approval.scope}" />
+													<spring:message code="scope.${approval.scope}" text="${approval.text}"/>
 												</div>
 											</c:forEach>
 
