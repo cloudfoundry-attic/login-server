@@ -399,7 +399,7 @@
 				</bean>
 				<bean class="org.cloudfoundry.identity.uaa.authentication.login.Prompt">
 					<constructor-arg name="name" value="password"/>
-					<constructor-arg name="text" value="One Time Code (Get one at ${uaa.url:http://localhost:8080/login}/passcode)"/>
+					<constructor-arg name="text" value="One Time Code (Get one at ${login.url:http://localhost:8080/login}/passcode)"/>
 					<constructor-arg name="type" value="password"/>
 				</bean>
 			</util:list>
