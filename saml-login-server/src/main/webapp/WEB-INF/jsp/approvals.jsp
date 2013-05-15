@@ -1,7 +1,7 @@
 <%--
 
     Cloud Foundry 2012.02.03 Beta
-    Copyright (c) [2009-2012] VMware, Inc. All Rights Reserved.
+    Copyright (c) [2013] GoPivotal, Inc. All Rights Reserved.
 
     This product is licensed to you under the Apache License, Version 2.0 (the "License").
     You may not use this product except in compliance with the License.
@@ -44,8 +44,8 @@
 <title>Account Settings | Cloud Foundry</title>
 <meta charset='utf-8'>
 <meta content='IE=edge,chrome=1' http-equiv='X-UA-Compatible'>
-<meta content='VMware' name='author' />
-<meta content='Copyright VMware 2011. All Rights Reserved.'
+<meta content='GoPivotal' name='author' />
+<meta content='Copyright GoPivotal 2013. All Rights Reserved.'
 	name='copyright' />
 <link href='${rootUrl}favicon.ico' rel='shortcut icon' />
 <meta content='all' name='robots' />
@@ -227,7 +227,7 @@
 		<div class="footer">
 			Copyright &copy;
 			<fmt:formatDate value="<%=new java.util.Date()%>" pattern="yyyy" />
-			VMware, Inc. All rights reserved.
+			GoPivotal, Inc. All rights reserved.
 		</div>
 	</div>
 	<cf:if test="${not empty analytics}">

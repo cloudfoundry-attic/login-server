@@ -1,7 +1,7 @@
 <%--
 
     Cloud Foundry 2012.02.03 Beta
-    Copyright (c) [2009-2012] VMware, Inc. All Rights Reserved.
+    Copyright (c) [2013] GoPivotal, Inc. All Rights Reserved.
 
     This product is licensed to you under the Apache License, Version 2.0 (the "License").
     You may not use this product except in compliance with the License.
@@ -43,8 +43,8 @@
 <title>Success | Cloud Foundry</title>
 <meta charset='utf-8'>
 <meta content='IE=edge,chrome=1' http-equiv='X-UA-Compatible'>
-<meta content='VMware' name='author' />
-<meta content='Copyright VMware 2011. All Rights Reserved.'
+<meta content='GoPivotal' name='author' />
+<meta content='Copyright GoPivotal 2013. All Rights Reserved.'
 	name='copyright' />
 <link href='${rootUrl}favicon.ico' rel='shortcut icon' />
 <meta content='all' name='robots' />
@@ -86,8 +86,12 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 	<div class="splash">
 		<a href='${links.home}'><img
 			alt="Cloud Foundry: The Industry's Open Platform As A Service"
-			class="logo" src='${baseUrl}/images/logo_header_cloudfoundry.png'
-			width='373' height='70'></img> </a>
+			class="logo"
+			src='${baseUrl}/images/logo-cloudfoundry.png'></img> </a>
+		<a href='http://www.gopivotal.com' target='_blank'><img
+			alt="Pivotal"
+			id="pivotal-logo"
+			src='${baseUrl}/images/logo-pivotal.png'></img> </a>
 		<div style="float: right;">
 			<ul class='super-nav'>
 				<li><span>Welcome <a href="${rootUrl}profile"><strong>${username}</strong></a></span>
@@ -100,7 +104,13 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 
 				<p>Your account login is working and you have authenticated.</p>
 				<p>
-					Proceed to your <a href="${rootUrl}profile">account settings</a>.
+					You can... 
+					<ul>
+						<li><a href="${links.passwd}">Reset</a> your password</li>
+						<li><a href="https://micro.cloudfoundry.com/eula">Manage</a> your Micro Cloud Foundry domain names</li>
+						<li><a href="${rootUrl}profile">Proceed</a> to your account settings</li>
+						<li><a href="https://cloudfoundry.zendesk.com/agent/#/dashboard">Submit</a> a support ticket</li>
+					</ul>
 				</p>
 
 				<c:if test="${error!=null}">
@@ -114,7 +124,7 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 		<div class="footer">
 			Copyright &copy;
 			<fmt:formatDate value="<%=new java.util.Date()%>" pattern="yyyy" />
-			VMware, Inc. All rights reserved.
+			GoPivotal, Inc. All rights reserved.
 		</div>
 	</div>
 	<cf:if test="${not empty analytics}">

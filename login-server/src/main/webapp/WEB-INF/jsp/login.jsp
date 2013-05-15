@@ -1,7 +1,7 @@
 <%--
 
     Cloud Foundry 2012.02.03 Beta
-    Copyright (c) [2009-2012] VMware, Inc. All Rights Reserved.
+    Copyright (c) [2013] GoPivotal, Inc. All Rights Reserved.
 
     This product is licensed to you under the Apache License, Version 2.0 (the "License").
     You may not use this product except in compliance with the License.
@@ -35,8 +35,8 @@
 <title>Login | Cloud Foundry</title>
 <meta charset='utf-8'>
 <meta content='IE=edge,chrome=1' http-equiv='X-UA-Compatible'>
-<meta content='VMware' name='author' />
-<meta content='Copyright VMware 2011. All Rights Reserved.'
+<meta content='GoPivotal' name='author' />
+<meta content='Copyright GoPivotal 2013. All Rights Reserved.'
 	name='copyright' />
 <link href='${rootUrl}favicon.ico' rel='shortcut icon' />
 <meta content='all' name='robots' />
@@ -99,10 +99,14 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 </head>
 <body id="micro">
 	<div class="splash">
-		<a href='${links.home}/'><img
+		<a href='${links.home}'><img
 			alt="Cloud Foundry: The Industry's Open Platform As A Service"
-			class="logo" src='${baseUrl}/images/logo_header_cloudfoundry.png'
-			width='373' height='70'></img> </a>
+			class="logo"
+			src='${baseUrl}/images/logo-cloudfoundry.png'></img> </a>
+		<a href='http://www.gopivotal.com' target='_blank'><img
+			alt="Pivotal"
+			id="pivotal-logo"
+			src='${baseUrl}/images/logo-pivotal.png'></img> </a>
 		<div class="splash-box">
 			<article class="container">
 				<p class="intro-text">Sign in with your CloudFoundry.com
@@ -129,16 +133,15 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 						</c:forEach>
 					</div>
 					<button type="submit" class="orange-button">Sign in</button>
-					<span class="button-alt"> <a class="question passwd"
-						href="${links.passwd}">Forgot your password</a></span><br /> <br />
+					<span class="button-alt" id="need-account"> <a class="question passwd"
+						href="http://my.cloudfoundry.com/signup">Need an account</a></span>
+					<span class="button-alt" id="forgot-pwd"> <a class="question passwd"
+						href="${links.passwd}">Forgot password</a></span>
 				</form>
+				<hr>
 				<p>
-					Don't have an account? <a href="${links.register}">Register
-						here.</a>
-				</p>
-				<p>
-					Reminder: do not type your Cloud Foundry password into any site
-					except <a href="${links.login}">${links.login}</a>.
+					<em>Reminder: do not type your Cloud Foundry password into any site
+					except <a href="${links.login}">${links.login}</a><em>
 				</p>
 			</article>
 		</div>
@@ -146,7 +149,7 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 			title="Version: ${app.version}, Commit: ${commit_id}, Timestamp: ${timestamp}, UAA: ${links.uaa}">
 			Copyright &copy;
 			<fmt:formatDate value="<%=new java.util.Date()%>" pattern="yyyy" />
-			VMware, Inc. All rights reserved.
+			GoPivotal, Inc. All rights reserved.
 		</div>
 	</div>
 
