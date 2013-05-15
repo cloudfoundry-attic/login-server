@@ -1,7 +1,7 @@
 <%--
 
     Cloud Foundry 2012.02.03 Beta
-    Copyright (c) [2009-2012] VMware, Inc. All Rights Reserved.
+    Copyright (c) [2013] GoPivotal, Inc. All Rights Reserved.
 
     This product is licensed to you under the Apache License, Version 2.0 (the "License").
     You may not use this product except in compliance with the License.
@@ -36,8 +36,8 @@
 <title>Account Settings | Cloud Foundry</title>
 <meta charset='utf-8'>
 <meta content='IE=edge,chrome=1' http-equiv='X-UA-Compatible'>
-<meta content='VMware' name='author' />
-<meta content='Copyright VMware 2011. All Rights Reserved.'
+<meta content='GoPivotal' name='author' />
+<meta content='Copyright GoPivotal 2013. All Rights Reserved.'
 	name='copyright' />
 <link href='${rootUrl}favicon.ico' rel='shortcut icon' />
 <meta content='all' name='robots' />
@@ -114,9 +114,12 @@
 	<div class="approvals">
 		<a href='${links.home}'><img
 			alt="Cloud Foundry: The Industry's Open Platform As A Service"
-			class="logo-approvals"
-			src='${baseUrl}/images/logo_header_cloudfoundry.png' width='373'
-			height='70'></img> </a>
+			class="logo"
+			src='${baseUrl}/images/logo-cloudfoundry.png'></img> </a>
+		<a href='http://www.gopivotal.com' target='_blank'><img
+			alt="Pivotal"
+			id="pivotal-logo"
+			src='${baseUrl}/images/logo-pivotal.png'></img> </a>
 		<div style="float: right;">
 			<ul class='super-nav'>
 				<li><span>Welcome <a href="${rootUrl}profile"><strong>${fn:escapeXml(pageContext.request.userPrincipal.name)}</strong></a></span>
@@ -144,8 +147,8 @@
 
 				<div class="content-inner-approvals">
 					<p class="right">
-						Looking for <a href="http://micro.cloudfoundry.com">Micro</a> or <a
-							href="http://support.cloudfoundry.com">Support</a> ?
+						Looking for <a href="https://micro.cloudfoundry.com/eula">Micro</a> or <a
+							href="https://cloudfoundry.zendesk.com/agent/#/dashboard">Support</a> ?
 					</p>
 
 					<p>
@@ -219,7 +222,7 @@
 		<div class="footer">
 			Copyright &copy;
 			<fmt:formatDate value="<%=new java.util.Date()%>" pattern="yyyy" />
-			VMware, Inc. All rights reserved.
+			GoPivotal, Inc. All rights reserved.
 		</div>
 	</div>
 	<cf:if test="${not empty analytics}">

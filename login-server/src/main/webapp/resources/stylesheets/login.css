@@ -34,10 +34,15 @@ hr {
 
 a {
 	text-decoration: none;
-	color: #FFFFFF;
+	color: #0099d6;
+  font-size:14px;
 }
 
-p {
+a:hover {
+  text-decoration: underline;
+}
+
+p, li {
   font-size: 14px;
 }
 
@@ -64,6 +69,12 @@ p {
 
 .logo {
 	margin: 58px 0 13px 231px;
+  width: 350px;
+}
+
+#pivotal-logo {
+  width: 60px;
+  margin: 0 0 13px -5px;
 }
 
 .splash-box {
@@ -101,7 +112,7 @@ p {
 	background: #2b2c31;
 	background-repeat: no-repeat;
 	border: none;
-	width: 330px;
+	width: 365px;
 	height: 38px;
 	border-radius: 6px;
 	padding: 0 0 0 20px;
@@ -152,12 +163,12 @@ input::-webkit-input-placeholder {
 
 input#username {
 	background-image: url(../images/icon-user.png);
-	background-position: 313px 6px;
+	background-position: 353px 6px;
 }
 
 input#password {
 	background-image: url(../images/icon-password.png);
-	background-position: 315px 6px;
+	background-position: 355px 6px;
 }
 
 
@@ -255,21 +266,31 @@ input#password {
 
 .button-alt a {
 	font-size: 14px;
-	margin: 0 0 0 73px;
 }
 
-.button-alt a:hover, a:hover {
+.button-alt a:hover {
 	color: #cccccc;
+  text-decoration: none;
 }
+
+#forgot-pwd, #need-account {
+
+}
+
+#need-account {
+  margin: 0 10px 0 10px;
+}
+
 
 .question {
-	padding-right: 50px;
+	padding-right: 22px;
 	padding-bottom: 10px;
 	background-image: url(../images/icon-question.png);
-	background-position: 140px 0px; /*A little hardcoded*/
+	background-position: 110px 0px; /*A little hardcoded*/
 	background-repeat: no-repeat;
 	width: 20px;
 	height: 20px;
+  color: #ffffff;
 }
 
 .footer {
@@ -702,3 +723,4 @@ a#first:hover, a#second:hover {
   top: -10px;
   left: 5px;
 }
+
