@@ -109,7 +109,7 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 			src='${baseUrl}/images/logo-pivotal.png'></img> </a>
 		<div class="splash-box">
 			<article class="container">
-				<p class="intro-text">Sign in with your CloudFoundry.com
+				<p class="intro-text">Log in with your CloudFoundry.com
 					credentials.</p>
 				<form id="loginForm" name="loginForm"
 					action="<c:url value="/login.do"/>" method="POST" novalidate>
@@ -132,7 +132,7 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 								placeholder='${text}' />
 						</c:forEach>
 					</div>
-					<button type="submit" class="orange-button">Sign in</button>
+					<button type="submit" class="orange-button">Log in</button>
 					<span class="button-alt" id="need-account"> <a class="question passwd"
 						href="http://my.cloudfoundry.com/signup">Need an account</a></span>
 					<span class="button-alt" id="forgot-pwd"> <a class="question passwd"
