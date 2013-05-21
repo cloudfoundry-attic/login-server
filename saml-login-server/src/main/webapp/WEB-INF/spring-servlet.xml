@@ -213,24 +213,27 @@
 				<bean
 					class="org.springframework.security.saml.metadata.ExtendedMetadataDelegate">
 					<constructor-arg>
-						<bean
-							class="org.opensaml.saml2.metadata.provider.FilesystemMetadataProvider">
-							<constructor-arg>
-								<value type="java.io.File">${login.idpMetadataFile}</value>
-							</constructor-arg>
+						<bean class="org.opensaml.saml2.metadata.provider.HTTPMetadataProvider">
+							<constructor-arg ref="metadataFetchingHttpClientTimer" />
+							<constructor-arg ref="metadataFetchingHttpClient" />
+							<constructor-arg value="${login.idpMetadataURL}" />
 							<property name="parserPool" ref="parserPool" />
 						</bean>
 					</constructor-arg>
 					<constructor-arg>
-						<bean
-							class="org.springframework.security.saml.metadata.ExtendedMetadata" />
-
+						<bean class="org.springframework.security.saml.metadata.ExtendedMetadata" />
 					</constructor-arg>
 				</bean>
 			</list>
 		</constructor-arg>
 	</bean>
 
+	<bean name="metadataFetchingHttpClientTimer" class="java.util.Timer" >
+		<constructor-arg value="true"/>
+	</bean>
+	
+	<bean name="metadataFetchingHttpClient" class="org.apache.commons.httpclient.HttpClient" />
+	
 	<!-- SAML Authentication Provider responsible for validating of received 
 		SAML messages -->
 	<bean id="samlAuthenticationProvider"
