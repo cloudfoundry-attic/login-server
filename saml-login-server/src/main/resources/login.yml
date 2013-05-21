@@ -25,7 +25,8 @@ login:
 
   # The entity alias of the IDP
   idpEntityAlias: openam-local
-  idpMetadataFile: classpath:security/idp.xml
+  # URL of the IDP metadata
+  idpMetadataURL: http://openam.example.org:8081/openam/saml2/jsp/exportmetadata.jsp?entityid=http://openam.example.org:8081/openam
   
   authorize:
     url: http://localhost:8080/login/oauth/authorize
