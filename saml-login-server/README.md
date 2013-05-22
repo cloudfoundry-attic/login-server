@@ -25,7 +25,7 @@
 
 - Create a user in OpenAM. Set the user's email address
 
-- Go to Federation -> <IDP Entity Provider> -> NameID Value Map
+- Go to Federation -> Click the link matching your IDP Entity Provider -> NameID Value Map
   - Add urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified=mail
 
 - Test the configuration by going to http://localhost:8080/app
