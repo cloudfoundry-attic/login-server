@@ -108,7 +108,7 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 			src='${baseUrl}/images/logo-pivotal.png'></img> </a>
 		<div class="splash-box">
 			<article class="container">
-				<p class="intro-text">Sign in with your CloudFoundry.com credentials.</p>
+				<p class="intro-text">Log in with your CloudFoundry.com credentials.</p>
 				<form id="loginForm" name="loginForm"
 					action="<c:url value="/login.do"/>" method="POST" novalidate>
 					<div>
@@ -123,12 +123,12 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
                 name='${prompt.key}' placeholder='${text}' />
 						</c:forEach>
 					</div>
-					<button type="submit" class="orange-button">Sign in</button>
+					<button type="submit" class="orange-button">Log in</button>
 					<span class="button-alt"> <a class="question passwd" href="${links.passwd}">Forgot your password</a></span><br />
 					<br />
 				</form>
 				<br/>
-				<a href="saml/discovery?returnIDParam=idp&entityID=${entityID}">Sign in with your organization's credentials.</a>
+				<a href="saml/discovery?returnIDParam=idp&entityID=${entityID}">Log in with your organization's credentials.</a>
 			</article>
 		</div>
 		<div class="footer"
