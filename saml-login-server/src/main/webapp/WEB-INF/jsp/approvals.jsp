@@ -153,7 +153,7 @@
 				<div class="content-inner-approvals">
 					<p class="right">
 						Looking for <a href="http://micro.cloudfoundry.com">Micro</a> or <a
-							href="http://support.cloudfoundry.com">Support</a> ?
+							href="${links.support}">Support</a> ?
 					</p>
 
 					<p>

@@ -109,7 +109,7 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 						<li><a href="${links.passwd}">Reset</a> your password</li>
 						<li><a href="https://micro.cloudfoundry.com/eula">Manage</a> your Micro Cloud Foundry domain names</li>
 						<li><a href="${rootUrl}profile">Proceed</a> to your account settings</li>
-						<li><a href="https://cloudfoundry.zendesk.com/agent/#/dashboard">Submit</a> a support ticket</li>
+						<li><a href="${links.support}">Submit</a> a support ticket</li>
 					</ul>
 				</p>
 

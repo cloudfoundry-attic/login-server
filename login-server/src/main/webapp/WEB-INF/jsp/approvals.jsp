@@ -148,7 +148,7 @@
 				<div class="content-inner-approvals">
 					<p class="right">
 						Looking for <a href="https://micro.cloudfoundry.com/eula">Micro</a> or <a
-							href="https://cloudfoundry.zendesk.com/agent/#/dashboard">Support</a> ?
+							href="${links.support}">Support</a> ?
 					</p>
 
 					<p>
