@@ -48,17 +48,14 @@ public class SAMLRemoteUaaController extends RemoteUaaController {
 	@Override
 	protected Map<String, String> getLoginCredentials(Principal principal) {
 		Map<String, String> login = new LinkedHashMap<String, String>();
-		if (principal instanceof ExpiringUsernameAuthenticationToken) {
-			appendField(login, "username", ((SAMLUserDetails)(((ExpiringUsernameAuthenticationToken) principal).getPrincipal())).getUsername());
+		Collection<? extends GrantedAuthority> authorities = null;
 
-			Collection<GrantedAuthority> authorities = ((SAMLUserDetails)(((ExpiringUsernameAuthenticationToken) principal).getPrincipal())).getAuthorities();
-			String[] authorityList = new String[authorities.size()];
-			int i = 0;
-			for (GrantedAuthority authority : authorities) {
-				authorityList[i] = "\"externalGroups." + i + "\": \"" + authority.getAuthority() + "\"";
-				i++;
-			}
-			appendField(login, "authorities", "{" + StringUtils.arrayToCommaDelimitedString(authorityList) + "}");
+		if (principal instanceof ExpiringUsernameAuthenticationToken) {
+			appendField(login, "username",
+					((SAMLUserDetails) (((ExpiringUsernameAuthenticationToken) principal).getPrincipal()))
+							.getUsername());
+
+			authorities = ((SAMLUserDetails) (((ExpiringUsernameAuthenticationToken) principal).getPrincipal())).getAuthorities();
 		}
 		else {
 			appendField(login, "username", principal.getName());
@@ -71,6 +68,20 @@ public class SAMLRemoteUaaController extends RemoteUaaController {
 				appendField(login, "external_id", user.getExternalId());
 				appendField(login, "email", user.getEmail());
 			}
+
+			if (((Authentication)principal).getAuthorities() instanceof Collection<?>) {
+				authorities = ((Authentication)principal).getAuthorities();
+			}
+		}
+
+		if (authorities != null) {
+			String[] authorityList = new String[authorities.size()];
+			int i = 0;
+			for (GrantedAuthority authority : authorities) {
+				authorityList[i] = "\"externalGroups." + i + "\": \"" + authority.getAuthority() + "\"";
+				i++;
+			}
+			appendField(login, "authorities", "{" + StringUtils.arrayToCommaDelimitedString(authorityList) + "}");
 		}
 		return login;
 	}
