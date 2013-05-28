@@ -49,24 +49,29 @@ public class CachingOneTimePasswordStore implements OneTimePasswordStore, Initia
 	}
 
 	@Override
-	public String getOneTimePassword(String userId) {
+	public String getOneTimePassword(PasscodeInformation passcodeInformation) {
 		String oneTimePassword = String.valueOf(rand.nextInt(1 << 30));
-		cache.put(new Element(userId, generatePassword(userId, oneTimePassword)));
+		String userId = passcodeInformation.getUserId();
+		String passcode = generatePassword(userId, oneTimePassword);
+		PasscodeInformation pi = new PasscodeInformation(userId, passcode,
+				passcodeInformation.getAuthorizationParameters());
+		cache.put(new Element(userId, pi));
 		return oneTimePassword;
 	}
 
 	@Override
-	public boolean validateOneTimePassword(String userId, String oneTimePassword) {
-		Element element = cache.get(userId);
+	public PasscodeInformation validateOneTimePassword(PasscodeInformation passcodeInformation, String oneTimePassword) {
+		Element element = cache.get(passcodeInformation.getUserId());
+		PasscodeInformation cachedPi = (PasscodeInformation) element.getObjectValue();
 		if (element != null && element.getObjectValue() != null
-				&& passwordEncoder.matches(userId + oneTimePassword, (String) element.getObjectValue())) {
-			cache.remove(userId);
+				&& passwordEncoder.matches(passcodeInformation.getUserId() + oneTimePassword, cachedPi.getPasscode())) {
+			cache.remove(passcodeInformation.getUserId());
 		}
 		else {
-			return false;
+			return null;
 		}
 
-		return true;
+		return cachedPi;
 	}
 
 	private String generatePassword(String userId, String oneTimePassword) {

@@ -15,10 +15,12 @@ package org.cloudfoundry.identity.uaa.login;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
+import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.opensaml.saml2.core.impl.NameIDImpl;
 import org.springframework.http.HttpHeaders;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.providers.ExpiringUsernameAuthenticationToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -41,12 +43,29 @@ public class OneTimePasswordController {
 
 		String username = null;
 		if (principal instanceof ExpiringUsernameAuthenticationToken) {
-			username = ((NameIDImpl) ((ExpiringUsernameAuthenticationToken) principal).getPrincipal()).getValue();
+			username = ((SAMLUserDetails) ((ExpiringUsernameAuthenticationToken) principal).getPrincipal()).getUsername();
 		}
 		else {
 			username = principal.getName();
 		}
-		model.put("oneTimePassword", store.getOneTimePassword(username));
+
+		Collection<GrantedAuthority> authorities = ((SAMLUserDetails) (((ExpiringUsernameAuthenticationToken) principal)
+				.getPrincipal())).getAuthorities();
+		Map<String, Object> authorizationParameters = null;
+		if (authorities != null) {
+			String[] authorityList = new String[authorities.size()];
+			int i = 0;
+			for (GrantedAuthority authority : authorities) {
+				authorityList[i] = "\"externalGroups." + i + "\": \"" + authority.getAuthority() + "\"";
+				i++;
+			}
+			authorizationParameters = new LinkedHashMap<String, Object>();
+//			authorizationParameters.put("authorities", "{" + StringUtils.arrayToCommaDelimitedString(authorityList) + "}");
+			authorizationParameters.put("authorities", authorities);
+		}
+
+		PasscodeInformation pi = new PasscodeInformation(username, null, authorizationParameters);
+		model.put("oneTimePassword", store.getOneTimePassword(pi));
 
 		return "one_time_code";
 	}

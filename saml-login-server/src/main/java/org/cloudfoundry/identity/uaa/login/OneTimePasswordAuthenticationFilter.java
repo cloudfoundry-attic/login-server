@@ -14,6 +14,7 @@
 package org.cloudfoundry.identity.uaa.login;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -38,6 +39,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.provider.error.OAuth2AuthenticationEntryPoint;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -84,11 +86,16 @@ public class OneTimePasswordAuthenticationFilter implements Filter {
 				throw new BadCredentialsException("Credentials must be sent by (one of methods): " + methods);
 			}
 
-			if (store.validateOneTimePassword(username, password)) {
+			PasscodeInformation pi = store.validateOneTimePassword(new PasscodeInformation(username), password);
+			if (pi != null) {
 				logger.info("Successful authentication request for " + username);
 
+				@SuppressWarnings("unchecked")
+				Collection<GrantedAuthority> externalAuthorties = (Collection<GrantedAuthority>) pi.getAuthorizationParameters().get("authorities");
+
 				Authentication result = new UsernamePasswordAuthenticationToken(username, null,
-						UaaAuthority.USER_AUTHORITIES);
+						externalAuthorties == null ? UaaAuthority.USER_AUTHORITIES : externalAuthorties);
+
 				SecurityContextHolder.getContext().setAuthentication(result);
 			}
 			else {
