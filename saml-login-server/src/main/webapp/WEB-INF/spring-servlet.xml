@@ -32,7 +32,7 @@
 	<security:http pattern="/favicon.ico" security="none" />
 	<security:http pattern="/resources/**" security="none" />
 	<security:http pattern="/healthz/**" security="none" />
-	<security:http pattern="/oauth/token" security="none" />
+	<!-- <security:http pattern="/oauth/token" security="none" /> -->
 	<security:http pattern="/login" security="none" />
 	<security:http pattern="/info" security="none" />
 	<security:http pattern="/error" security="none" />
@@ -63,6 +63,15 @@
 		<security:logout logout-url="/logout.do"
 			success-handler-ref="logoutHandler" />
 	</security:http>
+
+	<!-- Created only for clients like cf -->
+	<http name="tokenEndpointSecurity" pattern="/oauth/token" create-session="stateless"
+		entry-point-ref="basicAuthenticationEntryPoint" xmlns="http://www.springframework.org/schema/security">
+		<intercept-url pattern="/**" access="IS_AUTHENTICATED_FULLY" />
+		<anonymous enabled="false" />
+		<custom-filter ref="oneTimePasswordAuthenticationFilter" position="FORM_LOGIN_FILTER" />
+		<access-denied-handler ref="oauthAccessDeniedHandler" />
+	</http>
 
 	<security:http>
 		<security:intercept-url pattern="/**"

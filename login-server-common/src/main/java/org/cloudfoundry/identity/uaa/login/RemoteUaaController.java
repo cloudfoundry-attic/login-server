@@ -74,17 +74,17 @@ public class RemoteUaaController {
 
 	private static final String CONTENT_LENGTH = "Content-Length";
 
-	private static final String CONTENT_TYPE = "Content-Type";
+	protected static final String CONTENT_TYPE = "Content-Type";
 
-	private static final String ACCEPT = "Accept";
+	protected static final String ACCEPT = "Accept";
 
-	private static final String AUTHORIZATION = "Authorization";
+	protected static final String AUTHORIZATION = "Authorization";
 
 	private static final String TRANSFER_ENCODING = "Transfer-Encoding";
 
 	private static final String HOST = "Host";
 
-	private static final String COOKIE = "Cookie";
+	protected static final String COOKIE = "Cookie";
 
 	private static final String SET_COOKIE = "Set-Cookie";
 
@@ -376,7 +376,7 @@ public class RemoteUaaController {
 		return new ModelAndView("login", model);
 	}
 
-	private void saveCookie(HttpHeaders headers, Map<String, Object> model) {
+	protected void saveCookie(HttpHeaders headers, Map<String, Object> model) {
 		if (!headers.containsKey(SET_COOKIE)) {
 			return;
 		}
@@ -416,7 +416,7 @@ public class RemoteUaaController {
 		}
 	}
 
-	private ResponseEntity<byte[]> passthru(HttpServletRequest request, HttpEntity<byte[]> entity,
+	protected ResponseEntity<byte[]> passthru(HttpServletRequest request, HttpEntity<byte[]> entity,
 			Map<String, Object> model) throws Exception {
 
 		String path = extractPath(request);
@@ -485,6 +485,10 @@ public class RemoteUaaController {
 		}
 		logger.debug("Path: " + path);
 		return path;
+	}
+
+	public RestOperations getAuthorizationTemplate() {
+		return authorizationTemplate;
 	}
 
 }

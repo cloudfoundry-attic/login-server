@@ -14,24 +14,38 @@
 package org.cloudfoundry.identity.uaa.login;
 
 import java.security.Principal;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.cloudfoundry.identity.uaa.client.SocialClientUserDetails;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.oauth2.common.exceptions.InvalidTokenException;
 import org.springframework.security.providers.ExpiringUsernameAuthenticationToken;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 public class SAMLRemoteUaaController extends RemoteUaaController {
+
+	private static final Log logger = LogFactory.getLog(SAMLRemoteUaaController.class);
 
 	@Value("${login.entityID}")
 	public String entityID = "";
@@ -85,4 +99,62 @@ public class SAMLRemoteUaaController extends RemoteUaaController {
 		}
 		return login;
 	}
+
+	@RequestMapping(value = "/oauth/token", method = RequestMethod.POST, params = "grant_type=password" )
+	@ResponseBody
+	public ResponseEntity<byte[]> tokenEndpoint(HttpServletRequest request, HttpEntity<byte[]> entity,
+			Map<String, Object> model, Principal principal) throws Exception {
+
+
+		MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
+		if (principal != null) {
+			map.set("source", "login");
+			map.setAll(getLoginCredentials(principal));
+			map.remove("credentials"); // cf might break otherwise
+		}
+		else {
+			throw new BadCredentialsException("No principal found in authorize endpoint");
+		}
+
+		HttpHeaders requestHeaders = new HttpHeaders();
+//		requestHeaders.putAll(getRequestHeaders(headers));
+		requestHeaders.remove(AUTHORIZATION.toLowerCase());
+		requestHeaders.remove(ACCEPT.toLowerCase());
+		requestHeaders.remove(CONTENT_TYPE.toLowerCase());
+		requestHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+		requestHeaders.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+		requestHeaders.remove(COOKIE);
+		requestHeaders.remove(COOKIE.toLowerCase());
+
+		@SuppressWarnings("rawtypes")
+		ResponseEntity<Map> response;
+
+		response = getAuthorizationTemplate().exchange(getUaaBaseUrl() + "/oauth/authorize", HttpMethod.POST,
+				new HttpEntity<MultiValueMap<String, String>>(map, requestHeaders), Map.class);
+
+		saveCookie(response.getHeaders(), model);
+
+		@SuppressWarnings("unchecked")
+		Map<String, Object> body = response.getBody();
+		if (body != null) {
+			// User approval is required
+			logger.debug("Response: " + body);
+			throw new InvalidTokenException("Some scopes were not granted");
+		}
+
+//		String location = response.getHeaders().getFirst("Location");
+//		if (location != null) {
+//			logger.info("Redirect in /oauth/authorize for: " + principal.getName());
+//			// Don't expose model attributes (cookie) in redirect
+//			return new ModelAndView(new RedirectView(location, false, true, false));
+//		}
+//
+//		throw new IllegalStateException("Neither a redirect nor a user approval");
+
+
+//		return passthru(request, entity, model);
+
+		return new ResponseEntity<byte[]>(response.getBody(), outgoingHeaders, response.getStatusCode());
+	}
+
 }
