@@ -45,8 +45,7 @@ import org.springframework.security.oauth2.provider.error.OAuth2AuthenticationEn
 import org.springframework.security.web.AuthenticationEntryPoint;
 
 /**
- * Authentication filter to verify one time passwords with what's
- * cached in the one time password store.
+ * Authentication filter to verify one time passwords with what's cached in the one time password store.
  *
  * @author jdsa
  *
@@ -91,7 +90,8 @@ public class OneTimePasswordAuthenticationFilter implements Filter {
 				logger.info("Successful authentication request for " + username);
 
 				@SuppressWarnings("unchecked")
-				Collection<GrantedAuthority> externalAuthorties = (Collection<GrantedAuthority>) pi.getAuthorizationParameters().get("authorities");
+				Collection<GrantedAuthority> externalAuthorties = (Collection<GrantedAuthority>) pi
+						.getAuthorizationParameters().get("authorities");
 
 				Authentication result = new UsernamePasswordAuthenticationToken(username, null,
 						externalAuthorties == null ? UaaAuthority.USER_AUTHORITIES : externalAuthorties);

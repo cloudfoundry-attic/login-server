@@ -53,21 +53,14 @@ public class OneTimePasswordController {
 				.getPrincipal())).getAuthorities();
 		Map<String, Object> authorizationParameters = null;
 		if (authorities != null) {
-			String[] authorityList = new String[authorities.size()];
-			int i = 0;
-			for (GrantedAuthority authority : authorities) {
-				authorityList[i] = "\"externalGroups." + i + "\": \"" + authority.getAuthority() + "\"";
-				i++;
-			}
 			authorizationParameters = new LinkedHashMap<String, Object>();
-//			authorizationParameters.put("authorities", "{" + StringUtils.arrayToCommaDelimitedString(authorityList) + "}");
 			authorizationParameters.put("authorities", authorities);
 		}
 
 		PasscodeInformation pi = new PasscodeInformation(username, null, authorizationParameters);
 		model.put("oneTimePassword", store.getOneTimePassword(pi));
 
-		return "one_time_code";
+		return "passcode";
 	}
 
 	public void setStore(OneTimePasswordStore store) {
