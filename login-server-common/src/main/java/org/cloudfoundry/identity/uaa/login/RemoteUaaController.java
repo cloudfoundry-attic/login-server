@@ -214,7 +214,7 @@ public class RemoteUaaController {
 		return "home";
 	}
 
-	private Map<String, ?> getLinksInfo() {
+	protected Map<String, ?> getLinksInfo() {
 		Map<String, Object> model = new HashMap<String, Object>();
 		model.put("uaa", baseUrl);
 		model.put("login", baseUrl.replaceAll("uaa", "login"));
@@ -442,7 +442,7 @@ public class RemoteUaaController {
 
 	}
 
-	private HttpHeaders getResponseHeaders(HttpHeaders headers) {
+	protected HttpHeaders getResponseHeaders(HttpHeaders headers) {
 		// Some of the headers coming back are poisonous apparently (content-length?)...
 		HttpHeaders outgoingHeaders = new HttpHeaders();
 		outgoingHeaders.putAll(headers);
@@ -457,7 +457,7 @@ public class RemoteUaaController {
 		return outgoingHeaders;
 	}
 
-	private HttpHeaders getRequestHeaders(HttpHeaders headers) {
+	protected HttpHeaders getRequestHeaders(HttpHeaders headers) {
 		// Some of the headers coming back are poisonous apparently (content-length?)...
 		HttpHeaders outgoingHeaders = new HttpHeaders();
 		outgoingHeaders.putAll(headers);
@@ -468,7 +468,7 @@ public class RemoteUaaController {
 		return outgoingHeaders;
 	}
 
-	private String extractPath(HttpServletRequest request) {
+	protected String extractPath(HttpServletRequest request) {
 		String query = request.getQueryString();
 		try {
 			query = query == null ? "" : "?" + URLDecoder.decode(query, "UTF-8");
@@ -489,6 +489,10 @@ public class RemoteUaaController {
 
 	public RestOperations getAuthorizationTemplate() {
 		return authorizationTemplate;
+	}
+
+	public RestOperations getDefaultTemplate() {
+		return defaultTemplate;
 	}
 
 }

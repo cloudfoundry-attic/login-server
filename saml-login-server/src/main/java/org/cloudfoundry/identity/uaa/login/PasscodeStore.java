@@ -15,15 +15,15 @@ package org.cloudfoundry.identity.uaa.login;
 
 
 /**
- * Interface for the store for one time passwords.
+ * Interface for the passcode store.
  *
  * @author jdsa
  *
  */
-public interface OneTimePasswordStore {
+public interface PasscodeStore {
 
-	public String getOneTimePassword(PasscodeInformation passcodeInformation);
+	public String getPasscode(PasscodeInformation passcodeInformation);
 
-	public PasscodeInformation validateOneTimePassword(PasscodeInformation passcodeInformation, String oneTimePassword);
+	public PasscodeInformation validatePasscode(PasscodeInformation passcodeInformation, String oneTimePassword);
 
 }

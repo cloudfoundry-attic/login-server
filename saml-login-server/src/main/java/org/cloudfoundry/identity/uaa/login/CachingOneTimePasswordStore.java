@@ -29,7 +29,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
  * @author jdsa
  *
  */
-public class CachingOneTimePasswordStore implements OneTimePasswordStore, InitializingBean {
+public class CachingOneTimePasswordStore implements PasscodeStore, InitializingBean {
 
 	private SecureRandom rand = null;
 
@@ -49,7 +49,7 @@ public class CachingOneTimePasswordStore implements OneTimePasswordStore, Initia
 	}
 
 	@Override
-	public String getOneTimePassword(PasscodeInformation passcodeInformation) {
+	public String getPasscode(PasscodeInformation passcodeInformation) {
 		String oneTimePassword = String.valueOf(rand.nextInt(1 << 30));
 		String userId = passcodeInformation.getUserId();
 		String passcode = generatePassword(userId, oneTimePassword);
@@ -60,18 +60,18 @@ public class CachingOneTimePasswordStore implements OneTimePasswordStore, Initia
 	}
 
 	@Override
-	public PasscodeInformation validateOneTimePassword(PasscodeInformation passcodeInformation, String oneTimePassword) {
+	public PasscodeInformation validatePasscode(PasscodeInformation passcodeInformation, String oneTimePassword) {
 		Element element = cache.get(passcodeInformation.getUserId());
-		PasscodeInformation cachedPi = (PasscodeInformation) element.getObjectValue();
-		if (element != null && element.getObjectValue() != null
-				&& passwordEncoder.matches(passcodeInformation.getUserId() + oneTimePassword, cachedPi.getPasscode())) {
-			cache.remove(passcodeInformation.getUserId());
-		}
-		else {
-			return null;
+
+		if (element != null && element.getObjectValue() != null) {
+			PasscodeInformation cachedPi = (PasscodeInformation) element.getObjectValue();
+			if (passwordEncoder.matches(passcodeInformation.getUserId() + oneTimePassword, cachedPi.getPasscode())) {
+				cache.remove(passcodeInformation.getUserId());
+				return cachedPi;
+			}
 		}
 
-		return cachedPi;
+		return null;
 	}
 
 	private String generatePassword(String userId, String oneTimePassword) {
