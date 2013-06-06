@@ -32,7 +32,7 @@
 	<security:http pattern="/favicon.ico" security="none" />
 	<security:http pattern="/resources/**" security="none" />
 	<security:http pattern="/healthz/**" security="none" />
-	<!-- <security:http pattern="/oauth/token" security="none" /> -->
+	<security:http request-matcher-ref="oauthTokenAuthcodeFlow" security="none"/>
 	<security:http pattern="/login" security="none" />
 	<security:http pattern="/info" security="none" />
 	<security:http pattern="/error" security="none" />
@@ -42,7 +42,7 @@
 		entry-point-ref="oauthAuthenticationEntryPoint" authentication-manager-ref="remoteAuthenticationManager"
 		xmlns="http://www.springframework.org/schema/security">
 		<intercept-url pattern="/**" access="IS_AUTHENTICATED_FULLY" />
-		<custom-filter ref="oneTimePasswordAuthenticationFilter" position="FORM_LOGIN_FILTER" />
+		<custom-filter ref="passcodeAuthenticationFilter" position="FORM_LOGIN_FILTER" />
 		<anonymous enabled="false" />
 		<access-denied-handler ref="oauthAccessDeniedHandler" />
 		<custom-filter 
@@ -64,14 +64,74 @@
 			success-handler-ref="logoutHandler" />
 	</security:http>
 
-	<!-- Created only for clients like cf -->
-	<http name="tokenEndpointSecurity" pattern="/oauth/token" create-session="stateless"
-		entry-point-ref="basicAuthenticationEntryPoint" xmlns="http://www.springframework.org/schema/security">
+	<!-- Owner password flow for external authentication (SAML) -->
+ 	<http name="tokenEndpointSecurityForPasscodes" request-matcher-ref="passcodeTokenMatcher"
+		create-session="stateless" entry-point-ref="basicAuthenticationEntryPoint"
+		xmlns="http://www.springframework.org/schema/security">
 		<intercept-url pattern="/**" access="IS_AUTHENTICATED_FULLY" />
 		<anonymous enabled="false" />
-		<custom-filter ref="oneTimePasswordAuthenticationFilter" position="FORM_LOGIN_FILTER" />
+		<custom-filter ref="passcodeAuthenticationFilter"
+			position="FORM_LOGIN_FILTER" />
 		<access-denied-handler ref="oauthAccessDeniedHandler" />
 	</http>
+		
+	<bean id="passcodeTokenMatcher" class="org.cloudfoundry.identity.uaa.security.web.UaaRequestMatcher">
+		<constructor-arg value="/oauth/token" />
+		<property name="accept">
+			<list>
+				<value>application/json</value>
+				<value>application/x-www-form-urlencoded</value>
+			</list>
+		</property>
+		<property name="parameters">
+			<map>
+				<entry key="grant_type" value="password" />
+				<entry key="passcode" value="" />
+			</map>
+		</property>
+	</bean>
+	
+	<!-- Owner password flow for UAA authentication -->
+ 	<http name="tokenEndpointSecurityForPasswords" request-matcher-ref="uaaPasswordTokenMatcher"
+		create-session="stateless" entry-point-ref="basicAuthenticationEntryPoint" 
+		authentication-manager-ref="remoteAuthenticationManager"
+		xmlns="http://www.springframework.org/schema/security">
+		<intercept-url pattern="/**" access="IS_AUTHENTICATED_FULLY" />
+		<custom-filter ref="authzAuthenticationFilter" position="FORM_LOGIN_FILTER" />
+		<anonymous enabled="false" />
+		<access-denied-handler ref="oauthAccessDeniedHandler" />
+	</http>
+		
+	<bean id="uaaPasswordTokenMatcher" class="org.cloudfoundry.identity.uaa.security.web.UaaRequestMatcher">
+		<constructor-arg value="/oauth/token" />
+		<property name="accept">
+			<list>
+				<value>application/json</value>
+				<value>application/x-www-form-urlencoded</value>
+			</list>
+		</property>
+		<property name="parameters">
+			<map>
+				<entry key="grant_type" value="password" />
+				<entry key="password" value="" />
+			</map>
+		</property>
+	</bean>
+	
+	<bean id="oauthTokenAuthcodeFlow" class="org.cloudfoundry.identity.uaa.security.web.UaaRequestMatcher">
+		<constructor-arg value="/oauth/token" />
+		<property name="accept">
+			<list>
+				<value>application/json</value>
+				<value>application/x-www-form-urlencoded</value>
+			</list>
+		</property>
+		<property name="parameters">
+			<map>
+				<entry key="grant_type" value="authorization_code" />
+			</map>
+		</property>
+	</bean>
 
 	<security:http>
 		<security:intercept-url pattern="/**"
@@ -111,12 +171,13 @@
 		<security:anonymous enabled="false" />
 	</security:http>
 	
-	<bean id="oneTimePasswordAuthenticationFilter" class="org.cloudfoundry.identity.uaa.login.OneTimePasswordAuthenticationFilter">
+	<bean id="passcodeAuthenticationFilter" class="org.cloudfoundry.identity.uaa.login.PasscodeAuthenticationFilter">
 		<property name="store" ref="oneTimeCodeStore"/>
 		<property name="parameterNames">
 			<list>
 				<value>username</value>
 				<value>password</value>
+				<value>passcode</value>
 				<value>credentials</value>
 			</list>
 		</property>
@@ -412,6 +473,11 @@
 				</bean>
 				<bean class="org.cloudfoundry.identity.uaa.authentication.login.Prompt">
 					<constructor-arg name="name" value="password"/>
+					<constructor-arg name="text" value="Password"/>
+					<constructor-arg name="type" value="password"/>
+				</bean>
+				<bean class="org.cloudfoundry.identity.uaa.authentication.login.Prompt">
+					<constructor-arg name="name" value="passcode"/>
 					<constructor-arg name="text" value="One Time Code (Get one at ${login.url:http://localhost:8080/login}/passcode)"/>
 					<constructor-arg name="type" value="password"/>
 				</bean>

@@ -35,7 +35,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @Controller
 public class OneTimePasswordController {
 
-	private OneTimePasswordStore store = null;
+	private PasscodeStore store = null;
 
 	@RequestMapping(value = { "/passcode" }, method = RequestMethod.GET)
 	public String generateOneTimePassword(@RequestHeader
@@ -58,12 +58,12 @@ public class OneTimePasswordController {
 		}
 
 		PasscodeInformation pi = new PasscodeInformation(username, null, authorizationParameters);
-		model.put("oneTimePassword", store.getOneTimePassword(pi));
+		model.put("oneTimePassword", store.getPasscode(pi));
 
 		return "passcode";
 	}
 
-	public void setStore(OneTimePasswordStore store) {
+	public void setStore(PasscodeStore store) {
 		this.store = store;
 	}
 }

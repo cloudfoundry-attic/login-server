@@ -50,7 +50,7 @@ import org.springframework.security.web.AuthenticationEntryPoint;
  * @author jdsa
  *
  */
-public class OneTimePasswordAuthenticationFilter implements Filter {
+public class PasscodeAuthenticationFilter implements Filter {
 
 	private final Log logger = LogFactory.getLog(getClass());
 
@@ -62,7 +62,7 @@ public class OneTimePasswordAuthenticationFilter implements Filter {
 
 	private final ObjectMapper mapper = new ObjectMapper();
 
-	private OneTimePasswordStore store = null;
+	private PasscodeStore store = null;
 
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
@@ -75,6 +75,9 @@ public class OneTimePasswordAuthenticationFilter implements Filter {
 
 		String username = loginInfo.get("username");
 		String password = loginInfo.get("password");
+		if (null == password) {
+			password = loginInfo.get("passcode");
+		}
 
 		if (loginInfo.isEmpty()) {
 			throw new BadCredentialsException("Request does not contain credentials.");
@@ -85,7 +88,7 @@ public class OneTimePasswordAuthenticationFilter implements Filter {
 				throw new BadCredentialsException("Credentials must be sent by (one of methods): " + methods);
 			}
 
-			PasscodeInformation pi = store.validateOneTimePassword(new PasscodeInformation(username), password);
+			PasscodeInformation pi = store.validatePasscode(new PasscodeInformation(username), password);
 			if (pi != null) {
 				logger.info("Successful authentication request for " + username);
 
@@ -144,7 +147,7 @@ public class OneTimePasswordAuthenticationFilter implements Filter {
 		this.parameterNames = parameterNames;
 	}
 
-	public void setStore(OneTimePasswordStore store) {
+	public void setStore(PasscodeStore store) {
 		this.store = store;
 	}
 
