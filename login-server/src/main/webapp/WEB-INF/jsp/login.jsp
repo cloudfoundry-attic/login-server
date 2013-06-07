@@ -32,11 +32,11 @@
 <html class='no-js' dir='ltr' lang='en'>
 <!-- <![endif] -->
 <head>
-<title>Login | Cloud Foundry</title>
+<title>Cloud Foundry [BETA]</title>
 <meta charset='utf-8'>
 <meta content='IE=edge,chrome=1' http-equiv='X-UA-Compatible'>
-<meta content='GoPivotal' name='author' />
-<meta content='Copyright GoPivotal 2013. All Rights Reserved.'
+<meta content='VMware' name='author' />
+<meta content='Copyright 2013 Go Pivotal Inc. All Rights Reserved.'
 	name='copyright' />
 <link href='${rootUrl}favicon.ico' rel='shortcut icon' />
 <meta content='all' name='robots' />
@@ -78,11 +78,10 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 <script type="text/javascript">
 	$(document).ready(function() {
 		$('form:first *:input[type!=hidden]:first').focus();
-		Placeholders.init({
-			live : true, //Apply to future and modified elements too
-			hideOnFocus : true
-		//Hide the placeholder when the element receives focus
-		});
+    Placeholders.init({
+      live: true, //Apply to future and modified elements too
+      hideOnFocus: true //Hide the placeholder when the element receives focus
+    });
 	});
 </script>
 <script type="text/javascript">
@@ -99,55 +98,38 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 </head>
 <body id="micro">
 	<div class="splash">
-		<a href='${links.home}'><img
+		<a href='${links.home}/'><img
 			alt="Cloud Foundry: The Industry's Open Platform As A Service"
-			class="logo"
-			src='${baseUrl}/images/logo-cloudfoundry.png'></img> </a>
-		<a href='http://www.gopivotal.com' target='_blank'><img
-			alt="Pivotal"
-			id="pivotal-logo"
-			src='${baseUrl}/images/logo-pivotal.png'></img> </a>
+			class="logo" src='${baseUrl}/images/logo_cloud_foundry_by_pivotal.png'
+			width='414' height='70'></img> </a>
 		<div class="splash-box">
-			<article class="container">
-				<p class="intro-text">Sign in with your CloudFoundry.com
-					credentials.</p>
+			<div class="container">
 				<form id="loginForm" name="loginForm"
 					action="<c:url value="/login.do"/>" method="POST" novalidate>
 					<div>
 						<c:if test="${not empty param.error}">
-							<div class="flash">Sorry, we couldn't verify your email and
-								password.</div>
+							<div class="alert base alert-error alert-inline">
+								<div>Unable to verify, please try again:</div>
+							</div>
 						</c:if>
+						<p class="intro-text">Log in to CloudFoundry.com:</p>
 						<c:forEach items="${prompts}" var="prompt">
-							<spring:message
-								code="prompt.${prompt.key==null ? prompt.name : prompt.key}"
-								text="${prompt.key==null ? prompt.text : prompt.value[1]}"
-								var="text" />
-							<c:set value="${prompt.key==null ? prompt.type : prompt.value[0]}"
-								var="type" />
-							<c:set value="${prompt.key==null ? prompt.name : prompt.key}"
-								var="name" />
-							<input id='${name}' type='${type}'
-								${type=='password'?'autocomplete="off"':''} name='${name}'
-								placeholder='${text}' />
+              <spring:message code="prompt.${prompt.key}"
+                text="${prompt.value[1]}" var="text"/>
+              <input id='${prompt.key}' type='${prompt.value[0]}' ${prompt.value[0]=='password'?'autocomplete="off"':''}
+                name='${prompt.key}' placeholder='${text}' />
 						</c:forEach>
 					</div>
-					<button type="submit" class="orange-button">Sign in</button>
-					<span class="button-alt" id="need-account"> <a class="question passwd"
-						href="http://my.cloudfoundry.com/signup">Need an account</a></span>
-					<span class="button-alt" id="forgot-pwd"> <a class="question passwd"
-						href="${links.passwd}">Forgot password</a></span>
+					<button type="submit" class="button-orange">Log in</button>
+					<span class="button-alt"><a href="${links.passwd}">Forgot password &raquo;</a><a href="${links.register}">Create an account &raquo;</a></span>
 				</form>
-				<hr>
-				<p>
-					<em>Reminder: do not type your Cloud Foundry password into any site
-					except <a href="${links.login}">${links.login}</a><em>
-				</p>
-			</article>
+				<p class="small">Reminder: do not type your Cloud Foundry password into any
+					site except <a href="${links.login}">${links.login}</a>.</p>
+			</div>
 		</div>
 		<div class="footer"
 			title="Version: ${app.version}, Commit: ${commit_id}, Timestamp: ${timestamp}, UAA: ${links.uaa}">
-			Copyright &copy;
+			&copy;
 			<fmt:formatDate value="<%=new java.util.Date()%>" pattern="yyyy" />
 			GoPivotal, Inc. All rights reserved.
 		</div>

@@ -83,14 +83,10 @@
 </head>
 <body id="micro">
 	<div class="approvals">
-		<a href='${links.home}'><img
+		<a href='${links.home}/'><img
 			alt="Cloud Foundry: The Industry's Open Platform As A Service"
-			class="logo"
-			src='${baseUrl}/images/logo-cloudfoundry.png'></img> </a>
-		<a href='http://www.gopivotal.com' target='_blank'><img
-			alt="Pivotal"
-			id="pivotal-logo"
-			src='${baseUrl}/images/logo-pivotal.png'></img> </a>
+			class="logo" src='${baseUrl}/images/logo_cloud_foundry_by_pivotal.png'
+			width='414' height='70'></img> </a>
 		<div style="float: right;">
 			<ul class='super-nav'>
 				<li><span>Welcome <a href="${rootUrl}profile"><strong>${fn:escapeXml(pageContext.request.userPrincipal.name)}</strong></a></span>
@@ -220,9 +216,9 @@
 
 		</div>
 		<div class="footer">
-			Copyright &copy;
+			&copy;
 			<fmt:formatDate value="<%=new java.util.Date()%>" pattern="yyyy" />
-			GoPivotal, Inc. All rights reserved.
+			Go Pivotal Inc. All rights reserved.
 		</div>
 	</div>
 	<cf:if test="${not empty analytics}">

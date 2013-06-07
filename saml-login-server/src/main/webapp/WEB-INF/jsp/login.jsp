@@ -32,11 +32,11 @@
 <html class='no-js' dir='ltr' lang='en'>
 <!-- <![endif] -->
 <head>
-<title>Login | Cloud Foundry</title>
+<title>Cloud Foundry [BETA]</title>
 <meta charset='utf-8'>
 <meta content='IE=edge,chrome=1' http-equiv='X-UA-Compatible'>
-<meta content='GoPivotal' name='author' />
-<meta content='Copyright GoPivotal 2013. All Rights Reserved.'
+<meta content='VMware' name='author' />
+<meta content='Copyright 2013 Go Pivotal Inc. All Rights Reserved.'
 	name='copyright' />
 <link href='${rootUrl}favicon.ico' rel='shortcut icon' />
 <meta content='all' name='robots' />
@@ -98,24 +98,21 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 </head>
 <body id="micro">
 	<div class="splash">
-		<a href='${links.home}'><img
+		<a href='${links.home}/'><img
 			alt="Cloud Foundry: The Industry's Open Platform As A Service"
-			class="logo"
-			src='${baseUrl}/images/logo-cloudfoundry.png'></img> </a>
-		<a href='http://www.gopivotal.com' target='_blank'><img
-			alt="Pivotal"
-			id="pivotal-logo"
-			src='${baseUrl}/images/logo-pivotal.png'></img> </a>
+			class="logo" src='${baseUrl}/images/logo_cloud_foundry_by_pivotal.png'
+			width='414' height='70'></img> </a>
 		<div class="splash-box">
-			<article class="container">
-				<p class="intro-text">Sign in with your CloudFoundry.com credentials.</p>
+			<div class="container">
 				<form id="loginForm" name="loginForm"
 					action="<c:url value="/login.do"/>" method="POST" novalidate>
 					<div>
 						<c:if test="${not empty param.error}">
-							<div class="flash">Sorry, we couldn't verify your email and
-								password.</div>
+							<div class="alert base alert-error alert-inline">
+								<div>Unable to verify, please try again:</div>
+							</div>
 						</c:if>
+						<p class="intro-text">Log in to CloudFoundry.com:</p>
 						<c:forEach items="${prompts}" var="prompt">
 							<c:if test="${'passcode' != prompt.key}">
 				            	<spring:message code="prompt.${prompt.key}"
@@ -125,17 +122,15 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 			                </c:if>
 						</c:forEach>
 					</div>
-					<button type="submit" class="orange-button">Sign in</button>
-					<span class="button-alt"> <a class="question passwd" href="${links.passwd}">Forgot your password</a></span><br />
-					<br />
+					<button type="submit" class="button-orange">Log in</button>
+					<span class="button-alt"><a href="${links.passwd}">Forgot password &raquo;</a></span>
 				</form>
-				<br/>
-				<a href="saml/discovery?returnIDParam=idp&entityID=${entityID}">Sign in with your organization's credentials.</a>
-			</article>
+				<p><a href="saml/discovery?returnIDParam=idp&entityID=${entityID}">Sign in with your organization's credentials.</a></p>
+			</div>
 		</div>
 		<div class="footer"
 			title="Version: ${app.version}, Commit: ${commit_id}, Timestamp: ${timestamp}, UAA: ${links.uaa}">
-			Copyright &copy;
+			&copy;
 			<fmt:formatDate value="<%=new java.util.Date()%>" pattern="yyyy" />
 			GoPivotal, Inc. All rights reserved.
 		</div>
