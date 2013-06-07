@@ -7,7 +7,7 @@ html {
 }
 
 body {
-	font-family: Arial, Helvetica, sans-serif;
+	font-family: Helvetica, Arial, sans-serif;
 	text-shadow: 1px 0 #333333;
 	color: #FFFFFF;
 	font-weight: 300;
@@ -37,25 +37,61 @@ a {
 	color: #FFFFFF;
 }
 
+a:hover {color: #b9e2f5;}
+
 p {
-  font-size: 14px;
+	font-size: 14px;
 }
 
+form p {margin-bottom: 20px;}
+
 .intro-text {
-  font-size: 16px;
+	font-size: 16px;
+}
+
+.button-alt a {
+	font-size: 14px;
+	margin: 0 0 0 12px;
 }
 
 .confirm {
 	text-align: left;
-  font-size: 14px;
+	font-size: 14px;
 }
 
 .splash {
 	background: url('../images/bg-pattern.png') no-repeat;
-	margin: 32px auto 0 auto;
+	margin: 32px auto 0;
 	width: 1023px;
 	height: 672px;
 }
+
+.splash .alert {
+	text-shadow: none;
+	margin: 0 auto;
+	border-radius: 2px;
+	-moz-border-radius: 2px;
+	-khtml-border-radius: 2px;
+	width: 75%;
+	padding: 0;
+	background: none;
+}
+
+	.splash .alert.alert-error {
+		padding: 0;
+		border: 6px solid #67a6cf;
+		background: #FFCCCC;
+		color: #a61f1b;
+		font-size: 15px;
+	}
+
+	.splash .alert.alert-error div {
+		border: 1px solid #ff7874;
+		padding: 8px 35px 8px 14px;
+		border-radius: 2px;
+		-moz-border-radius: 2px;
+		-khtml-border-radius: 2px;
+	}
 
 .confirm a, .bg-content-approvals a {
 	text-decoration: none;
@@ -64,6 +100,12 @@ p {
 
 .logo {
 	margin: 58px 0 13px 231px;
+}
+
+.small,
+.small a {
+	color: #b9e2f5;
+	font-size: 11px;
 }
 
 .splash-box {
@@ -85,7 +127,7 @@ p {
 	/*filter: progid:DXImageTransform.Microsoft.gradient(  startColorstr='#1c94db',*/
 		/*endColorstr='#03396c', GradientType=0 );*/
 	border: 5px solid rgb(152, 178, 198);
-	border: 5px solid rgba(152, 178, 198, 0.6);
+	border: 5px solid rgba(152, 178, 198, 0.9);
 	-webkit-background-clip: padding-box; /* for Safari */
 	background-clip: padding-box; /* for IE9+, Firefox 4+, Opera, Chrome */
 }
@@ -94,37 +136,149 @@ p {
 	text-align: left;
 	margin: 33px;
 }
+.splash-box input[type="text"],
+.splash-box input[type="password"],
+.splash-box input[type="email"] {
+  color: #FFFFFF;
+  font-size: 13px;
+  background: #2b2c31;
+  background-repeat: no-repeat;
+  border: none;
+  width: 260px;
+  height: 38px;
+  border-radius: 6px;
+  padding: 0 0 0 20px;
+  margin: 0 0 9px 0;
+}
 
-#loginForm input {
-	color: #FFFFFF;
-	font-size: 13px;
-	background: #2b2c31;
-	background-repeat: no-repeat;
-	border: none;
-	width: 330px;
-	height: 38px;
+.splash-box input::-webkit-input-placeholder {
+  color: #FFFFFF;
+}
+
+.splash-box .control-group.error input::-webkit-input-placeholder,
+.splash-box :focus::-webkit-input-placeholder {
+  color: #666666;
+  font-weight: 200;
+}
+
+.splash-box :input:-moz-placeholder {
+  color: #FFFFFF;
+  font-weight: 200;
+}
+
+.splash-box .control-group.error :input:-moz-placeholder,
+.splash-box :focus::-moz-placeholder {
+  color: #666666;
+  font-weight: 200;
+}
+
+/* Hack to remove Safari's extra padding */
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+  .input input, .input textarea, .input select {
+    padding: 4px;
+  }
+}
+
+input#username {
+  background-image: url("../images/icon-user.png");
+  background-position: 241px 6px;
+}
+
+input#password {
+  background-image: url("../images/icon-password.png");
+  background-position: 243px 6px;
+}
+
+.button-orange {
+	position: relative;
+	display: inline-block;
+	padding: 4px 16px;
+	color: white;
+	font-size: 12px;
+	text-align: center;
+	background: #EC6129;
+	border: 1px solid #813516;
 	border-radius: 6px;
-	padding: 0 0 0 20px;
-	margin: 0 0 9px 0;
+	-moz-border-radius: 6px;
+	-khtml-border-radius: 6px;
+	background-color: #1c94db;
+	background: -moz-linear-gradient(top, #EC6129 0%, #C14513 100%);
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #EC6129),
+		color-stop(100%, #C14513) );
+	background: -webkit-linear-gradient(top, #EC6129 0%, #C14513 100%);
+	background: -o-linear-gradient(top, #EC6129 0%, #C14513 100%);
+	background: -ms-linear-gradient(top, #EC6129 0%, #C14513 100%);
+	background: linear-gradient(top, #EC6129 0%, #C14513 100%);
+	-webkit-box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, .3), inset 0 -1px 0 0 rgba(0, 0, 0, .4);
+	-moz-box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, .3), inset 0 -1px 0 0 rgba(0, 0, 0, .4);
+	box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, .3), inset 0 -1px 0 0 rgba(0, 0, 0, .4);
+	text-transform: uppercase;
+	text-decoration: none;
 }
 
-input::-webkit-input-placeholder {
-	color: #FFFFFF;
+	.button-orange:hover {
+	    text-decoration: none;
+	    background: #f9672c;
+		background: -moz-linear-gradient(top, #f9672c 0%, #e26638 100%);
+		background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #f9672c),
+			color-stop(100%, #e26638) );
+		background: -webkit-linear-gradient(top, #f9672c 0%, #e26638 100%);
+		background: -o-linear-gradient(top, #f9672c 0%, #e26638 100%);
+		background: -ms-linear-gradient(top, #f9672c 0%, #e26638 100%);
+		background: linear-gradient(top, #f9672c 0%, #e26638 100%);
+	    cursor: pointer;
+	}
+
+.splash-box-blank {
+	color: #333;
+	text-shadow: none;
+	font-size: 14px;
+	padding: 0 174px 0 328px;
+	margin: 0 auto;
+	text-align: center;
 }
 
-:focus::-webkit-input-placeholder {
-	color: #666666;
-	font-weight:200;
-}
+	.splash-box-blank a {color: #0099d6;}
+	.splash-box-blank .container {margin: 0 0 108px;}
 
-:focus:-moz-placeholder {
-  color: #666666;
-  font-weight:200;
-}
+	.splash-box-blank .intro-text {
+		color: #003a69;
+		@include text-shadow(0, -1px, #fff);
+		font-size: 60px;
+		font-weight: bold;
+		margin: 0;
+		padding: 148px 0 3px;
+		text-transform: uppercase;
+	}
 
-:focus::-moz-placeholder {
-  color: #666666;
-  font-weight:200;
+	.splash-box-blank p {
+		line-height: 1;
+		text-align: left;
+	}
+
+	.splash-box-blank .next {
+		margin-top: 15px;
+		line-height: 1.5;
+	}
+
+	.splash-box-blank .error {
+		color: #a61f1b;
+		font-weight: bold;
+	}
+	
+	.splash-box-blank .error a {
+		color: #a61f1b;
+		font-weight: normal;
+		}
+
+.footer {
+	font-size: 12px;
+	color: #333333;
+	text-shadow: none;
+	font-weight: 400;
+	padding: 0 0 28px;
+	margin: 28px 248px 0 0;
+	text-align: right;
 }
 
 .input {
@@ -150,16 +304,27 @@ input::-webkit-input-placeholder {
     .input input, .input textarea, .input select { padding: 4px; }
 }
 
-input#username {
-	background-image: url(../images/icon-user.png);
-	background-position: 313px 6px;
+.flash {
+	display: inline-block;
+	border-radius: 5px;
+	color: #FF0000;
+	background: #EEE;
+	padding: 10px;
+	margin-bottom: 10px;
+	font-size: 13px;
+	text-shadow: 0 1px white;
 }
+*/
 
-input#password {
-	background-image: url(../images/icon-password.png);
-	background-position: 315px 6px;
+.question {
+	padding-right: 50px;
+	padding-bottom: 10px;
+	background-image: url(../images/icon-question.png);
+	background-position: 140px 0px; /*A little hardcoded*/
+	background-repeat: no-repeat;
+	width: 20px;
+	height: 20px;
 }
-
 
 .orange-button {
 	position: relative;
@@ -251,45 +416,6 @@ input#password {
 	/*filter: progid:DXImageTransform.Microsoft.gradient(  startColorstr='#444',*/
 		/*endColorstr='#bbb', GradientType=0 );*/
 	cursor: pointer;
-}
-
-.button-alt a {
-	font-size: 14px;
-	margin: 0 0 0 73px;
-}
-
-.button-alt a:hover, a:hover {
-	color: #cccccc;
-}
-
-.question {
-	padding-right: 50px;
-	padding-bottom: 10px;
-	background-image: url(../images/icon-question.png);
-	background-position: 140px 0px; /*A little hardcoded*/
-	background-repeat: no-repeat;
-	width: 20px;
-	height: 20px;
-}
-
-.footer {
-	font-size: 12px;
-	text-align: center;
-	margin: 52px 0;
-	color: #333333;
-	text-shadow: 0 1px white;
-	font-weight: 400;
-}
-
-.flash {
-	display: inline-block;
-	border-radius: 5px;
-	color: #FF0000;
-	background: #EEE;
-	padding: 10px;
-	margin-bottom: 10px;
-	font-size: 13px;
-	text-shadow: 0 1px white;
 }
 
 /* Approvals/Access Confirmation */
