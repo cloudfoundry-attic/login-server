@@ -163,6 +163,16 @@
 		</property>
 	</bean>
 
+	<util:map id="links">
+		<entry key="home" value="${links.home:https://console.run.pivotal.io}" />
+		<entry key="passwd" value="${links.passwd:https://console.run.pivotal.io/password_resets/new}" />
+		<entry key="register" value="${links.signup:https://console.run.pivotal.io/register}" />
+	</util:map>
+
+	<bean id="homeController" class="org.cloudfoundry.identity.uaa.login.HomeController">
+		<property name="links" ref="links" />
+	</bean>
+
 	<bean id="autologinController" class="org.cloudfoundry.identity.uaa.login.AutologinController">
 		<property name="codeStore" ref="autologinCodeStore" />
 		<property name="authenticationManager" ref="remoteAuthenticationManager" />

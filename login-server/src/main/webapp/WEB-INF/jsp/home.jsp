@@ -83,7 +83,7 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 		<div class="splash-box-blank">
 			<div class="container">
 				<p class="intro-text">Welcome!</p>
-				<p class="next">You may go to the <a href="https://console.run.pivotal.io">Cloud Foundry console</a>, <br />your <a href="${rootUrl}profile">account settings</a>, or <a href="${rootUrl}logout.do">logout</a>. </p>
+				<p class="next">You may go to the <a href="${links.home}">Cloud Foundry console</a>, <br />your <a href="${rootUrl}profile">account settings</a>, or <a href="${rootUrl}logout.do">logout</a>. </p>
 				<c:if test="${error!=null}">
 				<p class="error" title="${fn:escapeXml(error)}">Error: <a href="${links.login}">please try again</a> </p>
 				</c:if>
