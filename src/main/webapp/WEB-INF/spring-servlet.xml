@@ -236,9 +236,9 @@
 	</bean>
 
 	<util:map id="links">
-		<entry key="home" value="${links.home:https://www.cloudfoundry.com}" />
-		<entry key="passwd" value="${links.passwd:https://www.cloudfoundry.com/passwd}" />
-		<entry key="register" value="${links.signup:https://www.cloudfoundry.com/signup}" />
+		<entry key="home" value="${links.home:https://console.run.pivotal.io}" />
+		<entry key="passwd" value="${links.passwd:https://console.run.pivotal.io/password_resets/new}" />
+		<entry key="register" value="${links.signup:https://console.run.pivotal.io/register}" />
 	</util:map>
 
 	<bean id="homeController" class="org.cloudfoundry.identity.uaa.login.HomeController">
