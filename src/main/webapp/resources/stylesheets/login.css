@@ -201,7 +201,6 @@ input#password {
 	border-radius: 6px;
 	-moz-border-radius: 6px;
 	-khtml-border-radius: 6px;
-	background-color: #1c94db;
 	background: -moz-linear-gradient(top, #EC6129 0%, #C14513 100%);
 	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #EC6129),
 		color-stop(100%, #C14513) );
