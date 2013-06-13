@@ -278,26 +278,9 @@
 
 	<bean id="metadata"
 		class="org.springframework.security.saml.metadata.CachingMetadataManager">
-		<constructor-arg>
-			<list>
-				<bean
-					class="org.springframework.security.saml.metadata.ExtendedMetadataDelegate">
-					<constructor-arg>
-						<bean class="org.opensaml.saml2.metadata.provider.HTTPMetadataProvider">
-							<constructor-arg ref="metadataFetchingHttpClientTimer" />
-							<constructor-arg ref="metadataFetchingHttpClient" />
-							<constructor-arg value="${login.idpMetadataURL}" />
-							<property name="parserPool" ref="parserPool" />
-						</bean>
-					</constructor-arg>
-					<constructor-arg>
-						<bean class="org.springframework.security.saml.metadata.ExtendedMetadata" />
-					</constructor-arg>
-				</bean>
-			</list>
-		</constructor-arg>
+		<constructor-arg ref="metadataProviderList"/>
 	</bean>
-
+	
 	<bean name="metadataFetchingHttpClientTimer" class="java.util.Timer" >
 		<constructor-arg value="true"/>
 	</bean>
@@ -495,6 +478,8 @@
 		<property name="cacheManager" ref="cacheManager"/>
 	</bean>
 	
+	<!-- <bean class="org.cloudfoundry.identity.uaa.login.SAMLMetadataBeanFactory" /> -->
+	
 	<ehcache:annotation-driven />
  
     <ehcache:config cache-manager="cacheManager">
@@ -505,5 +490,51 @@
     <bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
         <property name="configLocation" value="classpath:/ehcache.xml" />
     </bean>
+    
+    <bean id="metadataProviderList" class="java.util.ArrayList">
+        <constructor-arg>
+		  	<list>
+				<bean
+					class="org.springframework.security.saml.metadata.ExtendedMetadataDelegate">
+					<constructor-arg>
+						<bean class="org.opensaml.saml2.metadata.provider.HTTPMetadataProvider">
+							<constructor-arg ref="metadataFetchingHttpClientTimer" />
+							<constructor-arg ref="metadataFetchingHttpClient" />
+							<constructor-arg value="${login.idpMetadataURL}" />
+							<property name="parserPool" ref="parserPool" />
+						</bean>
+					</constructor-arg>
+					<constructor-arg>
+						<bean class="org.springframework.security.saml.metadata.ExtendedMetadata" />
+					</constructor-arg>
+				</bean>
+			</list>
+		</constructor-arg>
+	</bean>
+	
+	<beans profile="fileMetadata">
+		<bean id="metadataProviderList" class="java.util.ArrayList">
+	        <constructor-arg>
+			  	<list>
+			  		<bean
+					class="org.springframework.security.saml.metadata.ExtendedMetadataDelegate">
+						<constructor-arg>
+							<bean
+								class="org.opensaml.saml2.metadata.provider.FilesystemMetadataProvider">
+								<constructor-arg>
+									<value type="java.io.File">${login.idpMetadataFile}</value>
+								</constructor-arg>
+								<property name="parserPool" ref="parserPool" />
+							</bean>
+						</constructor-arg>
+						<constructor-arg>
+							<bean
+								class="org.springframework.security.saml.metadata.ExtendedMetadata" />
+						</constructor-arg>
+					</bean>
+			  	</list>
+			</constructor-arg>
+		</bean>
+	</beans>
 	
 </beans>

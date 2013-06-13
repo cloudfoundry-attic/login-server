@@ -157,9 +157,8 @@
 		<property name="links" ref="links" />
 	</bean>
 
-	<beans profile="default">
-		<bean id="remoteAuthenticationManager" class="org.cloudfoundry.identity.uaa.login.RemoteUaaAuthenticationManager">
-			<property name="loginUrl" value="${uaa.login.url:http://localhost:8080/uaa/authenticate}" />
-		</bean>
-	</beans>
+	<bean id="remoteAuthenticationManager" class="org.cloudfoundry.identity.uaa.login.RemoteUaaAuthenticationManager">
+		<property name="loginUrl" value="${uaa.login.url:http://localhost:8080/uaa/authenticate}" />
+	</bean>
+
 </beans>
