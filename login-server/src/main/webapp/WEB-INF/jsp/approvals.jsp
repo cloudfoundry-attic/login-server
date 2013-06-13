@@ -216,9 +216,9 @@
 		</div>
 
 		<div class="footer">
-			Copyright &copy;
+			&copy;
 			<fmt:formatDate value="<%=new java.util.Date()%>" pattern="yyyy" />
-			GoPivotal, Inc. All rights reserved.
+			Go Pivotal, Inc. All rights reserved.
 		</div>
 	</div>
 	<cf:if test="${not empty analytics}">
