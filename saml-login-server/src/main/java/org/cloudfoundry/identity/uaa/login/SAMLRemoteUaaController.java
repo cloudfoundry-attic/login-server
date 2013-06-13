@@ -13,10 +13,12 @@
 
 package org.cloudfoundry.identity.uaa.login;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -41,7 +43,6 @@ import org.springframework.security.oauth2.provider.BaseClientDetails;
 import org.springframework.security.providers.ExpiringUsernameAuthenticationToken;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -96,14 +97,22 @@ public class SAMLRemoteUaaController extends RemoteUaaController {
 			}
 		}
 
-		if (authorities != null) {
-			String[] authorityList = new String[authorities.size()];
+		if (authorities != null && authorities.size() > 0) {
+			Map<String, String> externalGroupMap = new HashMap<String, String>();
 			int i = 0;
 			for (GrantedAuthority authority : authorities) {
-				authorityList[i] = "\"externalGroups." + i + "\": \"" + authority.getAuthority() + "\"";
+				externalGroupMap.put("externalGroups." + i, authority.getAuthority());
 				i++;
 			}
-			appendField(login, "authorities", "{" + StringUtils.arrayToCommaDelimitedString(authorityList) + "}");
+
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			try {
+				mapper.writeValue(baos, externalGroupMap);
+				appendField(login, "authorities", new String(baos.toByteArray()));
+			}
+			catch (Throwable t) {
+				logger.error("Unable to convert external groups to be sent for authorization ", t);
+			}
 		}
 		return login;
 	}

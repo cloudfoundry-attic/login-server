@@ -23,6 +23,11 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.saml.SAMLCredential;
 import org.springframework.security.saml.userdetails.SAMLUserDetailsService;
 
+/**
+ * UserDetailsService that extracts the user's groups
+ * @author jdsa
+ *
+ */
 public class LoginServerSAMLUserDetailsService implements SAMLUserDetailsService {
 
 	@Override
@@ -36,7 +41,7 @@ public class LoginServerSAMLUserDetailsService implements SAMLUserDetailsService
 		Collection<SAMLUserAuthority> authorities = null;
 
 		for (Attribute attribute : credential.getAttributes()) {
-			if (attribute.getName().equals("Groups")) {
+			if (("Groups".equals(attribute.getName())) || ("Groups".equals(attribute.getFriendlyName()))) {
 				if (attribute.getAttributeValues() != null && attribute.getAttributeValues().size() > 0) {
 					authorities = new ArrayList<SAMLUserAuthority>();
 					for (XMLObject group : attribute.getAttributeValues()) {
