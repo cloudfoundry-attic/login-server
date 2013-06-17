@@ -308,7 +308,7 @@
 					<constructor-arg ref="contextSource" />
 					<property name="userDnPatterns">
 						<list>
-							<value>${ldap.base.userDnPattern:uid={0},ou=people}</value>
+							<value>uid={0},ou=people</value>
 						</list>
 					</property>
 				</bean>
