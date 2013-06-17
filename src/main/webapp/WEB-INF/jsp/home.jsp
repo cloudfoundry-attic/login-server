@@ -76,37 +76,23 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 </head>
 <body id="micro">
 	<div class="splash">
-		<a href='${links.home}'><img
+		<a href='${links.home}/'><img
 			alt="Cloud Foundry: The Industry's Open Platform As A Service"
-			class="logo" src='${baseUrl}/images/logo_header_cloudfoundry.png'
-			width='373' height='70'></img> </a>
-		<div style="float: right;">
-			<ul class='super-nav'>
-				<li><span>Welcome <a href="${rootUrl}profile"><strong>${fn:escapeXml(pageContext.request.userPrincipal.name)}</strong></a></span>
-					/ <a href="${rootUrl}logout.do">Logout</a> &nbsp;</li>
-			</ul>
-		</div>
-		<div class="splash-box">
+			class="logo" src='${baseUrl}/images/logo_cloud_foundry_by_pivotal.png'
+			width='414' height='70'></img> </a>
+		<div class="splash-box-blank">
 			<div class="container">
-				<h2>Success</h2>
-
-				<p>Your account login is working and you have authenticated.</p>
-				<p>
-					Proceed to your <a href="${rootUrl}profile">account settings</a>.
-				</p>
-
+				<p class="intro-text">Welcome!</p>
+				<p class="next">You may go to the <a href="${links.home}">Cloud Foundry console</a>, <br />your <a href="${rootUrl}profile">account settings</a>, or <a href="${rootUrl}logout.do">logout</a>. </p>
 				<c:if test="${error!=null}">
-					<div class="error" title="${fn:escapeXml(error)}">
-						<p>But there was an error.</p>
-					</div>
+				<p class="error" title="${fn:escapeXml(error)}">Error: <a href="${links.login}">please try again</a> </p>
 				</c:if>
-
 			</div>
 		</div>
 		<div class="footer">
-			Copyright &copy;
+			&copy;
 			<fmt:formatDate value="<%=new java.util.Date()%>" pattern="yyyy" />
-			VMware, Inc. All rights reserved.
+			GoPivotal, Inc. All rights reserved.
 		</div>
 	</div>
 	<cf:if test="${not empty analytics}">

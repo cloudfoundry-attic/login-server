@@ -76,31 +76,22 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 </head>
 <body id="micro">
 	<div class="splash">
-		<a href='${links.home}'><img
+		<a href='${links.home}/'><img
 			alt="Cloud Foundry: The Industry's Open Platform As A Service"
-			class="logo" src='${baseUrl}/images/logo_header_cloudfoundry.png'
-			width='373' height='70'></img> </a>
-		<div style="float: right;">
-			<ul class='super-nav'>
-				<li><span>Welcome <a href="${rootUrl}profile"><strong>${fn:escapeXml(pageContext.request.userPrincipal.name)}</strong></a></span>
-					/ <a href="${rootUrl}logout.do">Logout</a> &nbsp;</li>
-			</ul>
-		</div>
-		<div class="splash-box">
+			class="logo" src='${baseUrl}/images/logo_cloud_foundry_by_pivotal.png'
+			width='414' height='70'></img> </a>
+		<div class="splash-box-blank">
 			<div class="container">
-				<h2>Sorry, there was a problem!</h2>
+				<p class="intro-text">Sorry!</p>
 				<c:if test="${error!=null}">
-					<div class="error">
-						<p>"${fn:escapeXml(error)}"</p>
-					</div>
+				<p class="next">There was a problem: ${fn:escapeXml(error)} <a href="${links.login}">Please try again</a>. </p>
 				</c:if>
-
 			</div>
 		</div>
 		<div class="footer">
-			Copyright &copy;
-			<fmt:formatDate value="<%=new java.util.Date()%>" pattern="yyyy" />
-			VMware, Inc. All rights reserved.
+				&copy;
+				<fmt:formatDate value="<%=new java.util.Date()%>" pattern="yyyy" />
+				GoPivotal, Inc. All rights reserved.
 		</div>
 	</div>
 	<cf:if test="${not empty analytics}">
