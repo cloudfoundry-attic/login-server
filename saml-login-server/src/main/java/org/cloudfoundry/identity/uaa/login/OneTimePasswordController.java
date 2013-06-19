@@ -42,20 +42,22 @@ public class OneTimePasswordController {
 	HttpHeaders headers, Map<String, Object> model, Principal principal) throws NoSuchAlgorithmException {
 
 		String username = null;
+		Map<String, Object> authorizationParameters = null;
+
 		if (principal instanceof ExpiringUsernameAuthenticationToken) {
 			username = ((SAMLUserDetails) ((ExpiringUsernameAuthenticationToken) principal).getPrincipal()).getUsername();
+
+			Collection<GrantedAuthority> authorities = ((SAMLUserDetails) (((ExpiringUsernameAuthenticationToken) principal)
+					.getPrincipal())).getAuthorities();
+			if (authorities != null) {
+				authorizationParameters = new LinkedHashMap<String, Object>();
+				authorizationParameters.put("authorities", authorities);
+			}
 		}
 		else {
 			username = principal.getName();
 		}
 
-		Collection<GrantedAuthority> authorities = ((SAMLUserDetails) (((ExpiringUsernameAuthenticationToken) principal)
-				.getPrincipal())).getAuthorities();
-		Map<String, Object> authorizationParameters = null;
-		if (authorities != null) {
-			authorizationParameters = new LinkedHashMap<String, Object>();
-			authorizationParameters.put("authorities", authorities);
-		}
 
 		PasscodeInformation pi = new PasscodeInformation(username, null, authorizationParameters);
 		model.put("oneTimePassword", store.getPasscode(pi));
