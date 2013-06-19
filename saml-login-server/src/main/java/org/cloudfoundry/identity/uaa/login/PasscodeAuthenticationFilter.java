@@ -92,12 +92,14 @@ public class PasscodeAuthenticationFilter implements Filter {
 			if (pi != null) {
 				logger.info("Successful authentication request for " + username);
 
-				@SuppressWarnings("unchecked")
-				Collection<GrantedAuthority> externalAuthorties = (Collection<GrantedAuthority>) pi
-						.getAuthorizationParameters().get("authorities");
+				Collection<GrantedAuthority> externalAuthorities = null;
+
+				if (null != pi.getAuthorizationParameters()) {
+					externalAuthorities = (Collection<GrantedAuthority>) pi.getAuthorizationParameters().get("authorities");
+				}
 
 				Authentication result = new UsernamePasswordAuthenticationToken(username, null,
-						externalAuthorties == null ? UaaAuthority.USER_AUTHORITIES : externalAuthorties);
+						externalAuthorities == null ? UaaAuthority.USER_AUTHORITIES : externalAuthorities);
 
 				SecurityContextHolder.getContext().setAuthentication(result);
 			}
