@@ -283,6 +283,7 @@ public class RemoteUaaController {
 			map.set("source", "login");
 			map.setAll(getLoginCredentials(principal));
 			map.remove("credentials"); // legacy vmc might break otherwise
+			map.remove("password"); // request for token will not use password
 		}
 		else {
 			throw new BadCredentialsException("No principal found in authorize endpoint");
