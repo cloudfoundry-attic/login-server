@@ -24,11 +24,15 @@ login:
   keystorePassword: password
 
   # The entity alias of the IDP
-  idpEntityAlias: openam-local
+  #idpEntityAlias: openam-local
+  idpEntityAlias: vmware-sso2
   # URL of the IDP metadata
-  idpMetadataURL: http://openam.example.com:8181/openam/saml2/jsp/exportmetadata.jsp?entityid=http://openam.example.com:8181/openam
-  # File that stores the idpMetadata. Start the server with the fileMetadata profile
-  # idpMetadataFile: /dev/openam/metadata
+  #idpMetadataURL: http://openam.example.com:8181/openam/saml2/jsp/exportmetadata.jsp?entityid=http://openam.example.com:8181/openam
+  idpMetadataFile: /Users/jdsa/Downloads/vsphere.local
+  
+  saml:
+    nameID: urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress
+    assertionConsumerIndex: 1
   
   authorize:
     url: http://localhost:8080/login/oauth/authorize

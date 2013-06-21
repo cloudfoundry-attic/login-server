@@ -33,21 +33,21 @@ import org.springframework.web.bind.annotation.RequestMethod;
  *
  */
 @Controller
-public class OneTimePasswordController {
+public class PasscodeController {
 
 	private PasscodeStore store = null;
 
 	@RequestMapping(value = { "/passcode" }, method = RequestMethod.GET)
-	public String generateOneTimePassword(@RequestHeader
+	public String generatePasscode(@RequestHeader
 	HttpHeaders headers, Map<String, Object> model, Principal principal) throws NoSuchAlgorithmException {
 
 		String username = null;
 		Map<String, Object> authorizationParameters = null;
 
 		if (principal instanceof ExpiringUsernameAuthenticationToken) {
-			username = ((SAMLUserDetails) ((ExpiringUsernameAuthenticationToken) principal).getPrincipal()).getUsername();
+			username = ((SamlUserDetails) ((ExpiringUsernameAuthenticationToken) principal).getPrincipal()).getUsername();
 
-			Collection<GrantedAuthority> authorities = ((SAMLUserDetails) (((ExpiringUsernameAuthenticationToken) principal)
+			Collection<GrantedAuthority> authorities = ((SamlUserDetails) (((ExpiringUsernameAuthenticationToken) principal)
 					.getPrincipal())).getAuthorities();
 			if (authorities != null) {
 				authorizationParameters = new LinkedHashMap<String, Object>();
@@ -60,7 +60,7 @@ public class OneTimePasswordController {
 
 
 		PasscodeInformation pi = new PasscodeInformation(username, null, authorizationParameters);
-		model.put("oneTimePassword", store.getPasscode(pi));
+		model.put("passcode", store.getPasscode(pi));
 
 		return "passcode";
 	}

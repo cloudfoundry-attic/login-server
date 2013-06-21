@@ -103,7 +103,7 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 			<div class="container">
 				<h2>Success</h2>
 
-				<h3>Your one time code is ${oneTimePassword}</h3>
+				<h3>Your passcode is ${passcode}</h3>
 
 				<c:if test="${error!=null}">
 					<div class="error" title="${fn:escapeXml(error)}">

@@ -104,7 +104,7 @@ public class PasscodeAuthenticationFilter implements Filter {
 				SecurityContextHolder.getContext().setAuthentication(result);
 			}
 			else {
-				authenticationEntryPoint.commence(req, res, new BadCredentialsException("Invalid one time password"));
+				authenticationEntryPoint.commence(req, res, new BadCredentialsException("Invalid passcode"));
 			}
 		}
 

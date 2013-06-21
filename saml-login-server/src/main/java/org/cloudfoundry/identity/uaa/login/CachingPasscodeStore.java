@@ -16,11 +16,10 @@ package org.cloudfoundry.identity.uaa.login;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
-
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.cache.Cache;
+import org.springframework.cache.Cache.ValueWrapper;
+import org.springframework.cache.CacheManager;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 /**
@@ -29,7 +28,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
  * @author jdsa
  *
  */
-public class CachingOneTimePasswordStore implements PasscodeStore, InitializingBean {
+public class CachingPasscodeStore implements PasscodeStore, InitializingBean {
 
 	private SecureRandom rand = null;
 
@@ -39,7 +38,7 @@ public class CachingOneTimePasswordStore implements PasscodeStore, InitializingB
 
 	private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-	public CachingOneTimePasswordStore() {
+	public CachingPasscodeStore() {
 		try {
 			rand = SecureRandom.getInstance("SHA1PRNG");
 		}
@@ -55,18 +54,18 @@ public class CachingOneTimePasswordStore implements PasscodeStore, InitializingB
 		String passcode = generatePassword(userId, oneTimePassword);
 		PasscodeInformation pi = new PasscodeInformation(userId, passcode,
 				passcodeInformation.getAuthorizationParameters());
-		cache.put(new Element(userId, pi));
+		cache.put(userId, pi);
 		return oneTimePassword;
 	}
 
 	@Override
 	public PasscodeInformation validatePasscode(PasscodeInformation passcodeInformation, String oneTimePassword) {
-		Element element = cache.get(passcodeInformation.getUserId());
+		ValueWrapper element = cache.get(passcodeInformation.getUserId());
 
-		if (element != null && element.getObjectValue() != null) {
-			PasscodeInformation cachedPi = (PasscodeInformation) element.getObjectValue();
+		if (element != null && element.get() != null) {
+			PasscodeInformation cachedPi = (PasscodeInformation) element.get();
 			if (passwordEncoder.matches(passcodeInformation.getUserId() + oneTimePassword, cachedPi.getPasscode())) {
-				cache.remove(passcodeInformation.getUserId());
+				cache.evict(passcodeInformation.getUserId());
 				return cachedPi;
 			}
 		}
@@ -84,6 +83,6 @@ public class CachingOneTimePasswordStore implements PasscodeStore, InitializingB
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		cache = cacheManager.getCache("oneTimePasswordCache");
+		cache = cacheManager.getCache("passcodeCache");
 	}
 }

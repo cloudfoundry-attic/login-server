@@ -16,15 +16,14 @@
 	xmlns:security="http://www.springframework.org/schema/security"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:oauth="http://www.springframework.org/schema/security/oauth2"
-	xmlns:util="http://www.springframework.org/schema/util"
-	xmlns:ehcache="http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring"
+	xmlns:util="http://www.springframework.org/schema/util" xmlns:cache="http://www.springframework.org/schema/cache"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
               http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.1.xsd
               http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
               http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd
               http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd
               http://www.springframework.org/schema/security/oauth2 http://www.springframework.org/schema/security/spring-security-oauth2-1.0.xsd
-              http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring/ehcache-spring-1.1.xsd">
+              http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache-3.1.xsd">
 
 	<context:annotation-config />
 
@@ -285,8 +284,14 @@
 		<constructor-arg value="true"/>
 	</bean>
 	
-	<bean name="metadataFetchingHttpClient" class="org.apache.commons.httpclient.HttpClient" />
-	
+	<bean name="metadataFetchingHttpClient" class="org.apache.commons.httpclient.HttpClient">
+	   <constructor-arg ref="httpClientParams"/>
+	</bean>
+
+    <bean name="httpClientParams" class="org.apache.commons.httpclient.params.HttpClientParams">
+       <property name="connectionManagerTimeout" value="30000"/>
+    </bean>
+
 	<!-- SAML Authentication Provider responsible for validating of received 
 		SAML messages -->
 	<bean id="samlAuthenticationProvider"
@@ -294,7 +299,7 @@
 		<property name="userDetails" ref="samlUserDetails" />
 	</bean>
 	
-	<bean id="samlUserDetails" class="org.cloudfoundry.identity.uaa.login.LoginServerSAMLUserDetailsService" />
+	<bean id="samlUserDetails" class="org.cloudfoundry.identity.uaa.login.LoginServerSamlUserDetailsService" />
 
 	<!-- Provider of default SAML Context -->
 	<bean id="contextProvider"
@@ -445,7 +450,7 @@
 		</property>
 	</bean>
 	
-	<bean id="uaaController" class="org.cloudfoundry.identity.uaa.login.SAMLRemoteUaaController">
+	<bean id="uaaController" class="org.cloudfoundry.identity.uaa.login.SamlRemoteUaaController">
 		<property name="uaaBaseUrl" value="${uaa.url:http://localhost:8080/uaa}" />
 		<property name="prompts">
 			<util:list>
@@ -470,26 +475,23 @@
 		<property name="links" ref="links" />
 	</bean>
 	
-	<bean id="oneTimeCodeController" class="org.cloudfoundry.identity.uaa.login.OneTimePasswordController">
+	<bean id="oneTimeCodeController" class="org.cloudfoundry.identity.uaa.login.PasscodeController">
 		<property name="store" ref="oneTimeCodeStore"/>
 	</bean>
 	
-	<bean id="oneTimeCodeStore" class="org.cloudfoundry.identity.uaa.login.CachingOneTimePasswordStore">
+	<bean id="oneTimeCodeStore" class="org.cloudfoundry.identity.uaa.login.CachingPasscodeStore">
 		<property name="cacheManager" ref="cacheManager"/>
 	</bean>
 	
-	<!-- <bean class="org.cloudfoundry.identity.uaa.login.SAMLMetadataBeanFactory" /> -->
-	
-	<ehcache:annotation-driven />
+	<cache:annotation-driven />
  
-    <ehcache:config cache-manager="cacheManager">
-	    <!-- interval is in minutes -->
-        <ehcache:evict-expired-elements interval="60" />
-    </ehcache:config>
- 
-    <bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
-        <property name="configLocation" value="classpath:/ehcache.xml" />
+    <bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheCacheManager">
+    	<property name="cacheManager" ref="ehcache" />
     </bean>
+
+	<bean id="ehcache" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
+		<property name="configLocation" value="classpath:/ehcache.xml" />
+	</bean>
     
     <bean id="metadataProviderList" class="java.util.ArrayList">
         <constructor-arg>
@@ -521,9 +523,7 @@
 						<constructor-arg>
 							<bean
 								class="org.opensaml.saml2.metadata.provider.FilesystemMetadataProvider">
-								<constructor-arg>
-									<value type="java.io.File">${login.idpMetadataFile}</value>
-								</constructor-arg>
+								<constructor-arg value="${login.idpMetadataFile}" />
 								<property name="parserPool" ref="parserPool" />
 							</bean>
 						</constructor-arg>
