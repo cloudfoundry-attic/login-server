@@ -3,11 +3,11 @@ package org.cloudfoundry.identity.uaa.login;
 import org.springframework.security.core.GrantedAuthority;
 
 @SuppressWarnings("serial")
-public class SAMLUserAuthority implements GrantedAuthority{
+public class SamlUserAuthority implements GrantedAuthority{
 
 	private final String authority;
 
-	public SAMLUserAuthority(String authority) {
+	public SamlUserAuthority(String authority) {
 		this.authority = authority;
 	}
 

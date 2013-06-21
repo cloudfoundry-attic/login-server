@@ -49,9 +49,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-public class SAMLRemoteUaaController extends RemoteUaaController {
+public class SamlRemoteUaaController extends RemoteUaaController {
 
-	private static final Log logger = LogFactory.getLog(SAMLRemoteUaaController.class);
+	private static final Log logger = LogFactory.getLog(SamlRemoteUaaController.class);
 
 	private final ObjectMapper mapper = new ObjectMapper();
 
@@ -74,10 +74,10 @@ public class SAMLRemoteUaaController extends RemoteUaaController {
 
 		if (principal instanceof ExpiringUsernameAuthenticationToken) {
 			appendField(login, "username",
-					((SAMLUserDetails) (((ExpiringUsernameAuthenticationToken) principal).getPrincipal()))
+					((SamlUserDetails) (((ExpiringUsernameAuthenticationToken) principal).getPrincipal()))
 							.getUsername());
 
-			authorities = ((SAMLUserDetails) (((ExpiringUsernameAuthenticationToken) principal).getPrincipal())).getAuthorities();
+			authorities = ((SamlUserDetails) (((ExpiringUsernameAuthenticationToken) principal).getPrincipal())).getAuthorities();
 		}
 		else {
 			appendField(login, "username", principal.getName());

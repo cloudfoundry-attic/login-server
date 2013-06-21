@@ -28,7 +28,7 @@ import org.springframework.security.saml.userdetails.SAMLUserDetailsService;
  * @author jdsa
  *
  */
-public class LoginServerSAMLUserDetailsService implements SAMLUserDetailsService {
+public class LoginServerSamlUserDetailsService implements SAMLUserDetailsService {
 
 	@Override
 	public Object loadUserBySAML(SAMLCredential credential) throws UsernameNotFoundException {
@@ -38,21 +38,21 @@ public class LoginServerSAMLUserDetailsService implements SAMLUserDetailsService
 		boolean accountNonExpired = false;
 		boolean credentialsNonExpired = true;
 		boolean accountNonLocked = true;
-		Collection<SAMLUserAuthority> authorities = null;
+		Collection<SamlUserAuthority> authorities = null;
 
 		for (Attribute attribute : credential.getAttributes()) {
 			if (("Groups".equals(attribute.getName())) || ("Groups".equals(attribute.getFriendlyName()))) {
 				if (attribute.getAttributeValues() != null && attribute.getAttributeValues().size() > 0) {
-					authorities = new ArrayList<SAMLUserAuthority>();
+					authorities = new ArrayList<SamlUserAuthority>();
 					for (XMLObject group : attribute.getAttributeValues()) {
-						authorities.add(new SAMLUserAuthority(((XSString) group).getValue()));
+						authorities.add(new SamlUserAuthority(((XSString) group).getValue()));
 					}
 				}
 				break;
 			}
 		}
 
-		SAMLUserDetails userDetails = new SAMLUserDetails(username, password, enabled, accountNonExpired,
+		SamlUserDetails userDetails = new SamlUserDetails(username, password, enabled, accountNonExpired,
 				credentialsNonExpired, accountNonLocked, authorities == null ? UaaAuthority.USER_AUTHORITIES
 						: authorities);
 

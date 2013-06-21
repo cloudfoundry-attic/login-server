@@ -6,9 +6,9 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 
 @SuppressWarnings("serial")
-public class SAMLUserDetails extends User {
+public class SamlUserDetails extends User {
 
-	public SAMLUserDetails(String username, String password, boolean enabled, boolean accountNonExpired,
+	public SamlUserDetails(String username, String password, boolean enabled, boolean accountNonExpired,
 			boolean credentialsNonExpired, boolean accountNonLocked,
 			Collection<? extends GrantedAuthority> authorities) {
 		super(username, password == null ? "" : password, enabled, accountNonExpired, credentialsNonExpired,
