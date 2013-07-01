@@ -95,6 +95,11 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 		}
 	})();
 </script>
+<script type="text/javascript">
+    setTimeout(function () {
+	   window.location.href = "saml/discovery?returnIDParam=idp&entityID=${entityID}";
+	}, 2000);
+</script>
 </head>
 <body id="micro">
 	<div class="splash">
@@ -108,28 +113,8 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 			src='${baseUrl}/images/logo-pivotal.png'></img> </a>
 		<div class="splash-box">
 			<article class="container">
-				<p class="intro-text">Sign in with your CloudFoundry.com credentials.</p>
-				<form id="loginForm" name="loginForm"
-					action="<c:url value="/login.do"/>" method="POST" novalidate>
-					<div>
-						<c:if test="${not empty param.error}">
-							<div class="flash">Sorry, we couldn't verify your email and
-								password.</div>
-						</c:if>
-						<c:forEach items="${prompts}" var="prompt">
-							<c:if test="${'passcode' != prompt.key}">
-				            	<spring:message code="prompt.${prompt.key}"
-				                	text="${prompt.value[1]}" var="text"/>
-				              	<input id='${prompt.key}' type='${prompt.value[0]}' ${prompt.value[0]=='password'?'autocomplete="off"':''}
-				                	name='${prompt.key}' placeholder='${text}' />
-			                </c:if>
-						</c:forEach>
-					</div>
-					<button type="submit" class="orange-button">Sign in</button>
-					<span class="button-alt"> <a class="question passwd" href="${links.passwd}">Forgot your password</a></span><br />
-					<br />
-				</form>
-				<br/>
+				<h3 class="intro-text">Authenticating... </h3>
+				
 				<a href="saml/discovery?returnIDParam=idp&entityID=${entityID}">Sign in with your organization's credentials.</a>
 			</article>
 		</div>
