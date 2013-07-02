@@ -219,18 +219,11 @@
 	<!-- Logger for SAML messages and events -->
 	<bean id="samlLogger" class="org.springframework.security.saml.log.SAMLDefaultLogger" />
 
-	<!-- Central storage of cryptographic keys -->
-	<bean id="keyManager" class="org.springframework.security.saml.key.JKSKeyManager">
-		<constructor-arg value="${login.keystoreLocation}" />
-		<constructor-arg type="java.lang.String" value="${login.keystorePassword}" />
-		<constructor-arg>
-			<map>
-				<!-- Assuming the key password is the same as the keystore password -->
-				<entry key="${login.keystoreKey}" value="${login.keystorePassword}" />
-			</map>
-		</constructor-arg>
-		<constructor-arg type="java.lang.String" value="${login.keystoreKey}" />
-	</bean>
+	<bean id="keyManager" class="org.cloudfoundry.identity.uaa.login.SamlLoginServerKeyManager" lazy-init="false">
+        <constructor-arg type="java.lang.String" value="${login.serviceProviderKey}" />
+        <constructor-arg type="java.lang.String" value="${login.serviceProviderKeyPassword}" />
+        <constructor-arg type="java.lang.String" value="${login.serviceProviderCertificate}" />
+    </bean>
 
 	<!-- Entry point to initialize authentication, default values taken from 
 		properties file -->

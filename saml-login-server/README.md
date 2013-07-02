@@ -6,12 +6,27 @@
 
 - Create the openam script per the suggestions in the openam install guide.
   - For a mac, JDK_HOME is "/System/Library/Frameworks/JavaVM.framework/Home"
+  
+- Create the SAML Login Server service provider certificate
+  - Follow these commands to create a key and certificate. Enter a password to protect the private key when prompted.
+  - `openssl genrsa -des3 -out server.key 1024`
+  - `openssl req -new -nodes -out server.csr -key server.key -days 365 -subj "/CN=saml_login,OU=test,O=vmware,O=com"`
+  - `openssl x509 -req -days 365 -in server.csr -signkey server.key -out server.crt`
+
+  server.key is the private key protected by the password
+  server.crt is the certificate
+  
+- Set up login.yml with the SAML service provider certificate 
+  - See src/main/resources/login.yml for an example
+  - Paste the of server.key to _serviceProviderKey_ property in the login.yml.
+  - Fill in the password to the _serviceProviderKeyPassword_ in the login.yml.
+  - Paste the of server.crt to the _serviceProviderCertificate_ property in the login.yml. 
 
 - Install the saml login server certificate in the jdk trust store at "/System/Library/Frameworks/JavaVM.framework/Home/lib/security/cacerts"
-  - `keytool -importcert -file login-server/saml-login-server/src/main/resources/security/cert.pem -alias samlcert -storepass changeit -trustcacerts -keystore cacerts`
+  - `keytool -importcert -file server.crt -alias samlcert -storepass changeit -trustcacerts -keystore cacerts`
 
 - Install the saml login server certificate in the OpenAM trust store
-  - `keytool -importcert -file login-server/saml-login-server/src/main/resources/security/cert.pem -alias samlcert -storepass changeit -trustcacerts -keystore keystore.jks`
+  - `keytool -importcert -file server.crt -alias samlcert -storepass changeit -trustcacerts -keystore keystore.jks`
 
 - Start up the login server, uaa and sample apps
   - `export MAVEN_OPTS="-Xmx768m -XX:MaxPermSize=256m"`
