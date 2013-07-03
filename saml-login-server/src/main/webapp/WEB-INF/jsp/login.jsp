@@ -98,7 +98,7 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 <script type="text/javascript">
     setTimeout(function () {
 	   window.location.href = "saml/discovery?returnIDParam=idp&entityID=${entityID}";
-	}, 2000);
+	}, 1000);
 </script>
 </head>
 <body id="micro">
@@ -113,9 +113,11 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 			src='${baseUrl}/images/logo-pivotal.png'></img> </a>
 		<div class="splash-box">
 			<article class="container">
-				<h3 class="intro-text">Authenticating... </h3>
-				
-				<a href="saml/discovery?returnIDParam=idp&entityID=${entityID}">Sign in with your organization's credentials.</a>
+			    <div class="centered-image">
+					<a href="saml/discovery?returnIDParam=idp&entityID=${entityID}"><img
+			            alt="Click here to go to the identity provider"
+			            src='${baseUrl}/images/spinner.gif'></img> </a>
+			    </div>
 			</article>
 		</div>
 		<div class="footer"

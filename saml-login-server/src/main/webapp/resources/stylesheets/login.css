@@ -101,6 +101,11 @@ p, li {
   background-clip: padding-box; /* for IE9+, Firefox 4+, Opera, Chrome */
 }
 
+.centered-image {
+	text-align: center;
+	margin: 0 auto;
+}
+
 .container {
   text-align: left;
   margin: 33px;
