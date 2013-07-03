@@ -221,7 +221,7 @@
 
 	<bean id="keyManager" class="org.cloudfoundry.identity.uaa.login.SamlLoginServerKeyManager" lazy-init="false">
         <constructor-arg type="java.lang.String" value="${login.serviceProviderKey}" />
-        <constructor-arg type="java.lang.String" value="${login.serviceProviderKeyPassword}" />
+        <constructor-arg type="java.lang.String" value="${login.serviceProviderKeyPassword:''}" />
         <constructor-arg type="java.lang.String" value="${login.serviceProviderCertificate}" />
     </bean>
 

@@ -32,8 +32,8 @@ public class SamlLoginServerKeyManager implements KeyManager {
 	public SamlLoginServerKeyManager(String key, String password, String certificate) {
 	    Security.addProvider(new BouncyCastleProvider());
 
-	    if (null == password || password.isEmpty()) {
-	    	throw new IllegalArgumentException("Password must have a value");
+	    if (null == password) {
+	        password = "";
 	    }
 
 		try {
