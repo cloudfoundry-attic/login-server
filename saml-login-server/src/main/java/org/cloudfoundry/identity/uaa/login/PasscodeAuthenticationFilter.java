@@ -75,6 +75,9 @@ public class PasscodeAuthenticationFilter implements Filter {
 
 		String username = loginInfo.get("username");
 		String password = loginInfo.get("password");
+		if (null == password) {
+			password = loginInfo.get("passcode");
+		}
 
 		if (loginInfo.isEmpty()) {
 			throw new BadCredentialsException("Request does not contain credentials.");

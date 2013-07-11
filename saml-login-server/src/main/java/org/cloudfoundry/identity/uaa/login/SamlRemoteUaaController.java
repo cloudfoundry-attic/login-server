@@ -122,54 +122,61 @@ public class SamlRemoteUaaController extends RemoteUaaController {
 	public ResponseEntity<byte[]> tokenEndpoint(HttpServletRequest request, HttpEntity<byte[]> entity,
 			@RequestParam Map<String, String> parameters, Map<String, Object> model, Principal principal) throws Exception {
 
-		MultiValueMap<String, String> requestHeadersForClientInfo = new LinkedMultiValueMap<String, String>();
-		requestHeadersForClientInfo.add(AUTHORIZATION, request.getHeader(AUTHORIZATION));
-
-		ResponseEntity<byte[]> clientInfoResponse = getDefaultTemplate().exchange(getUaaBaseUrl() + "/clientinfo",
-				HttpMethod.POST, new HttpEntity<MultiValueMap<String, String>>(null, requestHeadersForClientInfo),
-				byte[].class);
-
-		if (clientInfoResponse.getStatusCode() == HttpStatus.OK) {
-			String path = extractPath(request);
-
-			MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
-			map.setAll(parameters);
-			if (principal != null) {
-				map.set("source", "login");
-				map.set("client_id", getClientId(clientInfoResponse.getBody()));
-				map.setAll(getLoginCredentials(principal));
-				map.remove("credentials"); // legacy vmc might break otherwise
-			}
-			else {
-				throw new BadCredentialsException("No principal found in authorize endpoint");
-			}
-
-			HttpHeaders requestHeaders = new HttpHeaders();
-			requestHeaders.putAll(getRequestHeaders(requestHeaders));
-			requestHeaders.remove(AUTHORIZATION.toLowerCase());
-			requestHeaders.remove(ACCEPT.toLowerCase());
-			requestHeaders.remove(CONTENT_TYPE.toLowerCase());
-			requestHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-			requestHeaders.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-			requestHeaders.remove(COOKIE);
-			requestHeaders.remove(COOKIE.toLowerCase());
-
-			ResponseEntity<byte[]> response = getAuthorizationTemplate().exchange(getUaaBaseUrl() + "/" + path,
-					HttpMethod.POST, new HttpEntity<MultiValueMap<String, String>>(map, requestHeaders),
-					byte[].class);
-
-			saveCookie(response.getHeaders(), model);
-
-			byte[] body = response.getBody();
-			if (body != null) {
-				HttpHeaders outgoingHeaders = getResponseHeaders(response.getHeaders());
-				return new ResponseEntity<byte[]>(response.getBody(), outgoingHeaders, response.getStatusCode());
-			}
-
-			throw new IllegalStateException("Neither a redirect nor a user approval");
+		// Request has a password. Owner password grant with a UAA password
+		if (null != request.getParameter("password")) {
+			return passthru(request, entity, model);
 		}
 		else {
-			throw new BadCredentialsException(new String(clientInfoResponse.getBody()));
+			//
+			MultiValueMap<String, String> requestHeadersForClientInfo = new LinkedMultiValueMap<String, String>();
+			requestHeadersForClientInfo.add(AUTHORIZATION, request.getHeader(AUTHORIZATION));
+
+			ResponseEntity<byte[]> clientInfoResponse = getDefaultTemplate().exchange(getUaaBaseUrl() + "/clientinfo",
+					HttpMethod.POST, new HttpEntity<MultiValueMap<String, String>>(null, requestHeadersForClientInfo),
+					byte[].class);
+
+			if (clientInfoResponse.getStatusCode() == HttpStatus.OK) {
+				String path = extractPath(request);
+
+				MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
+				map.setAll(parameters);
+				if (principal != null) {
+					map.set("source", "login");
+					map.set("client_id", getClientId(clientInfoResponse.getBody()));
+					map.setAll(getLoginCredentials(principal));
+					map.remove("credentials"); // legacy vmc might break otherwise
+				}
+				else {
+					throw new BadCredentialsException("No principal found in authorize endpoint");
+				}
+
+				HttpHeaders requestHeaders = new HttpHeaders();
+				requestHeaders.putAll(getRequestHeaders(requestHeaders));
+				requestHeaders.remove(AUTHORIZATION.toLowerCase());
+				requestHeaders.remove(ACCEPT.toLowerCase());
+				requestHeaders.remove(CONTENT_TYPE.toLowerCase());
+				requestHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+				requestHeaders.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+				requestHeaders.remove(COOKIE);
+				requestHeaders.remove(COOKIE.toLowerCase());
+
+				ResponseEntity<byte[]> response = getAuthorizationTemplate().exchange(getUaaBaseUrl() + "/" + path,
+						HttpMethod.POST, new HttpEntity<MultiValueMap<String, String>>(map, requestHeaders),
+						byte[].class);
+
+				saveCookie(response.getHeaders(), model);
+
+				byte[] body = response.getBody();
+				if (body != null) {
+					HttpHeaders outgoingHeaders = getResponseHeaders(response.getHeaders());
+					return new ResponseEntity<byte[]>(response.getBody(), outgoingHeaders, response.getStatusCode());
+				}
+
+				throw new IllegalStateException("Neither a redirect nor a user approval");
+			}
+			else {
+				throw new BadCredentialsException(new String(clientInfoResponse.getBody()));
+			}
 		}
 	}
 
