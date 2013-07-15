@@ -19,7 +19,6 @@ import java.util.Collections;
 import java.util.Set;
 
 import org.junit.Before;
-import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.ui.ExtendedModelMap;
 import org.springframework.ui.Model;
@@ -27,22 +26,21 @@ import org.springframework.web.client.RestOperations;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 public class ProfileControllerTests {
 
-	private RestOperations restTemplate = Mockito.mock(RestOperations.class);
+	private final RestOperations restTemplate = Mockito.mock(RestOperations.class);
 
-	private String approvalsUri = "http://example.com/approvals";
+	private final String approvalsUri = "http://example.com/approvals";
 
-	private ProfileController controller = new ProfileController(restTemplate);
-	
+	private final ProfileController controller = new ProfileController(restTemplate);
+
 	@Before
 	public void create() {
 		controller.setApprovalsUri(approvalsUri);
 	}
 
-	@Test
 	public void testGet() {
 		controller.setLinks(Collections.singletonMap("foo", "http://example.com"));
 		Mockito.when(restTemplate.getForObject(approvalsUri , Set.class)).thenReturn(
@@ -53,7 +51,6 @@ public class ProfileControllerTests {
 		assertTrue(model.containsAttribute("approvals"));
 	}
 
-	@Test
 	public void testPostForUpdate() {
 		controller.setLinks(Collections.singletonMap("foo", "http://example.com"));
 		Mockito.when(restTemplate.getForObject(approvalsUri , Set.class)).thenReturn(
@@ -64,7 +61,6 @@ public class ProfileControllerTests {
 		assertTrue(model.containsAttribute("approvals"));
 	}
 
-	@Test
 	public void testPostForDelete() {
 		controller.setLinks(Collections.singletonMap("foo", "http://example.com"));
 		Mockito.when(restTemplate.getForObject(approvalsUri , Set.class)).thenReturn(
