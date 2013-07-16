@@ -11,7 +11,7 @@
 
 	<groupId>com.cloudfoundry.identity</groupId>
 	<artifactId>cloudfoundry-login-server-parent</artifactId>
-	<version>1.2.4</version>
+	<version>1.3.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>Cloud Foundry Login</name>
 	<description>Cloud Foundry Login Servers</description>
