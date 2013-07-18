@@ -32,6 +32,7 @@
 	<security:http pattern="/resources/**" security="none" />
 	<security:http pattern="/healthz/**" security="none" />
 	<security:http request-matcher-ref="oauthTokenAuthcodeFlow" security="none"/>
+	<security:http request-matcher-ref="oauthTokenRefresh" security="none"/>
 	<security:http pattern="/login" security="none" />
 	<security:http pattern="/info" security="none" />
 	<security:http pattern="/error" security="none" />
@@ -131,6 +132,21 @@
 			</map>
 		</property>
 	</bean>
+	
+	<bean id="oauthTokenRefresh" class="org.cloudfoundry.identity.uaa.security.web.UaaRequestMatcher">
+        <constructor-arg value="/oauth/token" />
+        <property name="accept">
+            <list>
+                <value>application/json</value>
+                <value>application/x-www-form-urlencoded</value>
+            </list>
+        </property>
+        <property name="parameters">
+            <map>
+                <entry key="grant_type" value="refresh_token" />
+            </map>
+        </property>
+    </bean>
 
 	<security:http>
 		<security:intercept-url pattern="/**"
