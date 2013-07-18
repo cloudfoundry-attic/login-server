@@ -1,7 +1,7 @@
 <%--
 
     Cloud Foundry 2012.02.03 Beta
-    Copyright (c) [2013] GoPivotal, Inc. All Rights Reserved.
+    Copyright (c) [2009-2012] VMware, Inc. All Rights Reserved.
 
     This product is licensed to you under the Apache License, Version 2.0 (the "License").
     You may not use this product except in compliance with the License.
@@ -131,7 +131,7 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 			title="Version: ${app.version}, Commit: ${commit_id}, Timestamp: ${timestamp}, UAA: ${links.uaa}">
 			&copy;
 			<fmt:formatDate value="<%=new java.util.Date()%>" pattern="yyyy" />
-			Go Pivotal, Inc. All rights reserved.
+			GoPivotal, Inc. All rights reserved.
 		</div>
 	</div>
 
