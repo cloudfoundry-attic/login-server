@@ -511,7 +511,7 @@
 						<bean class="org.opensaml.saml2.metadata.provider.HTTPMetadataProvider">
 							<constructor-arg ref="metadataFetchingHttpClientTimer" />
 							<constructor-arg ref="metadataFetchingHttpClient" />
-							<constructor-arg value="${login.idpMetadataURL}" />
+							<constructor-arg value="${login.idpMetadataURL:''}" />
 							<property name="parserPool" ref="parserPool" />
 						</bean>
 					</constructor-arg>
