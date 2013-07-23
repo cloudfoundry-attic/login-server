@@ -45,6 +45,11 @@
           <enabled>false</enabled>
         </snapshots>
       </repository>
+      <repository>
+        <id>atlassian</id>
+        <name>Atlassian Public Repo</name>
+        <url>http://maven.atlassian.com/public</url>
+      </repository>
     </repositories>
 
 	<developers>
@@ -251,12 +256,12 @@
 			<groupId>org.cloudfoundry.identity</groupId>
 			<artifactId>cloudfoundry-identity-common</artifactId>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.cloudfoundry.identity</groupId>
 			<artifactId>cloudfoundry-identity-scim</artifactId>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>cloudfoundry-login-server-common</artifactId>
@@ -310,8 +315,18 @@
 		</dependency>
 
 		<dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-ldap</artifactId>
+        </dependency>
+
+        <dependency>
 			<groupId>org.springframework.security.oauth</groupId>
 			<artifactId>spring-security-oauth2</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.atlassian.crowd</groupId>
+            <artifactId>crowd-integration-springsecurity</artifactId>
 		</dependency>
 
 		<dependency>
