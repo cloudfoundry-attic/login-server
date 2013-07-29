@@ -1,0 +1,7 @@
+spring_profiles: crowd
+crowd:
+  applicationName: cf-login-server
+  applicationPassword: cf-login-server
+  serverUrl: http://localhost:8095/crowd
+  sessionValidationinterval: 0
+  ehcache: classpath:/crowd-ehcache.xml

@@ -15,20 +15,74 @@
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
 
-    <import resource="classpath:/applicationContext-CrowdClient.xml"/>
-
     <sec:authentication-manager alias="remoteAuthenticationManager">
-        <sec:authentication-provider ref='crowdAuthenticationProvider' />
+        <sec:authentication-provider ref='crowdAuthenticationProvider'/>
     </sec:authentication-manager>
 
-    <bean id="crowdUserDetailsService" class="com.atlassian.crowd.integration.springsecurity.user.CrowdUserDetailsServiceImpl">
+    <bean id="clientProperties" class="com.atlassian.crowd.service.soap.client.SoapClientPropertiesImpl"
+          factory-method="newInstanceFromProperties">
+        <constructor-arg>
+            <props>
+                <prop key="application.name">${crowd.applicationName:cf-login}</prop>
+                <prop key="application.password">${crowd.applicationPassword:cf-login}</prop>
+                <prop key="crowd.server.url">${crowd.serverUrl:http://localhost:8095/crowd}</prop>
+                <prop key="session.validationInterval">${crowd.sessionValidationinterval:0}</prop>
+            </props>
+        </constructor-arg>
+    </bean>
+
+    <bean id="securityServerClient" class="com.atlassian.crowd.service.soap.client.SecurityServerClientImpl">
+        <constructor-arg ref="clientProperties"/>
+    </bean>
+
+    <bean id="crowdAuthenticationManager" class="com.atlassian.crowd.service.cache.CacheAwareAuthenticationManager">
+        <constructor-arg index="0" ref="securityServerClient"/>
+        <constructor-arg index="1" ref="crowdUserManager"/>
+    </bean>
+
+    <bean id="httpAuthenticator" class="com.atlassian.crowd.integration.http.HttpAuthenticatorImpl">
+        <constructor-arg ref="crowdAuthenticationManager"/>
+    </bean>
+
+    <bean id="verifyTokenFilter" class="com.atlassian.crowd.integration.http.VerifyTokenFilter" lazy-init="true">
+        <constructor-arg ref="httpAuthenticator"/>
+    </bean>
+
+    <bean id="clientCache" class="com.atlassian.crowd.service.cache.CacheImpl">
+        <constructor-arg type="net.sf.ehcache.CacheManager">
+            <bean class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
+                <property name="configLocation" value="${crowd.ehcache:classpath:/crowd-ehcache.xml}"/>
+            </bean>
+        </constructor-arg>
+    </bean>
+
+    <bean id="crowdUserManager" class="com.atlassian.crowd.service.cache.CachingUserManager">
+        <constructor-arg index="0" ref="securityServerClient"/>
+        <constructor-arg index="1" ref="clientCache"/>
+    </bean>
+
+    <bean id="crowdGroupMembershipManager" class="com.atlassian.crowd.service.cache.CachingGroupMembershipManager">
+        <constructor-arg index="0" ref="securityServerClient"/>
+        <constructor-arg index="1" ref="crowdUserManager"/>
+        <constructor-arg index="2" ref="crowdGroupManager"/>
+        <constructor-arg index="3" ref="clientCache"/>
+    </bean>
+
+    <bean id="crowdGroupManager" class="com.atlassian.crowd.service.cache.CachingGroupManager">
+        <constructor-arg index="0" ref="securityServerClient"/>
+        <constructor-arg index="1" ref="clientCache"/>
+    </bean>
+
+    <bean id="crowdUserDetailsService"
+          class="com.atlassian.crowd.integration.springsecurity.user.CrowdUserDetailsServiceImpl">
         <property name="authenticationManager" ref="crowdAuthenticationManager"/>
         <property name="groupMembershipManager" ref="crowdGroupMembershipManager"/>
         <property name="userManager" ref="crowdUserManager"/>
         <property name="authorityPrefix" value="ROLE_"/>
     </bean>
 
-    <bean id="crowdAuthenticationProvider" class="com.atlassian.crowd.integration.springsecurity.RemoteCrowdAuthenticationProvider">
+    <bean id="crowdAuthenticationProvider"
+          class="com.atlassian.crowd.integration.springsecurity.RemoteCrowdAuthenticationProvider">
         <constructor-arg ref="crowdAuthenticationManager"/>
         <constructor-arg ref="httpAuthenticator"/>
         <constructor-arg ref="crowdUserDetailsService"/>
