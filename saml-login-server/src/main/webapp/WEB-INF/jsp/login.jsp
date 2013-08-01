@@ -112,7 +112,7 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 								<div>Unable to verify, please try again:</div>
 							</div>
 						</c:if>
-						<p class="intro-text">Log in to CloudFoundry.com:</p>
+						<p class="intro-text">Log in to Pivotal CF:</p>
 						<c:forEach items="${prompts}" var="prompt">
 							<c:if test="${'passcode' != prompt.key}">
 				            	<spring:message code="prompt.${prompt.key}"
@@ -169,7 +169,7 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 	</noscript>
 	<!-- End of DoubleClick Floodlight Tag: Please do not remove -->
 
-	<cf:if test="${not empty analytics}">
+	<c:if test="${not empty analytics}">
 	<script>
 			(function(i, s, o, g, r, a, m) {
 				i['GoogleAnalyticsObject'] = r;
@@ -186,6 +186,6 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 			ga('create', '${analytics.code}', '${analytics.domain}');
 			ga('send', 'pageview');
 	</script>
-	</cf:if>
+	</c:if>
 </body>
 </html>

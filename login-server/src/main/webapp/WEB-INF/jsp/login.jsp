@@ -112,7 +112,7 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 								<div>Unable to verify, please try again:</div>
 							</div>
 						</c:if>
-						<p class="intro-text">Log in to CloudFoundry.com:</p>
+						<p class="intro-text">Log in to Pivotal CF:</p>
 						<c:forEach items="${prompts}" var="prompt">
               <spring:message code="prompt.${prompt.key}"
                 text="${prompt.value[1]}" var="text"/>
@@ -123,8 +123,6 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 					<button type="submit" class="button-orange">Log in</button>
 					<span class="button-alt"><a href="${links.passwd}">Forgot password &raquo;</a><a href="${links.register}">Create an account &raquo;</a></span>
 				</form>
-				<p class="small">Reminder: do not type your Cloud Foundry password into any
-					site except <a href="${links.login}">${links.login}</a>.</p>
 			</div>
 		</div>
 		<div class="footer"
@@ -168,7 +166,7 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 	</noscript>
 	<!-- End of DoubleClick Floodlight Tag: Please do not remove -->
 
-	<cf:if test="${not empty analytics}">
+	<c:if test="${not empty analytics}">
 		<script>
 			(function(i, s, o, g, r, a, m) {
 				i['GoogleAnalyticsObject'] = r;
@@ -185,6 +183,6 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 			ga('create', '${analytics.code}', '${analytics.domain}');
 			ga('send', 'pageview');
 		</script>
-	</cf:if>
+	</c:if>
 </body>
 </html>
