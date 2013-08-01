@@ -221,7 +221,7 @@
 			GoPivotal, Inc. All rights reserved.
 		</div>
 	</div>
-	<cf:if test="${not empty analytics}">
+	<c:if test="${not empty analytics}">
 		<script>
 			(function(i, s, o, g, r, a, m) {
 				i['GoogleAnalyticsObject'] = r;
@@ -238,6 +238,6 @@
 			ga('create', '${analytics.code}', '${analytics.domain}');
 			ga('send', 'pageview');
 		</script>
-	</cf:if>
+	</c:if>
 </body>
 </html>
