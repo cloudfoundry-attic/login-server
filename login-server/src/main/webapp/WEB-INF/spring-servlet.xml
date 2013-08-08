@@ -136,8 +136,8 @@
 		<bean class="org.cloudfoundry.identity.uaa.login.AnalyticsInterceptor">
 			<property name="analytics">
 				<bean class="org.cloudfoundry.identity.uaa.login.AnalyticsInterceptor.Analytics">
-					<property name="code" value="${analytics.code:UA-22181585-1}" />
-					<property name="domain" value="${analytics.domain:cloudfoundry.com}" />
+					<property name="code" value="${analytics.code:UA-22181585-29}" />
+					<property name="domain" value="${analytics.domain:pivotal.io}" />
 				</bean>
 			</property>
 		</bean>
