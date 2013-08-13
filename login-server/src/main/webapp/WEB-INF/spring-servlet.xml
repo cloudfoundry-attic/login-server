@@ -110,12 +110,6 @@
 
 	<bean id="autologinAuthorizeRequestMatcher" class="org.cloudfoundry.identity.uaa.security.web.UaaRequestMatcher">
 		<constructor-arg value="/oauth/authorize" />
-		<property name="accept">
-			<list>
-				<value>application/json</value>
-				<value>application/x-www-form-urlencoded</value>
-			</list>
-		</property>
 		<property name="parameters">
 			<map>
 				<entry key="response_type" value="code" />
