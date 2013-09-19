@@ -32,10 +32,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.cloudfoundry.identity.uaa.authentication.AuthzAuthenticationRequest;
+import org.cloudfoundry.identity.uaa.authentication.UaaAuthenticationDetails;
 import org.cloudfoundry.identity.uaa.user.UaaAuthority;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -64,6 +67,8 @@ public class PasscodeAuthenticationFilter implements Filter {
 
 	private PasscodeStore store = null;
 
+	private AuthenticationManager authenticationManager;
+
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
 			ServletException {
@@ -75,20 +80,19 @@ public class PasscodeAuthenticationFilter implements Filter {
 
 		String username = loginInfo.get("username");
 		String password = loginInfo.get("password");
-		if (null == password) {
-			password = loginInfo.get("passcode");
-		}
+		String passcode = loginInfo.get("passcode");
 
 		if (loginInfo.isEmpty()) {
 			throw new BadCredentialsException("Request does not contain credentials.");
 		}
-		else {
+		else if (null == password && null != passcode) {
+			//Validate passcode
 			logger.debug("Located credentials in request, with keys: " + loginInfo.keySet());
 			if (methods != null && !methods.contains(req.getMethod().toUpperCase())) {
 				throw new BadCredentialsException("Credentials must be sent by (one of methods): " + methods);
 			}
 
-			PasscodeInformation pi = store.validatePasscode(new PasscodeInformation(username), password);
+			PasscodeInformation pi = store.validatePasscode(new PasscodeInformation(username), passcode);
 			if (pi != null) {
 				logger.info("Successful authentication request for " + username);
 
@@ -106,6 +110,16 @@ public class PasscodeAuthenticationFilter implements Filter {
 			else {
 				authenticationEntryPoint.commence(req, res, new BadCredentialsException("Invalid passcode"));
 			}
+		}
+		else {
+			//Authenticate user against the UAA
+			logger.debug("Located credentials in request, with keys: " + loginInfo.keySet());
+			if (methods != null && !methods.contains(req.getMethod().toUpperCase())) {
+				throw new BadCredentialsException("Credentials must be sent by (one of methods): " + methods);
+			}
+			Authentication result = authenticationManager.authenticate(new AuthzAuthenticationRequest(loginInfo,
+					new UaaAuthenticationDetails(req)));
+			SecurityContextHolder.getContext().setAuthentication(result);
 		}
 
 		chain.doFilter(request, response);
@@ -149,8 +163,9 @@ public class PasscodeAuthenticationFilter implements Filter {
 		this.parameterNames = parameterNames;
 	}
 
-	public void setStore(PasscodeStore store) {
+	public PasscodeAuthenticationFilter(PasscodeStore store, AuthenticationManager authenticationManager) {
 		this.store = store;
+		this.authenticationManager = authenticationManager;
 	}
 
 }

@@ -37,6 +37,21 @@
 	<security:http pattern="/info" security="none" />
 	<security:http pattern="/error" security="none" />
 
+    <!-- TODO: Move the autologin related beans from the login server and saml login server to login common -->
+    <http pattern="/autologin" create-session="stateless" entry-point-ref="basicAuthenticationEntryPoint"
+        xmlns="http://www.springframework.org/schema/security">
+        <intercept-url pattern="/**" access="IS_AUTHENTICATED_FULLY" />
+        <anonymous enabled="false" />
+        <custom-filter ref="clientAuthenticationFilter" position="BASIC_AUTH_FILTER" />
+    </http>
+
+    <http request-matcher-ref="autologinAuthorizeRequestMatcher" entry-point-ref="loginEntryPoint"
+        xmlns="http://www.springframework.org/schema/security">
+        <!-- TODO: add entry point that can redirect back to client app? -->
+        <anonymous enabled="false" />
+        <custom-filter ref="autologinAuthenticationFilter" position="FORM_LOGIN_FILTER" />
+    </http>
+    
 	<!-- Version of the /authorize endpoint for stateless clients such as VMC -->
 	<http name="statelessAuthzEndpointSecurity" request-matcher-ref="oauthAuthorizeRequestMatcher" create-session="stateless"
 		entry-point-ref="oauthAuthenticationEntryPoint" authentication-manager-ref="remoteAuthenticationManager"
@@ -70,8 +85,7 @@
 		xmlns="http://www.springframework.org/schema/security">
 		<intercept-url pattern="/**" access="IS_AUTHENTICATED_FULLY" />
 		<anonymous enabled="false" />
-		<custom-filter ref="passcodeAuthenticationFilter"
-			position="FORM_LOGIN_FILTER" />
+		<custom-filter ref="passcodeAuthenticationFilter" position="FORM_LOGIN_FILTER" />
 		<access-denied-handler ref="oauthAccessDeniedHandler" />
 	</http>
 		
@@ -187,7 +201,8 @@
 	</security:http>
 	
 	<bean id="passcodeAuthenticationFilter" class="org.cloudfoundry.identity.uaa.login.PasscodeAuthenticationFilter">
-		<property name="store" ref="oneTimeCodeStore"/>
+		<constructor-arg name="store" ref="oneTimeCodeStore"/>
+		<constructor-arg name="authenticationManager" ref="remoteAuthenticationManager"/>
 		<property name="parameterNames">
 			<list>
 				<value>username</value>
@@ -220,6 +235,51 @@
 	</bean>
 
 	<import resource="classpath:/login-common.xml" />
+	
+    <mvc:annotation-driven>
+       <mvc:message-converters>
+           <bean class="org.cloudfoundry.identity.uaa.login.AutologinController.AutologinRequestConverter" />
+       </mvc:message-converters>
+    </mvc:annotation-driven>
+
+    <bean id="autologinAuthenticationFilter" class="org.cloudfoundry.identity.uaa.authentication.AuthzAuthenticationFilter">
+        <constructor-arg ref="autologinAuthenticationManager" />
+        <property name="parameterNames">
+            <list>
+                <value>code</value>
+                <value>response_type</value>
+            </list>
+        </property>
+        <property name="methods">
+            <set>
+                <value>GET</value>
+                <value>POST</value>
+            </set>
+        </property>
+    </bean>
+
+    <bean id="autologinAuthenticationManager" class="org.cloudfoundry.identity.uaa.login.AutologinAuthenticationManager">
+        <property name="codeStore" ref="autologinCodeStore" />
+    </bean>
+
+    <bean id="autologinCodeStore" class="org.cloudfoundry.identity.uaa.login.DefaultAutologinCodeStore">
+        <property name="expireCodeWhenUsed" value="${autologin.expire_when_used:true}" />
+    </bean>
+
+    <bean id="autologinAuthorizeRequestMatcher" class="org.cloudfoundry.identity.uaa.security.web.UaaRequestMatcher">
+        <constructor-arg value="/oauth/authorize" />
+        <property name="parameters">
+            <map>
+                <entry key="response_type" value="code" />
+                <entry key="code" value="" />
+            </map>
+        </property>
+    </bean>
+
+    <bean id="autologinController" class="org.cloudfoundry.identity.uaa.login.AutologinController">
+        <property name="codeStore" ref="autologinCodeStore" />
+        <property name="authenticationManager" ref="remoteAuthenticationManager" />
+    </bean>
 
 	<!-- Handler deciding where to redirect user after successful login -->
 	<bean id="successRedirectHandler"
