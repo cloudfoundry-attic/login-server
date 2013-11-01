@@ -160,6 +160,7 @@
 		<module>login-server-common</module>
 		<module>login-server</module>
 		<module>saml-login-server</module>
+		<module>pivotal-login-server</module>
 	</modules>
 
 	<build>
