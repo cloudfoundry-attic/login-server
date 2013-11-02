@@ -1,0 +1,26 @@
+.permissions .approvals-list-div {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #ededed;
+    color: #767676;
+}
+
+.permissions input[type="checkbox"] {
+    float: right;
+    display: none;
+}
+
+.permissions input[type="checkbox"] + label {
+    float: right;
+    display: inline-block;
+    margin-top: -2px;
+    padding: 0;
+    width: 51px;
+    height: 22px;
+    background: url('../images/permissions-off.png') no-repeat 0 0;
+    cursor: pointer;
+}
+
+.permissions input[type="checkbox"]:checked + label {
+    background: url('../images/permissions-on.png') no-repeat 0 0;
+}
