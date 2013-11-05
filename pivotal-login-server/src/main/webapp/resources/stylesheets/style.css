@@ -1,0 +1,216 @@
+body {
+    background: #00776d;
+    background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMTAwJSIgeDI9IjEwMCUiIHkyPSIwJSI+CiAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjMDA3NzZkIiBzdG9wLW9wYWNpdHk9IjEiLz4KICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzYzYWRhNyIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgPC9saW5lYXJHcmFkaWVudD4KICA8cmVjdCB4PSIwIiB5PSIwIiB3aWR0aD0iMSIgaGVpZ2h0PSIxIiBmaWxsPSJ1cmwoI2dyYWQtdWNnZy1nZW5lcmF0ZWQpIiAvPgo8L3N2Zz4=);
+    background: -moz-linear-gradient(45deg,  #00776d 0%, #63ada7 100%);
+    background: -webkit-gradient(linear, left bottom, right top, color-stop(0%,#00776d), color-stop(100%,#63ada7));
+    background: -webkit-linear-gradient(45deg,  #00776d 0%,#63ada7 100%);
+    background: -o-linear-gradient(45deg,  #00776d 0%,#63ada7 100%);
+    background: -ms-linear-gradient(45deg,  #00776d 0%,#63ada7 100%);
+    background: linear-gradient(45deg,  #00776d 0%,#63ada7 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00776d', endColorstr='#63ada7',GradientType=1 );
+
+    border: 0;
+    margin: 0;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    font-size: 14px;
+    color: #3b3c41;
+    font-family: "freight-sans-pro", sans-serif;
+    font-weight: 400;
+}
+
+.container {
+    margin: 100px auto;
+    width: 550px;
+}
+
+.container-large {
+    width: 852px;
+    text-align: center;
+}
+
+h1, .h1,
+h2, .h2,
+h4, .h4 {
+    margin: 0;
+}
+
+h1, .h1 {
+    padding-top: 30px;
+    padding-bottom: 0;
+    font-size: 24px;
+    font-weight: 600;
+    color: #63ada7;
+}
+
+.container-large h1 {
+    padding-bottom: 24px;
+    border-bottom: 1px solid #cbcbcb;
+}
+
+h2, .h2 {
+    font-size: 18px;
+    font-weight: 400;
+    color: #767676;
+}
+
+h4, .h4 {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+a {
+    color: #00776d;
+}
+
+.header {
+    margin-top: 65px;
+    height: 65px;
+    width: 100%;
+    background-color: #63ada7;
+}
+
+.header .image-logo {
+    float: left;
+    width: 65px;
+    height: 65px;
+    background-color: #00776d;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-image: url('../images/p-logo.png');
+    background-size: 31px 31px;
+}
+
+.header .logo {
+    float: left;
+    padding: 22px 0 0 22px;
+    font-size: 24px;
+    font-weight: 300;
+    color: #fff;
+}
+
+.header-link {
+    float: right;
+    color: #00776d;
+    font-size: 14px;
+    padding: 33px 22px 0 0;
+}
+
+.main-content {
+    padding-top: 16px;
+    padding-bottom: 32px;
+    background-color: #ededed;
+}
+
+.fields-wrapper {
+    width: 320px;
+    margin: 0 auto;
+    padding: 16px 0;
+    text-align: center;
+}
+
+input[type=text],
+input[type=email],
+input[type=password] {
+    width: 288px;
+    padding: 16px;
+    font-size: 13px;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    -ms-border-radius: 3px;
+    -o-border-radius: 3px;
+    border-radius: 3px;
+    border: 0;
+    border-top: 1px solid #cbcbcb;
+}
+
+.btn-primary, .btn-redirect {
+    cursor: pointer;
+    border: 0;
+    padding: 14px 46px;
+    color: #fff;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    -ms-border-radius: 3px;
+    -o-border-radius: 3px;
+    border-radius: 3px;
+}
+
+a.btn-primary, a.btn-redirect {
+    color: #fff;
+    text-decoration: none;
+}
+
+.btn-primary {
+    font-size: 16px;
+    background: #2281bc;
+    box-shadow: 0 2px 0 #196084;
+}
+
+.btn-primary:hover {
+    background-color: #1e739e;
+    box-shadow: 0 2px 0 #175872;
+}
+
+.btn-small {
+    padding: 7px 12px;
+    font-size: 14px;
+}
+
+.btn-link {
+    text-decoration: underline;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+}
+
+.btn-redirect {
+    display: inline-block;
+    font-size: 24px;
+    background: #00776d;
+    box-shadow: 0 2px 0 #005147;
+}
+
+.btn-redirect:hover {
+    background: #006357;
+    box-shadow: 0 2px 0 #2d4f46;
+}
+
+.footer {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    height: 46px;
+    background: #3b3c41;
+}
+
+.footer .copyright, .powered-by {
+    padding: 15px 85px;
+    color: #cbcbcb;
+}
+
+.footer .copyright {
+    float: left;
+}
+
+.footer .powered-by {
+    float: right;
+    text-align: right;
+}
+
+.footer .logo {
+    display: inline;
+    font-weight: 800;
+    font-size: 16px;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.clearfix {
+    margin: 0;
+    padding: 0;
+    clear: both;
+}
