@@ -28,8 +28,8 @@
 <title>Cloud Foundry [BETA]</title>
 <meta charset='utf-8'>
 <meta content='IE=edge,chrome=1' http-equiv='X-UA-Compatible'>
-<meta content='VMware' name='author' />
-<meta content='Copyright 2013 Go Pivotal Inc. All Rights Reserved.'
+<meta content='Pivotal Software, Inc' name='author' />
+<meta content='Copyright 2013 Pivotal Software Inc. All Rights Reserved.' 
     name='copyright' />
 <link href='${rootUrl}favicon.ico' rel='shortcut icon' />
 <meta content='all' name='robots' />
