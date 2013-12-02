@@ -159,7 +159,7 @@
 
 	<util:map id="links">
 		<entry key="home" value="${links.home:https://console.run.pivotal.io}" />
-		<entry key="network" value="${links.network:https://network.gopivotal.com/}" />
+		<entry key="network" value="${links.network:https://network.gopivotal.com/login}" />
 		<entry key="passwd" value="${links.passwd:https://console.run.pivotal.io/password_resets/new}" />
 		<entry key="register" value="${links.signup:https://console.run.pivotal.io/register}" />
         <entry key="registerNetwork" value="${links.signup-network:https://network.gopivotal.com/users/new}" />
