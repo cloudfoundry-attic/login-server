@@ -12,10 +12,9 @@
  */
 package org.cloudfoundry.identity.uaa.login;
 
-import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
-import java.util.HashMap;
-import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -24,21 +23,17 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-public class HomeController {
+public class HomeController extends AbstractControllerInfo {
 	private final Log logger = LogFactory.getLog(getClass());
-	private Map<String,String> links = new HashMap<String, String>();
 
-	/**
-	 * @param links the links to set
-	 */
-	public void setLinks(Map<String, String> links) {
-		this.links = links;
-	}
+	public HomeController() {
+	    initProperties();
+    }
 
-	@RequestMapping(value={"/", "/home"})
+    @RequestMapping(value={"/", "/home"})
 	public String home(Model model, Principal principal) {
 		model.addAttribute("principal", principal);
-		model.addAttribute("links", links );
+		populateBuildAndLinkInfo(model);
 		return "home";
 	}
 

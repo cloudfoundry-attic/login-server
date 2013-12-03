@@ -124,6 +124,7 @@
 	</util:map>
 
 	<bean id="homeController" class="org.cloudfoundry.identity.uaa.login.HomeController">
+	    <property name="uaaBaseUrl" value="${uaa.url:http://localhost:8080/uaa}" />
 		<property name="links" ref="links" />
 	</bean>
 
@@ -154,6 +155,7 @@
 	<bean id="approvalsController" class="org.cloudfoundry.identity.uaa.login.ProfileController">
 		<constructor-arg ref="restTemplate" />
 		<property name="approvalsUri" value="${uaa.approvals.url:http://localhost:8080/uaa/approvals}" />
+		<property name="uaaBaseUrl" value="${uaa.url:http://localhost:8080/uaa}" />
 		<property name="links" ref="links" />
 	</bean>
 

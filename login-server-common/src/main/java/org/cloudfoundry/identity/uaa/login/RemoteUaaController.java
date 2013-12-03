@@ -68,7 +68,7 @@ import org.springframework.web.servlet.view.RedirectView;
  */
 @Controller
 @SessionAttributes(value = "cookie")
-public class RemoteUaaController {
+public class RemoteUaaController extends AbstractControllerInfo {
 
 	private static final Log logger = LogFactory.getLog(RemoteUaaController.class);
 
@@ -82,29 +82,17 @@ public class RemoteUaaController {
 
 	private static final String TRANSFER_ENCODING = "Transfer-Encoding";
 
-	private static final String HOST = "Host";
-
 	protected static final String COOKIE = "Cookie";
 
 	private static final String SET_COOKIE = "Set-Cookie";
 
 	private static final String COOKIE_MODEL = "cookie";
 
-	private static String DEFAULT_BASE_UAA_URL = "https://uaa.cloudfoundry.com";
-
-	private Properties gitProperties = new Properties();
-
-	private Properties buildProperties = new Properties();
 
 	private RestOperations defaultTemplate = new RestTemplate();
 
 	private RestOperations authorizationTemplate = new RestTemplate();
 
-	private String baseUrl;
-
-	private String uaaHost;
-
-	private Map<String, String> links = new HashMap<String, String>();
 
 	private List<Prompt> prompts;
 
@@ -116,13 +104,6 @@ public class RemoteUaaController {
 	 */
 	public void setPrompts(List<Prompt> prompts) {
 		this.prompts = prompts;
-	}
-
-	/**
-	 * @param links the links to set
-	 */
-	public void setLinks(Map<String, String> links) {
-		this.links = links;
 	}
 
 	/**
@@ -169,68 +150,21 @@ public class RemoteUaaController {
 			}
 		});
 		defaultTemplate = template;
-		setUaaBaseUrl(DEFAULT_BASE_UAA_URL);
-		try {
-			gitProperties = PropertiesLoaderUtils.loadAllProperties("git.properties");
-		}
-		catch (IOException e) {
-			// Ignore
-		}
-		try {
-			buildProperties = PropertiesLoaderUtils.loadAllProperties("build.properties");
-		}
-		catch (IOException e) {
-			// Ignore
-		}
+		initProperties();
 	}
 
-	/**
-	 * @param baseUrl the base uaa url
-	 */
-	public void setUaaBaseUrl(String baseUrl) {
-		this.baseUrl = baseUrl;
-		try {
-			this.uaaHost = new URI(baseUrl).getHost();
-		}
-		catch (URISyntaxException e) {
-			throw new IllegalArgumentException("Could not extract host from URI: " + baseUrl);
-		}
-	}
 
-	protected String getUaaBaseUrl() {
-		return baseUrl;
-	}
 
 	@RequestMapping(value = { "/login", "/info" }, method = RequestMethod.GET)
 	public String prompts(HttpServletRequest request, @RequestHeader HttpHeaders headers, Map<String, Object> model,
 			Principal principal) throws Exception {
-		String path = extractPath(request);
-		model.putAll(getLoginInfo(baseUrl + "/" + path, getRequestHeaders(headers)));
-		model.putAll(getBuildInfo());
-		model.put("links", getLinksInfo());
+ 		String path = extractPath(request);
+		model.putAll(getLoginInfo(getUaaBaseUrl() + "/" + path, getRequestHeaders(headers)));
+		populateBuildAndLinkInfo(model);
 		if (principal == null) {
 			return "login";
 		}
 		return "home";
-	}
-
-	protected Map<String, ?> getLinksInfo() {
-		Map<String, Object> model = new HashMap<String, Object>();
-		model.put("uaa", baseUrl);
-		model.put("login", baseUrl.replaceAll("uaa", "login"));
-		model.putAll(links);
-		return model;
-	}
-
-	private Map<String, ?> getBuildInfo() {
-		Map<String, Object> model = new HashMap<String, Object>();
-		model.put("commit_id", gitProperties.getProperty("git.commit.id.abbrev", "UNKNOWN"));
-		model.put(
-				"timestamp",
-				gitProperties.getProperty("git.commit.time",
-						new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date())));
-		model.put("app", UaaStringUtils.getMapFromProperties(buildProperties, "build."));
-		return model;
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -302,7 +236,7 @@ public class RemoteUaaController {
 		@SuppressWarnings("rawtypes")
 		ResponseEntity<Map> response;
 
-		response = authorizationTemplate.exchange(baseUrl + "/" + path, HttpMethod.POST,
+		response = authorizationTemplate.exchange(getUaaBaseUrl() + "/" + path, HttpMethod.POST,
 				new HttpEntity<MultiValueMap<String, String>>(map, requestHeaders), Map.class);
 
 		saveCookie(response.getHeaders(), model);
@@ -368,7 +302,7 @@ public class RemoteUaaController {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
 		Map<String, Object> model = new HashMap<String, Object>();
-		model.putAll(getLoginInfo(baseUrl + "/login", getRequestHeaders(headers)));
+		model.putAll(getLoginInfo(getUaaBaseUrl() + "/login", getRequestHeaders(headers)));
 		model.putAll(getBuildInfo());
 		Map<String, String> error = new LinkedHashMap<String, String>();
 		error.put("error", "rest_client_error");
@@ -435,7 +369,7 @@ public class RemoteUaaController {
 			}
 		}
 
-		ResponseEntity<byte[]> response = defaultTemplate.exchange(baseUrl + "/" + path,
+		ResponseEntity<byte[]> response = defaultTemplate.exchange(getUaaBaseUrl() + "/" + path,
 				HttpMethod.valueOf(request.getMethod()), new HttpEntity<byte[]>(entity.getBody(), requestHeaders),
 				byte[].class);
 		HttpHeaders outgoingHeaders = getResponseHeaders(response.getHeaders());
@@ -458,35 +392,6 @@ public class RemoteUaaController {
 		return outgoingHeaders;
 	}
 
-	protected HttpHeaders getRequestHeaders(HttpHeaders headers) {
-		// Some of the headers coming back are poisonous apparently (content-length?)...
-		HttpHeaders outgoingHeaders = new HttpHeaders();
-		outgoingHeaders.putAll(headers);
-		outgoingHeaders.remove(HOST);
-		outgoingHeaders.remove(HOST.toLowerCase());
-		outgoingHeaders.set(HOST, uaaHost);
-		logger.debug("Outgoing headers: " + outgoingHeaders);
-		return outgoingHeaders;
-	}
-
-	protected String extractPath(HttpServletRequest request) {
-		String query = request.getQueryString();
-		try {
-			query = query == null ? "" : "?" + URLDecoder.decode(query, "UTF-8");
-		}
-		catch (UnsupportedEncodingException e) {
-			throw new IllegalStateException("Cannot decode query string: " + query);
-		}
-		String path = request.getRequestURI() + query;
-		String context = request.getContextPath();
-		path = path.substring(context.length());
-		if (path.startsWith("/")) {
-			// In the root context we have to remove this as well
-			path = path.substring(1);
-		}
-		logger.debug("Path: " + path);
-		return path;
-	}
 
 	public RestOperations getAuthorizationTemplate() {
 		return authorizationTemplate;
