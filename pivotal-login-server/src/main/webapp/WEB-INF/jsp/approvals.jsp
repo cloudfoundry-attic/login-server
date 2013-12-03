@@ -186,6 +186,20 @@
             </c:if>
         </div>
     </div>
+    <div class='footer' title="Version: ${app.version}, Commit: ${commit_id}, Timestamp: ${timestamp}, UAA: ${links.uaa}">
+        <div class='copyright'>
+            &copy;
+            <fmt:formatDate value="<%=new java.util.Date()%>" pattern="yyyy" />
+            Go Pivotal, Inc. - All rights reserved
+        </div>
+        <div class='powered-by'>
+            Powered by
+            <div class='logo'>
+                Pivotal
+            </div>
+        </div>
+    </div>
+    
     <c:if test="${not empty analytics}">
         <script>
             (function(i, s, o, g, r, a, m) {

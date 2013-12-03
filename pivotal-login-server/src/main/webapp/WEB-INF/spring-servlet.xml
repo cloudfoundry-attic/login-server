@@ -165,10 +165,6 @@
         <entry key="registerNetwork" value="${links.signup-network:https://network.gopivotal.com/users/new}" />
 	</util:map>
 
-	<bean id="homeController" class="org.cloudfoundry.identity.uaa.login.HomeController">
-		<property name="links" ref="links" />
-	</bean>
-
 	<bean id="autologinController" class="org.cloudfoundry.identity.uaa.login.AutologinController">
 		<property name="codeStore" ref="autologinCodeStore" />
 		<property name="authenticationManager" ref="remoteAuthenticationManager" />

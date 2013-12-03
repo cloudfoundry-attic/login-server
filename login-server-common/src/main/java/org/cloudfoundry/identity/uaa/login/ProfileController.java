@@ -25,11 +25,9 @@ import org.springframework.web.client.RestOperations;
  * @author Vidya Valmikinathan
  */
 @Controller
-public class ProfileController implements InitializingBean {
+public class ProfileController extends AbstractControllerInfo implements InitializingBean {
 
 	private String approvalsUri;
-
-	private Map<String, String> links = new HashMap<String, String>();
 
 	private final RestOperations restTemplate;
 
@@ -37,6 +35,7 @@ public class ProfileController implements InitializingBean {
 
 	public ProfileController(RestOperations restTemplate) {
 		this.restTemplate = restTemplate;
+		initProperties();
 	}
 
 	/**
@@ -47,12 +46,6 @@ public class ProfileController implements InitializingBean {
 		this.approvalsUri = approvalsUri;
 	}
 
-	/**
-	 * @param links the links to set
-	 */
-	public void setLinks(Map<String, String> links) {
-		this.links = links;
-	}
 
 	/**
 	 * Display the current user's approvals
@@ -61,7 +54,8 @@ public class ProfileController implements InitializingBean {
 	public String get(Model model) {
 		Map<String, List<Object>> approvals = getCurrentApprovals();
 		model.addAttribute("approvals", approvals);
-		model.addAttribute("links", links);
+		populateBuildAndLinkInfo(model);
+		model.addAttribute("links", getLinks());
 		return "approvals";
 	}
 
