@@ -94,7 +94,7 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
         <div class='copyright'>
             &copy;
             <fmt:formatDate value="<%=new java.util.Date()%>" pattern="yyyy" />
-            Go Pivotal, Inc. - All rights reserved
+            Pivotal Software, Inc. - All rights reserved
         </div>
         <div class='powered-by'>
             Powered by
