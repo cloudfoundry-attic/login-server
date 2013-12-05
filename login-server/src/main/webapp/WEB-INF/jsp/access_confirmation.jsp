@@ -85,7 +85,7 @@
 	<div class="approvals">
 		<a href='${links.home}/'><img
 			alt="Cloud Foundry: The Industry's Open Platform As A Service"
-			class="logo" src='${baseUrl}/images/logo_cloud_foundry_by_pivotal.png'
+			class="logo" src='${baseUrl}/images/logo-cloudfoundry.png'
 			width='414' height='70'></img> </a>
 		<div style="float: right;">
 			<ul class='super-nav'>

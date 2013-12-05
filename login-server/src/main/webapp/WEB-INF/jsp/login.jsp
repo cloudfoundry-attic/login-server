@@ -1,4 +1,4 @@
-<%--
+<%-- FILIP HANIK
 
     Cloud Foundry 2012.02.03 Beta
     Copyright (c) [2009-2012] VMware, Inc. All Rights Reserved.
@@ -32,7 +32,7 @@
 <html class='no-js' dir='ltr' lang='en'>
 <!-- <![endif] -->
 <head>
-<title>Cloud Foundry [BETA]</title>
+<title>Cloud Foundry</title>
 <meta charset='utf-8'>
 <meta content='IE=edge,chrome=1' http-equiv='X-UA-Compatible'>
 <meta content='Pivotal Software, Inc' name='author' />
@@ -100,7 +100,7 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 	<div class="splash">
 		<a href='${links.home}/'><img
 			alt="Cloud Foundry: The Industry's Open Platform As A Service"
-			class="logo" src='${baseUrl}/images/logo_cloud_foundry_by_pivotal.png'
+			class="logo" src='${baseUrl}/images/logo-cloudfoundry.png'
 			width='414' height='70'></img> </a>
 		<div class="splash-box">
 			<div class="container">

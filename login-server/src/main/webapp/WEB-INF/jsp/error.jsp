@@ -78,7 +78,7 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 	<div class="splash">
 		<a href='${links.home}/'><img
 			alt="Cloud Foundry: The Industry's Open Platform As A Service"
-			class="logo" src='${baseUrl}/images/logo_cloud_foundry_by_pivotal.png'
+			class="logo" src='${baseUrl}/images/logo-cloudfoundry.png'
 			width='414' height='70'></img> </a>
 		<div class="splash-box-blank">
 			<div class="container">
