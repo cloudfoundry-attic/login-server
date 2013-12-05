@@ -79,7 +79,7 @@
 	</developers>
 
 	<properties>
-		<identity.version>1.4.4</identity.version>
+		<identity.version>1.4.6</identity.version>
 		<spring.version>3.1.2.RELEASE</spring.version>
 		<groupId>${project.groupId}</groupId>
 		<version>${project.version}</version>
