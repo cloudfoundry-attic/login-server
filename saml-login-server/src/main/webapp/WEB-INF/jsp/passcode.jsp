@@ -84,11 +84,6 @@
                 </div>
 
                 <div class="content-inner-approvals">
-                    <p class="right">
-                        Looking for <a href="http://micro.cloudfoundry.com">Micro</a> or <a
-                            href="http://support.cloudfoundry.com">Support</a> ?
-                    </p>
-
                     <p>
                         <strong>Username:</strong>
                         ${fn:escapeXml(pageContext.request.userPrincipal.name)}
