@@ -61,8 +61,8 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 <body>
     <div class="container">
         <div class="header">
-            <div class="image-logo"></div>
-            <div class="logo">PIVOTAL</div>
+            <a style="text-decoration: none;" href='${rootUrl}'><div class="image-logo"></div></a>
+            <div class="logo"><a style="text-decoration: none;" href='${rootUrl}'>PIVOTAL</a></div>
             <div class="header-link">
                 <a href="${rootUrl}logout.do" class="h4">Sign out</a>
             </div>
