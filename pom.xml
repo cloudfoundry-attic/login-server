@@ -11,7 +11,7 @@
 
 	<groupId>com.cloudfoundry.identity</groupId>
 	<artifactId>cloudfoundry-login-server-parent</artifactId>
-	<version>1.2.8</version>
+	<version>1.2.9</version>
 	<packaging>pom</packaging>
 	<name>Cloud Foundry Login</name>
 	<description>Cloud Foundry Login Servers</description>
@@ -48,6 +48,14 @@
 				<enabled>false</enabled>
 			</snapshots>
 		</repository>
+        <repository>
+            <id>spring-external</id>
+            <name>Spring External</name>
+            <url>http://repo.springsource.org/ext-release-local</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
 	</repositories>
 
 	<developers>
@@ -79,7 +87,7 @@
 	</developers>
 
 	<properties>
-		<identity.version>1.4.4</identity.version>
+		<identity.version>1.4.6</identity.version>
 		<spring.version>3.1.2.RELEASE</spring.version>
 		<groupId>${project.groupId}</groupId>
 		<version>${project.version}</version>

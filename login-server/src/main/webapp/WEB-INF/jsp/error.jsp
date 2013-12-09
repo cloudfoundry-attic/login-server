@@ -35,9 +35,9 @@
 <title>Success | Cloud Foundry</title>
 <meta charset='utf-8'>
 <meta content='IE=edge,chrome=1' http-equiv='X-UA-Compatible'>
-<meta content='VMwarrootUrle' name='author' />
-<meta content='Copyright VMware 2011. All Rights Reserved.'
-	name='copyright' />
+<meta content='Pivotal Software, Inc' name='author' />
+<meta content='Copyright 2013 Pivotal Software Inc. All Rights Reserved.' 
+    name='copyright' />
 <link href='${rootUrl}favicon.ico' rel='shortcut icon' />
 <meta content='all' name='robots' />
 <link href='${baseUrl}/stylesheets/print.css' media='print'
@@ -78,8 +78,7 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 	<div class="splash">
 		<a href='${links.home}/'><img
 			alt="Cloud Foundry: The Industry's Open Platform As A Service"
-			class="logo" src='${baseUrl}/images/logo_cloud_foundry_by_pivotal.png'
-			width='414' height='70'></img> </a>
+			class="logo" src='${baseUrl}/images/logo-cloudfoundry.png'></img> </a>
 		<div class="splash-box-blank">
 			<div class="container">
 				<p class="intro-text">Sorry!</p>
@@ -91,7 +90,7 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 		<div class="footer">
 				&copy;
 				<fmt:formatDate value="<%=new java.util.Date()%>" pattern="yyyy" />
-				GoPivotal, Inc. All rights reserved.
+				Pivotal Software, Inc. All rights reserved.
 		</div>
 	</div>
 	<c:if test="${not empty analytics}">

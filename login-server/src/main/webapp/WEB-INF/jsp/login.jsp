@@ -32,12 +32,12 @@
 <html class='no-js' dir='ltr' lang='en'>
 <!-- <![endif] -->
 <head>
-<title>Cloud Foundry [BETA]</title>
+<title>Cloud Foundry</title>
 <meta charset='utf-8'>
 <meta content='IE=edge,chrome=1' http-equiv='X-UA-Compatible'>
-<meta content='VMware' name='author' />
-<meta content='Copyright 2013 Go Pivotal Inc. All Rights Reserved.'
-	name='copyright' />
+<meta content='Pivotal Software, Inc' name='author' />
+<meta content='Copyright 2013 Pivotal Software Inc. All Rights Reserved.' 
+    name='copyright' />
 <link href='${rootUrl}favicon.ico' rel='shortcut icon' />
 <meta content='all' name='robots' />
 <link href='${baseUrl}/stylesheets/print.css' media='print'
@@ -100,8 +100,7 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 	<div class="splash">
 		<a href='${links.home}/'><img
 			alt="Cloud Foundry: The Industry's Open Platform As A Service"
-			class="logo" src='${baseUrl}/images/logo_cloud_foundry_by_pivotal.png'
-			width='414' height='70'></img> </a>
+			class="logo" src='${baseUrl}/images/logo-cloudfoundry.png'></img> </a>
 		<div class="splash-box">
 			<div class="container">
 				<form id="loginForm" name="loginForm"
@@ -129,7 +128,7 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 			title="Version: ${app.version}, Commit: ${commit_id}, Timestamp: ${timestamp}, UAA: ${links.uaa}">
 			&copy;
 			<fmt:formatDate value="<%=new java.util.Date()%>" pattern="yyyy" />
-			GoPivotal, Inc. All rights reserved.
+			Pivotal Software, Inc. All rights reserved.
 		</div>
 	</div>
 

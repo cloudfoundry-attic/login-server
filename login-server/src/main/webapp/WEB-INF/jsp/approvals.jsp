@@ -36,9 +36,9 @@
 <title>Account Settings | Cloud Foundry</title>
 <meta charset='utf-8'>
 <meta content='IE=edge,chrome=1' http-equiv='X-UA-Compatible'>
-<meta content='VMware' name='author' />
-<meta content='Copyright VMware 2011. All Rights Reserved.'
-	name='copyright' />
+<meta content='Pivotal Software, Inc' name='author' />
+<meta content='Copyright 2013 Pivotal Software Inc. All Rights Reserved.' 
+    name='copyright' />
 <link href='${rootUrl}favicon.ico' rel='shortcut icon' />
 <meta content='all' name='robots' />
 <link href='${baseUrl}/stylesheets/print.css' media='print'
@@ -114,8 +114,7 @@
 	<div class="approvals">
 		<a href='${links.home}/'><img
 			alt="Cloud Foundry: The Industry's Open Platform As A Service"
-			class="logo" src='${baseUrl}/images/logo_cloud_foundry_by_pivotal.png'
-			width='414' height='70'></img> </a>
+			class="logo" src='${baseUrl}/images/logo-cloudfoundry.png'></img> </a>
 		<div style="float: right;">
 			<ul class='super-nav'>
 				<li><span>Welcome <a href="${rootUrl}profile"><strong>${fn:escapeXml(pageContext.request.userPrincipal.name)}</strong></a></span>
@@ -142,11 +141,6 @@
 				</div>
 
 				<div class="content-inner-approvals">
-					<p class="right">
-						Looking for <a href="http://micro.cloudfoundry.com">Micro</a> or <a
-							href="http://support.cloudfoundry.com">Support</a> ?
-					</p>
-
 					<p>
 						<strong>Username:</strong>
 						${fn:escapeXml(pageContext.request.userPrincipal.name)}
@@ -218,7 +212,7 @@
 		<div class="footer">
 			&copy;
 			<fmt:formatDate value="<%=new java.util.Date()%>" pattern="yyyy" />
-			GoPivotal, Inc. All rights reserved.
+			Pivotal Software, Inc. All rights reserved.
 		</div>
 	</div>
 	<c:if test="${not empty analytics}">

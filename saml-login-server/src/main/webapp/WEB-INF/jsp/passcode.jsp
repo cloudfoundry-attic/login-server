@@ -36,8 +36,8 @@
 <title>Passcode | Cloud Foundry</title>
 <meta charset='utf-8'>
 <meta content='IE=edge,chrome=1' http-equiv='X-UA-Compatible'>
-<meta content='VMware' name='author' />
-<meta content='Copyright VMware 2011. All Rights Reserved.'
+<meta content='Pivotal Software, Inc' name='author' />
+<meta content='Copyright 2013 Pivotal Software Inc. All Rights Reserved.' 
     name='copyright' />
 <link href='${rootUrl}favicon.ico' rel='shortcut icon' />
 <meta content='all' name='robots' />
@@ -84,11 +84,6 @@
                 </div>
 
                 <div class="content-inner-approvals">
-                    <p class="right">
-                        Looking for <a href="http://micro.cloudfoundry.com">Micro</a> or <a
-                            href="http://support.cloudfoundry.com">Support</a> ?
-                    </p>
-
                     <p>
                         <strong>Username:</strong>
                         ${fn:escapeXml(pageContext.request.userPrincipal.name)}
@@ -106,7 +101,7 @@
         <div class="footer">
             &copy;
             <fmt:formatDate value="<%=new java.util.Date()%>" pattern="yyyy" />
-            GoPivotal, Inc. All rights reserved.
+            Pivotal Software, Inc. All rights reserved.
         </div>
     </div>
     <c:if test="${not empty analytics}">
