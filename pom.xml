@@ -48,6 +48,14 @@
 				<enabled>false</enabled>
 			</snapshots>
 		</repository>
+        <repository>
+            <id>spring-external</id>
+            <name>Spring External</name>
+            <url>http://repo.springsource.org/ext-release-local</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
 	</repositories>
 
 	<developers>
