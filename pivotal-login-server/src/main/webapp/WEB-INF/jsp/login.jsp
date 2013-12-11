@@ -113,7 +113,7 @@
             <div class="h1">Not a member yet?</div>
             <p class="h4">
                 Join <a href="${links.registerNetwork}">Pivotal Network</a> for enterprise,<br />
-                or <a href="${links.register}">Pivotal Webservices</a> for hosted solutions.
+                or <a href="${links.register}">Pivotal Web Services</a> for hosted solutions.
             </p>
         </div>
     </div>
