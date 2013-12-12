@@ -186,7 +186,7 @@
 													<input type="checkbox" name="checkedScopes"
 														value="${approval.clientId}-${approval.scope}"
 														${approval.status eq 'APPROVED' ? 'checked=checked' : '' }>
-													<spring:message code="scope.${approval.scope}" />
+													<spring:message code="scope.${approval.scope}" text="scope.${approval.scope}" />
 												</div>
 											</c:forEach>
 
@@ -209,11 +209,12 @@
 
 		</div>
 
-		<div class="footer">
-			&copy;
-			<fmt:formatDate value="<%=new java.util.Date()%>" pattern="yyyy" />
-			Pivotal Software, Inc. All rights reserved.
-		</div>
+        <div class="footer"
+            title="Version: ${app.version}, Commit: ${commit_id}, Timestamp: ${timestamp}, UAA: ${links.uaa}">
+            &copy;
+            <fmt:formatDate value="<%=new java.util.Date()%>" pattern="yyyy" />
+            Pivotal Software, Inc. All rights reserved.
+        </div>
 	</div>
 	<c:if test="${not empty analytics}">
 		<script>
