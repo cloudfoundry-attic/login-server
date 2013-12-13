@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>org.cloudfoundry.identity</groupId>
 		<artifactId>cloudfoundry-identity-parent</artifactId>
-		<version>1.4.3</version>
+		<version>1.5.0-SNAPSHOT</version>
 	</parent>
 
 	<groupId>com.cloudfoundry.identity</groupId>
@@ -36,7 +36,7 @@
 		</repository>
 		<repository>
 			<!-- necessary for Spring Security OAuth SNAPSHOT dependency -->
-			<id>spring-snapshost</id>
+			<id>spring-snapshot</id>
 			<name>Spring Framework Maven Snapshot Repository</name>
 			<url>http://maven.springframework.org/snapshot</url>
 		</repository>
@@ -392,9 +392,9 @@
 		</pluginManagement>
 		<extensions>
 			<extension>
-				<groupId>org.springframework.build.aws</groupId>
-				<artifactId>org.springframework.build.aws.maven</artifactId>
-				<version>3.0.0.RELEASE</version>
+				<groupId>org.springframework.build</groupId>
+				<artifactId>aws-maven</artifactId>
+				<version>5.0.0.BUILD-SNAPSHOT</version>
 			</extension>
 		</extensions>
 	</build>
