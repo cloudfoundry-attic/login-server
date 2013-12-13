@@ -555,7 +555,16 @@
           <enabled>false</enabled>
         </snapshots>
       </pluginRepository>
-	</pluginRepositories>
+      <pluginRepository>
+          <!-- necessary for Spring Security OAuth SNAPSHOT dependency -->
+          <id>spring-snapshot</id>
+          <name>Spring Framework Maven Snapshot Repository</name>
+          <url>http://maven.springframework.org/snapshot</url>
+          <snapshots>
+              <enabled>true</enabled>
+          </snapshots>
+      </pluginRepository>
+        </pluginRepositories>
     <scm>
       <url>http://github.com/cloudfoundry/login-server</url>
       <connection>scm:git:git://github.com/cloudfoundry/login-server.git</connection>
