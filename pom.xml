@@ -39,6 +39,7 @@
 			<id>spring-snapshot</id>
 			<name>Spring Framework Maven Snapshot Repository</name>
 			<url>http://maven.springframework.org/snapshot</url>
+            <snapshots><enabled>true</enabled></snapshots>
 		</repository>
 		<repository>
 			<id>objectstyle</id>
