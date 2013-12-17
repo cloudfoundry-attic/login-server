@@ -28,6 +28,8 @@
 			<id>spring-release</id>
 			<name>Spring Framework Release Repository</name>
 			<url>http://maven.springframework.org/release</url>
+            <snapshots><enabled>false</enabled></snapshots>
+            <releases><enabled>true</enabled></releases>
 		</repository>
 		<repository>
 			<id>spring-milestone</id>
@@ -40,22 +42,19 @@
 			<name>Spring Framework Maven Snapshot Repository</name>
 			<url>http://maven.springframework.org/snapshot</url>
             <snapshots><enabled>true</enabled></snapshots>
+            <releases><enabled>false</enabled></releases>
 		</repository>
 		<repository>
 			<id>objectstyle</id>
 			<name>ObjectStyle.org Repository</name>
 			<url>http://objectstyle.org/maven2/</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
+			<snapshots><enabled>false</enabled></snapshots>
 		</repository>
         <repository>
             <id>spring-external</id>
             <name>Spring External</name>
             <url>http://repo.springsource.org/ext-release-local</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
+            <snapshots><enabled>false</enabled></snapshots>
         </repository>
 	</repositories>
 
