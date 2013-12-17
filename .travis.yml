@@ -1,5 +1,5 @@
 language: java
 before_install: mvn -v
-install: mvn -U install -X -DskipTests=true
+install: mvn -U install -X -e -DskipTests=true
 script: mvn clean test
 
