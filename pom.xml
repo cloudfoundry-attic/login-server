@@ -6,12 +6,12 @@
 	<parent>
 		<groupId>org.cloudfoundry.identity</groupId>
 		<artifactId>cloudfoundry-identity-parent</artifactId>
-		<version>1.4.6</version>
+		<version>1.4.7</version>
 	</parent>
 
 	<groupId>com.cloudfoundry.identity</groupId>
 	<artifactId>cloudfoundry-login-server-parent</artifactId>
-	<version>1.2.9</version>
+	<version>1.2.10</version>
 	<packaging>pom</packaging>
 	<name>Cloud Foundry Login</name>
 	<description>Cloud Foundry Login Servers</description>
@@ -28,6 +28,8 @@
 			<id>spring-release</id>
 			<name>Spring Framework Release Repository</name>
 			<url>http://maven.springframework.org/release</url>
+            <snapshots><enabled>false</enabled></snapshots>
+            <releases><enabled>true</enabled></releases>
 		</repository>
 		<repository>
 			<id>spring-milestone</id>
@@ -36,25 +38,23 @@
 		</repository>
 		<repository>
 			<!-- necessary for Spring Security OAuth SNAPSHOT dependency -->
-			<id>spring-snapshost</id>
+			<id>spring-snapshot</id>
 			<name>Spring Framework Maven Snapshot Repository</name>
 			<url>http://maven.springframework.org/snapshot</url>
+            <snapshots><enabled>true</enabled></snapshots>
+            <releases><enabled>false</enabled></releases>
 		</repository>
 		<repository>
 			<id>objectstyle</id>
 			<name>ObjectStyle.org Repository</name>
 			<url>http://objectstyle.org/maven2/</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
+			<snapshots><enabled>false</enabled></snapshots>
 		</repository>
         <repository>
             <id>spring-external</id>
             <name>Spring External</name>
             <url>http://repo.springsource.org/ext-release-local</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
+            <snapshots><enabled>false</enabled></snapshots>
         </repository>
 	</repositories>
 
@@ -87,7 +87,7 @@
 	</developers>
 
 	<properties>
-		<identity.version>1.4.6</identity.version>
+		<identity.version>1.5.0-SNAPSHOT</identity.version>
 		<spring.version>3.1.2.RELEASE</spring.version>
 		<groupId>${project.groupId}</groupId>
 		<version>${project.version}</version>
@@ -392,9 +392,9 @@
 		</pluginManagement>
 		<extensions>
 			<extension>
-				<groupId>org.springframework.build.aws</groupId>
-				<artifactId>org.springframework.build.aws.maven</artifactId>
-				<version>3.0.0.RELEASE</version>
+				<groupId>org.springframework.build</groupId>
+				<artifactId>aws-maven</artifactId>
+				<version>5.0.0.BUILD-SNAPSHOT</version>
 			</extension>
 		</extensions>
 	</build>
@@ -555,7 +555,16 @@
           <enabled>false</enabled>
         </snapshots>
       </pluginRepository>
-	</pluginRepositories>
+      <pluginRepository>
+          <!-- necessary for Spring Security OAuth SNAPSHOT dependency -->
+          <id>spring-snapshot</id>
+          <name>Spring Framework Maven Snapshot Repository</name>
+          <url>http://maven.springframework.org/snapshot</url>
+          <snapshots>
+              <enabled>true</enabled>
+          </snapshots>
+      </pluginRepository>
+        </pluginRepositories>
     <scm>
       <url>http://github.com/cloudfoundry/login-server</url>
       <connection>scm:git:git://github.com/cloudfoundry/login-server.git</connection>
@@ -570,12 +579,12 @@
     </licenses>
 	<distributionManagement>
 		<repository>
-			<id>spring-release</id>
+			<id>spring-release-write</id>
 			<name>Spring Release Repository</name>
 			<url>s3://maven.springframework.org/release</url>
 		</repository>
 		<snapshotRepository>
-			<id>spring-snapshot</id>
+			<id>spring-snapshot-write</id>
 			<name>Spring Snapshot Repository</name>
 			<url>s3://maven.springframework.org/snapshot</url>
 		</snapshotRepository>

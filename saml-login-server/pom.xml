@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>com.cloudfoundry.identity</groupId>
 		<artifactId>cloudfoundry-login-server-parent</artifactId>
-		<version>1.2.9</version>
+		<version>1.2.10</version>
 		<relativePath>..</relativePath>
 	</parent>
 
@@ -188,7 +188,7 @@
 		</repository>
 		<repository>
 			<!-- necessary for Spring Security OAuth SNAPSHOT dependency -->
-			<id>spring-snapshost</id>
+			<id>spring-snapshot</id>
 			<name>Spring Framework Maven Snapshot Repository</name>
 			<url>http://maven.springframework.org/snapshot</url>
 		</repository>
