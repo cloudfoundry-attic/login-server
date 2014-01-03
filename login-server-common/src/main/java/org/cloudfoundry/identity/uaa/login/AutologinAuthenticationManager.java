@@ -16,6 +16,7 @@ package org.cloudfoundry.identity.uaa.login;
 import java.util.Map;
 
 import org.cloudfoundry.identity.uaa.authentication.AuthzAuthenticationRequest;
+import org.cloudfoundry.identity.uaa.authentication.UaaAuthenticationDetails;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -51,6 +52,23 @@ public class AutologinAuthenticationManager implements AuthenticationManager {
 		if (user == null) {
 			throw new BadCredentialsException("Cannot redeem provided code for user");
 		}
+		
+		//ensure that we stored clientId
+		String clientId = (String)user.getDetails();
+		if (clientId == null){
+            throw new BadCredentialsException("Cannot redeem provided code for user, client id missing");
+        }
+		
+		//validate the client Id
+		if (!(authentication.getDetails() instanceof UaaAuthenticationDetails)) {
+		    throw new BadCredentialsException("Cannot redeem provided code for user, auth details missing");
+		}
+		
+		UaaAuthenticationDetails details = (UaaAuthenticationDetails)authentication.getDetails();
+		if (!clientId.equals(details.getClientId())) {
+		    throw new BadCredentialsException("Cannot redeem provided code for user, client mismatch");
+		}
+		
 
 		UsernamePasswordAuthenticationToken result = new UsernamePasswordAuthenticationToken(user, null,
 				user.getAuthorities());
