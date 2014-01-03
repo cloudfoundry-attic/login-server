@@ -14,8 +14,10 @@
 package org.cloudfoundry.identity.uaa.login;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.cloudfoundry.identity.uaa.authentication.AuthzAuthenticationRequest;
@@ -37,6 +39,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -70,7 +73,12 @@ public class AutologinController {
 
 	@RequestMapping(value = "/autologin", method = RequestMethod.POST)
 	@ResponseBody
-	public AutologinResponse generateAutologinCode(@RequestBody AutologinRequest request) throws Exception {
+	public AutologinResponse generateAutologinCode(@RequestBody AutologinRequest request, 
+	                                               @RequestHeader(value="Authorization", required=false) String auth) throws Exception {
+	    if (auth==null || (!auth.startsWith("Basic"))) {
+	        throw new BadCredentialsException("No basic authorization client information in request");
+	    }
+	    
 		String username = request.getUsername();
 		if (username == null) {
 			throw new BadCredentialsException("No username in request");
@@ -82,8 +90,19 @@ public class AutologinController {
 			}
 			authenticationManager.authenticate(new AuthzAuthenticationRequest(username, password, null));
 		}
-		logger.info("Autologin authentication request for " + username);
+		
+		String base64Credentials = auth.substring("Basic".length()).trim();
+		String credentials = new String(new Base64().decode(base64Credentials.getBytes()),Charset.forName("UTF-8"));
+        // credentials = username:password
+        final String[] values = credentials.split(":",2);
+        if (values==null || values.length==0) {
+            throw new BadCredentialsException("Invalid authorization header.");
+        }
+        String clientId = values[0];
+		
+		logger.info("Autologin authentication request for user:" + username +"; client:"+clientId);
 		SocialClientUserDetails user = new SocialClientUserDetails(username, UaaAuthority.USER_AUTHORITIES);
+		user.setDetails(clientId);
 		return new AutologinResponse(codeStore.storeUser(user));
 	}
 

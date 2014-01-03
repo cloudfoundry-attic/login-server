@@ -16,6 +16,7 @@ package org.cloudfoundry.identity.uaa.login.integration;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -47,10 +48,12 @@ public class AutologinContollerIntegrationTests {
 	private UaaTestAccounts testAccounts = UaaTestAccounts.standard(serverRunning);
 
 	private HttpHeaders headers = new HttpHeaders();
+	
+	AuthorizationCodeResourceDetails client = null;
 
 	@Before
 	public void init() {
-		AuthorizationCodeResourceDetails client = testAccounts.getDefaultAuthorizationCodeResource();
+		client = testAccounts.getDefaultAuthorizationCodeResource();
 		headers.set("Authorization",
 				testAccounts.getAuthorizationHeader(client.getClientId(), client.getClientSecret()));
 		headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
@@ -112,4 +115,61 @@ public class AutologinContollerIntegrationTests {
 		assertNull(result.get("code"));
 	}
 
+    @Test
+    public void testFullCycle() {
+        AutologinRequest request = new AutologinRequest();
+        request.setUsername(testAccounts.getUserName());
+        request.setPassword(testAccounts.getPassword());
+        @SuppressWarnings("rawtypes")
+        ResponseEntity<Map> entity = serverRunning.getRestTemplate().exchange(serverRunning.getUrl("/autologin"),
+                HttpMethod.POST, new HttpEntity<AutologinRequest>(request, headers), Map.class);
+        assertEquals(HttpStatus.OK, entity.getStatusCode());
+        @SuppressWarnings("unchecked")
+        Map<String, Object> result = (Map<String, Object>) entity.getBody();
+        assertNotNull(result.get("code"));
+        
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<String, String>();
+        
+        String redir = "http://www.google.com";
+        String expectedredir = "["+redir+"?code=";
+        
+        params.set("redirect_uri", redir);
+        params.set("response_type", "code");
+        params.set("scope", "openid");
+        params.set("client_id", client.getClientId());
+        params.set("code", result.get("code").toString());
+        ResponseEntity<Void> getentity = serverRunning.getForResponse(serverRunning.getAuthorizationUri(), params, headers, params);
+        assertEquals(HttpStatus.FOUND, getentity.getStatusCode());
+        assertTrue(getentity.getHeaders().getFirst("Location").startsWith(expectedredir));
+    }
+
+    @Test
+    public void testClientSwitch() {
+        AutologinRequest request = new AutologinRequest();
+        request.setUsername(testAccounts.getUserName());
+        request.setPassword(testAccounts.getPassword());
+        @SuppressWarnings("rawtypes")
+        ResponseEntity<Map> entity = serverRunning.getRestTemplate().exchange(serverRunning.getUrl("/autologin"),
+                HttpMethod.POST, new HttpEntity<AutologinRequest>(request, headers), Map.class);
+        assertEquals(HttpStatus.OK, entity.getStatusCode());
+        @SuppressWarnings("unchecked")
+        Map<String, Object> result = (Map<String, Object>) entity.getBody();
+        assertNotNull(result.get("code"));
+        
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<String, String>();
+        
+        String redir = "http://www.google.com";
+        String expectedredir = "["+redir+"?code=";
+        
+        params.set("redirect_uri", redir);
+        params.set("response_type", "code");
+        params.set("scope", "openid");
+        params.set("client_id", "otherclient");
+        headers.remove("Authorization");
+        params.set("code", result.get("code").toString());
+        ResponseEntity<Void> getentity = serverRunning.getForResponse(serverRunning.getAuthorizationUri(), params, headers, params);
+        assertEquals(HttpStatus.UNAUTHORIZED, getentity.getStatusCode());
+    }
+    
+    
 }

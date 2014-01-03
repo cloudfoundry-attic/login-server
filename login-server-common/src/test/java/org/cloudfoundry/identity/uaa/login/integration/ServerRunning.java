@@ -17,6 +17,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -326,6 +327,18 @@ public class ServerRunning implements MethodRule, RestTemplateHolder, UrlHelper 
 		HttpEntity<Void> request = new HttpEntity<Void>(null, headers);
 		return client.exchange(getUrl(path), HttpMethod.GET, request, null, uriVariables);
 	}
+	
+	public ResponseEntity<Void> getForResponse(String path, MultiValueMap<String, String> params, final HttpHeaders headers, Object... uriVariables) {
+        HttpEntity<Void> request = new HttpEntity<Void>(null, headers);
+        String url = getUrl(path);
+        UriBuilder builder = new UriBuilder(url);
+        for (Map.Entry<String,List<String>> entry : params.entrySet()) {
+            for (String s : entry.getValue()) {
+                builder.queryParam(entry.getKey(), s);
+            }
+        }
+        return client.exchange(builder.buildString(), HttpMethod.GET, request, null, uriVariables);
+    }
 
 	public ResponseEntity<Void> postForResponse(String path, HttpHeaders headers, MultiValueMap<String, String> params) {
 		HttpHeaders actualHeaders = new HttpHeaders();
@@ -409,34 +422,42 @@ public class ServerRunning implements MethodRule, RestTemplateHolder, UrlHelper 
 			params.add(key, value);
 			return this;
 		}
+		
+		public String buildString() {
+            StringBuilder builder = new StringBuilder(url);
+            try {
+                if (!params.isEmpty()) {
+                    builder.append("?");
+                    boolean first = true;
+                    for (String key : params.keySet()) {
+                        if (!first) {
+                            builder.append("&");
+                        }
+                        else {
+                            first = false;
+                        }
+                        for (String value : params.get(key)) {
+                            builder.append(key + "=" + UriUtils.encodeQueryParam(value, "UTF-8"));
+                        }
+                    }
+                }
+                return builder.toString();
+            }
+            catch (UnsupportedEncodingException ex) {
+                // should not happen, UTF-8 is always supported
+                throw new IllegalStateException(ex);
+            }
+		    
+		}
 
 		public URI build() {
-			StringBuilder builder = new StringBuilder(url);
-			try {
-				if (!params.isEmpty()) {
-					builder.append("?");
-					boolean first = true;
-					for (String key : params.keySet()) {
-						if (!first) {
-							builder.append("&");
-						}
-						else {
-							first = false;
-						}
-						for (String value : params.get(key)) {
-							builder.append(key + "=" + UriUtils.encodeQueryParam(value, "UTF-8"));
-						}
-					}
-				}
-				return new URI(builder.toString());
-			}
-			catch (UnsupportedEncodingException ex) {
-				// should not happen, UTF-8 is always supported
-				throw new IllegalStateException(ex);
-			}
-			catch (URISyntaxException ex) {
-				throw new IllegalArgumentException("Could not create URI from [" + builder + "]: " + ex, ex);
-			}
+		    String s = buildString();
+		    try {
+		        return new URI(s);
+		    }
+            catch (URISyntaxException ex) {
+                throw new IllegalArgumentException("Could not create URI from [" + s + "]: " + ex, ex);
+            }
 		}
 
 	}
