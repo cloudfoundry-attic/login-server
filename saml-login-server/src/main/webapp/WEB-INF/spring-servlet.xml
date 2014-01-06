@@ -24,7 +24,9 @@
               http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd
               http://www.springframework.org/schema/security/oauth2 http://www.springframework.org/schema/security/spring-security-oauth2-1.0.xsd
               http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache-3.1.xsd">
-
+    
+    
+    
 	<context:annotation-config />
 
 	<security:http pattern="/saml/web/**" security="none" />
@@ -323,8 +325,10 @@
 	<!-- IDP Discovery Service -->
 	<bean id="samlIDPDiscovery" class="org.springframework.security.saml.SAMLDiscovery" />
 
+    <bean id="trustVsphere" class="org.cloudfoundry.identity.uaa.login.ssl.TrustManager" lazy-init="false" init-method="init"/>
+
 	<!-- Filter automatically generates default SP metadata -->
-	<bean id="metadataGeneratorFilter"
+	<bean id="metadataGeneratorFilter" depends-on="trustVsphere"
 		class="org.springframework.security.saml.metadata.MetadataGeneratorFilter">
 		<constructor-arg>
 			<bean class="org.springframework.security.saml.metadata.MetadataGenerator">
@@ -565,7 +569,7 @@
     <bean id="metadataProviderList" class="java.util.ArrayList">
         <constructor-arg>
 		  	<list>
-				<bean
+				<bean depends-on="trustVsphere"
 					class="org.springframework.security.saml.metadata.ExtendedMetadataDelegate">
 					<constructor-arg>
 						<bean class="org.opensaml.saml2.metadata.provider.HTTPMetadataProvider">

@@ -1,25 +1,7 @@
----
-# Cloud Foundry 2012.02.03 Beta
-# Copyright (c) [2009-2012] VMware, Inc. All Rights Reserved.
-#
-# This product is licensed to you under the Apache License, Version 2.0 (the "License").
-# You may not use this product except in compliance with the License.
-#
-# This product includes a number of subcomponents with
-# separate copyright notices and license terms. Your use of these
-# subcomponents is subject to the terms and conditions of the
-# subcomponent's license, as noted in the LICENSE file.
-
 login:
   url: http://localhost:8080/login
-  # The entity base url is the location of this application
-  # (The host and port of the application that will accept assertions) 
   entityBaseURL: http://localhost:8080/login
-  # The entityID of this SP
   entityID: cloudfoundry-saml-login-server
-
-  # The location and credentials of the certificate for this SP
-  # See README.md for details on how to create this.
   serviceProviderKey: ! '-----BEGIN RSA PRIVATE KEY-----
   
     Proc-Type: 4,ENCRYPTED
@@ -78,14 +60,12 @@ login:
   
     -----END CERTIFICATE-----'
 
-  # The entity alias of the IDP
-  idpEntityAlias: openam-local
-  # URL of the IDP metadata
-  idpMetadataURL: http://openam.example.com:8181/openam/saml2/jsp/exportmetadata.jsp?entityid=http://openam.example.com:8181/openam
-  #idpMetadataFile: /Users/jdsa/dev/login-server/saml-login-server/src/main/resources/security/idp.xml
+  idpEntityAlias: vshpere.local
+  idpMetadataURL: https://win2012-sso2:7444/websso/SAML2/Metadata/vsphere.local
+  
   
   saml:
-    nameID: urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress
+    nameID: urn:oasis:names:tc:SAML:2.0:nameid-format:persistent
     assertionConsumerIndex: 1
   
   authorize:
