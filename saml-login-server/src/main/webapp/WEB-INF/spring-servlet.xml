@@ -325,10 +325,8 @@
 	<!-- IDP Discovery Service -->
 	<bean id="samlIDPDiscovery" class="org.springframework.security.saml.SAMLDiscovery" />
 
-    <bean id="trustVsphere" class="org.cloudfoundry.identity.uaa.login.ssl.TrustManager" lazy-init="false" init-method="init"/>
-
 	<!-- Filter automatically generates default SP metadata -->
-	<bean id="metadataGeneratorFilter" depends-on="trustVsphere"
+	<bean id="metadataGeneratorFilter"
 		class="org.springframework.security.saml.metadata.MetadataGeneratorFilter">
 		<constructor-arg>
 			<bean class="org.springframework.security.saml.metadata.MetadataGenerator">
@@ -565,18 +563,20 @@
 	<bean id="ehcache" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
 		<property name="configLocation" value="classpath:/ehcache.xml" />
 	</bean>
+  
+   <bean id="acceptSSLSocketFactory" class="org.apache.commons.httpclient.contrib.ssl.EasySSLProtocolSocketFactory"/>
     
     <bean id="metadataProviderList" class="java.util.ArrayList">
         <constructor-arg>
 		  	<list>
-				<bean depends-on="trustVsphere"
-					class="org.springframework.security.saml.metadata.ExtendedMetadataDelegate">
+				<bean class="org.springframework.security.saml.metadata.ExtendedMetadataDelegate">
 					<constructor-arg>
-						<bean class="org.opensaml.saml2.metadata.provider.HTTPMetadataProvider">
+						<bean class="org.cloudfoundry.identity.uaa.login.ssl.FixedHttpMetaDataProvider">
 							<constructor-arg ref="metadataFetchingHttpClientTimer" />
 							<constructor-arg ref="metadataFetchingHttpClient" />
 							<constructor-arg value="${login.idpMetadataURL:''}" />
 							<property name="parserPool" ref="parserPool" />
+                            <property name="socketFactory" ref="acceptSSLSocketFactory"/>
 						</bean>
 					</constructor-arg>
 					<constructor-arg>
