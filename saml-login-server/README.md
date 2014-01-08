@@ -62,3 +62,16 @@ There are two ways to configure the SAML Login server
 
 - Test the configuration by going to http://localhost:8080/app
 
+
+### Deployment Note (Real world / Dev CF deploymemt)
+In order for the SAML login server to replace login server, your template must change as follows in your CF manifest;
+
+Jobs
+login
+  changed template:
+    - login
+    + saml_login
+    
+Otherwise all saml configuration as above will be ignored.
+
+
