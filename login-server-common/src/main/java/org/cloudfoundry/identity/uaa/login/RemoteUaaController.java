@@ -87,6 +87,8 @@ public class RemoteUaaController extends AbstractControllerInfo {
 	private static final String SET_COOKIE = "Set-Cookie";
 
 	private static final String COOKIE_MODEL = "cookie";
+	
+	private static final String USER_AGENT = "user-agent";
 
 
 	private RestOperations defaultTemplate = new RestTemplate();
@@ -226,6 +228,7 @@ public class RemoteUaaController extends AbstractControllerInfo {
 		HttpHeaders requestHeaders = new HttpHeaders();
 		requestHeaders.putAll(getRequestHeaders(headers));
 		requestHeaders.remove(AUTHORIZATION.toLowerCase());
+		requestHeaders.remove(USER_AGENT);
 		requestHeaders.remove(ACCEPT.toLowerCase());
 		requestHeaders.remove(CONTENT_TYPE.toLowerCase());
 		requestHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
