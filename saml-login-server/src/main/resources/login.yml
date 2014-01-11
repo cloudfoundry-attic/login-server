@@ -77,19 +77,26 @@ login:
   
     -----END CERTIFICATE-----'
 
-  # The entity alias of the IDP
+  # The entity alias of the IDP when vCenter SSO
   idpEntityAlias: vshpere.local
+  # The entity alias of the IDP when Open AM
+  #idpEntityAlias: openam-local
+  
   # URL of the IDP metadata
   idpMetadataURL: https://win2012-sso2:7444/websso/SAML2/Metadata/vsphere.local
   #if using file based, change the spring profile to 'fileMetadata'
   #idpMetadataFile: /Users/johndoe/dev/login-server/saml-login-server/src/main/resources/security/idp.xml
+  #if using OpenAM one can set the URL
+  #idpMetadataURL: http://openam.example.com:8181/openam/saml2/jsp/exportmetadata.jsp?entityid=http://openam.example.com:8181/openam
   
   
   saml:
     #openAM responds to emailAddress
     #nameID: urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress
+    
     #vCenter SSO responds to persistent
     nameID: urn:oasis:names:tc:SAML:2.0:nameid-format:persistent
+    
     assertionConsumerIndex: 1
   
   authorize:
