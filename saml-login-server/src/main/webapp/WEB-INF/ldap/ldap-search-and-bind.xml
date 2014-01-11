@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- 
+ Cloud Foundry 
+ Copyright (c) [2009-2014] Pivotal Software, Inc. All Rights Reserved.
+
+ This product is licensed to you under the Apache License, Version 2.0 (the "License").
+ You may not use this product except in compliance with the License.
+
+ This product includes a number of subcomponents with
+ separate copyright notices and license terms. Your use of these
+ subcomponents is subject to the terms and conditions of the
+ subcomponent's license, as noted in the LICENSE file.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:security="http://www.springframework.org/schema/security"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:oauth="http://www.springframework.org/schema/security/oauth2"
+    xmlns:util="http://www.springframework.org/schema/util" xmlns:cache="http://www.springframework.org/schema/cache"
+    xmlns:sec="http://www.springframework.org/schema/security"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+              http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.1.xsd
+              http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+              http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd
+              http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd
+              http://www.springframework.org/schema/security/oauth2 http://www.springframework.org/schema/security/spring-security-oauth2-1.0.xsd
+              http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache-3.1.xsd">
+
+        <security:authentication-manager alias="ldapAuthenticationManager">
+            <sec:authentication-provider ref="ldapAuthProvider" />
+        </security:authentication-manager>
+
+        <bean id="remoteAuthenticationManager" class="org.cloudfoundry.identity.uaa.login.UsernamePasswordExtractingAuthenticationManager">
+            <constructor-arg ref="ldapAuthenticationManager" />
+        </bean>
+        
+        <bean id="contextSource" class="org.springframework.security.ldap.DefaultSpringSecurityContextSource">
+            <constructor-arg value="${ldap.base.url:ldap://localhost:10389/dc=test,dc=com}" />
+            <property name="userDn" value="${ldap.base.userDn:cn=admin,ou=Users,dc=test,dc=com}" />
+            <property name="password" value="${ldap.base.password:password}" />
+        </bean>
+         
+        <bean id="ldapAuthProvider" class="org.springframework.security.ldap.authentication.LdapAuthenticationProvider">
+            <constructor-arg>
+                <bean class="org.springframework.security.ldap.authentication.BindAuthenticator">
+                    <constructor-arg ref="contextSource" />
+                    <property name="userSearch">
+                      <bean id="userSearch" class="org.springframework.security.ldap.search.FilterBasedLdapUserSearch">
+                        <constructor-arg index="0" value="${ldap.base.searchBase:}" />
+                        <constructor-arg index="1" value="${ldap.base.searchFilter:cn={0}}" />
+                        <constructor-arg index="2" ref="contextSource" />
+                      </bean>
+                    </property>
+                </bean>
+            </constructor-arg>
+            <constructor-arg>
+                <bean class="org.springframework.security.ldap.authentication.NullLdapAuthoritiesPopulator" />
+            </constructor-arg>
+            <property name="authoritiesMapper">
+                <bean class="org.springframework.security.core.authority.mapping.SimpleAuthorityMapper">
+                    <property name="defaultAuthority" value="ROLE_USER" />
+                </bean>
+            </property>
+            
+        </bean>
+
+</beans>              

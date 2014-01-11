@@ -611,41 +611,8 @@
 		</bean>
 	</beans>
   
-    <beans profile="default">
-
-        <security:authentication-manager alias="ldapAuthenticationManager">
-            <sec:authentication-provider ref="ldapAuthProvider" />
-        </security:authentication-manager>
-
-        <bean id="remoteAuthenticationManager" class="org.cloudfoundry.identity.uaa.login.UsernamePasswordExtractingAuthenticationManager">
-            <constructor-arg ref="ldapAuthenticationManager" />
-        </bean>
-        
-        <bean id="contextSource" class="org.springframework.security.ldap.DefaultSpringSecurityContextSource">
-            <constructor-arg value="${ldap.base.url:ldap://localhost:10389/dc=test,dc=com}" />
-        </bean>
-         
-        <bean id="ldapAuthProvider" class="org.springframework.security.ldap.authentication.LdapAuthenticationProvider">
-            <constructor-arg>
-                <bean class="org.springframework.security.ldap.authentication.BindAuthenticator">
-                    <constructor-arg ref="contextSource" />
-                    <property name="userDnPatterns">
-                        <list>
-                            <value>cn={0},ou=Users</value>
-                        </list>
-                    </property>
-                </bean>
-            </constructor-arg>
-            <constructor-arg>
-                <bean class="org.springframework.security.ldap.authentication.NullLdapAuthoritiesPopulator" />
-            </constructor-arg>
-            <property name="authoritiesMapper">
-                <bean class="org.springframework.security.core.authority.mapping.SimpleAuthorityMapper">
-                    <property name="defaultAuthority" value="ROLE_USER" />
-                </bean>
-            </property>
-        </bean>
-
+    <beans profile="ldap">
+        <import resource="${ldap.profile.file:ldap/ldap-simple-bind.xml}" />
     </beans>
   
 	

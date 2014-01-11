@@ -107,3 +107,36 @@ uaa:
 
 # The secret that this login server will use to authenticate to the uaa
 LOGIN_SECRET: loginsecret
+
+#spring_profiles: ldap #don't forget to add login.addnew=true in uaa.yml
+
+#ldap:
+#  profile:
+#    file:ldap/ldap-simple-bind.xml
+#  base:  
+#    url: 'ldap://localhost:10389/'
+#    userDnPattern: 'cn={0},ou=Users,dc=test,dc=com'
+    
+#ldap:
+#  profile:
+#    file:ldap/ldap-search-and-bind.xml
+#  base:  
+#    url: 'ldap://localhost:10389/'
+#    userDn: 'cn=admin,ou=Users,dc=test,dc=com'
+#    password: 'password'
+#    searchBase: '' 
+#    searchFilter: 'cn={0}'
+
+#ldap:
+#  profile:
+#    file:ldap/ldap-search-and-compare.xml
+#  base:  
+#    url: 'ldap://localhost:10389/'
+#    userDn: 'cn=admin,ou=Users,dc=test,dc=com'
+#    password: 'password'
+#    searchBase: '' 
+#    searchFilter: 'cn={0}'
+#    passwordAttributeName: userPassword
+#    passwordEncoder: org.cloudfoundry.identity.uaa.login.ldap.DynamicPasswordComparator
+#    localPasswordCompare: true
+   
