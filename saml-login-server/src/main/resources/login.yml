@@ -122,7 +122,8 @@ LOGIN_SECRET: loginsecret
 #    file:ldap/ldap-simple-bind.xml
 #  base:  
 #    url: 'ldap://localhost:10389/'
-#    userDnPattern: 'cn={0},ou=Users,dc=test,dc=com'
+#    #the below pattern can contains a list of patterns delimited by ; or userDnPatternDelimiter property
+#    userDnPattern: 'cn={0},ou=Users,dc=test,dc=com;cn={0},ou=OtherUsers,dc=example,dc=com'
     
 #ldap:
 #  profile:

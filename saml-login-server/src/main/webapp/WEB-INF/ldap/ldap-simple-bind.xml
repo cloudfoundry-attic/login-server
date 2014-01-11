@@ -43,9 +43,10 @@
                 <bean class="org.springframework.security.ldap.authentication.BindAuthenticator">
                     <constructor-arg ref="contextSource" />
                     <property name="userDnPatterns">
-                        <list>
-                            <value>${ldap.base.userDnPattern:cn={0},ou=Users,dc=test,dc=com}</value>
-                        </list>
+                        <bean class="org.springframework.util.StringUtils" factory-method="delimitedListToStringArray">
+                            <constructor-arg type="java.lang.String" value="${ldap.base.userDnPattern:cn={0},ou=Users,dc=test,dc=com}" />
+                            <constructor-arg type="java.lang.String" value="${ldap.base.userDnPatternDelimiter:;}" />
+                        </bean>
                     </property>
                 </bean>
             </constructor-arg>
