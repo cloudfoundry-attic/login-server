@@ -9,15 +9,14 @@
 # separate copyright notices and license terms. Your use of these
 # subcomponents is subject to the terms and conditions of the
 # subcomponent's license, as noted in the LICENSE file.
-
 login:
+  #base URL that the login server can be reached at
   url: http://localhost:8080/login
   # The entity base url is the location of this application
   # (The host and port of the application that will accept assertions) 
   entityBaseURL: http://localhost:8080/login
   # The entityID of this SP
   entityID: cloudfoundry-saml-login-server
-
   # The location and credentials of the certificate for this SP
   # See README.md for details on how to create this.
   serviceProviderKey: ! '-----BEGIN RSA PRIVATE KEY-----
@@ -78,14 +77,26 @@ login:
   
     -----END CERTIFICATE-----'
 
-  # The entity alias of the IDP
-  idpEntityAlias: openam-local
+  # The entity alias of the IDP when vCenter SSO
+  idpEntityAlias: vshpere.local
+  # The entity alias of the IDP when Open AM
+  #idpEntityAlias: openam-local
+  
   # URL of the IDP metadata
-  idpMetadataURL: http://openam.example.com:8181/openam/saml2/jsp/exportmetadata.jsp?entityid=http://openam.example.com:8181/openam
-  #idpMetadataFile: /Users/jdsa/dev/login-server/saml-login-server/src/main/resources/security/idp.xml
+  idpMetadataURL: https://win2012-sso2:7444/websso/SAML2/Metadata/vsphere.local
+  #if using file based, change the spring profile to 'fileMetadata'
+  #idpMetadataFile: /Users/johndoe/dev/login-server/saml-login-server/src/main/resources/security/idp.xml
+  #if using OpenAM one can set the URL
+  #idpMetadataURL: http://openam.example.com:8181/openam/saml2/jsp/exportmetadata.jsp?entityid=http://openam.example.com:8181/openam
+  
   
   saml:
-    nameID: urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress
+    #openAM responds to emailAddress
+    #nameID: urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress
+    
+    #vCenter SSO responds to persistent
+    nameID: urn:oasis:names:tc:SAML:2.0:nameid-format:persistent
+    
     assertionConsumerIndex: 1
   
   authorize:
@@ -103,3 +114,37 @@ uaa:
 
 # The secret that this login server will use to authenticate to the uaa
 LOGIN_SECRET: loginsecret
+
+#spring_profiles: ldap #don't forget to add login.addnew=true in uaa.yml
+
+#ldap:
+#  profile:
+#    file:ldap/ldap-simple-bind.xml
+#  base:  
+#    url: 'ldap://localhost:10389/'
+#    #the below pattern can contains a list of patterns delimited by ; or userDnPatternDelimiter property
+#    userDnPattern: 'cn={0},ou=Users,dc=test,dc=com;cn={0},ou=OtherUsers,dc=example,dc=com'
+    
+#ldap:
+#  profile:
+#    file:ldap/ldap-search-and-bind.xml
+#  base:  
+#    url: 'ldap://localhost:10389/'
+#    userDn: 'cn=admin,ou=Users,dc=test,dc=com'
+#    password: 'password'
+#    searchBase: '' 
+#    searchFilter: 'cn={0}'
+
+#ldap:
+#  profile:
+#    file:ldap/ldap-search-and-compare.xml
+#  base:  
+#    url: 'ldap://localhost:10389/'
+#    userDn: 'cn=admin,ou=Users,dc=test,dc=com'
+#    password: 'password'
+#    searchBase: '' 
+#    searchFilter: 'cn={0}'
+#    passwordAttributeName: userPassword
+#    passwordEncoder: org.cloudfoundry.identity.uaa.login.ldap.DynamicPasswordComparator
+#    localPasswordCompare: true
+   
