@@ -28,3 +28,5 @@ Servers/
 *.swo
 coverage.ec
 git.properties
+*.md.html
+
