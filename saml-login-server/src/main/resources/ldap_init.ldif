@@ -1,11 +1,13 @@
 dn: dc=test,dc=com
 changetype: add
 objectClass: top
+objectClass: dcObject
 objectClass: domain
 
 dn: ou=Users,dc=test,dc=com
 changetype: add
 objectClass: top
+objectClass: dcObject
 objectClass: organizationalUnit
 
 dn: cn=admin,ou=Users,dc=test,dc=com
