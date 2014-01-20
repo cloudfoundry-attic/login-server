@@ -115,15 +115,26 @@ uaa:
 # The secret that this login server will use to authenticate to the uaa
 LOGIN_SECRET: loginsecret
 
-#spring_profiles: ldap #don't forget to add login.addnew=true in uaa.yml
+#spring_profiles: ldap
+
 
 #ldap:
 #  profile:
-#    file:ldap/ldap-simple-bind.xml
-#  base:  
-#    url: 'ldap://localhost:10389/'
-#    #the below pattern can contains a list of patterns delimited by ; or userDnPatternDelimiter property
+#    file: ldap/ldap-simple-bind.xml
+#  base:
+#    url: 'ldaps://192.168.3.39:10636/'
 #    userDnPattern: 'cn={0},ou=Users,dc=test,dc=com;cn={0},ou=OtherUsers,dc=example,dc=com'
+#  ssl: 
+#    sslCertificate: ! '-----BEGIN CERTIFICATE-----
+#    MIIBfTCCAScCBgFDfaC2yzANBgkqhkiG9w0BAQUFADBCMQswCQYDVQQGEwJVUzEMMAoGA1UEChMD
+#    QVNGMRIwEAYDVQQLEwlEaXJlY3RvcnkxETAPBgNVBAMTCEFwYWNoZURTMB4XDTE0MDExMDE5Mjg0
+#    MVoXDTE1MDExMDE5Mjg0MVowTDELMAkGA1UEBhMCVVMxDDAKBgNVBAoTA0FTRjESMBAGA1UECxMJ
+#    RGlyZWN0b3J5MRswGQYDVQQDExJmaGFuaWstd29ya3N0YXRpb24wXDANBgkqhkiG9w0BAQEFAANL
+#    ADBIAkEAuA6Nmto6NFCCJ+CwsBnT2cvMxuYgf26iZ3ckIpLhs2V4ZJ4PFinR6JZUsVnRp0RbYoV5
+#    iW6F91XDTVtAMtDTJwIDAQABMA0GCSqGSIb3DQEBBQUAA0EATFGpEIprKYcnc+JuNcSQ8v2P2J7e
+#    lQ23NhTaljASF0g8AZ7SZEItU8JFYqf/KnNJ7FPwo4LbMbr7Zg6BRKBvnQ==
+#    -----END CERTIFICATE-----'
+#    sslCertificateAlias: ldaps
     
 #ldap:
 #  profile:
@@ -147,4 +158,3 @@ LOGIN_SECRET: loginsecret
 #    passwordAttributeName: userPassword
 #    passwordEncoder: org.cloudfoundry.identity.uaa.login.ldap.DynamicPasswordComparator
 #    localPasswordCompare: true
-   
