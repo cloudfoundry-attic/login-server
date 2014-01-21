@@ -64,6 +64,7 @@ public class SamlRemoteUaaController extends RemoteUaaController {
 	HttpHeaders headers, Map<String, Object> model, Principal principal) throws Exception {
 		// Entity ID to start the discovery
 		model.put("entityID", entityID);
+		model.put("saml",Boolean.TRUE);
 		return super.prompts(request, headers, model, principal);
 	}
 
