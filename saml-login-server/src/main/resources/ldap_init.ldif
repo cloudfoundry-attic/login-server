@@ -19,7 +19,7 @@ objectClass: organizationalPerson
 objectClass: inetOrgPerson
 cn: admin
 sn: Administrator
-userPassword: password
+userPassword: adminsecret
 uid: 3378a03c-fc8c-46b6-8a76-f67f9d7a7b4a
 mail: admin@test.com
 
