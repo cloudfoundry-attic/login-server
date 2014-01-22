@@ -45,16 +45,18 @@ public class UsernamePasswordExtractingAuthenticationManager implements Authenti
 	 */
 	@Override
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-
-		if (authentication == null || authentication instanceof UsernamePasswordAuthenticationToken) {
+		if (authentication == null) {
 			return authentication;
 		}
-		
-		UsernamePasswordAuthenticationToken output = new UsernamePasswordAuthenticationToken(authentication, authentication.getCredentials(), authentication.getAuthorities());
-		output.setAuthenticated(authentication.isAuthenticated());
-		output.setDetails(authentication.getDetails());
-		return delegate.authenticate(output);
-
+		UsernamePasswordAuthenticationToken output = null;
+		if (authentication instanceof UsernamePasswordAuthenticationToken) {
+		    output = (UsernamePasswordAuthenticationToken)authentication;
+		} else {
+		    output = new UsernamePasswordAuthenticationToken(authentication, authentication.getCredentials(), authentication.getAuthorities());
+		    output.setAuthenticated(authentication.isAuthenticated());
+		    output.setDetails(authentication.getDetails());
+		}
+        return delegate.authenticate(output);
 	}
 
 }

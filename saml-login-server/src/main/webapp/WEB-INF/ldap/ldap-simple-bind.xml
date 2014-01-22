@@ -26,7 +26,7 @@
               http://www.springframework.org/schema/security/oauth2 http://www.springframework.org/schema/security/spring-security-oauth2-1.0.xsd
               http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache-3.1.xsd">
 
-        <security:authentication-manager alias="ldapAuthenticationManager">
+        <security:authentication-manager id="ldapAuthenticationManager">
             <sec:authentication-provider ref="ldapAuthProvider" />
         </security:authentication-manager>
 

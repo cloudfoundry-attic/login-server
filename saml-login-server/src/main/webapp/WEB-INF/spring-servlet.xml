@@ -218,7 +218,9 @@
 
 	<bean id="httpsHeaderFilter" class="org.cloudfoundry.identity.web.HttpsHeaderFilter" />
 
+    <!-- this bean will be overwritten in the saml profile -->
     <bean id="metadataGeneratorFilter" class="org.cloudfoundry.identity.web.NoOpFilter"/>
+    <!-- this bean will be overwritten in the saml profile -->
 	<bean id="samlFilter" class="org.cloudfoundry.identity.web.NoOpFilter"/>
   
 
