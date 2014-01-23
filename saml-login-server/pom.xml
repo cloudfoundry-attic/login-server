@@ -30,6 +30,7 @@
 		<version>${project.version}</version>
 		<packaging>war</packaging>
 		<generatePom>true</generatePom>
+        <m2eclipse.wtp.contextRoot>/login</m2eclipse.wtp.contextRoot>
 	</properties>
 
 	<build>
