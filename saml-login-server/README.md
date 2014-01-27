@@ -1,68 +1,19 @@
-## Setting up OpenAM with the SAML Login server
+## The Cloud Foundry SAML Login Server
 
-- Follow this guide to set up OpenAM on tomcat http://openam.forgerock.org/openam-documentation/openam-doc-source/doc/install-guide/
+The saml_login server supports two additional features on top of what you get from the regular [login-server] [1]. 
+It adds LDAP authentication support, as well authentication using an external SAML source. We have tested our authentication with 
+Apache Directory Server, OpenLDAP, [OpenAM] [2] and the vCenter SSO appliance. 
 
-- Set the OpenAM tomcat port to 8081 so that it is usable along with the uaa and login server listening on 8080
+  [1]: https://github.com/cloudfoundry/login-server/tree/master/login-server "login-server"
+  [2]: https://github.com/cloudfoundry/login-server/tree/master/saml-login-server/OpenAM-README.md "OpenAM Installation Instructions"
 
-- Create the openam script per the suggestions in the openam install guide.
-  - For a mac, JDK_HOME is "/System/Library/Frameworks/JavaVM.framework/Home"
-  
-- Create the SAML Login Server service provider certificate
-  - Follow these commands to create a key and certificate. Enter a password to protect the private key when prompted.
-  - `openssl genrsa -des3 -out server.key 1024`
-  - `openssl req -new -nodes -out server.csr -key server.key -days 365 -subj "/CN=saml_login,OU=test,O=vmware,O=com"`
-  - `openssl x509 -req -days 365 -in server.csr -signkey server.key -out server.crt`
 
-  server.key is the private key protected by the password
-  server.crt is the certificate
-  
-- Set up login.yml with the SAML service provider certificate 
-  - See src/main/resources/login.yml for an example
-  - Paste the of server.key to _serviceProviderKey_ property in the login.yml.
-  - Fill in the password to the _serviceProviderKeyPassword_ in the login.yml.
-  - Paste the of server.crt to the _serviceProviderCertificate_ property in the login.yml. 
+###Configuring cf-release for a saml_login deployment
 
-- Install the saml login server certificate in the jdk trust store at "/System/Library/Frameworks/JavaVM.framework/Home/lib/security/cacerts"
-  - `keytool -importcert -file server.crt -alias samlcert -storepass changeit -trustcacerts -keystore cacerts`
+The saml_login deploys the same way as the login-server, with additional configuration parameters.
+Enabling ldap or saml is done using the `spring_profiles` configuration parameter. LDAP and SAML can be used together, as two different profiles active 
+at the same time.
 
-- Install the saml login server certificate in the OpenAM trust store
-  - `keytool -importcert -file server.crt -alias samlcert -storepass changeit -trustcacerts -keystore keystore.jks`
-
-- Start up the login server, uaa and sample apps
-  - `export MAVEN_OPTS="-Xmx768m -XX:MaxPermSize=256m"`
-  - `cd login-server/saml-login-server; mvn tomcat:run -P integration`
-
-- Create an OpenAM Hosted Identity provider and a circle of trust
-
-- Configure a Remote Service Provider using the metadata located at `http://localhost:8080/login/saml/metadata`
-
-- Create a user in OpenAM. Set the user's email address
-
-- Go to Federation -> Click the link matching your IDP Entity Provider -> NameID Value Map
-  - Add urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified=mail
-
-There are two ways to configure the SAML Login server
-
-- Set the configuration to have the SAML login server get the IDP metadata
-
-  <pre>
-    login:
-      idpMetadataURL: http://openam.example.com:8181/openam/saml2/jsp/exportmetadata.jsp?entityid=http://openam.example.com:8181/openam
-  </pre>
-
-- Export the IDP metadata from a URL similar to `http://openam.example.org:8081/openam/saml2/jsp/exportmetadata.jsp?entityid=http://openam.example.org:8081/openam` to a file
-  - Set the configuration to point to that file
-  
-  <pre>
-    login:
-      idpMetadataFile: /path/to/idpMetadata.xml
-  </pre>
-
-  - To use this option, run the SAML metadata with both the fileMetadata and default profiles. `mvn tomcat:run -Dspring.profiles.active=fileMetadata,default`
-
-- Test the configuration by going to http://localhost:8080/app
-
-Configuring cf-release for a saml_login deployment
 - Open your infrastructure manifest - for example cf-release/templates/cf-infrastructure-warden.yml
   
   Add your Tomcat JVM options as well as the intended protocol to use (http/https)
@@ -88,6 +39,11 @@ Configuring cf-release for a saml_login deployment
   </pre>  
   
 - Open your cf-properties.yml manifest to configure saml_login properties
+  
+  Please note the spring_profiles setting
+  - spring_profiles: ldap,saml (uses both ldap and saml with an external SAML provider)
+  - spring_profiles: ldap  (uses only ldap)
+  - spring_profiles: saml (uses only  saml with an external SAML provider)
 
   <pre>
     saml_login: 
@@ -101,7 +57,10 @@ Configuring cf-release for a saml_login deployment
         passwd: (( "https://console." domain "/password_resets/new" ))
         signup: (( "https://console." domain "/register" ))
     
-      #saml authentication information
+      #if you wish to use ldap or saml - (also remember to set uaa.login.addnew property)
+      spring_profiles: ldap,saml
+      
+      #saml authentication information, only required if 'saml' is part of spring_profiles
       entityid: cloudfoundry-saml-login-server
       idpEntityAlias: vsphere-local
       idpMetadataURL: "https://win2012-sso2:7444/websso/SAML2/Metadata/vsphere.local"  
@@ -140,8 +99,6 @@ Configuring cf-release for a saml_login deployment
         -----END CERTIFICATE-----
       nameidFormat: "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent"
   
-      #if you wish to use ldap - enable spring_profiles: ldap (also remember to set uaa.login.addnew property)
-      spring_profiles: ldap
       ldap:
         profile_type: simple-bind # options are simple-bind, search-and-bind, search-and-compare
         url: "ldap://192.168.3.39:10389/" #required
