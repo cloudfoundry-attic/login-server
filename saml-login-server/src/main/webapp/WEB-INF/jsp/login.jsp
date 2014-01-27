@@ -124,7 +124,9 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 					<button type="submit" class="button-orange">Log in</button>
 					<span class="button-alt"><a href="${links.passwd}">Forgot password &raquo;</a><a href="${links.register}">Create an account &raquo;</a></span>
 				</form>
-				<p><a href="saml/discovery?returnIDParam=idp&entityID=${entityID}">Sign in with your organization's credentials.</a></p>
+                <c:if test="${saml}">
+				  <p><a href="saml/discovery?returnIDParam=idp&entityID=${entityID}">Sign in with your organization's credentials.</a></p>
+                </c:if>
 			</div>
 		</div>
         <div class="footer"

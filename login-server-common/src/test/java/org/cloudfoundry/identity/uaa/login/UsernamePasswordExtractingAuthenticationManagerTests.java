@@ -48,6 +48,8 @@ public class UsernamePasswordExtractingAuthenticationManagerTests {
 	public void testUsernamePassword() {
 		Authentication expected = new UsernamePasswordAuthenticationToken("bar", "foo",
 				AuthorityUtils.commaSeparatedStringToAuthorityList("USER"));
+		Mockito.when(delegate.authenticate(Mockito.any(UsernamePasswordAuthenticationToken.class)))
+        .thenReturn(expected);
 		Authentication output = manager.authenticate(expected);
 		assertSame(expected, output);
 	}

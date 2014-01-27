@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>com.cloudfoundry.identity</groupId>
 		<artifactId>cloudfoundry-login-server-parent</artifactId>
-		<version>1.2.10</version>
+		<version>1.3.0-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
 
@@ -30,6 +30,7 @@
 		<version>${project.version}</version>
 		<packaging>war</packaging>
 		<generatePom>true</generatePom>
+        <m2eclipse.wtp.contextRoot>/login</m2eclipse.wtp.contextRoot>
 	</properties>
 
 	<build>
@@ -60,7 +61,7 @@
 					<!--skip deploy by default (sample) -->
 					<artifactId>maven-deploy-plugin</artifactId>
 					<configuration>
-						<skip>false</skip>
+						<skip>true</skip>
 					</configuration>
 				</plugin>
 				<plugin>
