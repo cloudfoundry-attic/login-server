@@ -184,7 +184,7 @@
 					<!--skip deploy by default (sample) -->
 					<artifactId>maven-deploy-plugin</artifactId>
 					<configuration>
-						<skip>false</skip>
+						<skip>true</skip>
 					</configuration>
 				</plugin>
 				<plugin>
