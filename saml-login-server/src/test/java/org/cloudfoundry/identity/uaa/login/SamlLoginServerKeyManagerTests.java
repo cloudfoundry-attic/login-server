@@ -2,6 +2,9 @@ package org.cloudfoundry.identity.uaa.login;
 
 import static org.junit.Assert.assertNotNull;
 
+import java.io.IOException;
+
+import org.junit.Assert;
 import org.junit.Test;
 import org.opensaml.xml.security.credential.Credential;
 
@@ -84,7 +87,16 @@ public class SamlLoginServerKeyManagerTests {
 					"-----END CERTIFICATE-----";
 		String password = "vmware";
 
-		keyManager = new SamlLoginServerKeyManager(key, password, certificate);
+		try {
+            keyManager = new SamlLoginServerKeyManager(key, password, certificate);
+            Assert.fail("Password invalid. Should not reach this line.");
+        } catch (Exception x) {
+            if (x.getClass().getName().equals("org.bouncycastle.openssl.EncryptionException")) {
+                    throw new IllegalArgumentException(x);
+            } else if (x.getClass().equals(IllegalArgumentException.class)) {
+                throw x;
+            }
+        }
 	}
 
 	@Test
@@ -194,6 +206,17 @@ public class SamlLoginServerKeyManagerTests {
 					"-----END CERTIFICATE-----";
 		String password = "password";
 
-		keyManager = new SamlLoginServerKeyManager(key, password, certificate);
+		try {
+		    keyManager = new SamlLoginServerKeyManager(key, password, certificate);
+		    Assert.fail("Key/Cert pair is invalid. Should not reach this line.");
+		} catch (Exception x) {
+		    if (x.getClass().getName().equals("org.bouncycastle.openssl.PEMException")) {
+		        throw new IllegalArgumentException(x);
+		    } else if (x.getClass().getName().equals("org.bouncycastle.openssl.EncryptionException")) {
+	                throw new IllegalArgumentException(x);
+		    } else if (x.getClass().equals(IllegalArgumentException.class)) {
+		        throw x;
+		    }
+		}
 	}
 }
