@@ -20,7 +20,7 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 
 <c:url var="rootUrl" value="/" />
-<c:url var="baseUrl" value="/resources" />
+<c:url var="baseUrl" value="/resources/oss" />
 
 <!DOCTYPE html>
 <!--[if IE]>  <![endif]-->

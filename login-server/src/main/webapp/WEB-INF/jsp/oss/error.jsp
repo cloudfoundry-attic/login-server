@@ -19,8 +19,8 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 
+<c:url var="baseUrl" value="/resources/oss" />
 <c:url var="rootUrl" value="/" />
-<c:url var="baseUrl" value="/resources" />
 
 <!DOCTYPE html>
 <!--[if IE]>  <![endif]-->
@@ -81,10 +81,9 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
             class="logo" src='${baseUrl}/images/logo-cloudfoundry.png'></img> </a>
         <div class="splash-box-blank">
             <div class="container">
-                <p class="intro-text">Welcome!</p>
-                <p class="next">You may go to the <a href="${links.home}">Cloud Foundry console</a>, <br />your <a href="${rootUrl}profile">account settings</a>, or <a href="${rootUrl}logout.do">logout</a>. </p>
+                <p class="intro-text">Sorry!</p>
                 <c:if test="${error!=null}">
-                <p class="error" title="${fn:escapeXml(error)}">Error: <a href="${links.login}">please try again</a> </p>
+                <p class="next">There was a problem: ${fn:escapeXml(error)} <a href="${links.login}">Please try again</a>. </p>
                 </c:if>
             </div>
         </div>
