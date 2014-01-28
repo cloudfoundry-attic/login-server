@@ -1,0 +1,14 @@
+uaa:
+  url: https://uaa.cloudfoundry.com
+  token:
+    url: https://uaa.cloudfoundry.com/oauth/token
+  login:
+    url: https://uaa.cloudfoundry.com/authenticate
+  clientinfo:
+    url: https://uaa.cloudfoundry.com/clientinfo
+  approvals:
+    url: https://uaa.cloudfoundry.com/approvals
+login:
+  authorize:
+    url: https://login.cloudfoundry.com/oauth/authorize
+    
