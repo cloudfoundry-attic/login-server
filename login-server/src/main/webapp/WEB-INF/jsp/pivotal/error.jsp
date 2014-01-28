@@ -19,7 +19,7 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 
-<c:url var="baseUrl" value="/resources" />
+<c:url var="baseUrl" value="/resources/pivotal" />
 <c:url var="rootUrl" value="/" />
 
 <html class='no-js' dir='ltr' lang='en'>
