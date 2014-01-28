@@ -9,7 +9,24 @@
 # separate copyright notices and license terms. Your use of these
 # subcomponents is subject to the terms and conditions of the
 # subcomponent's license, as noted in the LICENSE file.
+
+
+#links:
+#  home: https://console.run.pivotal.io
+#  network: https://network.gopivotal.com/login
+#  passwd: https://console.run.pivotal.io/password_resets/new
+#  signup: https://console.run.pivotal.io/register
+#  signup-network: https://network.gopivotal.com/users/new
+
+links:
+  home: https://console.10.244.0.34.xip.io
+  passwd: https://console.10.244.0.34.xip.io/password_resets/new
+  signup: https://console.10.244.0.34.xip.io/register
+
+
 login:
+  #the brand to use, oss or pivotal for JSP pages
+  brand: pivotal
   #base URL that the login server can be reached at
   url: http://localhost:8080/login
   # The entity base url is the location of this application
@@ -116,6 +133,7 @@ uaa:
 LOGIN_SECRET: loginsecret
 
 #spring_profiles: ldap
+#spring_profiles: saml
 
 
 #ldap:
