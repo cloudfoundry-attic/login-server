@@ -29,6 +29,12 @@ as well (as long as the UAA project is built and installed first as
 above):
 
     $ mvn test -P integration
+    
+There are two documents that can help you configure the login server in your environment.
+    
+[Login Server Configuration in deployment manifest](docs/Login-Server-Configuration.md)
+
+[OpenAM Configuration](docs/OpenAM-Configuration.md)
 
 # Contributing to the Login Server
 

@@ -1,212 +1,634 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!-- Cloud Foundry 2012.02.03 Beta Copyright (c) [2009-2012] VMware, Inc. All Rights Reserved. This product is licensed to 
-	you under the Apache License, Version 2.0 (the "License"). You may not use this product except in compliance with the License. 
-	This product includes a number of subcomponents with separate copyright notices and license terms. Your use of these subcomponents 
-	is subject to the terms and conditions of the subcomponent's license, as noted in the LICENSE file. -->
-<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mvc="http://www.springframework.org/schema/mvc"
-	xmlns="http://www.springframework.org/schema/beans" xmlns:context="http://www.springframework.org/schema/context"
-	xmlns:sec="http://www.springframework.org/schema/security" xmlns:oauth="http://www.springframework.org/schema/security/oauth2"
-	xmlns:util="http://www.springframework.org/schema/util"
-	xsi:schemaLocation="http://www.springframework.org/schema/security/oauth2 http://www.springframework.org/schema/security/spring-security-oauth2-1.0.xsd
-		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd
-		http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.1.xsd
-		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
-		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd
-		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+<!-- 
+ Cloud Foundry 2012.02.03 Beta
+ Copyright (c) [2009-2012] VMware, Inc. All Rights Reserved.
 
-	<sec:http pattern="/resources/**" security="none" />
-	<sec:http pattern="/favicon.ico" security="none" />
-	<sec:http pattern="/healthz/**" security="none" />
-	<sec:http pattern="/info" security="none" />
-	<sec:http pattern="/oauth/token" security="none" />
+ This product is licensed to you under the Apache License, Version 2.0 (the "License").
+ You may not use this product except in compliance with the License.
 
-	<bean class="org.cloudfoundry.identity.uaa.security.web.SecurityFilterChainPostProcessor">
-		<property name="requireHttps" value="${require_https:false}" />
-		<property name="dumpRequests" value="${dump_requests:false}" />
-		<property name="redirectToHttps">
-			<list>
-				<value>uiSecurity</value>
-			</list>
-		</property>
-	</bean>
-	
-	<http pattern="/autologin" create-session="stateless" entry-point-ref="basicAuthenticationEntryPoint"
-		xmlns="http://www.springframework.org/schema/security">
-		<intercept-url pattern="/**" access="IS_AUTHENTICATED_FULLY" />
-		<anonymous enabled="false" />
-		<custom-filter ref="clientAuthenticationFilter" position="BASIC_AUTH_FILTER" />
-	</http>
+ This product includes a number of subcomponents with
+ separate copyright notices and license terms. Your use of these
+ subcomponents is subject to the terms and conditions of the
+ subcomponent's license, as noted in the LICENSE file.
+-->
 
-	<http request-matcher-ref="autologinAuthorizeRequestMatcher" entry-point-ref="loginEntryPoint"
-		xmlns="http://www.springframework.org/schema/security">
-		<!-- TODO: add entry point that can redirect back to client app? -->
-		<anonymous enabled="false" />
-		<custom-filter ref="autologinAuthenticationFilter" position="FORM_LOGIN_FILTER" />
-	</http>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:security="http://www.springframework.org/schema/security"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:oauth="http://www.springframework.org/schema/security/oauth2"
+	xmlns:util="http://www.springframework.org/schema/util" xmlns:cache="http://www.springframework.org/schema/cache"
+	xmlns:sec="http://www.springframework.org/schema/security"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+              http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.1.xsd
+              http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+              http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd
+              http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd
+              http://www.springframework.org/schema/security/oauth2 http://www.springframework.org/schema/security/spring-security-oauth2-1.0.xsd
+              http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache-3.1.xsd">
+    
+    
+    
+	<context:annotation-config />
 
-	<!-- For backwards compatibility to the old way of posting credentials to /authorize endpoint -->
-	<http name="oldAuthzEndpointSecurity" request-matcher-ref="oauthAuthorizeRequestMatcherOld" create-session="stateless"
-		entry-point-ref="oauthAuthenticationEntryPoint" authentication-manager-ref="remoteAuthenticationManager"
-		xmlns="http://www.springframework.org/schema/security">
-		<intercept-url pattern="/**" access="IS_AUTHENTICATED_FULLY" />
-		<custom-filter ref="authzAuthenticationFilter" position="FORM_LOGIN_FILTER" />
-		<anonymous enabled="false" />
-		<access-denied-handler ref="oauthAccessDeniedHandler" />
-	</http>
-	
+	<security:http pattern="/saml/web/**" security="none" />
+	<security:http pattern="/favicon.ico" security="none" />
+	<security:http pattern="/resources/**" security="none" />
+	<security:http pattern="/healthz/**" security="none" />
+	<security:http request-matcher-ref="oauthTokenAuthcodeFlow" security="none"/>
+	<security:http request-matcher-ref="oauthTokenRefresh" security="none"/>
+	<security:http pattern="/login" security="none" />
+	<security:http pattern="/info" security="none" />
+	<security:http pattern="/error" security="none" />
+
+    <!-- TODO: Move the autologin related beans from the login server and saml login server to login common -->
+    <http pattern="/autologin" create-session="stateless" entry-point-ref="basicAuthenticationEntryPoint"
+        xmlns="http://www.springframework.org/schema/security">
+        <intercept-url pattern="/**" access="IS_AUTHENTICATED_FULLY" />
+        <anonymous enabled="false" />
+        <custom-filter ref="clientAuthenticationFilter" position="BASIC_AUTH_FILTER" />
+    </http>
+
+    <http request-matcher-ref="autologinAuthorizeRequestMatcher" entry-point-ref="loginEntryPoint"
+        xmlns="http://www.springframework.org/schema/security">
+        <!-- TODO: add entry point that can redirect back to client app? -->
+        <anonymous enabled="false" />
+        <custom-filter ref="autologinAuthenticationFilter" position="FORM_LOGIN_FILTER" />
+    </http>
+    
 	<!-- Version of the /authorize endpoint for stateless clients such as VMC -->
 	<http name="statelessAuthzEndpointSecurity" request-matcher-ref="oauthAuthorizeRequestMatcher" create-session="stateless"
 		entry-point-ref="oauthAuthenticationEntryPoint" authentication-manager-ref="remoteAuthenticationManager"
 		xmlns="http://www.springframework.org/schema/security">
 		<intercept-url pattern="/**" access="IS_AUTHENTICATED_FULLY" />
+		<custom-filter ref="passcodeAuthenticationFilter" position="FORM_LOGIN_FILTER" />
+		<anonymous enabled="false" />
+		<access-denied-handler ref="oauthAccessDeniedHandler" />
+		<custom-filter 
+			ref="oauth2ClientFilter" after="EXCEPTION_TRANSLATION_FILTER" />
+	</http>
+
+	<security:http pattern="/log*.do"
+		authentication-manager-ref="remoteAuthenticationManager"
+		disable-url-rewriting="true" entry-point-ref="loginEntryPoint">
+		<security:intercept-url pattern="/login.do"
+			access="IS_AUTHENTICATED_ANONYMOUSLY" />
+		<security:intercept-url pattern="/logout.do"
+			access="IS_AUTHENTICATED_ANONYMOUSLY" />
+		<security:anonymous enabled="true" />
+		<security:form-login login-page="/login"
+			username-parameter="username" password-parameter="password"
+			login-processing-url="/login.do" authentication-failure-url="/login?error=true" />
+		<security:logout logout-url="/logout.do"
+			success-handler-ref="logoutHandler" />
+	</security:http>
+
+	<!-- Owner password flow for external authentication (SAML) -->
+ 	<http name="tokenEndpointSecurityForPasscodes" request-matcher-ref="passcodeTokenMatcher"
+		create-session="stateless" entry-point-ref="basicAuthenticationEntryPoint"
+		xmlns="http://www.springframework.org/schema/security">
+		<intercept-url pattern="/**" access="IS_AUTHENTICATED_FULLY" />
+		<anonymous enabled="false" />
+		<custom-filter ref="passcodeAuthenticationFilter" position="FORM_LOGIN_FILTER" />
+		<access-denied-handler ref="oauthAccessDeniedHandler" />
+	</http>
+		
+	<bean id="passcodeTokenMatcher" class="org.cloudfoundry.identity.uaa.security.web.UaaRequestMatcher">
+		<constructor-arg value="/oauth/token" />
+		<property name="accept">
+			<list>
+				<value>application/json</value>
+				<value>application/x-www-form-urlencoded</value>
+			</list>
+		</property>
+		<property name="parameters">
+			<map>
+				<entry key="grant_type" value="password" />
+				<entry key="passcode" value="" />
+			</map>
+		</property>
+	</bean>
+	
+	<!-- Owner password flow for UAA authentication -->
+ 	<http name="tokenEndpointSecurityForPasswords" request-matcher-ref="uaaPasswordTokenMatcher"
+		create-session="stateless" entry-point-ref="basicAuthenticationEntryPoint" 
+		authentication-manager-ref="remoteAuthenticationManager"
+		xmlns="http://www.springframework.org/schema/security">
+		<intercept-url pattern="/**" access="IS_AUTHENTICATED_FULLY" />
 		<custom-filter ref="authzAuthenticationFilter" position="FORM_LOGIN_FILTER" />
 		<anonymous enabled="false" />
 		<access-denied-handler ref="oauthAccessDeniedHandler" />
 	</http>
-
-	<http name="uiSecurity" xmlns="http://www.springframework.org/schema/security" authentication-manager-ref="remoteAuthenticationManager"
-		disable-url-rewriting="true" entry-point-ref="loginEntryPoint">
-		<intercept-url pattern="/login*" access="IS_AUTHENTICATED_ANONYMOUSLY" />
-		<intercept-url pattern="/logout.do" access="IS_AUTHENTICATED_ANONYMOUSLY" />
-		<intercept-url pattern="/**" access="IS_AUTHENTICATED_FULLY" />
-		<form-login login-page="/login" username-parameter="username" password-parameter="password"
-			login-processing-url="/login.do" authentication-failure-url="/login?error=true" />
-		<logout logout-url="/logout.do" success-handler-ref="logoutHandler" />
-		<!-- The filter that uses Oauth2 auth-code flow to acquire an Oauth2 token if the user doesn't already have one -->
-		<custom-filter ref="oauth2ClientFilter" after="EXCEPTION_TRANSLATION_FILTER" />
-	</http>
-	
-	<import resource="classpath:/login-common.xml" />
-	
-	<mvc:annotation-driven>
-		<mvc:message-converters>
-			<bean class="org.cloudfoundry.identity.uaa.login.AutologinController.AutologinRequestConverter" />
-		</mvc:message-converters>
-	</mvc:annotation-driven>
-
-	<bean id="autologinAuthenticationFilter" class="org.cloudfoundry.identity.uaa.authentication.AuthzAuthenticationFilter">
-		<constructor-arg ref="autologinAuthenticationManager" />
-		<property name="parameterNames">
+		
+	<bean id="uaaPasswordTokenMatcher" class="org.cloudfoundry.identity.uaa.security.web.UaaRequestMatcher">
+		<constructor-arg value="/oauth/token" />
+		<property name="accept">
 			<list>
-				<value>code</value>
-				<value>response_type</value>
+				<value>application/json</value>
+				<value>application/x-www-form-urlencoded</value>
 			</list>
 		</property>
-		<property name="methods">
-			<set>
-				<value>GET</value>
-				<value>POST</value>
-			</set>
-		</property>
-	</bean>
-
-	<bean id="autologinAuthenticationManager" class="org.cloudfoundry.identity.uaa.login.AutologinAuthenticationManager">
-		<property name="codeStore" ref="autologinCodeStore" />
-	</bean>
-
-	<bean id="autologinCodeStore" class="org.cloudfoundry.identity.uaa.login.DefaultAutologinCodeStore">
-		<property name="expireCodeWhenUsed" value="${autologin.expire_when_used:true}" />
-	</bean>
-
-	<bean id="autologinAuthorizeRequestMatcher" class="org.cloudfoundry.identity.uaa.security.web.UaaRequestMatcher">
-		<constructor-arg value="/oauth/authorize" />
 		<property name="parameters">
 			<map>
-				<entry key="response_type" value="code" />
-				<entry key="code" value="" />
+				<entry key="grant_type" value="password" />
+				<entry key="password" value="" />
 			</map>
 		</property>
 	</bean>
+	
+	<bean id="oauthTokenAuthcodeFlow" class="org.cloudfoundry.identity.uaa.security.web.UaaRequestMatcher">
+		<constructor-arg value="/oauth/token" />
+		<property name="accept">
+			<list>
+				<value>application/json</value>
+				<value>application/x-www-form-urlencoded</value>
+			</list>
+		</property>
+		<property name="parameters">
+			<map>
+				<entry key="grant_type" value="authorization_code" />
+			</map>
+		</property>
+	</bean>
+	
+	<bean id="oauthTokenRefresh" class="org.cloudfoundry.identity.uaa.security.web.UaaRequestMatcher">
+        <constructor-arg value="/oauth/token" />
+        <property name="accept">
+            <list>
+                <value>application/json</value>
+                <value>application/x-www-form-urlencoded</value>
+            </list>
+        </property>
+        <property name="parameters">
+            <map>
+                <entry key="grant_type" value="refresh_token" />
+            </map>
+        </property>
+    </bean>
 
-	<mvc:resources location="/" mapping="/**" />
+	<security:http>
+		<security:intercept-url pattern="/**"
+			access="IS_AUTHENTICATED_FULLY" />
+		<security:custom-filter before="FIRST"
+			ref="metadataGeneratorFilter" />
+		<security:custom-filter after="FIRST"
+			ref="httpsHeaderFilter" />
+		<security:custom-filter after="BASIC_AUTH_FILTER"
+			ref="samlFilter" />
+		<security:custom-filter 
+			ref="oauth2ClientFilter" after="EXCEPTION_TRANSLATION_FILTER" />
+		<security:logout logout-url="/logout"
+			success-handler-ref="logoutHandler" />
+		<security:openid-login login-page="/login"
+			user-service-ref="openIdUserDetailsService"
+			authentication-failure-url="/login?error=true">
+			<security:attribute-exchange
+				identifier-match=".*myopenid.com.*">
+				<security:openid-attribute name="email"
+					type="http://schema.openid.net/contact/email" required="true" />
+				<security:openid-attribute name="fullname"
+					type="http://schema.openid.net/namePerson" required="true" />
+			</security:attribute-exchange>
+			<security:attribute-exchange
+				identifier-match=".*">
+				<security:openid-attribute name="email"
+					type="http://axschema.org/contact/email" required="true" count="1" />
+				<security:openid-attribute name="firstname"
+					type="http://axschema.org/namePerson/first" required="true" />
+				<security:openid-attribute name="lastname"
+					type="http://axschema.org/namePerson/last" required="true" />
+				<security:openid-attribute name="fullname"
+					type="http://axschema.org/namePerson" required="true" />
+			</security:attribute-exchange>
+		</security:openid-login>
+		<security:anonymous enabled="false" />
+	</security:http>
+	
+	<bean id="passcodeAuthenticationFilter" class="org.cloudfoundry.identity.uaa.login.PasscodeAuthenticationFilter">
+		<constructor-arg name="store" ref="oneTimeCodeStore"/>
+		<constructor-arg name="authenticationManager" ref="remoteAuthenticationManager"/>
+		<property name="parameterNames">
+			<list>
+				<value>username</value>
+				<value>password</value>
+				<value>passcode</value>
+				<value>credentials</value>
+			</list>
+		</property>
+	</bean>
 
-	<mvc:annotation-driven>
-		<mvc:message-converters>
-			<bean class="org.cloudfoundry.identity.uaa.login.AutologinController.AutologinRequestConverter" />
-		</mvc:message-converters>
-	</mvc:annotation-driven>
+	<bean id="httpsHeaderFilter" class="org.cloudfoundry.identity.web.HttpsHeaderFilter" />
 
-	<mvc:interceptors>
-		<bean class="org.cloudfoundry.identity.uaa.login.AnalyticsInterceptor">
-			<property name="analytics">
-				<bean class="org.cloudfoundry.identity.uaa.login.AnalyticsInterceptor.Analytics">
-					<property name="code" value="${analytics.code:UA-22181585-29}" />
-					<property name="domain" value="${analytics.domain:pivotal.io}" />
-				</bean>
-			</property>
-		</bean>
-	</mvc:interceptors>
+    <!-- this bean will be overwritten in the saml profile -->
+    <bean id="metadataGeneratorFilter" class="org.cloudfoundry.identity.web.NoOpFilter"/>
+    <!-- this bean will be overwritten in the saml profile -->
+	<bean id="samlFilter" class="org.cloudfoundry.identity.web.NoOpFilter"/>
+  
 
+	<import resource="classpath:/login-common.xml" />
+	
+    <mvc:annotation-driven>
+       <mvc:message-converters>
+           <bean class="org.cloudfoundry.identity.uaa.login.AutologinController.AutologinRequestConverter" />
+       </mvc:message-converters>
+    </mvc:annotation-driven>
+
+    <bean id="autologinAuthenticationFilter" class="org.cloudfoundry.identity.uaa.authentication.AuthzAuthenticationFilter">
+        <constructor-arg ref="autologinAuthenticationManager" />
+        <property name="parameterNames">
+            <list>
+                <value>code</value>
+                <value>response_type</value>
+            </list>
+        </property>
+        <property name="methods">
+            <set>
+                <value>GET</value>
+                <value>POST</value>
+            </set>
+        </property>
+    </bean>
+
+    <bean id="autologinAuthenticationManager" class="org.cloudfoundry.identity.uaa.login.AutologinAuthenticationManager">
+        <property name="codeStore" ref="autologinCodeStore" />
+    </bean>
+
+    <bean id="autologinCodeStore" class="org.cloudfoundry.identity.uaa.login.DefaultAutologinCodeStore">
+        <property name="expireCodeWhenUsed" value="${autologin.expire_when_used:true}" />
+    </bean>
+
+    <bean id="autologinAuthorizeRequestMatcher" class="org.cloudfoundry.identity.uaa.security.web.UaaRequestMatcher">
+        <constructor-arg value="/oauth/authorize" />
+        <property name="parameters">
+            <map>
+                <entry key="response_type" value="code" />
+                <entry key="code" value="" />
+            </map>
+        </property>
+    </bean>
+
+    <bean id="autologinController" class="org.cloudfoundry.identity.uaa.login.AutologinController">
+        <property name="codeStore" ref="autologinCodeStore" />
+        <property name="authenticationManager" ref="remoteAuthenticationManager" />
+    </bean>
+
+	<!-- Handler deciding where to redirect user after successful login -->
+	<bean id="successRedirectHandler"
+		class="org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler" />
+
+	
+
+	<bean id="openIdUserDetailsService"
+		class="org.cloudfoundry.identity.uaa.openid2.OpenIdUserDetailsService" />
+
+	
+
+	<mvc:resources mapping="/resources/**" location="/resources/" />
+	<mvc:annotation-driven />
 	<mvc:default-servlet-handler />
 
-	<bean id="viewResolver" class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
+	<bean id="viewResolver"
+		class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
 		<property name="mediaTypes">
 			<map>
-				<entry key="html" value="text/html" />
 				<entry key="json" value="application/json" />
 			</map>
 		</property>
 		<property name="viewResolvers">
-			<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
-				<property name="prefix" value="/WEB-INF/jsp/" />
-				<property name="suffix" value=".jsp" />
-			</bean>
+			<list>
+				<bean
+					class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+					<property name="prefix" value="/WEB-INF/jsp/${login.brand:oss}/" />
+					<property name="suffix" value=".jsp" />
+				</bean>
+				<bean class="org.springframework.web.servlet.view.BeanNameViewResolver" />
+			</list>
 		</property>
 		<property name="defaultViews">
-			<bean class="org.springframework.web.servlet.view.json.MappingJacksonJsonView" />
+			<bean
+				class="org.springframework.web.servlet.view.json.MappingJacksonJsonView">
+				<property name="extractValueFromSingleKeyModel" value="true" />
+			</bean>
 		</property>
 	</bean>
-
-	<util:map id="links">
-		<entry key="home" value="${links.home:https://console.run.pivotal.io}" />
-		<entry key="passwd" value="${links.passwd:https://console.run.pivotal.io/password_resets/new}" />
-		<entry key="register" value="${links.signup:https://console.run.pivotal.io/register}" />
-	</util:map>
-
-	<bean id="homeController" class="org.cloudfoundry.identity.uaa.login.HomeController">
-		<property name="links" ref="links" />
+	
+	
+	
+	<bean id="oneTimeCodeController" class="org.cloudfoundry.identity.uaa.login.PasscodeController">
+		<property name="store" ref="oneTimeCodeStore"/>
 	</bean>
-
-	<bean id="autologinController" class="org.cloudfoundry.identity.uaa.login.AutologinController">
-		<property name="codeStore" ref="autologinCodeStore" />
-		<property name="authenticationManager" ref="remoteAuthenticationManager" />
+	
+	<bean id="oneTimeCodeStore" class="org.cloudfoundry.identity.uaa.login.CachingPasscodeStore">
+		<property name="cacheManager" ref="cacheManager"/>
 	</bean>
+	
+	<cache:annotation-driven />
+ 
+    <bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheCacheManager">
+    	<property name="cacheManager" ref="ehcache" />
+    </bean>
 
-	<beans profile="ldap">
-
-		<sec:authentication-manager alias="ldapAuthenticationManager">
-			<sec:authentication-provider ref="ldapAuthProvider" />
-		</sec:authentication-manager>
-
-		<bean id="remoteAuthenticationManager" class="org.cloudfoundry.identity.uaa.login.UsernamePasswordExtractingAuthenticationManager">
-			<constructor-arg ref="ldapAuthenticationManager" />
-		</bean>
-
-		<bean id="contextSource" class="org.springframework.security.ldap.DefaultSpringSecurityContextSource">
-			<constructor-arg value="${ldap.base.url:ldap://localhost:33389/dc=springframework,dc=org}" />
-		</bean>
-
-		<bean id="ldapAuthProvider" class="org.springframework.security.ldap.authentication.LdapAuthenticationProvider">
-			<constructor-arg>
-				<bean class="org.springframework.security.ldap.authentication.BindAuthenticator">
-					<constructor-arg ref="contextSource" />
-					<property name="userDnPatterns">
-						<list>
-							<value>uid={0},ou=people</value>
-						</list>
-					</property>
-				</bean>
+	<bean id="ehcache" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
+		<property name="configLocation" value="classpath:/ehcache.xml" />
+	</bean>
+  
+	
+	<beans profile="fileMetadata">
+		<bean id="metadataProviderList" class="java.util.ArrayList">
+	        <constructor-arg>
+			  	<list>
+			  		<bean
+					class="org.springframework.security.saml.metadata.ExtendedMetadataDelegate">
+						<constructor-arg>
+							<bean
+								class="org.opensaml.saml2.metadata.provider.FilesystemMetadataProvider">
+								<constructor-arg value="${login.idpMetadataFile}" />
+								<property name="parserPool" ref="parserPool" />
+							</bean>
+						</constructor-arg>
+						<constructor-arg>
+							<bean
+								class="org.springframework.security.saml.metadata.ExtendedMetadata" />
+						</constructor-arg>
+					</bean>
+			  	</list>
 			</constructor-arg>
-			<constructor-arg>
-				<bean class="org.springframework.security.ldap.authentication.NullLdapAuthoritiesPopulator" />
-			</constructor-arg>
-			<property name="authoritiesMapper">
-				<bean class="org.springframework.security.core.authority.mapping.SimpleAuthorityMapper">
-					<property name="defaultAuthority" value="ROLE_USER" />
-				</bean>
-			</property>
 		</bean>
-
 	</beans>
+  
+  <beans profile="saml">
+      <!-- Register authentication manager with SAML provider -->
+      <security:authentication-manager id="authenticationManager">
+        <security:authentication-provider
+            ref="samlAuthenticationProvider" />
+      </security:authentication-manager>
+  
+      <bean id="samlFilter" class="org.springframework.security.web.FilterChainProxy">
+        <security:filter-chain-map path-type="ant">
+            <security:filter-chain pattern="/saml/login/**"
+                filters="samlEntryPoint" />
+            <security:filter-chain pattern="/saml/logout/**"
+                filters="samlLogoutFilter" />
+            <security:filter-chain pattern="/saml/metadata/**"
+                filters="metadataDisplayFilter" />
+            <security:filter-chain pattern="/saml/SSO/**"
+                filters="samlWebSSOProcessingFilter" />
+            <security:filter-chain pattern="/saml/SingleLogout/**"
+                filters="samlLogoutProcessingFilter" />
+            <security:filter-chain pattern="/saml/discovery/**"
+                filters="samlIDPDiscovery" />
+            <security:filter-chain pattern="/oauth/authorize/**"
+                filters="exceptionTranslationFilter" />
+        </security:filter-chain-map>
+    </bean>
+    
+    <!-- Logger for SAML messages and events -->
+    <bean id="samlLogger" class="org.springframework.security.saml.log.SAMLDefaultLogger" />
 
+    <bean id="keyManager" class="org.cloudfoundry.identity.uaa.login.SamlLoginServerKeyManager" lazy-init="false">
+        <constructor-arg type="java.lang.String" value="${login.serviceProviderKey}" />
+        <constructor-arg type="java.lang.String" value="${login.serviceProviderKeyPassword:''}" />
+        <constructor-arg type="java.lang.String" value="${login.serviceProviderCertificate}" />
+    </bean>
+
+    <!-- Entry point to initialize authentication, default values taken from 
+        properties file -->
+    <bean id="samlEntryPoint" class="org.springframework.security.saml.SAMLEntryPoint">
+        <property name="defaultProfileOptions">
+            <bean class="org.springframework.security.saml.websso.WebSSOProfileOptions">
+                <property name="includeScoping" value="false" />
+                <property name="nameID" value="${login.saml.nameID:urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified}"/>
+                <property name="assertionConsumerIndex" value="${login.saml.assertionConsumerIndex:0}"/>
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="exceptionTranslationFilter"
+        class="org.springframework.security.web.access.ExceptionTranslationFilter">
+        <constructor-arg ref="samlEntryPoint" />
+    </bean>
+
+    <!-- IDP Discovery Service -->
+    <bean id="samlIDPDiscovery" class="org.springframework.security.saml.SAMLDiscovery" />
+
+    <!-- Filter automatically generates default SP metadata -->
+    <bean id="metadataGeneratorFilter"
+        class="org.springframework.security.saml.metadata.MetadataGeneratorFilter">
+        <constructor-arg>
+            <bean class="org.springframework.security.saml.metadata.MetadataGenerator">
+                <property name="includeDiscovery" value="true" />
+                <property name="requestSigned" value="true" />
+                <property name="wantAssertionSigned" value="false" />
+                <property name="signMetadata" value="true" />
+                <property name="entityBaseURL" value="${login.entityBaseURL}" />
+                <property name="entityId" value="${login.entityID}" />
+                <property name="entityAlias" value="${login.idpEntityAlias}" />
+            </bean>
+        </constructor-arg>
+    </bean>
+
+    <!-- The filter is waiting for connections on URL suffixed with filterSuffix 
+        and presents SP metadata there -->
+    <bean id="metadataDisplayFilter"
+        class="org.springframework.security.saml.metadata.MetadataDisplayFilter" />
+
+    <bean id="metadata"
+        class="org.springframework.security.saml.metadata.CachingMetadataManager">
+        <constructor-arg ref="metadataProviderList"/>
+    </bean>
+    
+    <bean name="metadataFetchingHttpClientTimer" class="java.util.Timer" >
+        <constructor-arg value="true"/>
+    </bean>
+    
+    <bean name="metadataFetchingHttpClient" class="org.apache.commons.httpclient.HttpClient">
+       <constructor-arg ref="httpClientParams"/>
+    </bean>
+
+    <bean name="httpClientParams" class="org.apache.commons.httpclient.params.HttpClientParams">
+       <property name="connectionManagerTimeout" value="30000"/>
+    </bean>
+
+    <!-- SAML Authentication Provider responsible for validating of received 
+        SAML messages -->
+    <bean id="samlAuthenticationProvider"
+        class="org.springframework.security.saml.SAMLAuthenticationProvider">
+        <property name="userDetails" ref="samlUserDetails" />
+    </bean>
+    
+    <bean id="samlUserDetails" class="org.cloudfoundry.identity.uaa.login.LoginServerSamlUserDetailsService" />
+
+    <!-- Provider of default SAML Context -->
+    <bean id="contextProvider"
+        class="org.springframework.security.saml.context.SAMLContextProviderImpl" />
+
+    <!-- Processing filter for WebSSO profile messages -->
+    <bean id="samlWebSSOProcessingFilter" class="org.springframework.security.saml.SAMLProcessingFilter">
+        <property name="authenticationManager" ref="authenticationManager" />
+        <property name="authenticationSuccessHandler" ref="successRedirectHandler" />
+    </bean>
+
+    <!-- Logout handler terminating local session -->
+    <bean id="samlLogoutHandler"
+        class="org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler">
+        <property name="invalidateHttpSession" value="true" />
+    </bean>
+
+    <!-- Override default logout processing filter with the one processing SAML 
+        messages -->
+    <bean id="samlLogoutFilter" class="org.springframework.security.saml.SAMLLogoutFilter">
+        <constructor-arg ref="logoutHandler" />
+        <constructor-arg ref="samlLogoutHandler" />
+        <constructor-arg ref="samlLogoutHandler" />
+    </bean>
+
+    <!-- Filter processing incoming logout messages -->
+    <!-- First argument determines URL user will be redirected to after successful 
+        global logout -->
+    <bean id="samlLogoutProcessingFilter"
+        class="org.springframework.security.saml.SAMLLogoutProcessingFilter">
+        <constructor-arg ref="logoutHandler" />
+        <constructor-arg ref="samlLogoutHandler" />
+    </bean>
+
+    <!-- Class loading incoming SAML messages from httpRequest stream -->
+    <bean id="processor"
+        class="org.springframework.security.saml.processor.SAMLProcessorImpl">
+        <constructor-arg>
+            <list>
+                <ref bean="redirectBinding" />
+                <ref bean="postBinding" />
+                <ref bean="artifactBinding" />
+                <ref bean="soapBinding" />
+                <ref bean="paosBinding" />
+            </list>
+        </constructor-arg>
+    </bean>
+
+    <!-- SAML 2.0 WebSSO Assertion Consumer -->
+    <bean id="webSSOprofileConsumer"
+        class="org.springframework.security.saml.websso.WebSSOProfileConsumerImpl" />
+
+    <!-- SAML 2.0 Holder-of-Key WebSSO Assertion Consumer -->
+    <bean id="hokWebSSOprofileConsumer"
+        class="org.springframework.security.saml.websso.WebSSOProfileConsumerHoKImpl" />
+
+    <!-- SAML 2.0 Web SSO profile -->
+    <bean id="webSSOprofile"
+        class="org.springframework.security.saml.websso.WebSSOProfileImpl" />
+
+    <!-- SAML 2.0 Holder-of-Key Web SSO profile -->
+    <bean id="hokWebSSOProfile"
+        class="org.springframework.security.saml.websso.WebSSOProfileConsumerHoKImpl" />
+
+    <!-- SAML 2.0 Logout Profile -->
+    <bean id="logoutprofile"
+        class="org.springframework.security.saml.websso.SingleLogoutProfileImpl" />
+
+    <!-- Bindings, encoders and decoders used for creating and parsing messages -->
+    <bean id="postBinding"
+        class="org.springframework.security.saml.processor.HTTPPostBinding">
+        <constructor-arg ref="parserPool" />
+        <constructor-arg ref="velocityEngine" />
+    </bean>
+
+    <bean id="redirectBinding"
+        class="org.springframework.security.saml.processor.HTTPRedirectDeflateBinding">
+        <constructor-arg ref="parserPool" />
+    </bean>
+
+    <bean id="artifactBinding"
+        class="org.springframework.security.saml.processor.HTTPArtifactBinding">
+        <constructor-arg ref="parserPool" />
+        <constructor-arg ref="velocityEngine" />
+        <constructor-arg>
+            <bean
+                class="org.springframework.security.saml.websso.ArtifactResolutionProfileImpl">
+                <constructor-arg>
+                    <bean class="org.apache.commons.httpclient.HttpClient" />
+                </constructor-arg>
+                <property name="processor">
+                    <bean id="soapProcessor"
+                        class="org.springframework.security.saml.processor.SAMLProcessorImpl">
+                        <constructor-arg ref="soapBinding" />
+                    </bean>
+                </property>
+            </bean>
+        </constructor-arg>
+    </bean>
+
+    <bean id="soapBinding"
+        class="org.springframework.security.saml.processor.HTTPSOAP11Binding">
+        <constructor-arg ref="parserPool" />
+    </bean>
+
+    <bean id="paosBinding"
+        class="org.springframework.security.saml.processor.HTTPPAOS11Binding">
+        <constructor-arg ref="parserPool" />
+    </bean>
+
+    <!-- Initialization of OpenSAML library -->
+    <bean class="org.springframework.security.saml.SAMLBootstrap" />
+
+    <!-- Initialization of the velocity engine -->
+    <bean id="velocityEngine" class="org.springframework.security.saml.util.VelocityFactory"
+        factory-method="getEngine" />
+
+    <!-- XML parser pool needed for OpenSAML parsing -->
+    <bean id="parserPool" class="org.opensaml.xml.parse.BasicParserPool"
+        scope="singleton" />
+    <bean id="uaaController" class="org.cloudfoundry.identity.uaa.login.SamlRemoteUaaController">
+        <property name="uaaBaseUrl" value="${uaa.url:http://localhost:8080/uaa}" />
+        <property name="prompts">
+            <util:list>
+                <bean class="org.cloudfoundry.identity.uaa.authentication.login.Prompt">
+                    <constructor-arg name="name" value="username"/>
+                    <constructor-arg name="text" value="Email"/>
+                    <constructor-arg name="type" value="text"/>
+                </bean>
+                <bean class="org.cloudfoundry.identity.uaa.authentication.login.Prompt">
+                    <constructor-arg name="name" value="password"/>
+                    <constructor-arg name="text" value="Password"/>
+                    <constructor-arg name="type" value="password"/>
+                </bean>
+                <bean class="org.cloudfoundry.identity.uaa.authentication.login.Prompt">
+                    <constructor-arg name="name" value="passcode"/>
+                    <constructor-arg name="text" value="One Time Code (Get one at ${login.url:http://localhost:8080/login}/passcode)"/>
+                    <constructor-arg name="type" value="password"/>
+                </bean>
+            </util:list>
+        </property>
+        <property name="authorizationTemplate" ref="authorizationTemplate" />
+        <property name="links" ref="links" />
+    </bean>
+    
+    <bean id="acceptSSLSocketFactory" class="org.apache.commons.httpclient.contrib.ssl.EasySSLProtocolSocketFactory"/>
+    
+    <bean id="metadataProviderList" class="java.util.ArrayList">
+        <constructor-arg>
+            <list>
+                <bean class="org.springframework.security.saml.metadata.ExtendedMetadataDelegate">
+                    <constructor-arg>
+                        <bean class="org.cloudfoundry.identity.uaa.login.ssl.FixedHttpMetaDataProvider">
+                            <constructor-arg ref="metadataFetchingHttpClientTimer" />
+                            <constructor-arg ref="metadataFetchingHttpClient" />
+                            <constructor-arg value="${login.idpMetadataURL:''}" />
+                            <property name="parserPool" ref="parserPool" />
+                            <property name="socketFactory" ref="acceptSSLSocketFactory"/>
+                        </bean>
+                    </constructor-arg>
+                    <constructor-arg>
+                        <bean class="org.springframework.security.saml.metadata.ExtendedMetadata" />
+                    </constructor-arg>
+                </bean>
+            </list>
+        </constructor-arg>
+    </bean>
+  </beans>
+  
+  
+    <beans profile="ldap">
+        <import resource="${ldap.profile.file:ldap/ldap-simple-bind.xml}" />
+    </beans>
+  
+	
 </beans>
