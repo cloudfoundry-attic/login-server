@@ -95,12 +95,14 @@
                 </div>
 
                 <c:forEach items="${prompts}" var="prompt">
+                  <c:if test="${'passcode' != prompt.key}">
                     <div class="fields-wrapper">
                       <spring:message code="prompt.${prompt.key}"
                         text="${prompt.value[1]}" var="text"/>
                       <input id='${prompt.key}' type='${prompt.value[0]}' ${prompt.value[0]=='password'?'autocomplete="off"':''}
                         name='${prompt.key}' placeholder='${text}' />
                     </div>
+                  </c:if>
                 </c:forEach>
 
                 <div class="fields-wrapper">
