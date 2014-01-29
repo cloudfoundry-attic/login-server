@@ -107,6 +107,13 @@
                     <button type="submit" class="btn-primary">Sign in</button>
                 </div>
             </form>
+            
+            <div class="fields-wrapper">
+            <c:if test="${saml}">
+               <p><a href="saml/discovery?returnIDParam=idp&entityID=${entityID}">Sign in with your organization's credentials.</a></p>
+            </c:if>
+            </div>
+            
         </div>
 
         <div class="not-a-member">
