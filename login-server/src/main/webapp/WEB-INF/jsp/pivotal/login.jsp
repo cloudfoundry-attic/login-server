@@ -76,121 +76,130 @@
 <script>
   try { Typekit.load(); } catch (e) { }
 </script>
+<c:if test="${autoRedirect}">
+   <script type="text/javascript">
+	   setTimeout(function () {
+	      window.location.href = "saml/discovery?returnIDParam=idp&entityID=${entityID}";
+	   }, 1000);
+   </script>
+</c:if>
 </head>
-<body>
-    <div class="container">
-        <div class="header">
-            <a style="text-decoration: none;" href='${rootUrl}'><div class="image-logo"></div></a>
-            <div class="logo"><a style="text-decoration: none;" href='${rootUrl}'>PIVOTAL</a></div>
-            <div class="header-link">
-                <a href="${links.passwd}" class="h4">Forgot Password</a>
-            </div>
-        </div>
-
-        <div class="main-content">
-            <form id="loginForm" name="loginForm"
-                                action="<c:url value="/login.do"/>" method="POST" novalidate>
-                <div class="error-messages<c:if test="${empty param.error}"> hidden</c:if>">
-                    Unable to verify, please try again:
-                </div>
-
-                <c:forEach items="${prompts}" var="prompt">
-                  <c:if test="${'passcode' != prompt.key}">
-                    <div class="fields-wrapper">
-                      <spring:message code="prompt.${prompt.key}"
-                        text="${prompt.value[1]}" var="text"/>
-                      <input id='${prompt.key}' type='${prompt.value[0]}' ${prompt.value[0]=='password'?'autocomplete="off"':''}
-                        name='${prompt.key}' placeholder='${text}' />
-                    </div>
-                  </c:if>
-                </c:forEach>
-
-                <div class="fields-wrapper">
-                    <button type="submit" class="btn-primary">Sign in</button>
-                </div>
-            </form>
-            
-            <div class="fields-wrapper">
-            <c:if test="${saml}">
-               <p><a href="saml/discovery?returnIDParam=idp&entityID=${entityID}">Sign in with your organization's credentials.</a></p>
-            </c:if>
-            </div>
-            
-        </div>
-
-        <div class="not-a-member">
-            <div class="h1">Not a member yet?</div>
-            <p class="h4">
-                Join <a href="${links.registerNetwork}">Pivotal Network</a> for enterprise,<br />
-                or <a href="${links.register}">Pivotal Web Services</a> for hosted solutions.
-            </p>
-        </div>
-    </div>
-
-    <div class='footer' title="Version: ${app.version}, Commit: ${commit_id}, Timestamp: ${timestamp}, UAA: ${links.uaa}">
-        <div class='copyright'>
-            &copy;
-            <fmt:formatDate value="<%=new java.util.Date()%>" pattern="yyyy" />
-            Pivotal Software, Inc. - All rights reserved
-        </div>
-        <div class='powered-by'>
-            Powered by
-            <div class='logo'>
-                Pivotal
-            </div>
-        </div>
-    </div>
-
-    <%-- Clear out session scoped attributes, don't leak info --%>
-    <c:if
-        test="${not empty sessionScope['SPRING_SECURITY_LAST_EXCEPTION']}">
-        <c:set scope="session" var="SPRING_SECURITY_LAST_EXCEPTION"
-            value="${null}" />
-    </c:if>
-    <c:if test="${not empty sessionScope['SPRING_SECURITY_LAST_USERNAME']}">
-        <c:set scope="session" var="SPRING_SECURITY_LAST_USERNAME"
-            value="${null}" />
-    </c:if>
-
-    <!--
-                                Start of DoubleClick Floodlight Tag: Please do not remove
-                                Activity name of this tag: Micro Cloud Foundry - Landing Page Arrival
-                                URL of the webpage where the tag is expected to be placed: https://www.cloudfoundry.com/micro
-                                This tag must be placed between the <body> and </body> tags, as close as possible to the opening tag.
-                                Creation Date: 08/18/2011
-                                -->
-    <script type="text/javascript">
-        var axel = Math.random() + "";
-        var a = axel * 10000000000000;
-        document
-                .write('<iframe src="https://fls.doubleclick.net/activityi;src=2645750;type=cloud806;cat=micro467;ord='
-                        + a
-                        + '?" width="1" height="1" frameborder="0" style="display:none"></iframe>');
-    </script>
-    <noscript>
-        <iframe
-            src="https://fls.doubleclick.net/activityi;src=2645750;type=cloud806;cat=micro467;ord=1?"
-            width="1" height="1" frameborder="0" style="display: none"></iframe>
-    </noscript>
-    <!-- End of DoubleClick Floodlight Tag: Please do not remove -->
-
-    <c:if test="${not empty analytics}">
-        <script>
-            (function(i, s, o, g, r, a, m) {
-                i['GoogleAnalyticsObject'] = r;
-                i[r] = i[r] || function() {
-                    (i[r].q = i[r].q || []).push(arguments)
-                }, i[r].l = 1 * new Date();
-                a = s.createElement(o), m = s.getElementsByTagName(o)[0];
-                a.async = 1;
-                a.src = g;
-                m.parentNode.insertBefore(a, m)
-            })(window, document, 'script',
-                    '//www.google-analytics.com/analytics.js', 'ga');
-
-            ga('create', '${analytics.code}', '${analytics.domain}');
-            ga('send', 'pageview');
-        </script>
-    </c:if>
-</body>
+<c:if test="!${autoRedirect}">
+	<body>
+	    <div class="container">
+	        <div class="header">
+	            <a style="text-decoration: none;" href='${rootUrl}'><div class="image-logo"></div></a>
+	            <div class="logo"><a style="text-decoration: none;" href='${rootUrl}'>PIVOTAL</a></div>
+	            <div class="header-link">
+	                <a href="${links.passwd}" class="h4">Forgot Password</a>
+	            </div>
+	        </div>
+	
+	        <div class="main-content">
+	            <form id="loginForm" name="loginForm"
+	                                action="<c:url value="/login.do"/>" method="POST" novalidate>
+	                <div class="error-messages<c:if test="${empty param.error}"> hidden</c:if>">
+	                    Unable to verify, please try again:
+	                </div>
+	
+	                <c:forEach items="${prompts}" var="prompt">
+	                  <c:if test="${'passcode' != prompt.key}">
+	                    <div class="fields-wrapper">
+	                      <spring:message code="prompt.${prompt.key}"
+	                        text="${prompt.value[1]}" var="text"/>
+	                      <input id='${prompt.key}' type='${prompt.value[0]}' ${prompt.value[0]=='password'?'autocomplete="off"':''}
+	                        name='${prompt.key}' placeholder='${text}' />
+	                    </div>
+	                  </c:if>
+	                </c:forEach>
+	
+	                <div class="fields-wrapper">
+	                    <button type="submit" class="btn-primary">Sign in</button>
+	                </div>
+	            </form>
+	            
+	            <div class="fields-wrapper">
+	            <c:if test="${saml}">
+	               <p><a href="saml/discovery?returnIDParam=idp&entityID=${entityID}">Sign in with your organization's credentials.</a></p>
+	            </c:if>
+	            </div>
+	            
+	        </div>
+	
+	        <div class="not-a-member">
+	            <div class="h1">Not a member yet?</div>
+	            <p class="h4">
+	                Join <a href="${links.registerNetwork}">Pivotal Network</a> for enterprise,<br />
+	                or <a href="${links.register}">Pivotal Web Services</a> for hosted solutions.
+	            </p>
+	        </div>
+	    </div>
+	
+	    <div class='footer' title="Version: ${app.version}, Commit: ${commit_id}, Timestamp: ${timestamp}, UAA: ${links.uaa}">
+	        <div class='copyright'>
+	            &copy;
+	            <fmt:formatDate value="<%=new java.util.Date()%>" pattern="yyyy" />
+	            Pivotal Software, Inc. - All rights reserved
+	        </div>
+	        <div class='powered-by'>
+	            Powered by
+	            <div class='logo'>
+	                Pivotal
+	            </div>
+	        </div>
+	    </div>
+	
+	    <%-- Clear out session scoped attributes, don't leak info --%>
+	    <c:if
+	        test="${not empty sessionScope['SPRING_SECURITY_LAST_EXCEPTION']}">
+	        <c:set scope="session" var="SPRING_SECURITY_LAST_EXCEPTION"
+	            value="${null}" />
+	    </c:if>
+	    <c:if test="${not empty sessionScope['SPRING_SECURITY_LAST_USERNAME']}">
+	        <c:set scope="session" var="SPRING_SECURITY_LAST_USERNAME"
+	            value="${null}" />
+	    </c:if>
+	
+	    <!--
+	                                Start of DoubleClick Floodlight Tag: Please do not remove
+	                                Activity name of this tag: Micro Cloud Foundry - Landing Page Arrival
+	                                URL of the webpage where the tag is expected to be placed: https://www.cloudfoundry.com/micro
+	                                This tag must be placed between the <body> and </body> tags, as close as possible to the opening tag.
+	                                Creation Date: 08/18/2011
+	                                -->
+	    <script type="text/javascript">
+	        var axel = Math.random() + "";
+	        var a = axel * 10000000000000;
+	        document
+	                .write('<iframe src="https://fls.doubleclick.net/activityi;src=2645750;type=cloud806;cat=micro467;ord='
+	                        + a
+	                        + '?" width="1" height="1" frameborder="0" style="display:none"></iframe>');
+	    </script>
+	    <noscript>
+	        <iframe
+	            src="https://fls.doubleclick.net/activityi;src=2645750;type=cloud806;cat=micro467;ord=1?"
+	            width="1" height="1" frameborder="0" style="display: none"></iframe>
+	    </noscript>
+	    <!-- End of DoubleClick Floodlight Tag: Please do not remove -->
+	
+	    <c:if test="${not empty analytics}">
+	        <script>
+	            (function(i, s, o, g, r, a, m) {
+	                i['GoogleAnalyticsObject'] = r;
+	                i[r] = i[r] || function() {
+	                    (i[r].q = i[r].q || []).push(arguments)
+	                }, i[r].l = 1 * new Date();
+	                a = s.createElement(o), m = s.getElementsByTagName(o)[0];
+	                a.async = 1;
+	                a.src = g;
+	                m.parentNode.insertBefore(a, m)
+	            })(window, document, 'script',
+	                    '//www.google-analytics.com/analytics.js', 'ga');
+	
+	            ga('create', '${analytics.code}', '${analytics.domain}');
+	            ga('send', 'pageview');
+	        </script>
+	    </c:if>
+	</body>
+</c:if>
 </html>
