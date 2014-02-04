@@ -56,6 +56,9 @@ public class SamlRemoteUaaController extends RemoteUaaController {
 
 	@Value("${login.entityID}")
 	public String entityID = "";
+	
+	@Value("${login.autoRedirect}")
+	public boolean autoRedirect = false;
 
 	@Override
 	@RequestMapping(value = { "/info", "/login" }, method = RequestMethod.GET)
@@ -63,7 +66,8 @@ public class SamlRemoteUaaController extends RemoteUaaController {
 	HttpHeaders headers, Map<String, Object> model, Principal principal) throws Exception {
 		// Entity ID to start the discovery
 		model.put("entityID", entityID);
-		model.put("saml",Boolean.TRUE);
+		model.put("saml", Boolean.TRUE);
+		model.put("autoRedirect", autoRedirect);
 		return super.prompts(request, headers, model, principal);
 	}
 
