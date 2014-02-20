@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>org.cloudfoundry.identity</groupId>
 		<artifactId>cloudfoundry-identity-parent</artifactId>
-		<version>1.5.1-SNAPSHOT</version>
+		<version>1.5.3</version>
 	</parent>
 
 	<groupId>com.cloudfoundry.identity</groupId>
@@ -87,7 +87,7 @@
 	</developers>
 
 	<properties>
-		<identity.version>1.5.1-SNAPSHOT</identity.version>
+		<identity.version>1.5.3</identity.version>
 		<spring.version>3.1.2.RELEASE</spring.version>
 		<groupId>${project.groupId}</groupId>
 		<version>${project.version}</version>
