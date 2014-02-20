@@ -41,6 +41,8 @@
 	<security:http pattern="/error" security="none" />
 
     <!-- TODO: Move the autologin related beans from the login server and saml login server to login common -->
+    
+    <!-- Pattern:/autologin -->
     <http pattern="/autologin" create-session="stateless" entry-point-ref="basicAuthenticationEntryPoint"
         xmlns="http://www.springframework.org/schema/security">
         <intercept-url pattern="/**" access="IS_AUTHENTICATED_FULLY" />
@@ -48,6 +50,7 @@
         <custom-filter ref="clientAuthenticationFilter" position="BASIC_AUTH_FILTER" />
     </http>
 
+    <!-- Pattern: /oauth/authorize parameters:{response_type=code,code=?} -->
     <http request-matcher-ref="autologinAuthorizeRequestMatcher" entry-point-ref="loginEntryPoint"
         xmlns="http://www.springframework.org/schema/security">
         <!-- TODO: add entry point that can redirect back to client app? -->
@@ -56,6 +59,7 @@
     </http>
     
 	<!-- Version of the /authorize endpoint for stateless clients such as VMC -->
+    <!-- Pattern: /oauth/authorize parameters:{response_type=token,credentials={} -->
 	<http name="statelessAuthzEndpointSecurity" request-matcher-ref="oauthAuthorizeRequestMatcher" create-session="stateless"
 		entry-point-ref="oauthAuthenticationEntryPoint" authentication-manager-ref="remoteAuthenticationManager"
 		xmlns="http://www.springframework.org/schema/security">
@@ -83,6 +87,7 @@
 	</security:http>
 
 	<!-- Owner password flow for external authentication (SAML) -->
+    <!-- Pattern: /oauth/token parameters:{grant_type=password,passcode= -->
  	<http name="tokenEndpointSecurityForPasscodes" request-matcher-ref="passcodeTokenMatcher"
 		create-session="stateless" entry-point-ref="basicAuthenticationEntryPoint"
 		xmlns="http://www.springframework.org/schema/security">
@@ -109,6 +114,7 @@
 	</bean>
 	
 	<!-- Owner password flow for UAA authentication -->
+    <!-- Pattern: /oauth/token parameters:{grant_type=password,password= -->
  	<http name="tokenEndpointSecurityForPasswords" request-matcher-ref="uaaPasswordTokenMatcher"
 		create-session="stateless" entry-point-ref="basicAuthenticationEntryPoint" 
 		authentication-manager-ref="remoteAuthenticationManager"
@@ -256,6 +262,7 @@
         <property name="expireCodeWhenUsed" value="${autologin.expire_when_used:true}" />
     </bean>
 
+    <!-- Pattern: /oauth/authorize parameters:{response_type=code,code=?} -->
     <bean id="autologinAuthorizeRequestMatcher" class="org.cloudfoundry.identity.uaa.security.web.UaaRequestMatcher">
         <constructor-arg value="/oauth/authorize" />
         <property name="parameters">
