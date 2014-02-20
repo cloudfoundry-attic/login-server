@@ -1,5 +1,10 @@
 language: java
 before_install: mvn -v
-install: mvn -U install --quiet -DskipTests=true
-script: mvn clean test
-
+install: 
+  -  mvn -U clean --quiet -DskipTests=true
+  -  mvn -U install --quiet -DskipTests=true
+script: 
+  - ./.run-script.sh
+  - mvn test
+  - kill -9 `cat mvn.pid`
+  - rm -f mvn.pid

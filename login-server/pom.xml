@@ -17,10 +17,9 @@
 	<description>Login/LDAP/SAML2 Service provider for Cloud Foundry</description>
 
 	<properties>
-		<spring.security.saml.version>1.0.0.RC2</spring.security.saml.version>
+		<spring.security.saml.version>1.0.0.RC3-SNAPSHOT</spring.security.saml.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<tomcat.version>6.0.35</tomcat.version>
 
 		<login.path>/login</login.path>
 		<file>target/${project.artifactId}-${project.version}.war</file>
@@ -64,18 +63,21 @@
 					</configuration>
 				</plugin>
 				<plugin>
-					<groupId>org.codehaus.mojo</groupId>
-					<artifactId>tomcat-maven-plugin</artifactId>
-					<configuration>
-						<path>${login.path}</path>
-					</configuration>
-				</plugin>
-				<plugin>
 					<groupId>org.apache.tomcat.maven</groupId>
-					<artifactId>tomcat7-maven-plugin</artifactId>
-					<configuration>
-						<path>${login.path}</path>
-					</configuration>
+                    <artifactId>tomcat7-maven-plugin</artifactId>
+                    <configuration>
+                        <fork>false</fork>
+                        <useTestClasspath>false</useTestClasspath>
+                        <jarScanAllDirectories>false</jarScanAllDirectories>
+                        <addWarDependenciesInClassloader>false</addWarDependenciesInClassloader>
+                        <path>${login.path}</path>
+                        <systemProperties>
+                          <CLOUD_FOUNDRY_CONFIG_PATH>${CLOUD_FOUNDRY_CONFIG_PATH}</CLOUD_FOUNDRY_CONFIG_PATH>
+                          <UAA_PROFILE>local</UAA_PROFILE>
+                          <tomcat.util.scan.DefaultJarScanner.jarsToSkip>bcprov-jdk15-1.46.jar,bcprov-jdk15on-1.47.jar,not-yet-commons-ssl-0.3.9.jar</tomcat.util.scan.DefaultJarScanner.jarsToSkip>
+                          <org.apache.catalina.startup.ContextConfig.jarsToSkip>bcprov-jdk15-1.46.jar,bcprov-jdk15on-1.47.jar,not-yet-commons-ssl-0.3.9.jar</org.apache.catalina.startup.ContextConfig.jarsToSkip>
+                        </systemProperties>
+                    </configuration>
 				</plugin>
 				<plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -124,30 +126,24 @@
 			<build>
 				<plugins>
 					<plugin>
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>tomcat-maven-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>start-tomcat</id>
-								<phase>process-test-sources</phase>
-								<goals>
-									<goal>run</goal>
-								</goals>
-								<configuration>
-									<fork>true</fork>
-								</configuration>
-							</execution>
-						</executions>
+                        <groupId>org.apache.tomcat.maven</groupId>
+                        <artifactId>tomcat7-maven-plugin</artifactId>
 						<configuration>
-							<systemProperties>
-								<CLOUD_FOUNDRY_CONFIG_PATH>${CLOUD_FOUNDRY_CONFIG_PATH}</CLOUD_FOUNDRY_CONFIG_PATH>
-								<UAA_PROFILE>local</UAA_PROFILE>
-							</systemProperties>
-							<addContextWarDependencies>true</addContextWarDependencies>
+                          <webapps>
+                              <webapp>
+                                <groupId>org.cloudfoundry.identity</groupId>
+                                <artifactId>cloudfoundry-identity-uaa</artifactId>
+                                <version>${identity.version}</version>
+                                <type>war</type>
+                                <contextPath>uaa</contextPath>
+                                <asWebapp>true</asWebapp>
+                              </webapp>
+                            </webapps>
 						</configuration>
 					</plugin>
 				</plugins>
 			</build>
+<!--       
 			<dependencies>
 				<dependency>
 					<groupId>org.cloudfoundry.identity</groupId>
@@ -177,6 +173,7 @@
 					<scope>tomcat</scope>
 				</dependency>
 			</dependencies>
+ -->      
 		</profile>
 	</profiles>
 
@@ -234,6 +231,18 @@
 			<artifactId>spring-security-saml2-core</artifactId>
 			<version>${spring.security.saml.version}</version>
 		</dependency>
+
+        <dependency>
+            <groupId>org.opensaml</groupId>
+            <artifactId>opensaml</artifactId>
+            <version>2.5.3</version>
+        </dependency>
+
+        <!--<dependency>-->
+            <!--<groupId>xml-apis</groupId>-->
+            <!--<artifactId>xml-apis</artifactId>-->
+            <!--<version>1.4.01</version>-->
+        <!--</dependency>-->
 
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -325,13 +334,6 @@
 			<version>4.4</version>
 			<scope>test</scope>
 		</dependency>
-    
-        <dependency>
-          <groupId>xml-apis</groupId>
-          <artifactId>xml-apis</artifactId>
-          <version>1.4.01</version>
-          <scope>test</scope>
-        </dependency>
 
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
