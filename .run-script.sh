@@ -16,6 +16,14 @@ while [ $SLEEP_TIME -gt 0 ]; do
         then
           SLEEP_TIME=0
         fi
+        ps -p `cat mvn.pid` 2>&1 >/dev/null
+        PS_EXIT_VALUE=$?
+        if [ $PS_EXIT_VALUE -ne 0 ]
+        then
+            echo ""
+            echo "Tomcat no longer running."
+            SLEEP_TIME=0
+        fi
 done
 ps -p `cat mvn.pid`
 EXIT_VALUE=$?
