@@ -228,12 +228,6 @@
 			<version>${spring.security.saml.version}</version>
 		</dependency>
 
-        <dependency>
-            <groupId>org.opensaml</groupId>
-            <artifactId>opensaml</artifactId>
-            <version>2.6.1</version>
-        </dependency>
-
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-web</artifactId>
