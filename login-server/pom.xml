@@ -69,7 +69,7 @@
                         <fork>false</fork>
                         <useTestClasspath>false</useTestClasspath>
                         <jarScanAllDirectories>false</jarScanAllDirectories>
-                        <addWarDependenciesInClassloader>false</addWarDependenciesInClassloader>
+                        <addWarDependenciesInClassloader>true</addWarDependenciesInClassloader>
                         <path>${login.path}</path>
                         <systemProperties>
                           <CLOUD_FOUNDRY_CONFIG_PATH>${CLOUD_FOUNDRY_CONFIG_PATH}</CLOUD_FOUNDRY_CONFIG_PATH>
