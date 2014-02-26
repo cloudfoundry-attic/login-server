@@ -138,6 +138,22 @@
                                 <contextPath>uaa</contextPath>
                                 <asWebapp>true</asWebapp>
                               </webapp>
+                              <webapp>
+                                <groupId>org.cloudfoundry.identity</groupId>
+                                <artifactId>cloudfoundry-identity-api</artifactId>
+                                <version>${identity.version}</version>
+                                <type>war</type>
+                                <contextPath>api</contextPath>
+                                <asWebapp>true</asWebapp>
+                              </webapp>
+                              <webapp>
+                                <groupId>org.cloudfoundry.identity</groupId>
+                                <artifactId>cloudfoundry-identity-app</artifactId>
+                                <version>${identity.version}</version>
+                                <type>war</type>
+                                <contextPath>app</contextPath>
+                                <asWebapp>true</asWebapp>
+                              </webapp>
                             </webapps>
 						</configuration>
 					</plugin>
