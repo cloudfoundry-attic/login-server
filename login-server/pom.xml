@@ -197,10 +197,6 @@
 				<enabled>false</enabled>
 			</snapshots>
 		</repository>
-	    <repository>
-	      <id>org.opensaml</id>
-	      <url>https://build.shibboleth.net/nexus/content/repositories/releases</url>
-	    </repository>
 	</repositories>
 
 	<dependencies>
@@ -235,14 +231,8 @@
         <dependency>
             <groupId>org.opensaml</groupId>
             <artifactId>opensaml</artifactId>
-            <version>2.5.3</version>
+            <version>2.6.1</version>
         </dependency>
-
-        <!--<dependency>-->
-            <!--<groupId>xml-apis</groupId>-->
-            <!--<artifactId>xml-apis</artifactId>-->
-            <!--<version>1.4.01</version>-->
-        <!--</dependency>-->
 
 		<dependency>
 			<groupId>org.springframework</groupId>
