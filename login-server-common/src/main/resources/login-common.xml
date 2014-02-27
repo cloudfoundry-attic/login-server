@@ -117,10 +117,12 @@
 	</bean>
 
 	<util:map id="links">
-		<entry key="home" value="${links.home:https://www.cloudfoundry.com}" />
-		<entry key="support" value="${links.support:https://support.cloudfoundry.com/home}" />
-		<entry key="passwd" value="${links.passwd:https://www.cloudfoundry.com/passwd}" />
-		<entry key="register" value="${links.signup:https://www.cloudfoundry.com/signup}" />
+        <entry key="home" value="${links.home:https://www.cloudfoundry.com}" />
+        <entry key="support" value="${links.support:https://support.cloudfoundry.com/home}" />
+        <entry key="passwd" value="${links.passwd:https://www.cloudfoundry.com/passwd}" />
+        <entry key="register" value="${links.signup:https://www.cloudfoundry.com/signup}" />
+        <entry key="network" value="${links.network:https://network.gopivotal.com/login}" />
+        <entry key="signup-network" value="${links.signup-network:https://network.gopivotal.com/users/new/}" />    
 	</util:map>
 
 	<bean id="homeController" class="org.cloudfoundry.identity.uaa.login.HomeController">
