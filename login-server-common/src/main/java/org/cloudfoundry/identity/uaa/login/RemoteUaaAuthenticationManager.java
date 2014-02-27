@@ -31,7 +31,6 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.DefaultResponseErrorHandler;
 import org.springframework.web.client.RestOperations;
@@ -91,7 +90,7 @@ public class RemoteUaaAuthenticationManager implements AuthenticationManager {
 		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 		headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
 
-		MultiValueMap<String, Object> parameters = new LinkedMultiValueMap<String, Object>();
+		MultiValueMap<String, Object> parameters = new LinkedMaskingMultiValueMap<String, Object>("password");
 		parameters.set("username", username);
 		parameters.set("password", password);
 

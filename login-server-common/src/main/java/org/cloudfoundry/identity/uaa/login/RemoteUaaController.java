@@ -40,7 +40,6 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.common.exceptions.OAuth2Exception;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -213,7 +212,7 @@ public class RemoteUaaController extends AbstractControllerInfo {
 
 		String path = extractPath(request);
 
-		MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
+		MultiValueMap<String, String> map = new LinkedMaskingMultiValueMap<String, String>();
 		map.setAll(parameters);
 		if (principal != null) {
 			map.set("source", "login");

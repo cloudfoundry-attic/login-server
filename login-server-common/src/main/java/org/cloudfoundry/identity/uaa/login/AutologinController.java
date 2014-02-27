@@ -35,7 +35,6 @@ import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -182,7 +181,7 @@ public class AutologinController {
 		@Override
 		protected void writeInternal(AutologinRequest t, HttpOutputMessage outputMessage) throws IOException,
 				HttpMessageNotWritableException {
-			MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
+			MultiValueMap<String, String> map = new LinkedMaskingMultiValueMap<String, String>("password");
 			if (t.getUsername() != null) {
 				map.set("username", t.getUsername());
 			}

@@ -41,7 +41,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.provider.BaseClientDetails;
 import org.springframework.security.providers.ExpiringUsernameAuthenticationToken;
-import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -129,7 +128,7 @@ public class SamlRemoteUaaController extends RemoteUaaController {
 		}
 		else {
 			//
-			MultiValueMap<String, String> requestHeadersForClientInfo = new LinkedMultiValueMap<String, String>();
+			MultiValueMap<String, String> requestHeadersForClientInfo = new LinkedMaskingMultiValueMap<String, String>(AUTHORIZATION);
 			requestHeadersForClientInfo.add(AUTHORIZATION, request.getHeader(AUTHORIZATION));
 
 			ResponseEntity<byte[]> clientInfoResponse = getDefaultTemplate().exchange(getUaaBaseUrl() + "/clientinfo",
@@ -139,7 +138,7 @@ public class SamlRemoteUaaController extends RemoteUaaController {
 			if (clientInfoResponse.getStatusCode() == HttpStatus.OK) {
 				String path = extractPath(request);
 
-				MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
+				MultiValueMap<String, String> map = new LinkedMaskingMultiValueMap<String, String>();
 				map.setAll(parameters);
 				if (principal != null) {
 					map.set("source", "login");
