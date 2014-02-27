@@ -1,7 +1,7 @@
 language: java
 before_install: 
   - mvn -v
-  - git pull --depth=1000
+  - git pull --unshallow
 install: 
   -  mvn -U clean --quiet -DskipTests=true
   -  mvn -U install --quiet -DskipTests=true
