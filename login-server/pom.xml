@@ -154,6 +154,14 @@
                                 <contextPath>app</contextPath>
                                 <asWebapp>true</asWebapp>
                               </webapp>
+                              <webapp>
+                                <groupId>org.cloudfoundry.identity</groupId>
+                                <artifactId>doc-server</artifactId>
+                                <version>0.0.1-SNAPSHOT</version>
+                                <type>war</type>
+                                <contextPath>doc</contextPath>
+                                <asWebapp>true</asWebapp>
+                              </webapp>
                             </webapps>
 						</configuration>
 					</plugin>
