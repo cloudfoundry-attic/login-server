@@ -5,6 +5,7 @@
 
 	<groupId>org.cloudfoundry.identity</groupId>
 	<artifactId>doc-server</artifactId>
+    <packaging>war</packaging>
 	<version>0.0.1-SNAPSHOT</version>
 
     <name>Cloud Foundry Login Documentation Server</name>
@@ -45,7 +46,6 @@
 
 	<properties>
 		<start-class>docserver.Application</start-class>
-        <java.version>1.6</java.version>
 	</properties>
 
 	<build>
