@@ -159,7 +159,7 @@
                                 <artifactId>doc-server</artifactId>
                                 <version>0.0.1-SNAPSHOT</version>
                                 <type>war</type>
-                                <contextPath>doc</contextPath>
+                                <contextPath>api-docs</contextPath>
                                 <asWebapp>true</asWebapp>
                               </webapp>
                             </webapps>
