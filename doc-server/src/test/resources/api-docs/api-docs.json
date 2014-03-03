@@ -1,0 +1,12 @@
+{
+  "apiVersion" : "1.0",
+  "swaggerVersion" : "1.2",
+  "apis" : [ {
+    "path" : "/ApprovalsAdminEndpoints",
+    "position" : 0
+  }, {
+    "path" : "/AccessController",
+    "position" : 0
+  } ],
+  "authorizations" : [ ]
+}

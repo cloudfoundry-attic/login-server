@@ -1,0 +1,66 @@
+{
+  "apiVersion" : "1.0",
+  "swaggerVersion" : "1.2",
+  "apis" : [ {
+    "path" : "/HealthzEndpoint",
+    "position" : 0
+  }, {
+    "path" : "/ClientAdminEndpoints",
+    "position" : 0
+  }, {
+    "path" : "/ApprovalsAdminEndpoints",
+    "position" : 0
+  }, {
+    "path" : "/PasswordCheckEndpoint",
+    "position" : 0
+  }, {
+    "path" : "/ScimUserEndpoints",
+    "position" : 0
+  }, {
+    "path" : "/CheckTokenEndpoint",
+    "position" : 0
+  }, {
+    "path" : "/TokenKeyEndpoint",
+    "position" : 0
+  }, {
+    "path" : "/LoginInfoEndpoint",
+    "position" : 0
+  }, {
+    "path" : "/ProfileController",
+    "position" : 0
+  }, {
+    "path" : "/RemoteAuthenticationEndpoint",
+    "position" : 0
+  }, {
+    "path" : "/UserIdConversionEndpoints",
+    "position" : 0
+  }, {
+    "path" : "/RemoteUaaController",
+    "position" : 0
+  }, {
+    "path" : "/AutologinController",
+    "position" : 0
+  }, {
+    "path" : "/ClientInfoEndpoint",
+    "position" : 0
+  }, {
+    "path" : "/PasswordChangeEndpoint",
+    "position" : 0
+  }, {
+    "path" : "/AccessController",
+    "position" : 0
+  }, {
+    "path" : "/ScimGroupEndpoints",
+    "position" : 0
+  }, {
+    "path" : "/UserInfoEndpoint",
+    "position" : 0
+  }, {
+    "path" : "/PasscodeController",
+    "position" : 0
+  }, {
+    "path" : "/HomeController",
+    "position" : 0
+  } ],
+  "authorizations" : [ ]
+}

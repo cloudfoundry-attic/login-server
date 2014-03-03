@@ -1,0 +1,141 @@
+{
+  "apiVersion" : "1.0",
+  "swaggerVersion" : "1.2",
+  "basePath" : "http://localhost:8080/login",
+  "resourcePath" : "/ClientAdminEndpoints",
+  "produces" : [ ],
+  "consumes" : [ ],
+  "protocols" : [ ],
+  "authorizations" : [ ],
+  "apis" : [ {
+    "path" : "/oauth/clients/{client}",
+    "operations" : [ {
+      "method" : "DELETE",
+      "summary" : "",
+      "notes" : "",
+      "responseClass" : "",
+      "nickname" : "",
+      "position" : 0,
+      "produces" : [ ],
+      "consumes" : [ ],
+      "protocols" : [ ],
+      "authorizations" : [ ],
+      "parameters" : [ ],
+      "responseMessages" : [ ]
+    }, {
+      "method" : "GET",
+      "summary" : "",
+      "notes" : "",
+      "responseClass" : "",
+      "nickname" : "",
+      "position" : 1,
+      "produces" : [ ],
+      "consumes" : [ ],
+      "protocols" : [ ],
+      "authorizations" : [ ],
+      "parameters" : [ ],
+      "responseMessages" : [ ]
+    }, {
+      "method" : "PUT",
+      "summary" : "",
+      "notes" : "",
+      "responseClass" : "",
+      "nickname" : "",
+      "position" : 2,
+      "produces" : [ ],
+      "consumes" : [ ],
+      "protocols" : [ ],
+      "authorizations" : [ ],
+      "parameters" : [ ],
+      "responseMessages" : [ ]
+    } ]
+  }, {
+    "path" : "/oauth/clients/{client}/secret",
+    "operations" : [ {
+      "method" : "PUT",
+      "summary" : "",
+      "notes" : "",
+      "responseClass" : "",
+      "nickname" : "",
+      "position" : 0,
+      "produces" : [ ],
+      "consumes" : [ ],
+      "protocols" : [ ],
+      "authorizations" : [ ],
+      "parameters" : [ ],
+      "responseMessages" : [ ]
+    } ]
+  }, {
+    "path" : "/oauth/clients",
+    "operations" : [ {
+      "method" : "GET",
+      "summary" : "",
+      "notes" : "",
+      "responseClass" : "",
+      "nickname" : "",
+      "position" : 0,
+      "produces" : [ ],
+      "consumes" : [ ],
+      "protocols" : [ ],
+      "authorizations" : [ ],
+      "parameters" : [ {
+        "name" : "string0",
+        "required" : false,
+        "allowMultiple" : false,
+        "dataType" : "String",
+        "allowableValues" : null,
+        "paramType" : ""
+      }, {
+        "name" : "string1",
+        "required" : false,
+        "allowMultiple" : false,
+        "dataType" : "String",
+        "allowableValues" : null,
+        "paramType" : ""
+      }, {
+        "name" : "string2",
+        "required" : false,
+        "allowMultiple" : false,
+        "dataType" : "String",
+        "allowableValues" : null,
+        "paramType" : ""
+      }, {
+        "name" : "string3",
+        "required" : false,
+        "allowMultiple" : false,
+        "dataType" : "String",
+        "allowableValues" : null,
+        "paramType" : ""
+      }, {
+        "name" : "int4",
+        "required" : false,
+        "allowMultiple" : false,
+        "dataType" : "int",
+        "allowableValues" : null,
+        "paramType" : ""
+      }, {
+        "name" : "int5",
+        "required" : false,
+        "allowMultiple" : false,
+        "dataType" : "int",
+        "allowableValues" : null,
+        "paramType" : ""
+      } ],
+      "responseMessages" : [ ]
+    }, {
+      "method" : "POST",
+      "summary" : "",
+      "notes" : "",
+      "responseClass" : "",
+      "nickname" : "",
+      "position" : 1,
+      "produces" : [ ],
+      "consumes" : [ ],
+      "protocols" : [ ],
+      "authorizations" : [ ],
+      "parameters" : [ ],
+      "responseMessages" : [ ]
+    } ]
+  } ],
+  "position" : 0
+}
