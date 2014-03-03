@@ -294,16 +294,8 @@
 					<artifactId>spring-jdbc</artifactId>
 					<groupId>org.springframework</groupId>
 				</exclusion>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-jdk14</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-nop</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
+			</exclusions>
+		</dependency>
 		
 		<dependency>
 			<groupId>org.cloudfoundry.identity</groupId>
