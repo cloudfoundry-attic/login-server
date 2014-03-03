@@ -56,10 +56,6 @@
             <url>http://repo.springsource.org/ext-release-local</url>
             <snapshots><enabled>false</enabled></snapshots>
         </repository>
-        <repository>
-            <id>org.opensaml</id>
-            <url>https://build.shibboleth.net/nexus/content/repositories/releases</url>
-        </repository>
 	</repositories>
 
 	<developers>
