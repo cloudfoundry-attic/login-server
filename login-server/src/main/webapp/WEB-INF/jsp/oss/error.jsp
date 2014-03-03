@@ -38,7 +38,7 @@
 <meta content='Pivotal Software, Inc' name='author' />
 <meta content='Copyright 2013 Pivotal Software Inc. All Rights Reserved.' 
     name='copyright' />
-<link href='${rootUrl}favicon.ico' rel='shortcut icon' />
+<link href='${baseUrl}/images/favicon.ico' rel='shortcut icon' />
 <meta content='all' name='robots' />
 <link href='${baseUrl}/stylesheets/print.css' media='print'
     rel='stylesheet' type='text/css' />
