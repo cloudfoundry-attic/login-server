@@ -30,7 +30,8 @@
 
 - Start up the login server, uaa and sample apps
   - `export MAVEN_OPTS="-Xmx768m -XX:MaxPermSize=256m"`
-  - `cd login-server/saml-login-server; mvn tomcat:run -P integration`
+  - modify login.yml to contain spring_profiles: saml 
+  - `cd login-server/login-server; mvn tomcat7:run -Pintegration`
 
 - Create an OpenAM Hosted Identity provider and a circle of trust
 
@@ -58,6 +59,6 @@ There are two ways to configure the SAML Login server
       idpMetadataFile: /path/to/idpMetadata.xml
   </pre>
 
-  - To use this option, run the SAML metadata with both the fileMetadata and default profiles. `mvn tomcat:run -Dspring.profiles.active=fileMetadata,default`
+  - To use this option, run the SAML metadata with both the fileMetadata and default profiles. `mvn tomcat7:run -Pintegration -Dspring.profiles.active=saml,fileMetadata,default`
 
 - Test the configuration by going to http://localhost:8080/app
