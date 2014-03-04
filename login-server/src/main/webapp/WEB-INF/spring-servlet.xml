@@ -583,6 +583,7 @@
     <bean id="parserPool" class="org.opensaml.xml.parse.BasicParserPool"
         scope="singleton" />
     <bean id="uaaController" class="org.cloudfoundry.identity.uaa.login.SamlRemoteUaaController">
+        <property name="addNew" value="true"/>
         <property name="uaaBaseUrl" value="${uaa.url:http://localhost:8080/uaa}" />
         <property name="prompts">
             <util:list>

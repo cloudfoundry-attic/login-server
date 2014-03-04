@@ -55,7 +55,6 @@ public class SamlRemoteUaaController extends RemoteUaaController {
 	private final ObjectMapper mapper = new ObjectMapper();
 	
 	public SamlRemoteUaaController() {
-	    this.setAddNew(true);
 	}
 
 	@Value("${login.entityID}")
@@ -146,7 +145,7 @@ public class SamlRemoteUaaController extends RemoteUaaController {
 				map.setAll(parameters);
 				if (principal != null) {
 					map.set("source", "login");
-					map.set("add_new", String.valueOf(true));
+					map.set("add_new", String.valueOf(isAddNew()));
 					map.set("client_id", getClientId(clientInfoResponse.getBody()));
 					map.setAll(getLoginCredentials(principal));
 					map.remove("credentials"); // legacy vmc might break otherwise
