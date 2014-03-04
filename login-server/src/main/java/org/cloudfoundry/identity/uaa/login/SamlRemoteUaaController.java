@@ -53,6 +53,10 @@ public class SamlRemoteUaaController extends RemoteUaaController {
 	private static final Log logger = LogFactory.getLog(SamlRemoteUaaController.class);
 
 	private final ObjectMapper mapper = new ObjectMapper();
+	
+	public SamlRemoteUaaController() {
+	    this.setAddNew(true);
+	}
 
 	@Value("${login.entityID}")
 	public String entityID = "";
