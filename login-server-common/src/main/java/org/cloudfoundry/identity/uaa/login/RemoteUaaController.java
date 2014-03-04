@@ -96,6 +96,8 @@ public class RemoteUaaController extends AbstractControllerInfo {
 
 
 	private List<Prompt> prompts;
+	
+	private boolean addNew = false;
 
 	/**
 	 * Prompts to use if authenticating locally. Set this if you want to override the default behaviour of asking the
@@ -107,7 +109,15 @@ public class RemoteUaaController extends AbstractControllerInfo {
 		this.prompts = prompts;
 	}
 
-	/**
+	public boolean isAddNew() {
+        return addNew;
+    }
+
+    public void setAddNew(boolean addNew) {
+        this.addNew = addNew;
+    }
+
+    /**
 	 * The rest template used to grab prompts and do stuff that doesn't require authentication.
 	 *
 	 * @param defaultTemplate the defaultTemplate to set
@@ -216,6 +226,7 @@ public class RemoteUaaController extends AbstractControllerInfo {
 		map.setAll(parameters);
 		if (principal != null) {
 			map.set("source", "login");
+			map.set("add_new", String.valueOf(isAddNew()));
 			map.setAll(getLoginCredentials(principal));
 			map.remove("credentials"); // legacy vmc might break otherwise
 			map.remove("password"); // request for token will not use password

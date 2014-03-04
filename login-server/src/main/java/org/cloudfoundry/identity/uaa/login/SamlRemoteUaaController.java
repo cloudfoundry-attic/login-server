@@ -142,6 +142,7 @@ public class SamlRemoteUaaController extends RemoteUaaController {
 				map.setAll(parameters);
 				if (principal != null) {
 					map.set("source", "login");
+					map.set("add_new", String.valueOf(true));
 					map.set("client_id", getClientId(clientInfoResponse.getBody()));
 					map.setAll(getLoginCredentials(principal));
 					map.remove("credentials"); // legacy vmc might break otherwise
