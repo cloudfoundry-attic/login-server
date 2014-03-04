@@ -633,6 +633,12 @@
   
   
     <beans profile="ldap">
+        <bean id="uaaController" class="org.cloudfoundry.identity.uaa.login.RemoteUaaController">
+            <property name="uaaBaseUrl" value="${uaa.url:http://localhost:8080/uaa}" />
+            <property name="authorizationTemplate" ref="authorizationTemplate" />
+            <property name="links" ref="links" />
+            <property name="addNew" value="true"/>
+        </bean>
         <import resource="${ldap.profile.file:ldap/ldap-simple-bind.xml}" />
     </beans>
   
