@@ -57,7 +57,7 @@ at the same time.
         passwd: (( "https://console." domain "/password_resets/new" ))
         signup: (( "https://console." domain "/register" ))
     
-      #if you wish to use ldap or saml - (also remember to set uaa.login.addnew property)
+      #if you wish to use ldap or saml
       spring_profiles: ldap,saml
       
       #saml authentication information, only required if 'saml' is part of spring_profiles
