@@ -1,0 +1,35 @@
+set -e -x
+
+#clean up - so we don't transfer files we don't need
+cd ${BUILD_DIR}
+rm -rf apache-maven*
+rm -rf java
+rm -rf maven
+
+#clean up source code, we don't need that anymore
+rm -rf ${BUILD_DIR}/uaa/scim
+rm -rf ${BUILD_DIR}/uaa/common
+rm -rf ${BUILD_DIR}/uaa/gatling
+rm -rf ${BUILD_DIR}/uaa/samples
+rm -rf ${BUILD_DIR}/uaa/docs
+rm -rf ${BUILD_DIR}/uaa/uaa
+
+rm -f ${BUILD_DIR}/uaa/README.md
+rm -f ${BUILD_DIR}/uaa/NOTICE
+rm -f ${BUILD_DIR}/uaa/.run-script.sh
+rm -f ${BUILD_DIR}/uaa/.travis.yml
+rm -f ${BUILD_DIR}/uaa/pom.xml
+rm -f ${BUILD_DIR}/uaa/LICENSE
+
+rm -rf ${BUILD_DIR}/login/login-server
+rm -rf ${BUILD_DIR}/login/login-server-common
+rm -rf ${BUILD_DIR}/login/docs
+rm -rf ${BUILD_DIR}/login/doc-server
+rm -rf ${BUILD_DIR}/login/api-docs
+
+rm -f ${BUILD_DIR}/login/README.md
+rm -f ${BUILD_DIR}/login/NOTICE
+rm -f ${BUILD_DIR}/login/.run-script.sh
+rm -f ${BUILD_DIR}/login/.travis.yml
+rm -f ${BUILD_DIR}/login/pom.xml
+rm -f ${BUILD_DIR}/login/LICENSE
