@@ -1,11 +1,5 @@
 set -e -x
 
-#clean up - so we don't transfer files we don't need
-cd ${BUILD_DIR}
-rm -rf apache-maven*
-rm -rf java
-rm -rf maven
-
 #clean up source code, we don't need that anymore
 rm -rf ${BUILD_DIR}/uaa/scim
 rm -rf ${BUILD_DIR}/uaa/common
