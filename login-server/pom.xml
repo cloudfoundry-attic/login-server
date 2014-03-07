@@ -173,37 +173,6 @@
 					</plugin>
 				</plugins>
 			</build>
-<!--       
-			<dependencies>
-				<dependency>
-					<groupId>org.cloudfoundry.identity</groupId>
-					<artifactId>uaa</artifactId>
-					<version>${identity.version}</version>
-					<type>war</type>
-					<scope>tomcat</scope>
-				</dependency>
-				<dependency>
-					<groupId>${project.parent.groupId}</groupId>
-					<artifactId>cloudfoundry-login-server-common</artifactId>
-					<version>${project.version}</version>
-					<type>jar</type>
-				</dependency>
-				<dependency>
-					<groupId>org.cloudfoundry.identity</groupId>
-					<artifactId>api</artifactId>
-					<version>${identity.version}</version>
-					<type>war</type>
-					<scope>tomcat</scope>
-				</dependency>
-				<dependency>
-					<groupId>org.cloudfoundry.identity</groupId>
-					<artifactId>app</artifactId>
-					<version>${identity.version}</version>
-					<type>war</type>
-					<scope>tomcat</scope>
-				</dependency>
-			</dependencies>
- -->      
 		</profile>
 	</profiles>
 

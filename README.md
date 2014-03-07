@@ -18,11 +18,7 @@ directories with a common parent):
     $ (cd uaa; mvn clean install)
     $ cd login-server
     $ mvn clean install
-    $ mvn tomcat:run -P integration
-
-(Note that the `tomcat7` plugin at the moment does not support running
-multiple apps in the same container - it's a bug that is fixed but not
-released as of September 2012.)
+    $ mvn tomcat7:run -P integration
 
 You can run the Login Server integration tests using the command line
 as well (as long as the UAA project is built and installed first as
