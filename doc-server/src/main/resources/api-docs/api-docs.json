@@ -38,7 +38,7 @@
     "path" : "/RemoteUaaController",
     "position" : 0
   }, {
-    "path" : "/AutologinController",
+    "path" : "/AutologinFlow",
     "position" : 0
   }, {
     "path" : "/ClientInfoEndpoint",
@@ -61,6 +61,5 @@
   }, {
     "path" : "/HomeController",
     "position" : 0
-  } ],
-  "authorizations" : [ ]
+  } ]
 }
