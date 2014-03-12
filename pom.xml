@@ -88,7 +88,8 @@
 
 	<properties>
 		<identity.version>1.6.0-SNAPSHOT</identity.version>
-		<spring.version>3.1.2.RELEASE</spring.version>
+		<spring.version>3.2.8.RELEASE</spring.version>
+        <spring.security.version>3.2.2.RELEASE</spring.security.version>
 		<groupId>${project.groupId}</groupId>
 		<version>${project.version}</version>
 		<generatePom>true</generatePom>
@@ -329,6 +330,12 @@
 			<artifactId>spring-context</artifactId>
 			<version>${spring.version}</version>
 		</dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context-support</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
 
 		<dependency>
 			<groupId>org.springframework</groupId>
