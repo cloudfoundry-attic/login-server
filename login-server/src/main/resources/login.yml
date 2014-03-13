@@ -133,7 +133,7 @@ uaa:
 LOGIN_SECRET: loginsecret
 
 #spring_profiles: ldap
-spring_profiles: saml
+#spring_profiles: saml
 
 
 #ldap:
