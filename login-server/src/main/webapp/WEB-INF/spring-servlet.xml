@@ -37,6 +37,18 @@
 	<security:http pattern="/error" security="none" />
 
     <!-- TODO: Move the autologin related beans from the login server and saml login server to login common -->
+    <bean id="abstractRemoteUaaController" abstract="true">
+      <property name="remoteAuthenticationManager" ref="remoteAuthenticationManager"/>
+      <property name="uaaBaseUrl" value="${uaa.url:http://localhost:8080/uaa}" />
+      <property name="authorizationTemplate" ref="authorizationTemplate" />
+      <property name="links" ref="links" />
+      <property name="addNew" value="true" />
+      <property name="codeExpirationMillis" value="300000"/>
+    </bean>
+    
+    <bean id="uaaController" class="org.cloudfoundry.identity.uaa.login.RemoteUaaController" parent="abstractRemoteUaaController">
+        <property name="addNew" value="false"/>
+    </bean>
     
     <!-- Pattern:/autologin -->
     <http pattern="/autologin" create-session="stateless" entry-point-ref="basicAuthenticationEntryPoint"
@@ -206,8 +218,9 @@
 	</security:http>
 	
 	<bean id="passcodeAuthenticationFilter" class="org.cloudfoundry.identity.uaa.login.PasscodeAuthenticationFilter">
-		<constructor-arg name="store" ref="oneTimeCodeStore"/>
 		<constructor-arg name="authenticationManager" ref="remoteAuthenticationManager"/>
+        <property name="authorizationTemplate" ref="authorizationTemplate" />
+        <property name="uaaBaseUrl" value="${uaa.url:http://localhost:8080/uaa}" />
 		<property name="parameterNames">
 			<list>
 				<value>username</value>
@@ -230,7 +243,7 @@
 	
     <mvc:annotation-driven>
        <mvc:message-converters>
-           <bean class="org.cloudfoundry.identity.uaa.login.AutologinController.AutologinRequestConverter" />
+           <bean class="org.cloudfoundry.identity.uaa.login.AutologinRequestConverter" />
        </mvc:message-converters>
     </mvc:annotation-driven>
 
@@ -251,11 +264,8 @@
     </bean>
 
     <bean id="autologinAuthenticationManager" class="org.cloudfoundry.identity.uaa.login.AutologinAuthenticationManager">
-        <property name="codeStore" ref="autologinCodeStore" />
-    </bean>
-
-    <bean id="autologinCodeStore" class="org.cloudfoundry.identity.uaa.login.DefaultAutologinCodeStore">
-        <property name="expireCodeWhenUsed" value="${autologin.expire_when_used:true}" />
+        <property name="uaaBaseUrl" value="${uaa.url:http://localhost:8080/uaa}" />
+      <property name="authorizationTemplate" ref="authorizationTemplate" />
     </bean>
 
     <!-- Pattern: /oauth/authorize parameters:{response_type=code,code=?} -->
@@ -267,11 +277,6 @@
                 <entry key="code" value="" />
             </map>
         </property>
-    </bean>
-
-    <bean id="autologinController" class="org.cloudfoundry.identity.uaa.login.AutologinController">
-        <property name="codeStore" ref="autologinCodeStore" />
-        <property name="authenticationManager" ref="remoteAuthenticationManager" />
     </bean>
 
 	<!-- Handler deciding where to redirect user after successful login -->
@@ -313,27 +318,6 @@
 			</bean>
 		</property>
 	</bean>
-	
-	
-	
-	<bean id="oneTimeCodeController" class="org.cloudfoundry.identity.uaa.login.PasscodeController">
-		<property name="store" ref="oneTimeCodeStore"/>
-	</bean>
-	
-	<bean id="oneTimeCodeStore" class="org.cloudfoundry.identity.uaa.login.CachingPasscodeStore">
-		<property name="cacheManager" ref="cacheManager"/>
-	</bean>
-	
-	<cache:annotation-driven />
- 
-    <bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheCacheManager">
-    	<property name="cacheManager" ref="ehcache" />
-    </bean>
-
-	<bean id="ehcache" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
-		<property name="configLocation" value="classpath:/ehcache.xml" />
-	</bean>
-  
 	
 	<beans profile="fileMetadata">
 		<bean id="metadataProviderList" class="java.util.ArrayList">
@@ -579,9 +563,7 @@
     <!-- XML parser pool needed for OpenSAML parsing -->
     <bean id="parserPool" class="org.opensaml.xml.parse.BasicParserPool"
         scope="singleton" />
-    <bean id="uaaController" class="org.cloudfoundry.identity.uaa.login.SamlRemoteUaaController">
-        <property name="addNew" value="true"/>
-        <property name="uaaBaseUrl" value="${uaa.url:http://localhost:8080/uaa}" />
+    <bean id="uaaController" class="org.cloudfoundry.identity.uaa.login.SamlRemoteUaaController" parent="abstractRemoteUaaController">
         <property name="prompts">
             <util:list>
                 <bean class="org.cloudfoundry.identity.uaa.authentication.login.Prompt">
@@ -601,8 +583,6 @@
                 </bean>
             </util:list>
         </property>
-        <property name="authorizationTemplate" ref="authorizationTemplate" />
-        <property name="links" ref="links" />
     </bean>
     
     <bean id="acceptSSLSocketFactory" class="org.apache.commons.httpclient.contrib.ssl.EasySSLProtocolSocketFactory"/>
@@ -631,12 +611,7 @@
   
   
     <beans profile="ldap">
-        <bean id="uaaController" class="org.cloudfoundry.identity.uaa.login.RemoteUaaController">
-            <property name="uaaBaseUrl" value="${uaa.url:http://localhost:8080/uaa}" />
-            <property name="authorizationTemplate" ref="authorizationTemplate" />
-            <property name="links" ref="links" />
-            <property name="addNew" value="true"/>
-        </bean>
+        <bean id="uaaController" class="org.cloudfoundry.identity.uaa.login.RemoteUaaController" parent="abstractRemoteUaaController"/>
         <import resource="${ldap.profile.file:ldap/ldap-simple-bind.xml}" />
     </beans>
   

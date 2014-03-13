@@ -15,6 +15,7 @@ package org.cloudfoundry.identity.uaa.login;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 import java.util.Arrays;
 import java.util.Collection;
@@ -27,6 +28,9 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.cloudfoundry.identity.uaa.client.SocialClientUserDetails;
+import org.cloudfoundry.identity.uaa.codestore.ExpiringCode;
+import org.codehaus.jackson.JsonGenerationException;
+import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 import org.springframework.beans.factory.annotation.Value;
@@ -183,6 +187,34 @@ public class SamlRemoteUaaController extends RemoteUaaController {
 			}
 		}
 	}
+	
+	@RequestMapping(value = { "/passcode" }, method = RequestMethod.GET)
+    public String generatePasscode(@RequestHeader HttpHeaders headers, Map<String, Object> model, Principal principal) 
+            throws NoSuchAlgorithmException, IOException, JsonGenerationException, JsonMappingException {
+        String username = null;
+        Map<String, Object> authorizationParameters = null;
+
+        if (principal instanceof ExpiringUsernameAuthenticationToken) {
+            username = ((SamlUserDetails) ((ExpiringUsernameAuthenticationToken) principal).getPrincipal()).getUsername();
+
+            Collection<GrantedAuthority> authorities = ((SamlUserDetails) (((ExpiringUsernameAuthenticationToken) principal)
+                    .getPrincipal())).getAuthorities();
+            if (authorities != null) {
+                authorizationParameters = new LinkedHashMap<String, Object>();
+                authorizationParameters.put("authorities", authorities);
+            }
+        }
+        else {
+            username = principal.getName();
+        }
+
+
+        PasscodeInformation pi = new PasscodeInformation(username, null, authorizationParameters);
+        
+        ResponseEntity<ExpiringCode> response = doGenerateCode(pi);
+        model.put("passcode", response.getBody().getCode());
+        return "passcode";
+    }
 
 	private String getClientId(byte[] clientInfoResponse) {
 		try {

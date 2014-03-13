@@ -13,15 +13,31 @@
 
 package org.cloudfoundry.identity.uaa.login;
 
+import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.cloudfoundry.identity.uaa.authentication.AuthzAuthenticationRequest;
 import org.cloudfoundry.identity.uaa.authentication.UaaAuthenticationDetails;
+import org.cloudfoundry.identity.uaa.client.SocialClientUserDetails;
+import org.cloudfoundry.identity.uaa.codestore.ExpiringCode;
+import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.web.client.RestTemplate;
 
 /**
  * @author Dave Syer
@@ -29,13 +45,45 @@ import org.springframework.security.core.AuthenticationException;
  */
 public class AutologinAuthenticationManager implements AuthenticationManager {
 
-	private AutologinCodeStore codeStore = new DefaultAutologinCodeStore();
+    private Log logger = LogFactory.getLog(getClass());
+    
+	private RestTemplate authorizationTemplate;
+	private String uaaBaseUrl;
+	
+	public String getUaaBaseUrl() {
+        return uaaBaseUrl;
+    }
 
-	/**
-	 * @param codeStore the codeStore to set
-	 */
-	public void setCodeStore(AutologinCodeStore codeStore) {
-		this.codeStore = codeStore;
+    public void setUaaBaseUrl(String uaaBaseUrl) {
+        this.uaaBaseUrl = uaaBaseUrl;
+    }
+
+    public RestTemplate getAuthorizationTemplate() {
+        return authorizationTemplate;
+    }
+
+    public void setAuthorizationTemplate(RestTemplate authorizationTemplate) {
+		this.authorizationTemplate = authorizationTemplate;
+	}
+	
+	public ExpiringCode doRetrieveCode(String code) {
+        HttpHeaders requestHeaders = new HttpHeaders();
+        requestHeaders.add("Accept", MediaType.APPLICATION_JSON_VALUE);
+        
+        HttpEntity<ExpiringCode> requestEntity = new HttpEntity<ExpiringCode>(null, requestHeaders);
+        
+        ResponseEntity<ExpiringCode> response = authorizationTemplate.exchange(getUaaBaseUrl() + "/Codes/" + code, HttpMethod.GET,
+                requestEntity, ExpiringCode.class);
+        
+        if (response.getStatusCode().equals(HttpStatus.NOT_FOUND)) {
+            return null;
+        } else if (response.getStatusCode() != HttpStatus.OK) {
+            logger.warn("Request failed: "+requestEntity);
+            //TODO throw exception with the correct error
+            throw new RuntimeException(String.valueOf(response.getStatusCode()));
+        }
+        
+        return response.getBody();
 	}
 
 	@Override
@@ -48,7 +96,19 @@ public class AutologinAuthenticationManager implements AuthenticationManager {
 		AuthzAuthenticationRequest request = (AuthzAuthenticationRequest) authentication;
 		Map<String, String> info = request.getInfo();
 		String code = info.get("code");
-		Authentication user = codeStore.getUser(code);
+		
+		ExpiringCode ec = doRetrieveCode(code);
+		Authentication user = null;
+		try {
+		    if (ec!=null) {
+		        user = new ObjectMapper().readValue(ec.getData(), SocialClientUserDetails.class);
+		    }
+		} catch (IOException x) {
+		    throw new BadCredentialsException("JsonConversion error", x);
+		}
+		
+		
+		
 		if (user == null) {
 			throw new BadCredentialsException("Cannot redeem provided code for user");
 		}

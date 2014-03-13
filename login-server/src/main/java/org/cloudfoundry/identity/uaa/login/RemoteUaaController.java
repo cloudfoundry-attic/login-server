@@ -5,9 +5,13 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
+import java.nio.charset.Charset;
+import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -18,15 +22,22 @@ import java.util.Properties;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.params.ClientPNames;
 import org.apache.http.client.params.CookiePolicy;
+import org.cloudfoundry.identity.uaa.authentication.AuthzAuthenticationRequest;
 import org.cloudfoundry.identity.uaa.authentication.login.Prompt;
 import org.cloudfoundry.identity.uaa.client.SocialClientUserDetails;
+import org.cloudfoundry.identity.uaa.codestore.ExpiringCode;
+import org.cloudfoundry.identity.uaa.user.UaaAuthority;
 import org.cloudfoundry.identity.uaa.util.UaaStringUtils;
+import org.codehaus.jackson.JsonGenerationException;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -36,12 +47,17 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.common.exceptions.OAuth2Exception;
+import org.springframework.security.providers.ExpiringUsernameAuthenticationToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.MultiValueMap;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -98,8 +114,30 @@ public class RemoteUaaController extends AbstractControllerInfo {
 	private List<Prompt> prompts;
 	
 	private boolean addNew = false;
+	
+	
+	
+	private long codeExpirationMillis = 5*60*1000;
+	
+	private AuthenticationManager remoteAuthenticationManager;
+	
+	public long getCodeExpirationMillis() {
+        return codeExpirationMillis;
+    }
 
-	/**
+    public void setCodeExpirationMillis(long codeExpirationMillis) {
+        this.codeExpirationMillis = codeExpirationMillis;
+    }
+    
+    public AuthenticationManager getRemoteAuthenticationManager() {
+        return remoteAuthenticationManager;
+    }
+
+    public void setRemoteAuthenticationManager(AuthenticationManager remoteAuthenticationManager) {
+        this.remoteAuthenticationManager = remoteAuthenticationManager;
+    }
+
+    /**
 	 * Prompts to use if authenticating locally. Set this if you want to override the default behaviour of asking the
 	 * remote UAA for its prompts.
 	 *
@@ -301,6 +339,65 @@ public class RemoteUaaController extends AbstractControllerInfo {
 	public void invalid(HttpServletRequest request) throws Exception {
 		throw new OAuth2Exception("no matching handler for request: " + request.getServletPath());
 	}
+	
+	@RequestMapping(value = "/autologin", method = RequestMethod.POST)
+    @ResponseBody
+    public AutologinResponse generateAutologinCode(@RequestBody AutologinRequest request, 
+                                                   @RequestHeader(value="Authorization", required=false) String auth) throws Exception {
+        if (auth==null || (!auth.startsWith("Basic"))) {
+            throw new BadCredentialsException("No basic authorization client information in request");
+        }
+        
+        String username = request.getUsername();
+        if (username == null) {
+            throw new BadCredentialsException("No username in request");
+        }
+        if (remoteAuthenticationManager != null) {
+            String password = request.getPassword();
+            if (!StringUtils.hasText(password)) {
+                throw new BadCredentialsException("No password in request");
+            }
+            remoteAuthenticationManager.authenticate(new AuthzAuthenticationRequest(username, password, null));
+        }
+        
+        String base64Credentials = auth.substring("Basic".length()).trim();
+        String credentials = new String(new Base64().decode(base64Credentials.getBytes()),Charset.forName("UTF-8"));
+        // credentials = username:password
+        final String[] values = credentials.split(":",2);
+        if (values==null || values.length==0) {
+            throw new BadCredentialsException("Invalid authorization header.");
+        }
+        String clientId = values[0];
+        logger.debug("Autologin authentication request for user:" + username +"; client:"+clientId);
+        SocialClientUserDetails user = new SocialClientUserDetails(username, UaaAuthority.USER_AUTHORITIES);
+        user.setDetails(clientId);
+        
+        ResponseEntity<ExpiringCode> response = doGenerateCode(user);
+        return new AutologinResponse(response.getBody().getCode());
+    }
+	
+    protected ResponseEntity<ExpiringCode> doGenerateCode(Object o) throws IOException{
+        ExpiringCode ec = new ExpiringCode(null, new Timestamp(System.currentTimeMillis()+(getCodeExpirationMillis())), new ObjectMapper().writeValueAsString(o));
+        
+        //ec =  generateCode
+        HttpHeaders requestHeaders = new HttpHeaders();
+        requestHeaders.add(ACCEPT, MediaType.APPLICATION_JSON_VALUE);
+        requestHeaders.add(CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+        
+        HttpEntity<ExpiringCode> requestEntity = new HttpEntity<ExpiringCode>(ec, requestHeaders);
+        
+        ResponseEntity<ExpiringCode> response = authorizationTemplate.exchange(getUaaBaseUrl() + "/Codes" , HttpMethod.POST,
+                requestEntity, ExpiringCode.class);
+        
+        if (response.getStatusCode() != HttpStatus.CREATED) {
+            logger.warn("Request failed: "+requestEntity);
+            //TODO throw exception with the correct error
+            throw new RuntimeException(String.valueOf(response.getStatusCode()));
+        }
+        
+        return response;
+    }
+
 
 	@ExceptionHandler(OAuth2Exception.class)
 	public ModelAndView handleOAuth2Exception(OAuth2Exception e, ServletWebRequest webRequest) throws Exception {

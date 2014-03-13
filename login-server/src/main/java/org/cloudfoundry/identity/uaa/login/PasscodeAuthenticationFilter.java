@@ -34,10 +34,16 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.cloudfoundry.identity.uaa.authentication.AuthzAuthenticationRequest;
 import org.cloudfoundry.identity.uaa.authentication.UaaAuthenticationDetails;
+import org.cloudfoundry.identity.uaa.codestore.ExpiringCode;
 import org.cloudfoundry.identity.uaa.user.UaaAuthority;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -46,6 +52,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.provider.error.OAuth2AuthenticationEntryPoint;
 import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.web.client.RestTemplate;
 
 /**
  * Authentication filter to verify one time passwords with what's cached in the one time password store.
@@ -65,11 +72,31 @@ public class PasscodeAuthenticationFilter implements Filter {
 
 	private final ObjectMapper mapper = new ObjectMapper();
 
-	private PasscodeStore store = null;
-
 	private AuthenticationManager authenticationManager;
+	
+	private RestTemplate authorizationTemplate;
+	
+	private String uaaBaseUrl;
+	
+	
+	
+	public String getUaaBaseUrl() {
+        return uaaBaseUrl;
+    }
 
-	@Override
+    public void setUaaBaseUrl(String uaaBaseUrl) {
+        this.uaaBaseUrl = uaaBaseUrl;
+    }
+
+    public RestTemplate getAuthorizationTemplate() {
+        return authorizationTemplate;
+    }
+
+    public void setAuthorizationTemplate(RestTemplate authorizationTemplate) {
+        this.authorizationTemplate = authorizationTemplate;
+    }
+
+    @Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
 			ServletException {
 
@@ -84,15 +111,22 @@ public class PasscodeAuthenticationFilter implements Filter {
 
 		if (loginInfo.isEmpty()) {
 			throw new BadCredentialsException("Request does not contain credentials.");
-		}
-		else if (null == password && null != passcode) {
+		} else if (null == password && null != passcode) {
 			//Validate passcode
 			logger.debug("Located credentials in request, with keys: " + loginInfo.keySet());
 			if (methods != null && !methods.contains(req.getMethod().toUpperCase())) {
 				throw new BadCredentialsException("Credentials must be sent by (one of methods): " + methods);
 			}
-
-			PasscodeInformation pi = store.validatePasscode(new PasscodeInformation(username), passcode);
+			
+			ExpiringCode eCode = doRetrieveCode(passcode);
+			PasscodeInformation pi = null;
+			if (eCode!=null && eCode.getData()!=null) {
+			    pi = (PasscodeInformation)new ObjectMapper().readValue(eCode.getData(), PasscodeInformation.class);
+		    }
+			if (!pi.getUserId().equals(username)) {
+			    throw new BadCredentialsException("Username mismatch");
+			}
+			
 			if (pi != null) {
 				logger.info("Successful authentication request for " + username);
 
@@ -124,6 +158,26 @@ public class PasscodeAuthenticationFilter implements Filter {
 
 		chain.doFilter(request, response);
 	}
+	
+	public ExpiringCode doRetrieveCode(String code) {
+        HttpHeaders requestHeaders = new HttpHeaders();
+        requestHeaders.add("Accept", MediaType.APPLICATION_JSON_VALUE);
+        
+        HttpEntity<ExpiringCode> requestEntity = new HttpEntity<ExpiringCode>(null, requestHeaders);
+        
+        ResponseEntity<ExpiringCode> response = authorizationTemplate.exchange(getUaaBaseUrl() + "/Codes/" + code, HttpMethod.GET,
+                requestEntity, ExpiringCode.class);
+        
+        if (response.getStatusCode().equals(HttpStatus.NOT_FOUND)) {
+            return null;
+        } else if (response.getStatusCode() != HttpStatus.OK) {
+            logger.warn("Request failed: "+requestEntity);
+            //TODO throw exception with the correct error
+            throw new BadCredentialsException("Unable to retrieve passcode:"+String.valueOf(response.getStatusCode()));
+        }
+        
+        return response.getBody();
+    }
 
 	private Map<String, String> getCredentials(HttpServletRequest request) {
 		Map<String, String> credentials = new HashMap<String, String>();
@@ -163,8 +217,7 @@ public class PasscodeAuthenticationFilter implements Filter {
 		this.parameterNames = parameterNames;
 	}
 
-	public PasscodeAuthenticationFilter(PasscodeStore store, AuthenticationManager authenticationManager) {
-		this.store = store;
+	public PasscodeAuthenticationFilter(AuthenticationManager authenticationManager) {
 		this.authenticationManager = authenticationManager;
 	}
 
