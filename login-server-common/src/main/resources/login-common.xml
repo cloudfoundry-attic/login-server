@@ -132,12 +132,6 @@
 
 	<oauth:rest-template id="authorizationTemplate" resource="uaa" />
 
-	<bean id="uaaController" class="org.cloudfoundry.identity.uaa.login.RemoteUaaController">
-		<property name="uaaBaseUrl" value="${uaa.url:http://localhost:8080/uaa}" />
-		<property name="authorizationTemplate" ref="authorizationTemplate" />
-		<property name="links" ref="links" />
-	</bean>
-
 	<bean id="healthzEndpoint" class="org.cloudfoundry.identity.uaa.web.HealthzEndpoint" />
 
 	<oauth:resource id="uaa" access-token-uri="${uaa.token.url:http://localhost:8080/uaa/oauth/token}"

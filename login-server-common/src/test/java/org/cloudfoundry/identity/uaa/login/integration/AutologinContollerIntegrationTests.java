@@ -21,7 +21,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 import java.util.Map;
 
-import org.cloudfoundry.identity.uaa.login.AutologinController.AutologinRequest;
+import org.cloudfoundry.identity.uaa.login.AutologinRequest;
 import org.cloudfoundry.identity.uaa.test.UaaTestAccounts;
 import org.junit.Before;
 import org.junit.Rule;

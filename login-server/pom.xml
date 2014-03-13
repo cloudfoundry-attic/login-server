@@ -337,12 +337,6 @@
 			<artifactId>httpclient</artifactId>
 		</dependency>
 		
-		<dependency>
-		    <groupId>net.sf.ehcache</groupId>
-		    <artifactId>ehcache-core</artifactId>
-		    <version>2.6.5</version>
-		</dependency>
-    
         <dependency>
             <groupId>org.springframework.ldap</groupId>
             <artifactId>spring-ldap-core</artifactId>
@@ -365,6 +359,20 @@
             <artifactId>api-ldap-model</artifactId>
             <version>1.0.0-M20</version>
         </dependency>
+        
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <version>1.8.5</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        
 
         <dependency>
             <groupId>org.springframework</groupId>
