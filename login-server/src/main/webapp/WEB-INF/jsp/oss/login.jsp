@@ -149,28 +149,6 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 			value="${null}" />
 	</c:if>
 
-	<!--
-								Start of DoubleClick Floodlight Tag: Please do not remove
-								Activity name of this tag: Micro Cloud Foundry - Landing Page Arrival
-								URL of the webpage where the tag is expected to be placed: https://www.cloudfoundry.com/micro
-								This tag must be placed between the <body> and </body> tags, as close as possible to the opening tag.
-								Creation Date: 08/18/2011
-								-->
-	<script type="text/javascript">
-		var axel = Math.random() + "";
-		var a = axel * 10000000000000;
-		document
-				.write('<iframe src="https://fls.doubleclick.net/activityi;src=2645750;type=cloud806;cat=micro467;ord='
-						+ a
-						+ '?" width="1" height="1" frameborder="0" style="display:none"></iframe>');
-	</script>
-	<noscript>
-		<iframe
-			src="https://fls.doubleclick.net/activityi;src=2645750;type=cloud806;cat=micro467;ord=1?"
-			width="1" height="1" frameborder="0" style="display: none"></iframe>
-	</noscript>
-	<!-- End of DoubleClick Floodlight Tag: Please do not remove -->
-
 	<c:if test="${not empty analytics}">
 	<script>
 			(function(i, s, o, g, r, a, m) {
