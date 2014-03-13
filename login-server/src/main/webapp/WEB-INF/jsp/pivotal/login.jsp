@@ -61,17 +61,6 @@
         $('form:first *:input[type!=hidden]:first').focus();
     });
 </script>
-<script type="text/javascript">
-    (function() {
-        // force ssl if cf.com
-        var loc = window.location;
-        if (loc.hostname.indexOf('cloudfoundry.com') >= 0
-                && loc.protocol == "http:") {
-            window.location = "https://" + loc.host + loc.pathname + loc.search
-                    + loc.hash;
-        }
-    })();
-</script>
 <script src="//use.typekit.net/zwc8anl.js"></script>
 <script>
   try { Typekit.load(); } catch (e) { }

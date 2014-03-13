@@ -84,17 +84,6 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
     });
 	});
 </script>
-<script type="text/javascript">
-	(function() {
-		// force ssl if cf.com
-		var loc = window.location;
-		if (loc.hostname.indexOf('cloudfoundry.com') >= 0
-				&& loc.protocol == "http:") {
-			window.location = "https://" + loc.host + loc.pathname + loc.search
-					+ loc.hash;
-		}
-	})();
-</script>
 </head>
 <body id="micro">
 	<div class="splash">
