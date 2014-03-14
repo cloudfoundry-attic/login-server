@@ -36,66 +36,70 @@
 <meta charset='utf-8'>
 <meta content='IE=edge,chrome=1' http-equiv='X-UA-Compatible'>
 <meta content='Pivotal Software, Inc' name='author' />
-<meta content='Copyright 2013 Pivotal Software Inc. All Rights Reserved.' 
-    name='copyright' />
+<meta
+ content='Copyright 2013 Pivotal Software Inc. All Rights Reserved.'
+ name='copyright' />
 <link href='${baseUrl}/images/favicon.ico' rel='shortcut icon' />
 <meta content='all' name='robots' />
 <link href='${baseUrl}/stylesheets/print.css' media='print'
-    rel='stylesheet' type='text/css' />
+ rel='stylesheet' type='text/css' />
 <link href='${baseUrl}/stylesheets/login.css' media='screen'
-    rel='stylesheet' type='text/css' />
+ rel='stylesheet' type='text/css' />
 <!--[if IE 9 ]> <link href="${baseUrl}/stylesheets/ie9.css" media="screen" rel="stylesheet" type="text/css" /> <![endif]-->
 <!--[if lt IE 9 ]> <link href="${baseUrl}/stylesheets/ie.css" media="screen" rel="stylesheet" type="text/css" /> <![endif]-->
 <!--[if lt IE 8 ]> <link href="${baseUrl}/stylesheets/ie7.css" media="screen" rel="stylesheet" type="text/css" /> <![endif]-->
 <style media='screen' type='text/css'>
 .js-hide {
-    display: none;
+ display: none;
 }
 
 .js-show {
-    display: block;
+ display: block;
 }
 
 .fouc-fix {
-    display: none;
+ display: none;
 }
 </style>
 <meta content='' name='Description' />
 <meta content='' name='keywords' />
 <style type='text/css'>
 img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc-branding-img-noclear
-    {
-    display: none;
+ {
+ display: none;
 }
 
 .gs-result .gs-title,.gs-result .gs-title * {
-    color: #0094d4;
+ color: #0094d4;
 }
 </style>
 <script type="text/javascript" src="${baseUrl}/javascripts/jquery.js"></script>
 </head>
 <body id="micro">
-    <div class="splash">
-        <a href='${links.home}/'><img
-            alt="Cloud Foundry: The Industry's Open Platform As A Service"
-            class="logo" src='${baseUrl}/images/logo-cloudfoundry.png'></img> </a>
-        <div class="splash-box-blank">
-            <div class="container">
-                <p class="intro-text">Sorry!</p>
-                <c:if test="${error!=null}">
-                <p class="next">There was a problem: ${fn:escapeXml(error)} <a href="${links.login}">Please try again</a>. </p>
-                </c:if>
-            </div>
-        </div>
-        <div class="footer"
-            title="Version: ${app.version}, Commit: ${commit_id}, Timestamp: ${timestamp}, UAA: ${links.uaa}">
-            &copy;
-            <fmt:formatDate value="<%=new java.util.Date()%>" pattern="yyyy" />
-            Pivotal Software, Inc. All rights reserved.
-        </div>    
-    </div>
-    <c:if test="${not empty analytics}">
-        <script>
+ <div class="splash">
+  <a href='${links.home}/'><img
+   alt="Cloud Foundry: The Industry's Open Platform As A Service"
+   class="logo" src='${baseUrl}/images/logo-cloudfoundry.png'></img> </a>
+  <div class="splash-box-blank">
+   <div class="container">
+    <p class="intro-text">Sorry!</p>
+    <c:if test="${error!=null}">
+     <p class="next">
+      There was a problem: ${fn:escapeXml(error)} <a
+       href="${links.login}">Please try again</a>.
+     </p>
+    </c:if>
+   </div>
+  </div>
+  <div class="footer"
+   title="Version: ${app.version}, Commit: ${commit_id}, Timestamp: ${timestamp}, UAA: ${links.uaa}">
+   &copy;
+   <fmt:formatDate value="<%=new java.util.Date()%>" pattern="yyyy" />
+   Pivotal Software, Inc. All rights reserved.
+  </div>
+ </div>
+ <c:if test="${not empty analytics}">
+  <script>
             (function(i, s, o, g, r, a, m) {
                 i['GoogleAnalyticsObject'] = r;
                 i[r] = i[r] || function() {
@@ -111,6 +115,6 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
             ga('create', '${analytics.code}', '${analytics.domain}');
             ga('send', 'pageview');
         </script>
-    </c:if>
+ </c:if>
 </body>
 </html>

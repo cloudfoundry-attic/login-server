@@ -1,3 +1,15 @@
+/*******************************************************************************
+ *     Cloud Foundry 
+ *     Copyright (c) [2009-2014] Pivotal Software, Inc. All Rights Reserved.
+ *
+ *     This product is licensed to you under the Apache License, Version 2.0 (the "License").
+ *     You may not use this product except in compliance with the License.
+ *
+ *     This product includes a number of subcomponents with
+ *     separate copyright notices and license terms. Your use of these
+ *     subcomponents is subject to the terms and conditions of the
+ *     subcomponent's license, as noted in the LICENSE file.
+ *******************************************************************************/
 package org.cloudfoundry.identity.uaa.login;
 
 import java.io.Serializable;
@@ -13,16 +25,19 @@ import java.util.Set;
 import org.springframework.util.MultiValueMap;
 
 /**
- * Simple implementation of {@link MultiValueMap} that wraps a {@link LinkedHashMap},
+ * Simple implementation of {@link MultiValueMap} that wraps a
+ * {@link LinkedHashMap},
  * storing multiple values in a {@link LinkedList}.
- *
- * <p>This Map implementation is generally not thread-safe. It is primarily designed
- * for data structures exposed from request objects, for use in a single thread only.
  * 
- * Enhancements from Spring Core is that we can mask values from sensitive attributes 
- * such as passwords and other credentials.
- * It also supports cyclic references in the toString and hashCode methods
- *
+ * <p>
+ * This Map implementation is generally not thread-safe. It is primarily
+ * designed for data structures exposed from request objects, for use in a
+ * single thread only.
+ * 
+ * Enhancements from Spring Core is that we can mask values from sensitive
+ * attributes such as passwords and other credentials. It also supports cyclic
+ * references in the toString and hashCode methods
+ * 
  * @author Arjen Poutsma
  * @author Juergen Hoeller
  * @author fhanik
@@ -47,7 +62,7 @@ public class LinkedMaskingMultiValueMap<K, V> implements MultiValueMap<K, V>, Se
         this.targetMap = new LinkedHashMap<K, List<V>>();
         this.maskedAttributeSet.add(maskedAttribute);
     }
-    
+
     /**
      * Create a new LinkedMultiValueMap that wraps a {@link LinkedHashMap}.
      */
@@ -57,8 +72,9 @@ public class LinkedMaskingMultiValueMap<K, V> implements MultiValueMap<K, V>, Se
     }
 
     /**
-     * Create a new LinkedMultiValueMap that wraps a {@link LinkedHashMap}
-     * with the given initial capacity.
+     * Create a new LinkedMultiValueMap that wraps a {@link LinkedHashMap} with
+     * the given initial capacity.
+     * 
      * @param initialCapacity the initial capacity
      */
     public LinkedMaskingMultiValueMap(int initialCapacity) {
@@ -68,6 +84,7 @@ public class LinkedMaskingMultiValueMap<K, V> implements MultiValueMap<K, V>, Se
     /**
      * Copy constructor: Create a new LinkedMultiValueMap with the same mappings
      * as the specified Map.
+     * 
      * @param otherMap the Map whose mappings are to be placed in this Map
      */
     public LinkedMaskingMultiValueMap(Map<K, List<V>> otherMap) {
@@ -78,6 +95,7 @@ public class LinkedMaskingMultiValueMap<K, V> implements MultiValueMap<K, V>, Se
 
     // MultiValueMap implementation
 
+    @Override
     public void add(K key, V value) {
         List<V> values = this.targetMap.get(key);
         if (values == null) {
@@ -87,82 +105,96 @@ public class LinkedMaskingMultiValueMap<K, V> implements MultiValueMap<K, V>, Se
         values.add(value);
     }
 
+    @Override
     public V getFirst(K key) {
         List<V> values = this.targetMap.get(key);
         return (values != null ? values.get(0) : null);
     }
 
+    @Override
     public void set(K key, V value) {
         List<V> values = new LinkedList<V>();
         values.add(value);
         this.targetMap.put(key, values);
     }
 
+    @Override
     public void setAll(Map<K, V> values) {
         for (Entry<K, V> entry : values.entrySet()) {
             set(entry.getKey(), entry.getValue());
         }
     }
 
+    @Override
     public Map<K, V> toSingleValueMap() {
-        LinkedHashMap<K, V> singleValueMap = new LinkedHashMap<K,V>(this.targetMap.size());
+        LinkedHashMap<K, V> singleValueMap = new LinkedHashMap<K, V>(this.targetMap.size());
         for (Entry<K, List<V>> entry : targetMap.entrySet()) {
             singleValueMap.put(entry.getKey(), entry.getValue().get(0));
         }
         return singleValueMap;
     }
 
-
     // Map implementation
 
+    @Override
     public int size() {
         return this.targetMap.size();
     }
 
+    @Override
     public boolean isEmpty() {
         return this.targetMap.isEmpty();
     }
 
+    @Override
     public boolean containsKey(Object key) {
         return this.targetMap.containsKey(key);
     }
 
+    @Override
     public boolean containsValue(Object value) {
         return this.targetMap.containsValue(value);
     }
 
+    @Override
     public List<V> get(Object key) {
         return this.targetMap.get(key);
     }
 
+    @Override
     public List<V> put(K key, List<V> value) {
         return this.targetMap.put(key, value);
     }
 
+    @Override
     public List<V> remove(Object key) {
         return this.targetMap.remove(key);
     }
 
+    @Override
     public void putAll(Map<? extends K, ? extends List<V>> m) {
         this.targetMap.putAll(m);
     }
 
+    @Override
     public void clear() {
         this.targetMap.clear();
     }
 
+    @Override
     public Set<K> keySet() {
         return this.targetMap.keySet();
     }
 
+    @Override
     public Collection<List<V>> values() {
         return this.targetMap.values();
     }
 
+    @Override
     public Set<Entry<K, List<V>>> entrySet() {
         return this.targetMap.entrySet();
     }
-
 
     @Override
     public boolean equals(Object obj) {
@@ -172,22 +204,22 @@ public class LinkedMaskingMultiValueMap<K, V> implements MultiValueMap<K, V>, Se
     @Override
     public int hashCode() {
         int h = 0;
-        Iterator<Entry<K,List<V>>> i = entrySet().iterator();
+        Iterator<Entry<K, List<V>>> i = entrySet().iterator();
         while (i.hasNext()) {
             int keyHash = 1;
-            Entry<K,List<V>> entry = i.next();
-            if (entry.getKey()==null || entry.getKey()==this) {
-                //no op - don't modify the hash
+            Entry<K, List<V>> entry = i.next();
+            if (entry.getKey() == null || entry.getKey() == this) {
+                // no op - don't modify the hash
             } else {
                 keyHash += entry.getKey().hashCode();
             }
             List<V> value = entry.getValue();
             int valueHash = 1;
             for (V v : value) {
-                valueHash = 31*valueHash + (v==null ? 0 : v==this ? 0 : v.hashCode());
+                valueHash = 31 * valueHash + (v == null ? 0 : v == this ? 0 : v.hashCode());
             }
-            
-            h += (keyHash ^ valueHash); 
+
+            h += (keyHash ^ valueHash);
         }
         return h;
     }
@@ -195,24 +227,24 @@ public class LinkedMaskingMultiValueMap<K, V> implements MultiValueMap<K, V>, Se
     @Override
     public String toString() {
         Iterator<Entry<K, List<V>>> i = targetMap.entrySet().iterator();
-        if (! i.hasNext())
+        if (!i.hasNext())
             return "{}";
 
         StringBuilder sb = new StringBuilder();
         sb.append('{');
-        
+
         while (i.hasNext()) {
-            
-            Entry<K,List<V>> e = i.next();
+
+            Entry<K, List<V>> e = i.next();
             List<V> value = e.getValue();
-            
+
             K key = e.getKey();
             sb.append(key == this ? "(this map)" : key);
             sb.append('=');
-            
+
             if (maskedAttributeSet.contains(key)) {
                 sb.append("[PROTECTED]");
-            } else if (value==null) {
+            } else if (value == null) {
                 sb.append("[]");
             } else {
                 Iterator<V> it = value.iterator();
@@ -226,7 +258,7 @@ public class LinkedMaskingMultiValueMap<K, V> implements MultiValueMap<K, V>, Se
                 }
                 sb.append(']');
             }
-            
+
             if (i.hasNext()) {
                 sb.append(',').append(' ');
             }

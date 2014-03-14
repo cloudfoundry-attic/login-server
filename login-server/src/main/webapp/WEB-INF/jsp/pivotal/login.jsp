@@ -29,27 +29,28 @@
 <meta charset='utf-8'>
 <meta content='IE=edge,chrome=1' http-equiv='X-UA-Compatible'>
 <meta content='Pivotal Software, Inc' name='author' />
-<meta content='Copyright 2013 Pivotal Software Inc. All Rights Reserved.' 
-    name='copyright' />
+<meta
+ content='Copyright 2013 Pivotal Software Inc. All Rights Reserved.'
+ name='copyright' />
 <link href='${baseUrl}/images/favicon.ico' rel='shortcut icon' />
 <meta content='all' name='robots' />
 <link href='${baseUrl}/stylesheets/print.css' media='print'
-    rel='stylesheet' type='text/css' />
+ rel='stylesheet' type='text/css' />
 <link href='${baseUrl}/stylesheets/style.css' media='screen'
-    rel='stylesheet' type='text/css' />
+ rel='stylesheet' type='text/css' />
 <link href='${baseUrl}/stylesheets/login.css' media='screen'
-    rel='stylesheet' type='text/css' />
+ rel='stylesheet' type='text/css' />
 <style media='screen' type='text/css'>
 .js-hide {
-    display: none;
+ display: none;
 }
 
 .js-show {
-    display: block;
+ display: block;
 }
 
 .fouc-fix {
-    display: none;
+ display: none;
 }
 </style>
 <meta content='' name='Description' />
@@ -67,82 +68,89 @@
 </script>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <a style="text-decoration: none;" href='${rootUrl}'><div class="image-logo"></div></a>
-            <div class="logo"><a style="text-decoration: none;" href='${rootUrl}'>PIVOTAL</a></div>
-            <div class="header-link">
-                <a href="${links.passwd}" class="h4">Forgot Password</a>
-            </div>
-        </div>
+ <div class="container">
+  <div class="header">
+   <a style="text-decoration: none;" href='${rootUrl}'><div
+     class="image-logo"></div></a>
+   <div class="logo">
+    <a style="text-decoration: none;" href='${rootUrl}'>PIVOTAL</a>
+   </div>
+   <div class="header-link">
+    <a href="${links.passwd}" class="h4">Forgot Password</a>
+   </div>
+  </div>
 
-        <div class="main-content">
-            <form id="loginForm" name="loginForm"
-                                action="<c:url value="/login.do"/>" method="POST" novalidate>
-                <div class="error-messages<c:if test="${empty param.error}"> hidden</c:if>">
-                    Unable to verify, please try again:
-                </div>
+  <div class="main-content">
+   <form id="loginForm" name="loginForm"
+    action="<c:url value="/login.do"/>" method="POST" novalidate>
+    <div
+     class="error-messages<c:if test="${empty param.error}"> hidden</c:if>">
+     Unable to verify, please try again:</div>
 
-                <c:forEach items="${prompts}" var="prompt">
-                  <c:if test="${'passcode' != prompt.key}">
-                    <div class="fields-wrapper">
-                      <spring:message code="prompt.${prompt.key}"
-                        text="${prompt.value[1]}" var="text"/>
-                      <input id='${prompt.key}' type='${prompt.value[0]}' ${prompt.value[0]=='password'?'autocomplete="off"':''}
-                        name='${prompt.key}' placeholder='${text}' />
-                    </div>
-                  </c:if>
-                </c:forEach>
+    <c:forEach items="${prompts}" var="prompt">
+     <c:if test="${'passcode' != prompt.key}">
+      <div class="fields-wrapper">
+       <spring:message code="prompt.${prompt.key}"
+        text="${prompt.value[1]}" var="text" />
+       <input id='${prompt.key}' type='${prompt.value[0]}'
+        ${prompt.value[0]=='password'?'autocomplete="off"':''}
+        name='${prompt.key}' placeholder='${text}' />
+      </div>
+     </c:if>
+    </c:forEach>
 
-                <div class="fields-wrapper">
-                    <button type="submit" class="btn-primary">Sign in</button>
-                </div>
-            </form>
-            
-            <div class="fields-wrapper">
-            <c:if test="${saml}">
-               <p><a href="saml/discovery?returnIDParam=idp&entityID=${entityID}">Sign in with your organization's credentials.</a></p>
-            </c:if>
-            </div>
-            
-        </div>
-
-        <div class="not-a-member">
-            <div class="h1">Not a member yet?</div>
-            <p class="h4">
-                Join <a href="${links.registerNetwork}">Pivotal Network</a> for enterprise,<br />
-                or <a href="${links.register}">Pivotal Web Services</a> for hosted solutions.
-            </p>
-        </div>
+    <div class="fields-wrapper">
+     <button type="submit" class="btn-primary">Sign in</button>
     </div>
+   </form>
 
-    <div class='footer' title="Version: ${app.version}, Commit: ${commit_id}, Timestamp: ${timestamp}, UAA: ${links.uaa}">
-        <div class='copyright'>
-            &copy;
-            <fmt:formatDate value="<%=new java.util.Date()%>" pattern="yyyy" />
-            Pivotal Software, Inc. - All rights reserved
-        </div>
-        <div class='powered-by'>
-            Powered by
-            <div class='logo'>
-                Pivotal
-            </div>
-        </div>
-    </div>
-
-    <%-- Clear out session scoped attributes, don't leak info --%>
-    <c:if
-        test="${not empty sessionScope['SPRING_SECURITY_LAST_EXCEPTION']}">
-        <c:set scope="session" var="SPRING_SECURITY_LAST_EXCEPTION"
-            value="${null}" />
+   <div class="fields-wrapper">
+    <c:if test="${saml}">
+     <p>
+      <a href="saml/discovery?returnIDParam=idp&entityID=${entityID}">Sign
+       in with your organization's credentials.</a>
+     </p>
     </c:if>
-    <c:if test="${not empty sessionScope['SPRING_SECURITY_LAST_USERNAME']}">
-        <c:set scope="session" var="SPRING_SECURITY_LAST_USERNAME"
-            value="${null}" />
-    </c:if>
+   </div>
 
-    <c:if test="${not empty analytics}">
-        <script>
+  </div>
+
+  <div class="not-a-member">
+   <div class="h1">Not a member yet?</div>
+   <p class="h4">
+    Join <a href="${links.registerNetwork}">Pivotal Network</a> for
+    enterprise,<br /> or <a href="${links.register}">Pivotal Web
+     Services</a> for hosted solutions.
+   </p>
+  </div>
+ </div>
+
+ <div class='footer'
+  title="Version: ${app.version}, Commit: ${commit_id}, Timestamp: ${timestamp}, UAA: ${links.uaa}">
+  <div class='copyright'>
+   &copy;
+   <fmt:formatDate value="<%=new java.util.Date()%>" pattern="yyyy" />
+   Pivotal Software, Inc. - All rights reserved
+  </div>
+  <div class='powered-by'>
+   Powered by
+   <div class='logo'>Pivotal</div>
+  </div>
+ </div>
+
+ <%-- Clear out session scoped attributes, don't leak info --%>
+ <c:if
+  test="${not empty sessionScope['SPRING_SECURITY_LAST_EXCEPTION']}">
+  <c:set scope="session" var="SPRING_SECURITY_LAST_EXCEPTION"
+   value="${null}" />
+ </c:if>
+ <c:if test="${not empty sessionScope['SPRING_SECURITY_LAST_USERNAME']}">
+  <c:set scope="session" var="SPRING_SECURITY_LAST_USERNAME"
+   value="${null}" />
+ </c:if>
+
+ <c:if test="${not empty analytics}">
+  <script>
             (function(i, s, o, g, r, a, m) {
                 i['GoogleAnalyticsObject'] = r;
                 i[r] = i[r] || function() {
@@ -158,6 +166,6 @@
             ga('create', '${analytics.code}', '${analytics.domain}');
             ga('send', 'pageview');
         </script>
-    </c:if>
+ </c:if>
 </body>
 </html>

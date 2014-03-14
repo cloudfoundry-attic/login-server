@@ -1,5 +1,12 @@
 package org.cloudfoundry.identity.docserver;
 
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -11,11 +18,6 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
@@ -37,12 +39,12 @@ public class DocumentationControllerTest {
         MediaType mediaTypeOfRestService = MediaType.parseMediaType("application/json;charset=UTF-8");
 
         mockMvc.perform(get("/api-docs")
-                .accept(mediaTypeOfRestService))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(mediaTypeOfRestService))
-                .andExpect(jsonPath("$.swaggerVersion", is("1.2")))
-                .andExpect(jsonPath("$.apis", hasSize(2)))
-                .andReturn();
+                        .accept(mediaTypeOfRestService))
+                        .andExpect(status().isOk())
+                        .andExpect(content().contentType(mediaTypeOfRestService))
+                        .andExpect(jsonPath("$.swaggerVersion", is("1.2")))
+                        .andExpect(jsonPath("$.apis", hasSize(2)))
+                        .andReturn();
     }
 
     @Test
@@ -50,11 +52,11 @@ public class DocumentationControllerTest {
         MediaType mediaTypeOfRestService = MediaType.parseMediaType("application/json;charset=UTF-8");
 
         mockMvc.perform(get("/api-docs/AccessController")
-                .accept(mediaTypeOfRestService))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(mediaTypeOfRestService))
-                .andExpect(jsonPath("$.resourcePath", is("/AccessController")))
-                .andExpect(jsonPath("$.apis", hasSize(2)))
-                .andReturn();
+                        .accept(mediaTypeOfRestService))
+                        .andExpect(status().isOk())
+                        .andExpect(content().contentType(mediaTypeOfRestService))
+                        .andExpect(jsonPath("$.resourcePath", is("/AccessController")))
+                        .andExpect(jsonPath("$.apis", hasSize(2)))
+                        .andReturn();
     }
 }

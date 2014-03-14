@@ -1,15 +1,15 @@
-/*
- * Cloud Foundry 2012.02.03 Beta
- * Copyright (c) [2009-2012] VMware, Inc. All Rights Reserved.
+/*******************************************************************************
+ *     Cloud Foundry 
+ *     Copyright (c) [2009-2014] Pivotal Software, Inc. All Rights Reserved.
  *
- * This product is licensed to you under the Apache License, Version 2.0 (the "License").
- * You may not use this product except in compliance with the License.
+ *     This product is licensed to you under the Apache License, Version 2.0 (the "License").
+ *     You may not use this product except in compliance with the License.
  *
- * This product includes a number of subcomponents with
- * separate copyright notices and license terms. Your use of these
- * subcomponents is subject to the terms and conditions of the
- * subcomponent's license, as noted in the LICENSE file.
- */
+ *     This product includes a number of subcomponents with
+ *     separate copyright notices and license terms. Your use of these
+ *     subcomponents is subject to the terms and conditions of the
+ *     subcomponent's license, as noted in the LICENSE file.
+ *******************************************************************************/
 
 package org.cloudfoundry.identity.uaa.login;
 
@@ -55,32 +55,31 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.web.client.RestTemplate;
 
 /**
- * Authentication filter to verify one time passwords with what's cached in the one time password store.
- *
+ * Authentication filter to verify one time passwords with what's cached in the
+ * one time password store.
+ * 
  * @author jdsa
- *
+ * 
  */
 public class PasscodeAuthenticationFilter implements Filter {
 
-	private final Log logger = LogFactory.getLog(getClass());
+    private final Log logger = LogFactory.getLog(getClass());
 
-	private List<String> parameterNames = Collections.emptyList();
+    private List<String> parameterNames = Collections.emptyList();
 
-	private final Set<String> methods = Collections.singleton(HttpMethod.POST.toString());
+    private final Set<String> methods = Collections.singleton(HttpMethod.POST.toString());
 
-	private final AuthenticationEntryPoint authenticationEntryPoint = new OAuth2AuthenticationEntryPoint();
+    private final AuthenticationEntryPoint authenticationEntryPoint = new OAuth2AuthenticationEntryPoint();
 
-	private final ObjectMapper mapper = new ObjectMapper();
+    private final ObjectMapper mapper = new ObjectMapper();
 
-	private AuthenticationManager authenticationManager;
-	
-	private RestTemplate authorizationTemplate;
-	
-	private String uaaBaseUrl;
-	
-	
-	
-	public String getUaaBaseUrl() {
+    private AuthenticationManager authenticationManager;
+
+    private RestTemplate authorizationTemplate;
+
+    private String uaaBaseUrl;
+
+    public String getUaaBaseUrl() {
         return uaaBaseUrl;
     }
 
@@ -97,128 +96,129 @@ public class PasscodeAuthenticationFilter implements Filter {
     }
 
     @Override
-	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
-			ServletException {
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
+                    ServletException {
 
-		HttpServletRequest req = (HttpServletRequest) request;
-		HttpServletResponse res = (HttpServletResponse) response;
+        HttpServletRequest req = (HttpServletRequest) request;
+        HttpServletResponse res = (HttpServletResponse) response;
 
-		Map<String, String> loginInfo = getCredentials(req);
+        Map<String, String> loginInfo = getCredentials(req);
 
-		String username = loginInfo.get("username");
-		String password = loginInfo.get("password");
-		String passcode = loginInfo.get("passcode");
+        String username = loginInfo.get("username");
+        String password = loginInfo.get("password");
+        String passcode = loginInfo.get("passcode");
 
-		if (loginInfo.isEmpty()) {
-			throw new BadCredentialsException("Request does not contain credentials.");
-		} else if (null == password && null != passcode) {
-			//Validate passcode
-			logger.debug("Located credentials in request, with keys: " + loginInfo.keySet());
-			if (methods != null && !methods.contains(req.getMethod().toUpperCase())) {
-				throw new BadCredentialsException("Credentials must be sent by (one of methods): " + methods);
-			}
-			
-			ExpiringCode eCode = doRetrieveCode(passcode);
-			PasscodeInformation pi = null;
-			if (eCode!=null && eCode.getData()!=null) {
-			    pi = (PasscodeInformation)new ObjectMapper().readValue(eCode.getData(), PasscodeInformation.class);
-		    }
-			if (!pi.getUserId().equals(username)) {
-			    throw new BadCredentialsException("Username mismatch");
-			}
-			
-			if (pi != null) {
-				logger.info("Successful authentication request for " + username);
+        if (loginInfo.isEmpty()) {
+            throw new BadCredentialsException("Request does not contain credentials.");
+        } else if (null == password && null != passcode) {
+            // Validate passcode
+            logger.debug("Located credentials in request, with keys: " + loginInfo.keySet());
+            if (methods != null && !methods.contains(req.getMethod().toUpperCase())) {
+                throw new BadCredentialsException("Credentials must be sent by (one of methods): " + methods);
+            }
 
-				Collection<GrantedAuthority> externalAuthorities = null;
+            ExpiringCode eCode = doRetrieveCode(passcode);
+            PasscodeInformation pi = null;
+            if (eCode != null && eCode.getData() != null) {
+                pi = new ObjectMapper().readValue(eCode.getData(), PasscodeInformation.class);
+            }
+            if (!pi.getUserId().equals(username)) {
+                throw new BadCredentialsException("Username mismatch");
+            }
 
-				if (null != pi.getAuthorizationParameters()) {
-					externalAuthorities = (Collection<GrantedAuthority>) pi.getAuthorizationParameters().get("authorities");
-				}
+            if (pi != null) {
+                logger.info("Successful authentication request for " + username);
 
-				Authentication result = new UsernamePasswordAuthenticationToken(username, null,
-						externalAuthorities == null ? UaaAuthority.USER_AUTHORITIES : externalAuthorities);
+                Collection<GrantedAuthority> externalAuthorities = null;
 
-				SecurityContextHolder.getContext().setAuthentication(result);
-			}
-			else {
-				authenticationEntryPoint.commence(req, res, new BadCredentialsException("Invalid passcode"));
-			}
-		}
-		else {
-			//Authenticate user against the UAA
-			logger.debug("Located credentials in request, with keys: " + loginInfo.keySet());
-			if (methods != null && !methods.contains(req.getMethod().toUpperCase())) {
-				throw new BadCredentialsException("Credentials must be sent by (one of methods): " + methods);
-			}
-			Authentication result = authenticationManager.authenticate(new AuthzAuthenticationRequest(loginInfo,
-					new UaaAuthenticationDetails(req)));
-			SecurityContextHolder.getContext().setAuthentication(result);
-		}
+                if (null != pi.getAuthorizationParameters()) {
+                    externalAuthorities = (Collection<GrantedAuthority>) pi.getAuthorizationParameters().get(
+                                    "authorities");
+                }
 
-		chain.doFilter(request, response);
-	}
-	
-	public ExpiringCode doRetrieveCode(String code) {
+                Authentication result = new UsernamePasswordAuthenticationToken(username, null,
+                                externalAuthorities == null ? UaaAuthority.USER_AUTHORITIES : externalAuthorities);
+
+                SecurityContextHolder.getContext().setAuthentication(result);
+            }
+            else {
+                authenticationEntryPoint.commence(req, res, new BadCredentialsException("Invalid passcode"));
+            }
+        }
+        else {
+            // Authenticate user against the UAA
+            logger.debug("Located credentials in request, with keys: " + loginInfo.keySet());
+            if (methods != null && !methods.contains(req.getMethod().toUpperCase())) {
+                throw new BadCredentialsException("Credentials must be sent by (one of methods): " + methods);
+            }
+            Authentication result = authenticationManager.authenticate(new AuthzAuthenticationRequest(loginInfo,
+                            new UaaAuthenticationDetails(req)));
+            SecurityContextHolder.getContext().setAuthentication(result);
+        }
+
+        chain.doFilter(request, response);
+    }
+
+    public ExpiringCode doRetrieveCode(String code) {
         HttpHeaders requestHeaders = new HttpHeaders();
         requestHeaders.add("Accept", MediaType.APPLICATION_JSON_VALUE);
-        
+
         HttpEntity<ExpiringCode> requestEntity = new HttpEntity<ExpiringCode>(null, requestHeaders);
-        
-        ResponseEntity<ExpiringCode> response = authorizationTemplate.exchange(getUaaBaseUrl() + "/Codes/" + code, HttpMethod.GET,
-                requestEntity, ExpiringCode.class);
-        
+
+        ResponseEntity<ExpiringCode> response = authorizationTemplate.exchange(getUaaBaseUrl() + "/Codes/" + code,
+                        HttpMethod.GET,
+                        requestEntity, ExpiringCode.class);
+
         if (response.getStatusCode().equals(HttpStatus.NOT_FOUND)) {
             return null;
         } else if (response.getStatusCode() != HttpStatus.OK) {
-            logger.warn("Request failed: "+requestEntity);
-            //TODO throw exception with the correct error
-            throw new BadCredentialsException("Unable to retrieve passcode:"+String.valueOf(response.getStatusCode()));
+            logger.warn("Request failed: " + requestEntity);
+            // TODO throw exception with the correct error
+            throw new BadCredentialsException("Unable to retrieve passcode:" + String.valueOf(response.getStatusCode()));
         }
-        
+
         return response.getBody();
     }
 
-	private Map<String, String> getCredentials(HttpServletRequest request) {
-		Map<String, String> credentials = new HashMap<String, String>();
+    private Map<String, String> getCredentials(HttpServletRequest request) {
+        Map<String, String> credentials = new HashMap<String, String>();
 
-		for (String paramName : parameterNames) {
-			String value = request.getParameter(paramName);
-			if (value != null) {
-				if (value.startsWith("{")) {
-					try {
-						Map<String, String> jsonCredentials = mapper.readValue(value,
-								new TypeReference<Map<String, String>>() {
-								});
-						credentials.putAll(jsonCredentials);
-					}
-					catch (IOException e) {
-						logger.warn("Unknown format of value for request param: " + paramName + ". Ignoring.");
-					}
-				}
-				else {
-					credentials.put(paramName, value);
-				}
-			}
-		}
+        for (String paramName : parameterNames) {
+            String value = request.getParameter(paramName);
+            if (value != null) {
+                if (value.startsWith("{")) {
+                    try {
+                        Map<String, String> jsonCredentials = mapper.readValue(value,
+                                        new TypeReference<Map<String, String>>() {
+                                        });
+                        credentials.putAll(jsonCredentials);
+                    } catch (IOException e) {
+                        logger.warn("Unknown format of value for request param: " + paramName + ". Ignoring.");
+                    }
+                }
+                else {
+                    credentials.put(paramName, value);
+                }
+            }
+        }
 
-		return credentials;
-	}
+        return credentials;
+    }
 
-	@Override
-	public void init(FilterConfig filterConfig) throws ServletException {
-	}
+    @Override
+    public void init(FilterConfig filterConfig) throws ServletException {
+    }
 
-	@Override
-	public void destroy() {
-	}
+    @Override
+    public void destroy() {
+    }
 
-	public void setParameterNames(List<String> parameterNames) {
-		this.parameterNames = parameterNames;
-	}
+    public void setParameterNames(List<String> parameterNames) {
+        this.parameterNames = parameterNames;
+    }
 
-	public PasscodeAuthenticationFilter(AuthenticationManager authenticationManager) {
-		this.authenticationManager = authenticationManager;
-	}
+    public PasscodeAuthenticationFilter(AuthenticationManager authenticationManager) {
+        this.authenticationManager = authenticationManager;
+    }
 
 }

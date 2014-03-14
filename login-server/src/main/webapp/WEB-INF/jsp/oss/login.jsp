@@ -36,45 +36,46 @@
 <meta charset='utf-8'>
 <meta content='IE=edge,chrome=1' http-equiv='X-UA-Compatible'>
 <meta content='Pivotal Software, Inc' name='author' />
-<meta content='Copyright 2013 Pivotal Software Inc. All Rights Reserved.' 
-    name='copyright' />
+<meta
+ content='Copyright 2013 Pivotal Software Inc. All Rights Reserved.'
+ name='copyright' />
 <link href='${baseUrl}/images/favicon.ico' rel='shortcut icon' />
 <meta content='all' name='robots' />
 <link href='${baseUrl}/stylesheets/print.css' media='print'
-	rel='stylesheet' type='text/css' />
+ rel='stylesheet' type='text/css' />
 <link href='${baseUrl}/stylesheets/login.css' media='screen'
-	rel='stylesheet' type='text/css' />
+ rel='stylesheet' type='text/css' />
 <!--[if IE 9 ]> <link href="${baseUrl}/stylesheets/ie9.css" media="screen" rel="stylesheet" type="text/css" /> <![endif]-->
 <!--[if lt IE 9 ]> <link href="${baseUrl}/stylesheets/ie.css" media="screen" rel="stylesheet" type="text/css" /> <![endif]-->
 <!--[if lt IE 8 ]> <link href="${baseUrl}/stylesheets/ie7.css" media="screen" rel="stylesheet" type="text/css" /> <![endif]-->
 <style media='screen' type='text/css'>
 .js-hide {
-	display: none;
+ display: none;
 }
 
 .js-show {
-	display: block;
+ display: block;
 }
 
 .fouc-fix {
-	display: none;
+ display: none;
 }
 </style>
 <meta content='' name='Description' />
 <meta content='' name='keywords' />
 <style type='text/css'>
 img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc-branding-img-noclear
-	{
-	display: none;
+ {
+ display: none;
 }
 
 .gs-result .gs-title,.gs-result .gs-title * {
-	color: #0094d4;
+ color: #0094d4;
 }
 </style>
 <script type="text/javascript" src="${baseUrl}/javascripts/jquery.js"></script>
 <script type="text/javascript"
-	src="${baseUrl}/javascripts/placeholder.js"></script>
+ src="${baseUrl}/javascripts/placeholder.js"></script>
 <script type="text/javascript">
 	$(document).ready(function() {
 		$('form:first *:input[type!=hidden]:first').focus();
@@ -86,60 +87,66 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 </script>
 </head>
 <body id="micro">
-	<div class="splash">
-		<a href='${links.home}/'><img
-			alt="Cloud Foundry: The Industry's Open Platform As A Service"
-			class="logo" src='${baseUrl}/images/logo-cloudfoundry.png'></img> </a>
-		<div class="splash-box">
-			<div class="container">
-				<form id="loginForm" name="loginForm"
-					action="<c:url value="/login.do"/>" method="POST" novalidate>
-					<div>
-						<c:if test="${not empty param.error}">
-							<div class="alert base alert-error alert-inline">
-								<div>Unable to verify, please try again:</div>
-							</div>
-						</c:if>
-						<p class="intro-text">Log in to Pivotal CF:</p>
-						<c:forEach items="${prompts}" var="prompt">
-							<c:if test="${'passcode' != prompt.key}">
-				            	<spring:message code="prompt.${prompt.key}"
-				                	text="${prompt.value[1]}" var="text"/>
-				              	<input id='${prompt.key}' type='${prompt.value[0]}' ${prompt.value[0]=='password'?'autocomplete="off"':''}
-				                	name='${prompt.key}' placeholder='${text}' />
-			                </c:if>
-						</c:forEach>
-					</div>
-					<button type="submit" class="button-orange">Log in</button>
-					<span class="button-alt"><a href="${links.passwd}">Forgot password &raquo;</a><a href="${links.register}">Create an account &raquo;</a></span>
-				</form>
-                <c:if test="${saml}">
-				  <p><a href="saml/discovery?returnIDParam=idp&entityID=${entityID}">Sign in with your organization's credentials.</a></p>
-                </c:if>
-			</div>
-		</div>
-        <div class="footer"
-            title="Version: ${app.version}, Commit: ${commit_id}, Timestamp: ${timestamp}, UAA: ${links.uaa}">
-            &copy;
-            <fmt:formatDate value="<%=new java.util.Date()%>" pattern="yyyy" />
-            Pivotal Software, Inc. All rights reserved.
-        </div>
+ <div class="splash">
+  <a href='${links.home}/'><img
+   alt="Cloud Foundry: The Industry's Open Platform As A Service"
+   class="logo" src='${baseUrl}/images/logo-cloudfoundry.png'></img> </a>
+  <div class="splash-box">
+   <div class="container">
+    <form id="loginForm" name="loginForm"
+     action="<c:url value="/login.do"/>" method="POST" novalidate>
+     <div>
+      <c:if test="${not empty param.error}">
+       <div class="alert base alert-error alert-inline">
+        <div>Unable to verify, please try again:</div>
+       </div>
+      </c:if>
+      <p class="intro-text">Log in to Pivotal CF:</p>
+      <c:forEach items="${prompts}" var="prompt">
+       <c:if test="${'passcode' != prompt.key}">
+        <spring:message code="prompt.${prompt.key}"
+         text="${prompt.value[1]}" var="text" />
+        <input id='${prompt.key}' type='${prompt.value[0]}'
+         ${prompt.value[0]=='password'?'autocomplete="off"':''}
+         name='${prompt.key}' placeholder='${text}' />
+       </c:if>
+      </c:forEach>
+     </div>
+     <button type="submit" class="button-orange">Log in</button>
+     <span class="button-alt"><a href="${links.passwd}">Forgot
+       password &raquo;</a><a href="${links.register}">Create an account
+       &raquo;</a></span>
+    </form>
+    <c:if test="${saml}">
+     <p>
+      <a href="saml/discovery?returnIDParam=idp&entityID=${entityID}">Sign
+       in with your organization's credentials.</a>
+     </p>
+    </c:if>
+   </div>
+  </div>
+  <div class="footer"
+   title="Version: ${app.version}, Commit: ${commit_id}, Timestamp: ${timestamp}, UAA: ${links.uaa}">
+   &copy;
+   <fmt:formatDate value="<%=new java.util.Date()%>" pattern="yyyy" />
+   Pivotal Software, Inc. All rights reserved.
+  </div>
 
-	</div>
+ </div>
 
-	<%-- Clear out session scoped attributes, don't leak info --%>
-	<c:if
-		test="${not empty sessionScope['SPRING_SECURITY_LAST_EXCEPTION']}">
-		<c:set scope="session" var="SPRING_SECURITY_LAST_EXCEPTION"
-			value="${null}" />
-	</c:if>
-	<c:if test="${not empty sessionScope['SPRING_SECURITY_LAST_USERNAME']}">
-		<c:set scope="session" var="SPRING_SECURITY_LAST_USERNAME"
-			value="${null}" />
-	</c:if>
+ <%-- Clear out session scoped attributes, don't leak info --%>
+ <c:if
+  test="${not empty sessionScope['SPRING_SECURITY_LAST_EXCEPTION']}">
+  <c:set scope="session" var="SPRING_SECURITY_LAST_EXCEPTION"
+   value="${null}" />
+ </c:if>
+ <c:if test="${not empty sessionScope['SPRING_SECURITY_LAST_USERNAME']}">
+  <c:set scope="session" var="SPRING_SECURITY_LAST_USERNAME"
+   value="${null}" />
+ </c:if>
 
-	<c:if test="${not empty analytics}">
-	<script>
+ <c:if test="${not empty analytics}">
+  <script>
 			(function(i, s, o, g, r, a, m) {
 				i['GoogleAnalyticsObject'] = r;
 				i[r] = i[r] || function() {
@@ -155,6 +162,6 @@ img.gsc-branding-img,img.gsc-branding-img-noclear,img.gcsc-branding-img,img.gcsc
 			ga('create', '${analytics.code}', '${analytics.domain}');
 			ga('send', 'pageview');
 	</script>
-	</c:if>
+ </c:if>
 </body>
 </html>

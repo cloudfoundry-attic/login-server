@@ -37,14 +37,15 @@
 <meta charset='utf-8'>
 <meta content='IE=edge,chrome=1' http-equiv='X-UA-Compatible'>
 <meta content='Pivotal Software, Inc' name='author' />
-<meta content='Copyright 2013 Pivotal Software Inc. All Rights Reserved.' 
-    name='copyright' />
+<meta
+ content='Copyright 2013 Pivotal Software Inc. All Rights Reserved.'
+ name='copyright' />
 <link href='${baseUrl}/images/favicon.ico' rel='shortcut icon' />
 <meta content='all' name='robots' />
 <link href='${baseUrl}/stylesheets/print.css' media='print'
-    rel='stylesheet' type='text/css' />
+ rel='stylesheet' type='text/css' />
 <link href='${baseUrl}/stylesheets/login.css' media='screen'
-    rel='stylesheet' type='text/css' />
+ rel='stylesheet' type='text/css' />
 <!--[if IE 9 ]> <link href="${baseUrl}/stylesheets/ie9.css" media="screen" rel="stylesheet" type="text/css" /> <![endif]-->
 <!--[if lt IE 9 ]> <link href="${baseUrl}/stylesheets/ie.css" media="screen" rel="stylesheet" type="text/css" /> <![endif]-->
 <!--[if lt IE 8 ]> <link href="${baseUrl}/stylesheets/ie7.css" media="screen" rel="stylesheet" type="text/css" /> <![endif]-->
@@ -82,147 +83,147 @@
 </script>
 </head>
 <body id="micro">
-    <div class="approvals">
-        <a href='${links.home}/'><img
-            alt="Cloud Foundry: The Industry's Open Platform As A Service"
-            class="logo" src='${baseUrl}/images/logo-cloudfoundry.png'></img> </a>
-        <div style="float: right;">
-            <ul class='super-nav'>
-                <li><span>Welcome <a href="${rootUrl}profile"><strong>${fn:escapeXml(pageContext.request.userPrincipal.name)}</strong></a></span>
-                    / <a href="${rootUrl}logout.do">Logout</a> &nbsp;</li>
-            </ul>
-        </div>
-        <div class="bg-content-approvals">
-            <c:if test="${error!=null}">
-                <div class="error" title="${fn:escapeXml(error)}">
-                    <div class="content-title-approvals">
-                        <h2>Sorry</h2>
-                    </div>
-                    <div class="content-inner-approvals">
-                        <p>There was an error. The request for authorization was
-                            invalid.</p>
-                    </div>
-                </div>
-            </c:if>
-
-            <c:if test="${error==null}">
-
-                <div class="content-title-approvals">
-                    <h2>Application Authorization</h2>
-                </div>
-
-
-                <div class="content-inner-approvals">
-
-                    <div class="left-side-approvals">
-                        <strong>${client_id}</strong><br> <a class="break"
-                            href="${redirect_uri}">${redirect_uri}</a>
-                    </div>
-
-                    <div class="right-side-approvals">
-                        <form id="confirmationForm" name="confirmationForm"
-                            action="${authorizeUrl}" method="POST">
-
-                            <div class="confirm">
-                                <p>
-                                    ${client_id} has requested permission to access your
-                                    CloudFoundry.com account. If you do not recognize this
-                                    application or its URL (<a href="${redirect_uri}">${redirect_uri}</a>),
-                                    you should click Cancel below. The application will not see
-                                    your password.
-                                </p>
-                                <br>
-                                <c:set var="count" value="0" />
-                                <c:if
-                                    test="${(! empty undecided_scopes) && (! empty approved_scopes || ! empty denied_scopes)}">
-                                    <p>
-                                        <strong>New Requests</strong>
-                                    </p>
-                                </c:if>
-                                <c:if test="${(! empty undecided_scopes)}">
-                                    <a class="allrequests">
-                                        <div class="approvals-list-div">
-                                            <input onClick="toggle(this)" type="checkbox" checked=checked>
-                                            Approve all
-                                        </div>
-                                    </a>
-                                    <c:forEach items="${undecided_scopes}" var="scope">
-                                        <a class="individualrequests">
-                                            <div class="approvals-list-div">
-                                                <input type="checkbox" class="requests" checked="checked"
-                                                    name="scope.${count}" value="${scope['code']}">
-                                                <spring:message code="${scope['code']}"
-                                                    text="${scope['text']}" />
-                                            </div>
-                                        </a>
-                                        <c:set var="count" value="${count + 1}" />
-                                    </c:forEach>
-                                </c:if>
-                                <c:if
-                                    test="${(! empty approved_scopes) || (! empty denied_scopes)}">
-                                    <p>
-                                        <strong>Existing Permissions</strong>
-                                    </p>
-                                </c:if>
-                                <c:if
-                                    test="${(approved_scopes != null) && (! empty approved_scopes)}">
-                                    <c:forEach items="${approved_scopes}" var="scope">
-                                        <div class="approvals-list-div">
-                                            <input type="checkbox" checked="checked"
-                                                name="scope.${count}" value="${scope['code']}">
-                                            <spring:message code="${scope['code']}"
-                                                text="${scope['text']}" />
-                                        </div>
-                                        <c:set var="count" value="${count + 1}" />
-                                    </c:forEach>
-                                </c:if>
-                                <c:if
-                                    test="${(denied_scopes != null) && (! empty denied_scopes)}">
-                                    <c:forEach items="${denied_scopes}" var="scope">
-                                        <div class="approvals-list-div">
-                                            <input type="checkbox" name="scope.${count}"
-                                                value="${scope['code']}">
-                                            <spring:message code="${scope['code']}"
-                                                text="${scope['text']}" />
-                                        </div>
-                                        <c:set var="count" value="${count + 1}" />
-                                    </c:forEach>
-                                </c:if>
-
-                                <br>
-                                <p>You can change your approval of permissions or revoke
-                                    access for this application at any time from account settings.
-                                    By approving access, you agree to ${client_id}'s terms of
-                                    service and privacy policy.</p>
-                            </div>
-                            <input name="${options.confirm.key}"
-                                value="${options.confirm.value}" type="hidden" />
-                            <div class="right spacer">
-                                <button class="btn-primary-medium" type="submit">Submit</button>
-                            </div>
-                        </form>
-                        <form id="denialForm" name="denialForm" action="${authorizeUrl}"
-                            method="POST">
-                            <input name="${options.deny.key}" value="${options.deny.value}"
-                                type="hidden" />
-                            <div class="right spacer">
-                                <button class="btn-secondary-medium" type="submit">Cancel</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </c:if>
-
-        </div>
-        <div class="footer"
-            title="Version: ${app.version}, Commit: ${commit_id}, Timestamp: ${timestamp}, UAA: ${links.uaa}">
-            &copy;
-            <fmt:formatDate value="<%=new java.util.Date()%>" pattern="yyyy" />
-            Pivotal Software, Inc. All rights reserved.
-        </div>    
+ <div class="approvals">
+  <a href='${links.home}/'><img
+   alt="Cloud Foundry: The Industry's Open Platform As A Service"
+   class="logo" src='${baseUrl}/images/logo-cloudfoundry.png'></img> </a>
+  <div style="float: right;">
+   <ul class='super-nav'>
+    <li><span>Welcome <a href="${rootUrl}profile"><strong>${fn:escapeXml(pageContext.request.userPrincipal.name)}</strong></a></span>
+     / <a href="${rootUrl}logout.do">Logout</a> &nbsp;</li>
+   </ul>
+  </div>
+  <div class="bg-content-approvals">
+   <c:if test="${error!=null}">
+    <div class="error" title="${fn:escapeXml(error)}">
+     <div class="content-title-approvals">
+      <h2>Sorry</h2>
+     </div>
+     <div class="content-inner-approvals">
+      <p>There was an error. The request for authorization was
+       invalid.</p>
+     </div>
     </div>
-    <c:if test="${not empty analytics}">
-        <script>
+   </c:if>
+
+   <c:if test="${error==null}">
+
+    <div class="content-title-approvals">
+     <h2>Application Authorization</h2>
+    </div>
+
+
+    <div class="content-inner-approvals">
+
+     <div class="left-side-approvals">
+      <strong>${client_id}</strong><br> <a class="break"
+       href="${redirect_uri}">${redirect_uri}</a>
+     </div>
+
+     <div class="right-side-approvals">
+      <form id="confirmationForm" name="confirmationForm"
+       action="${authorizeUrl}" method="POST">
+
+       <div class="confirm">
+        <p>
+         ${client_id} has requested permission to access your
+         CloudFoundry.com account. If you do not recognize this
+         application or its URL (<a href="${redirect_uri}">${redirect_uri}</a>),
+         you should click Cancel below. The application will not see
+         your password.
+        </p>
+        <br>
+        <c:set var="count" value="0" />
+        <c:if
+         test="${(! empty undecided_scopes) && (! empty approved_scopes || ! empty denied_scopes)}">
+         <p>
+          <strong>New Requests</strong>
+         </p>
+        </c:if>
+        <c:if test="${(! empty undecided_scopes)}">
+         <a class="allrequests">
+          <div class="approvals-list-div">
+           <input onClick="toggle(this)" type="checkbox" checked=checked>
+           Approve all
+          </div>
+         </a>
+         <c:forEach items="${undecided_scopes}" var="scope">
+          <a class="individualrequests">
+           <div class="approvals-list-div">
+            <input type="checkbox" class="requests" checked="checked"
+             name="scope.${count}" value="${scope['code']}">
+            <spring:message code="${scope['code']}"
+             text="${scope['text']}" />
+           </div>
+          </a>
+          <c:set var="count" value="${count + 1}" />
+         </c:forEach>
+        </c:if>
+        <c:if
+         test="${(! empty approved_scopes) || (! empty denied_scopes)}">
+         <p>
+          <strong>Existing Permissions</strong>
+         </p>
+        </c:if>
+        <c:if
+         test="${(approved_scopes != null) && (! empty approved_scopes)}">
+         <c:forEach items="${approved_scopes}" var="scope">
+          <div class="approvals-list-div">
+           <input type="checkbox" checked="checked"
+            name="scope.${count}" value="${scope['code']}">
+           <spring:message code="${scope['code']}"
+            text="${scope['text']}" />
+          </div>
+          <c:set var="count" value="${count + 1}" />
+         </c:forEach>
+        </c:if>
+        <c:if
+         test="${(denied_scopes != null) && (! empty denied_scopes)}">
+         <c:forEach items="${denied_scopes}" var="scope">
+          <div class="approvals-list-div">
+           <input type="checkbox" name="scope.${count}"
+            value="${scope['code']}">
+           <spring:message code="${scope['code']}"
+            text="${scope['text']}" />
+          </div>
+          <c:set var="count" value="${count + 1}" />
+         </c:forEach>
+        </c:if>
+
+        <br>
+        <p>You can change your approval of permissions or revoke
+         access for this application at any time from account settings.
+         By approving access, you agree to ${client_id}'s terms of
+         service and privacy policy.</p>
+       </div>
+       <input name="${options.confirm.key}"
+        value="${options.confirm.value}" type="hidden" />
+       <div class="right spacer">
+        <button class="btn-primary-medium" type="submit">Submit</button>
+       </div>
+      </form>
+      <form id="denialForm" name="denialForm" action="${authorizeUrl}"
+       method="POST">
+       <input name="${options.deny.key}" value="${options.deny.value}"
+        type="hidden" />
+       <div class="right spacer">
+        <button class="btn-secondary-medium" type="submit">Cancel</button>
+       </div>
+      </form>
+     </div>
+    </div>
+   </c:if>
+
+  </div>
+  <div class="footer"
+   title="Version: ${app.version}, Commit: ${commit_id}, Timestamp: ${timestamp}, UAA: ${links.uaa}">
+   &copy;
+   <fmt:formatDate value="<%=new java.util.Date()%>" pattern="yyyy" />
+   Pivotal Software, Inc. All rights reserved.
+  </div>
+ </div>
+ <c:if test="${not empty analytics}">
+  <script>
             (function(i, s, o, g, r, a, m) {
                 i['GoogleAnalyticsObject'] = r;
                 i[r] = i[r] || function() {
@@ -238,6 +239,6 @@
             ga('create', '${analytics.code}', '${analytics.domain}');
             ga('send', 'pageview');
         </script>
-    </c:if>
+ </c:if>
 </body>
 </html>

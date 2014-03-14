@@ -1,33 +1,32 @@
 .error-messages {
-    color: #932b2b;
-    width: 320px;
-    border: 1px solid #b53333;
-    background-color: #f47171;
-    margin: 0 auto;
-    padding: 4px 0;
-    text-align: center;
+ color: #932b2b;
+ width: 320px;
+ border: 1px solid #b53333;
+ background-color: #f47171;
+ margin: 0 auto;
+ padding: 4px 0;
+ text-align: center;
 }
 
 .error-messages.hidden {
-    visibility: hidden;
+ visibility: hidden;
 }
 
-
 .not-a-member {
-    color: #cbcbcb;
-    text-align: center;
+ color: #cbcbcb;
+ text-align: center;
 }
 
 .not-a-member a {
-    color: #cbcbcb;
+ color: #cbcbcb;
 }
 
 .not-a-member .h1 {
-    color: #fff;
-    margin: 10px 0 5px;
+ color: #fff;
+ margin: 10px 0 5px;
 }
 
 .not-a-member p {
-    line-height: 2em;
-    margin: 0;
+ line-height: 2em;
+ margin: 0;
 }
