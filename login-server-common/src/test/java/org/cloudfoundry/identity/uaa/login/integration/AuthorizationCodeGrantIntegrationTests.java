@@ -69,7 +69,7 @@ public class AuthorizationCodeGrantIntegrationTests {
         AuthorizationCodeResourceDetails resource = testAccounts.getDefaultAuthorizationCodeResource();
 
         URI uri = serverRunning.buildUri("/oauth/authorize").queryParam("response_type", "code")
-                        .queryParam("state", "mystateid").queryParam("client_id", resource.getClientId())
+                        .queryParam("state", "mystateid5").queryParam("client_id", resource.getClientId())
                         .queryParam("redirect_uri", resource.getPreEstablishedRedirectUri()).build();
         ResponseEntity<Void> result = serverRunning.getForResponse(uri.toString(), headers);
         assertEquals(HttpStatus.FOUND, result.getStatusCode());
