@@ -1,27 +1,5 @@
 package org.cloudfoundry.identity.uaa.login;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URLDecoder;
-import java.nio.charset.Charset;
-import java.security.NoSuchAlgorithmException;
-import java.security.Principal;
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -34,36 +12,20 @@ import org.cloudfoundry.identity.uaa.authentication.login.Prompt;
 import org.cloudfoundry.identity.uaa.client.SocialClientUserDetails;
 import org.cloudfoundry.identity.uaa.codestore.ExpiringCode;
 import org.cloudfoundry.identity.uaa.user.UaaAuthority;
-import org.cloudfoundry.identity.uaa.util.UaaStringUtils;
-import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.springframework.core.io.support.PropertiesLoaderUtils;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.core.env.Environment;
+import org.springframework.http.*;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.common.exceptions.OAuth2Exception;
-import org.springframework.security.providers.ExpiringUsernameAuthenticationToken;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.Assert;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.client.DefaultResponseErrorHandler;
 import org.springframework.web.client.ResourceAccessException;
@@ -72,6 +34,13 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.RedirectView;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.security.Principal;
+import java.sql.Timestamp;
+import java.util.*;
 
 /**
  * Controller that manages OAuth authorization via a remote UAA service. Use this in conjunction with the authentication
@@ -110,17 +79,18 @@ public class RemoteUaaController extends AbstractControllerInfo {
 
 	private RestOperations authorizationTemplate = new RestTemplate();
 
-
 	private List<Prompt> prompts;
-	
+
+    private Map<String, String> analytics;
+
 	private boolean addNew = false;
 	
-	
-	
+    private final Environment environment;
+
 	private long codeExpirationMillis = 5*60*1000;
-	
+
 	private AuthenticationManager remoteAuthenticationManager;
-	
+
 	public long getCodeExpirationMillis() {
         return codeExpirationMillis;
     }
@@ -128,7 +98,7 @@ public class RemoteUaaController extends AbstractControllerInfo {
     public void setCodeExpirationMillis(long codeExpirationMillis) {
         this.codeExpirationMillis = codeExpirationMillis;
     }
-    
+
     public AuthenticationManager getRemoteAuthenticationManager() {
         return remoteAuthenticationManager;
     }
@@ -180,8 +150,10 @@ public class RemoteUaaController extends AbstractControllerInfo {
 		}
 	}
 
-	public RemoteUaaController() {
-		RestTemplate template = new RestTemplate();
+	public RemoteUaaController(Environment environment) {
+        this.environment = environment;
+
+        RestTemplate template = new RestTemplate();
 		// The default java.net client doesn't allow you to handle 4xx responses
 		template.setRequestFactory(new HttpComponentsClientHttpRequestFactory() {
 			@Override
@@ -200,9 +172,8 @@ public class RemoteUaaController extends AbstractControllerInfo {
 		});
 		defaultTemplate = template;
 		initProperties();
+        initAnalytics();
 	}
-
-
 
 	@RequestMapping(value = { "/login", "/info" }, method = RequestMethod.GET)
 	public String prompts(HttpServletRequest request, @RequestHeader HttpHeaders headers, Map<String, Object> model,
@@ -210,13 +181,14 @@ public class RemoteUaaController extends AbstractControllerInfo {
  		String path = extractPath(request);
 		model.putAll(getLoginInfo(getUaaBaseUrl() + "/" + path, getRequestHeaders(headers)));
 		populateBuildAndLinkInfo(model);
+        model.put("analytics", analytics);
 		if (principal == null) {
 			return "login";
 		}
 		return "home";
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+    @SuppressWarnings({ "rawtypes", "unchecked" })
 	private Map<String, Object> getLoginInfo(String baseUrl, HttpHeaders headers) {
 
 		Map<String, Object> body = new LinkedHashMap<String, Object>();
@@ -390,7 +362,7 @@ public class RemoteUaaController extends AbstractControllerInfo {
                 requestEntity, ExpiringCode.class);
         
         if (response.getStatusCode() != HttpStatus.CREATED) {
-            logger.warn("Request failed: "+requestEntity);
+            logger.warn("Request failed: " + requestEntity);
             //TODO throw exception with the correct error
             throw new RuntimeException(String.valueOf(response.getStatusCode()));
         }
@@ -502,7 +474,6 @@ public class RemoteUaaController extends AbstractControllerInfo {
 		return outgoingHeaders;
 	}
 
-
 	public RestOperations getAuthorizationTemplate() {
 		return authorizationTemplate;
 	}
@@ -511,4 +482,15 @@ public class RemoteUaaController extends AbstractControllerInfo {
 		return defaultTemplate;
 	}
 
+    private void initAnalytics() {
+        String code = environment.getProperty("analytics.code");
+        String domain = environment.getProperty("analytics.domain");
+        Assert.isTrue(!(code != null ^ domain != null), "analytics.code and analytics.domain properties must both be set");
+        if (code != null && domain != null) {
+            HashMap<String, String> map = new HashMap<String, String>();
+            map.put("code", code);
+            map.put("domain", domain);
+            analytics = map;
+        }
+    }
 }

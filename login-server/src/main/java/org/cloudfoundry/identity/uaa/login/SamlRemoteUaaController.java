@@ -13,18 +13,6 @@
 
 package org.cloudfoundry.identity.uaa.login;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.security.Principal;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.cloudfoundry.identity.uaa.client.SocialClientUserDetails;
@@ -34,23 +22,22 @@ import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.core.env.Environment;
+import org.springframework.http.*;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.provider.BaseClientDetails;
 import org.springframework.security.providers.ExpiringUsernameAuthenticationToken;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.security.Principal;
+import java.util.*;
 
 public class SamlRemoteUaaController extends RemoteUaaController {
 
@@ -58,13 +45,14 @@ public class SamlRemoteUaaController extends RemoteUaaController {
 
 	private final ObjectMapper mapper = new ObjectMapper();
 	
-	public SamlRemoteUaaController() {
-	}
-
 	@Value("${login.entityID}")
 	public String entityID = "";
 
-	@Override
+    public SamlRemoteUaaController(Environment environment) {
+        super(environment);
+    }
+
+    @Override
 	@RequestMapping(value = { "/info", "/login" }, method = RequestMethod.GET)
 	public String prompts(HttpServletRequest request, @RequestHeader
 	HttpHeaders headers, Map<String, Object> model, Principal principal) throws Exception {

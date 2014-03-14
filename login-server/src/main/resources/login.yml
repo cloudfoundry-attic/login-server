@@ -132,6 +132,10 @@ uaa:
 # The secret that this login server will use to authenticate to the uaa
 LOGIN_SECRET: loginsecret
 
+analytics:
+  code: secret_code
+  domain: example.com
+
 #spring_profiles: ldap
 #spring_profiles: saml
 

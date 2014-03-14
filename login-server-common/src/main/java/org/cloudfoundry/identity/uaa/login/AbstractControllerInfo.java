@@ -81,7 +81,7 @@ public abstract class AbstractControllerInfo {
 			// Ignore
 		}
 	}
-	
+
 	/**
 	 * @param baseUrl the base uaa url
 	 */
