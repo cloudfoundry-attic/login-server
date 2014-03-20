@@ -24,7 +24,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
-public class RemoteUaaControllerMockMvcTest {
+public class RemoteUaaControllerMockMvcTests {
 
     @Test
     public void testLoginWithoutAnalytics() throws Exception {
