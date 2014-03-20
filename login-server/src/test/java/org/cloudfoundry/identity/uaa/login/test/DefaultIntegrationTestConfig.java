@@ -12,11 +12,41 @@
  *******************************************************************************/
 package org.cloudfoundry.identity.uaa.login.test;
 
+import org.cloudfoundry.identity.uaa.config.YamlPropertiesFactoryBean;
+import org.openqa.selenium.Dimension;
+import org.openqa.selenium.phantomjs.PhantomJSDriver;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.ImportResource;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 
 @Configuration
-@ImportResource("file:./src/main/webapp/WEB-INF/spring-servlet.xml")
+@PropertySource("classpath:integration.test.properties")
 public class DefaultIntegrationTestConfig {
-    // empty java config allows autowired fields in tests without alterations to spring-servlet.xml
+
+    @Bean
+    public PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
+        YamlPropertiesFactoryBean yamlProcessor = new YamlPropertiesFactoryBean();
+        yamlProcessor.setResources(new Resource[] { new ClassPathResource("login.yml")});
+        PropertySourcesPlaceholderConfigurer configurer = new PropertySourcesPlaceholderConfigurer();
+        configurer.setProperties(yamlProcessor.getObject());
+        return configurer;
+    }
+
+    @Bean
+    public PhantomJSDriver webDriver() {
+        DesiredCapabilities desiredCapabilities = new DesiredCapabilities();
+        PhantomJSDriver driver = new PhantomJSDriver(desiredCapabilities);
+        driver.manage().window().setSize(new Dimension(800, 600));
+        return driver;
+    }
+
+    @Bean
+    public String integrationTestServerBaseUrlString(@Value("${integration.test.port}") int port) {
+        return "http://localhost:" + port + "/";
+    }
 }
