@@ -18,41 +18,38 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
-import org.cloudfoundry.identity.uaa.config.YamlServletProfileInitializer;
-import org.junit.After;
+import org.cloudfoundry.identity.uaa.login.test.DefaultIntegrationTestConfig;
+import org.cloudfoundry.identity.uaa.login.test.IntegrationTestContextLoader;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.mock.web.MockServletConfig;
-import org.springframework.mock.web.MockServletContext;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.web.FilterChainProxy;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.support.XmlWebApplicationContext;
+import org.springframework.web.context.WebApplicationContext;
 
+@RunWith(SpringJUnit4ClassRunner.class)
+@WebAppConfiguration
+@ContextConfiguration(classes = DefaultIntegrationTestConfig.class, loader = IntegrationTestContextLoader.class)
 public class LoginIntegrationTests {
-    private XmlWebApplicationContext webApplicationContext;
+
+    @Autowired
+    WebApplicationContext webApplicationContext;
+
+    @Autowired
+    FilterChainProxy filterChainProxy;
+
     private MockMvc mockMvc;
 
     @Before
     public void setUp() throws Exception {
-        webApplicationContext = new XmlWebApplicationContext();
-        MockServletContext servletContext = new MockServletContext();
-        MockServletConfig servletConfig = new MockServletConfig(servletContext);
-        servletConfig.addInitParameter("environmentConfigDefaults", "login.yml");
-        webApplicationContext.setServletContext(servletContext);
-        webApplicationContext.setServletConfig(servletConfig);
-        webApplicationContext.setConfigLocation("file:./src/main/webapp/WEB-INF/spring-servlet.xml");
-        new YamlServletProfileInitializer().initialize(webApplicationContext);
-        webApplicationContext.refresh();
-
-        FilterChainProxy[] filters = webApplicationContext.getBeansOfType(FilterChainProxy.class).values()
-                        .toArray(new FilterChainProxy[0]);
-        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).addFilters(filters).build();
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        webApplicationContext.close();
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
+                .addFilter(filterChainProxy)
+                .build();
     }
 
     @Test
