@@ -37,6 +37,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.dumbster.smtp.SimpleSmtpServer;
 import com.dumbster.smtp.SmtpMessage;
+import java.util.regex.Pattern;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = DefaultIntegrationTestConfig.class)
@@ -69,7 +70,7 @@ public class ResetPasswordIT {
     }
 
     @Test
-    public void requestingAPasswordReset() throws Exception {
+    public void resettingAPassword() throws Exception {
         webDriver.get(baseUrl + "/login");
         Assert.assertEquals("Pivotal", webDriver.getTitle());
 
@@ -81,9 +82,19 @@ public class ResetPasswordIT {
         Assert.assertEquals(1, simpleSmtpServer.getReceivedEmailSize());
         SmtpMessage message = (SmtpMessage) simpleSmtpServer.getReceivedEmail().next();
         Assert.assertEquals("user@example.com", message.getHeaderValue("To"));
-        Assert.assertThat(message.getBody(), containsString("This is a placeholder email.  We cannot support resetting of passwords just yet.  Sorry for the ruse."));
+        Assert.assertThat(message.getBody(), containsString("Click the link to reset your password"));
 
         Assert.assertEquals("An email has been sent with password reset instructions.", webDriver.findElement(By.cssSelector(".flash")).getText());
+
+        Pattern linkPattern = Pattern.compile("<a href=\"(.*?)\">.*?</a>");
+        String link = linkPattern.matcher(message.getBody()).group();
+        System.out.println("link = " + link);
+        webDriver.get(link);
+
+        webDriver.findElement(By.name("password")).sendKeys("newsecret");
+        webDriver.findElement(By.name("password_confirmation")).sendKeys("newsecret");
+
+        // TODO: click the submit button and assert the result
     }
 
     private void createScimClient(String adminAccessToken) throws Exception {

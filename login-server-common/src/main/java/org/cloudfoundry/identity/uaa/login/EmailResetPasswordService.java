@@ -14,6 +14,7 @@ package org.cloudfoundry.identity.uaa.login;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Properties;
@@ -30,13 +31,15 @@ public class EmailResetPasswordService implements ResetPasswordService {
     private final Log logger = LogFactory.getLog(getClass());
 
     private final RestTemplate uaaTemplate;
+    private final String uaaBaseUrl;
     private final String smtpHost;
     private final int smtpPort;
     private final String smtpUser;
     private final String smtpPassword;
 
-    public EmailResetPasswordService(RestTemplate uaaTemplate, String smtpHost, int smtpPort, String smtpUser, String smtpPassword) {
+    public EmailResetPasswordService(RestTemplate uaaTemplate, String uaaBaseUrl, String smtpHost, int smtpPort, String smtpUser, String smtpPassword) {
         this.uaaTemplate = uaaTemplate;
+        this.uaaBaseUrl = uaaBaseUrl;
         this.smtpHost = smtpHost;
         this.smtpPort = smtpPort;
         this.smtpUser = smtpUser;
@@ -45,17 +48,23 @@ public class EmailResetPasswordService implements ResetPasswordService {
 
     @Override
     public void resetPassword(String emailOrUsername) {
-//        String code = uaaTemplate.postForObject("/password_resets", emailOrUsername, String.class);
-
-        MimeMessage message = new MimeMessage(getSession());
         try {
-            message.addRecipients(Message.RecipientType.TO, emailOrUsername);
-            message.setSubject("Password Reset Instructions");
-            message.setText("This is a placeholder email.  We cannot support resetting of passwords just yet.  Sorry for the ruse.");
-            Transport.send(message);
-        } catch (MessagingException e) {
-            logger.error("Exception raised while sending message to " + emailOrUsername, e);
+            String code = uaaTemplate.postForObject(uaaBaseUrl + "/password_resets", emailOrUsername, String.class);
+            try {
+                MimeMessage message = new MimeMessage(getSession());
+                message.addRecipients(Message.RecipientType.TO, emailOrUsername);
+                message.setSubject("Password Reset Instructions");
+                message.setText(getEmailText(code));
+                Transport.send(message);
+            } catch (MessagingException e) {
+                logger.error("Exception raised while sending message to " + emailOrUsername, e);
+            }
+        } catch (RestClientException e) {
         }
+    }
+
+    private String getEmailText(String code) {
+        return "Click the link to reset your password <a href=\"https://localhost:8080/login/reset_password?code=" + code + "\">Reset Password</a>";
     }
 
     private Session getSession() {

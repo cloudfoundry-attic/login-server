@@ -301,6 +301,7 @@
 
     <bean id="resetPasswordService" class="org.cloudfoundry.identity.uaa.login.EmailResetPasswordService">
         <constructor-arg ref="authorizationTemplate"/>
+        <constructor-arg value="${uaa.url:http://localhost:8080/uaa}"/>
         <constructor-arg value="${smtp.host:localhost}"/>
         <constructor-arg value="${smtp.port:25}"/>
         <constructor-arg value="${smtp.user:}"/>

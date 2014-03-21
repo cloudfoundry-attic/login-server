@@ -15,9 +15,9 @@ package org.cloudfoundry.identity.uaa.login;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import com.dumbster.smtp.SimpleSmtpServer;
@@ -26,14 +26,14 @@ import com.dumbster.smtp.SmtpMessage;
 public class EmailResetPasswordServiceTests {
 
     private SimpleSmtpServer smtpServer;
-    private EmailResetPasswordService emailResetPasswordService;
     private RestTemplate uaaTemplate;
+    private EmailResetPasswordService emailResetPasswordService;
 
     @Before
     public void setUp() throws Exception {
         smtpServer = SimpleSmtpServer.start(2525);
         uaaTemplate = Mockito.mock(RestTemplate.class);
-        emailResetPasswordService = new EmailResetPasswordService(uaaTemplate, "localhost", 2525, "", "");
+        emailResetPasswordService = new EmailResetPasswordService(uaaTemplate, "http://uaa.example.com/uaa", "localhost", 2525, "", "");
     }
 
     @After
@@ -43,21 +43,19 @@ public class EmailResetPasswordServiceTests {
 
     @Test
     public void testWhenAResetCodeIsReturnedByTheUaa() throws Exception {
-        Mockito.when(uaaTemplate.postForObject("/password_resets", "user@example.com", String.class)).thenReturn("the_secret_code");
+        Mockito.when(uaaTemplate.postForObject("http://uaa.example.com/uaa/password_resets", "user@example.com", String.class)).thenReturn("the_secret_code");
 
         emailResetPasswordService.resetPassword("user@example.com");
 
         Assert.assertEquals(1, smtpServer.getReceivedEmailSize());
         SmtpMessage message = (SmtpMessage) smtpServer.getReceivedEmail().next();
         Assert.assertEquals("user@example.com", message.getHeaderValue("To"));
-        Assert.assertEquals("This is a placeholder email.  We cannot support resetting of passwords just yet.  Sorry for the ruse.", message.getBody());
-//        Assert.assertEquals("Click the link to reset your password <a href=\"https://localhost:8080/login/reset_password?code=the_secret_code\">Reset Password</a>", message.getBody());
+        Assert.assertEquals("Click the link to reset your password <a href=\"https://localhost:8080/login/reset_password?code=the_secret_code\">Reset Password</a>", message.getBody());
     }
 
     @Test
-    @Ignore
     public void testWhenTheCodeIsDenied() throws Exception {
-        Mockito.when(uaaTemplate.postForObject("/password_resets", "user@example.com", String.class)).thenThrow(new Exception());
+        Mockito.when(uaaTemplate.postForObject("http://uaa.example.com/uaa/password_resets", "user@example.com", String.class)).thenThrow(new RestClientException("no code for you"));
 
         emailResetPasswordService.resetPassword("user@example.com");
 
