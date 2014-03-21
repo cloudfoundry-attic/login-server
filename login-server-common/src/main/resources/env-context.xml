@@ -19,7 +19,7 @@
 
 	<bean id="applicationProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
 		<property name="properties">
-			<bean class="org.cloudfoundry.identity.uaa.config.EnvironmentMapFactoryBean" />
+			<bean class="org.cloudfoundry.identity.uaa.config.EnvironmentPropertiesFactoryBean" />
 		</property>
 	</bean>
 
