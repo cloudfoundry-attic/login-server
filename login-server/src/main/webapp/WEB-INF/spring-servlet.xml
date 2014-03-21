@@ -34,6 +34,8 @@
     <security:http pattern="/login" security="none" />
     <security:http pattern="/info" security="none" />
     <security:http pattern="/error" security="none" />
+    <security:http pattern="/forgot_password" security="none" />
+    <security:http pattern="/reset_password.do" security="none" />
 
     <!-- TODO: Move the autologin related beans from the login server and saml login server to login common -->
     <bean id="abstractRemoteUaaController" abstract="true">
@@ -295,6 +297,18 @@
                 <property name="extractValueFromSingleKeyModel" value="true" />
             </bean>
         </property>
+    </bean>
+
+    <bean id="resetPasswordService" class="org.cloudfoundry.identity.uaa.login.EmailResetPasswordService">
+        <constructor-arg ref="authorizationTemplate"/>
+        <constructor-arg value="${smtp.host:localhost}"/>
+        <constructor-arg value="${smtp.port:25}"/>
+        <constructor-arg value="${smtp.user:}"/>
+        <constructor-arg value="${smtp.password:}"/>
+    </bean>
+
+    <bean id="resetPasswordController" class="org.cloudfoundry.identity.uaa.login.ResetPasswordController">
+        <constructor-arg ref="resetPasswordService"/>
     </bean>
 
     <beans profile="fileMetadata">

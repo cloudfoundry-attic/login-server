@@ -35,7 +35,7 @@ import org.springframework.web.context.WebApplicationContext;
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
 @ContextConfiguration(classes = DefaultTestConfig.class, loader = DefaultTestConfigContextLoader.class)
-public class LoginIntegrationTests {
+public class LoginMockMvcIntegrationTests {
 
     @Autowired
     WebApplicationContext webApplicationContext;
@@ -59,7 +59,7 @@ public class LoginIntegrationTests {
                         .andExpect(view().name("login"))
                         .andExpect(model().attribute("links", hasEntry("home", "https://console.10.244.0.34.xip.io")))
                         .andExpect(model().attribute("links",
-                                        hasEntry("passwd", "https://console.10.244.0.34.xip.io/password_resets/new")))
+                                        hasEntry("passwd", "http://localhost:8080/login/forgot_password")))
                         .andExpect(model().attribute("links",
                                         hasEntry("register", "https://console.10.244.0.34.xip.io/register")))
                         .andExpect(model().attribute("links",

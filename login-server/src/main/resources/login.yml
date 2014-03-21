@@ -20,7 +20,7 @@
 
 links:
   home: https://console.10.244.0.34.xip.io
-  passwd: https://console.10.244.0.34.xip.io/password_resets/new
+  passwd: http://localhost:8080/login/forgot_password
   signup: https://console.10.244.0.34.xip.io/register
   signup-network: https://network.gopivotal.com/registrations/new
 
@@ -136,6 +136,12 @@ LOGIN_SECRET: loginsecret
 analytics:
   code: secret_code
   domain: example.com
+
+smtp:
+  host: localhost
+  port: 2525
+  user:
+  password:
 
 #spring_profiles: ldap
 #spring_profiles: saml
