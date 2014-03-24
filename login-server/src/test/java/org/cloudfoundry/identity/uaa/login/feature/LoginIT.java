@@ -35,7 +35,7 @@ public class LoginIT {
     String baseUrl;
 
     @Test
-    public void requestingAPasswordReset() throws Exception {
+    public void testLoggingIn() throws Exception {
         webDriver.get(baseUrl + "/login");
         Assert.assertEquals("Pivotal", webDriver.getTitle());
 

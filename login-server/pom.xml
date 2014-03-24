@@ -41,7 +41,7 @@
         <packaging>war</packaging>
         <generatePom>true</generatePom>
         <m2eclipse.wtp.contextRoot>/login</m2eclipse.wtp.contextRoot>
-        <integration.test.port>9090</integration.test.port>
+        <integration.test.port>8080</integration.test.port>
     </properties>
 
     <build>
@@ -103,6 +103,16 @@
                         <configuration>
                             <port>${integration.test.port}</port>
                             <fork>true</fork>
+                            <webapps>
+                                <webapp>
+                                    <groupId>org.cloudfoundry.identity</groupId>
+                                    <artifactId>cloudfoundry-identity-uaa</artifactId>
+                                    <version>${identity.version}</version>
+                                    <type>war</type>
+                                    <contextPath>uaa</contextPath>
+                                    <asWebapp>true</asWebapp>
+                                </webapp>
+                            </webapps>
                         </configuration>
                     </execution>
                     <execution>

@@ -16,7 +16,6 @@ import org.cloudfoundry.identity.uaa.config.YamlPropertiesFactoryBean;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
@@ -43,10 +42,5 @@ public class DefaultIntegrationTestConfig {
         PhantomJSDriver driver = new PhantomJSDriver(desiredCapabilities);
         driver.manage().window().setSize(new Dimension(800, 600));
         return driver;
-    }
-
-    @Bean
-    public String integrationTestServerBaseUrlString(@Value("${integration.test.port}") int port) {
-        return "http://localhost:" + port + "/";
     }
 }
