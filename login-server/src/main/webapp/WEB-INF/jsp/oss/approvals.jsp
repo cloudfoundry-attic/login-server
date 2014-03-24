@@ -187,7 +187,7 @@
              <input type="checkbox" name="checkedScopes"
               value="${approval.clientId}-${approval.scope}"
               ${approval.status eq 'APPROVED' ? 'checked=checked' : '' }>
-             <spring:message code="scope.${approval.scope}" />
+              <spring:message code="scope.${approval.scope}" text="scope.${approval.scope}" />
             </div>
            </c:forEach>
 

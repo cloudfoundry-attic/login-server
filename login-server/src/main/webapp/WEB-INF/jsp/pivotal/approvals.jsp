@@ -166,7 +166,7 @@
               value="${approval.clientId}-${approval.scope}"
               ${approval.status eq 'APPROVED' ? 'checked=checked' : '' }>
              <label for="checkbox.scope.${count}"></label>
-             <spring:message code="scope.${approval.scope}" />
+             <spring:message code="scope.${approval.scope}" text="scope.${approval.scope}" />
             </div>
 
             <c:set var="count" value="${count + 1}" />
