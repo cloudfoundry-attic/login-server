@@ -12,7 +12,6 @@
  *******************************************************************************/
 package org.cloudfoundry.identity.uaa.login.test;
 
-import org.cloudfoundry.identity.uaa.config.YamlPropertiesFactoryBean;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -20,8 +19,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 
 @Configuration
 @PropertySource("classpath:integration.test.properties")
@@ -29,11 +26,7 @@ public class DefaultIntegrationTestConfig {
 
     @Bean
     public PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
-        YamlPropertiesFactoryBean yamlProcessor = new YamlPropertiesFactoryBean();
-        yamlProcessor.setResources(new Resource[] { new ClassPathResource("login.yml")});
-        PropertySourcesPlaceholderConfigurer configurer = new PropertySourcesPlaceholderConfigurer();
-        configurer.setProperties(yamlProcessor.getObject());
-        return configurer;
+        return new PropertySourcesPlaceholderConfigurer();
     }
 
     @Bean
