@@ -32,10 +32,15 @@ public class ResetPasswordController {
         return "forgot_password";
     }
 
-    @RequestMapping(value = "/reset_password.do", method = RequestMethod.POST)
+    @RequestMapping(value = "/forgot_password.do", method = RequestMethod.POST)
     public String resetPassword(@ModelAttribute("email") String email, RedirectAttributes redirectAttributes) {
         resetPasswordService.resetPassword(email);
         redirectAttributes.addFlashAttribute("success", Boolean.TRUE);
         return "redirect:forgot_password";
+    }
+
+    @RequestMapping(value = "/reset_password", method = RequestMethod.GET)
+    public String resetPassword() {
+        return "reset_password";
     }
 }

@@ -16,8 +16,6 @@ import static org.hamcrest.Matchers.containsString;
 
 import org.cloudfoundry.identity.uaa.login.test.DefaultIntegrationTestConfig;
 import org.cloudfoundry.identity.uaa.login.test.TestClient;
-import org.cloudfoundry.identity.uaa.scim.ScimUser;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,6 +35,8 @@ import org.springframework.web.client.RestTemplate;
 
 import com.dumbster.smtp.SimpleSmtpServer;
 import com.dumbster.smtp.SmtpMessage;
+import java.security.SecureRandom;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -61,12 +61,18 @@ public class ResetPasswordIT {
     @Value("${integration.test.uaa_url}")
     String uaaUrl;
 
+    private String userEmail;
+
     @Before
     public void setUp() throws Exception {
+        int randomInt = new SecureRandom().nextInt();
+
         String adminAccessToken = testClient.getOAuthAccessToken("admin", "adminsecret", "client_credentials", "clients.read clients.write clients.secret");
-        createScimClient(adminAccessToken);
-        String scimAccessToken = testClient.getOAuthAccessToken("scim", "scimsecret", "client_credentials", "scim.read scim.write password.write");
-        createUser(scimAccessToken);
+        String scimClientId = "scim" + randomInt;
+        createScimClient(adminAccessToken, scimClientId);
+        String scimAccessToken = testClient.getOAuthAccessToken(scimClientId, "scimsecret", "client_credentials", "scim.read scim.write password.write");
+        userEmail = "user" + randomInt + "@example.com";
+        createUser(scimAccessToken, "JOE" + randomInt, userEmail);
     }
 
     @Test
@@ -76,44 +82,61 @@ public class ResetPasswordIT {
 
         webDriver.findElement(By.linkText("Forgot Password")).click();
 
-        webDriver.findElement(By.name("email")).sendKeys("user@example.com");
+        webDriver.findElement(By.name("email")).sendKeys(userEmail);
         webDriver.findElement(By.xpath("//button[contains(text(),'Reset Password')]")).click();
 
         Assert.assertEquals(1, simpleSmtpServer.getReceivedEmailSize());
         SmtpMessage message = (SmtpMessage) simpleSmtpServer.getReceivedEmail().next();
-        Assert.assertEquals("user@example.com", message.getHeaderValue("To"));
+        Assert.assertEquals(userEmail, message.getHeaderValue("To"));
         Assert.assertThat(message.getBody(), containsString("Click the link to reset your password"));
 
         Assert.assertEquals("An email has been sent with password reset instructions.", webDriver.findElement(By.cssSelector(".flash")).getText());
 
-        Pattern linkPattern = Pattern.compile("<a href=\"(.*?)\">.*?</a>");
-        String link = linkPattern.matcher(message.getBody()).group();
-        System.out.println("link = " + link);
+        String link = extractLink(message.getBody());
         webDriver.get(link);
 
         webDriver.findElement(By.name("password")).sendKeys("newsecret");
         webDriver.findElement(By.name("password_confirmation")).sendKeys("newsecret");
 
-        // TODO: click the submit button and assert the result
+        webDriver.findElement(By.xpath("//button[contains(text(),'Reset Password')]")).click();
+
+        // TODO: assert the reset succeeded
     }
 
-    private void createScimClient(String adminAccessToken) throws Exception {
+    private String extractLink(String messageBody) {
+        Pattern linkPattern = Pattern.compile("<a href=\"(.*?)\">.*?</a>");
+        Matcher matcher = linkPattern.matcher(messageBody);
+        matcher.find();
+        return matcher.group(1);
+    }
+
+    private void createScimClient(String adminAccessToken, String clientId) throws Exception {
         restfulCreate(
                 adminAccessToken,
-                "{\"scope\":[\"uaa.none\"],\"client_id\":\"scim\",\"client_secret\":\"scimsecret\",\"resource_ids\":[\"oauth\"],\"authorized_grant_types\":[\"client_credentials\"],\"authorities\":[\"password.write\",\"scim.write\",\"scim.read\",\"oauth.approvals\"]}",
+                "{" +
+                        "\"scope\":[\"uaa.none\"]," +
+                        "\"client_id\":\"" + clientId + "\"," +
+                        "\"client_secret\":\"scimsecret\"," +
+                        "\"resource_ids\":[\"oauth\"]," +
+                        "\"authorized_grant_types\":[\"client_credentials\"]," +
+                        "\"authorities\":[\"password.write\",\"scim.write\",\"scim.read\",\"oauth.approvals\"]" +
+                        "}",
                 uaaUrl + "/oauth/clients"
         );
     }
 
-    private void createUser(String scimAccessToken) throws Exception {
-        ScimUser user = new ScimUser();
-        user.setUserName("JOE");
-        user.setName(new ScimUser.Name("Joe", "User"));
-        user.addEmail("user@example.com");
-
+    private void createUser(String scimAccessToken, String userName, String email) throws Exception {
         restfulCreate(
                 scimAccessToken,
-                new ObjectMapper().writeValueAsString(user),
+                "{" +
+                        "\"meta\":{\"version\":0,\"created\":\"2014-03-24T18:01:24.584Z\"}," +
+                        "\"userName\":\"" + userName + "\"," +
+                        "\"name\":{\"formatted\":\"Joe User\",\"familyName\":\"User\",\"givenName\":\"Joe\"}," +
+                        "\"emails\":[{\"value\":\"" + email + "\"}]," +
+                        "\"active\":true," +
+                        "\"verified\":false," +
+                        "\"schemas\":[\"urn:scim:schemas:core:1.0\"]" +
+                        "}",
                 uaaUrl + "/Users"
         );
     }

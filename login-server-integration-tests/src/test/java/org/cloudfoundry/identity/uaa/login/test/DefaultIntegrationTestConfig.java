@@ -15,12 +15,12 @@ package org.cloudfoundry.identity.uaa.login.test;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
+import org.springframework.web.client.RestTemplate;
 
 import com.dumbster.smtp.SimpleSmtpServer;
 
@@ -52,7 +52,7 @@ public class DefaultIntegrationTestConfig {
     }
 
     @Bean
-    public RestClientTestClient testClient(RestTemplate restTemplate, @Value("${integration.test.uaa_url}") String baseUrl) {
-        return new RestClientTestClient(restTemplate, baseUrl);
+    public TestClient testClient(RestTemplate restTemplate, @Value("${integration.test.uaa_url}") String baseUrl) {
+        return new TestClient(restTemplate, baseUrl);
     }
 }

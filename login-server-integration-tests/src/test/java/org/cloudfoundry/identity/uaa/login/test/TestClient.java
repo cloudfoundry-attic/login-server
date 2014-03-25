@@ -23,12 +23,12 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
 
-public class RestClientTestClient implements TestClient {
+public class TestClient {
 
     private final RestTemplate restTemplate;
     private final String baseUrl;
 
-    public RestClientTestClient(RestTemplate restTemplate, String baseUrl) {
+    public TestClient(RestTemplate restTemplate, String baseUrl) {
         this.restTemplate = restTemplate;
         this.baseUrl = baseUrl;
     }

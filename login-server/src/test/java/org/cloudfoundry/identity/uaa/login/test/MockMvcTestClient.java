@@ -23,7 +23,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
-public class MockMvcTestClient implements TestClient {
+public class MockMvcTestClient {
 
     private MockMvc mockMvc;
     private final ObjectMapper objectMapper;
@@ -33,7 +33,6 @@ public class MockMvcTestClient implements TestClient {
         objectMapper = new ObjectMapper();
     }
 
-    @Override
     public String getOAuthAccessToken(String username, String password, String grantType, String scope)
                     throws Exception {
         String basicDigestHeaderValue = "Basic "

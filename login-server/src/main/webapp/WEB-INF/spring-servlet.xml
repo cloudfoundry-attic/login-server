@@ -34,8 +34,8 @@
     <security:http pattern="/login" security="none" />
     <security:http pattern="/info" security="none" />
     <security:http pattern="/error" security="none" />
-    <security:http pattern="/forgot_password" security="none" />
-    <security:http pattern="/reset_password.do" security="none" />
+    <security:http pattern="/forgot_password*" security="none" />
+    <security:http pattern="/reset_password*" security="none" />
 
     <!-- TODO: Move the autologin related beans from the login server and saml login server to login common -->
     <bean id="abstractRemoteUaaController" abstract="true">

@@ -46,15 +46,15 @@ public class ResetPasswordControllerTest {
     }
 
     @Test
-    public void testForgotPassword() throws Exception {
+    public void testForgotPasswordPage() throws Exception {
         mockMvc.perform(get("/forgot_password"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("forgot_password"));
     }
 
     @Test
-    public void testResetPassword() throws Exception {
-        MockHttpServletRequestBuilder post = post("/reset_password.do")
+    public void testForgotPassword() throws Exception {
+        MockHttpServletRequestBuilder post = post("/forgot_password.do")
                 .contentType(APPLICATION_FORM_URLENCODED)
                 .param("email", "user@example.com");
         mockMvc.perform(post)
@@ -62,5 +62,24 @@ public class ResetPasswordControllerTest {
                 .andExpect(flash().attributeExists("success"));
 
         Mockito.verify(resetPasswordService).resetPassword("user@example.com");
+    }
+
+    @Test
+    public void testResetPasswordPage() throws Exception {
+        mockMvc.perform(get("/reset_password"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("reset_password"));
+    }
+
+    @Test
+    public void testResetPassword() throws Exception {
+//        MockHttpServletRequestBuilder post = post("/reset_password.do")
+//                .contentType(APPLICATION_FORM_URLENCODED)
+//                .param("email", "user@example.com");
+//        mockMvc.perform(post)
+//                .andExpect(status().isFound())
+//                .andExpect(flash().attributeExists("success"));
+//
+//        Mockito.verify(resetPasswordService).resetPassword("user@example.com");
     }
 }
