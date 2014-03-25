@@ -62,6 +62,10 @@ public class LoginIntegrationTests {
                                         hasEntry("passwd", "https://console.10.244.0.34.xip.io/password_resets/new")))
                         .andExpect(model().attribute("links",
                                         hasEntry("register", "https://console.10.244.0.34.xip.io/register")))
+                        .andExpect(model().attribute("links",
+                                        hasEntry("network", "https://network.gopivotal.com/login")))
+                        .andExpect(model().attribute("links",
+                                        hasEntry("registerNetwork", "https://network.gopivotal.com/registrations/new")))
                         .andExpect(model().attribute("links", hasEntry("uaa", "http://localhost:8080/uaa")))
                         .andExpect(model().attribute("links", hasEntry("login", "http://localhost:8080/login")))
                         .andExpect(model().attributeExists("prompts"))
