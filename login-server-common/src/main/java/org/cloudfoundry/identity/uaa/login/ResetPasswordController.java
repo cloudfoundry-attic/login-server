@@ -12,11 +12,16 @@
  *******************************************************************************/
 package org.cloudfoundry.identity.uaa.login;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import javax.servlet.http.HttpServletResponse;
 
 @Controller
 public class ResetPasswordController {
@@ -28,19 +33,37 @@ public class ResetPasswordController {
     }
 
     @RequestMapping(value = "/forgot_password", method = RequestMethod.GET)
-    public String forgotPassword() {
+    public String forgotPasswordPage() {
         return "forgot_password";
     }
 
     @RequestMapping(value = "/forgot_password.do", method = RequestMethod.POST)
-    public String resetPassword(@ModelAttribute("email") String email, RedirectAttributes redirectAttributes) {
-        resetPasswordService.resetPassword(email);
+    public String forgotPassword(@ModelAttribute("email") String email, RedirectAttributes redirectAttributes) {
+        resetPasswordService.forgotPassword(email);
         redirectAttributes.addFlashAttribute("success", Boolean.TRUE);
         return "redirect:forgot_password";
     }
 
     @RequestMapping(value = "/reset_password", method = RequestMethod.GET)
-    public String resetPassword() {
+    public String resetPasswordPage(@RequestParam String code, Model model) {
+        model.addAttribute("code", code);
+
         return "reset_password";
+    }
+
+    @RequestMapping(value = "/reset_password.do", method = RequestMethod.POST)
+    public String resetPassword(Model model,
+                                @ModelAttribute("code") String code,
+                                @ModelAttribute("password") String password,
+                                @ModelAttribute("password_confirmation") String passwordConfirmation,
+                                HttpServletResponse response) {
+
+        if (password.isEmpty() || passwordConfirmation.isEmpty() || !password.equals(passwordConfirmation)) {
+            model.addAttribute("message", "Passwords must match and not be empty");
+            response.setStatus(HttpStatus.UNPROCESSABLE_ENTITY.value());
+            return "reset_password";
+        }
+        resetPasswordService.resetPassword(code, password);
+        return "redirect:home";
     }
 }

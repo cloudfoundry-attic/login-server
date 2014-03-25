@@ -47,7 +47,7 @@ public class EmailResetPasswordService implements ResetPasswordService {
     }
 
     @Override
-    public void resetPassword(String emailOrUsername) {
+    public void forgotPassword(String emailOrUsername) {
         try {
             String code = uaaTemplate.postForObject(uaaBaseUrl + "/password_resets", emailOrUsername, String.class);
             try {
@@ -63,8 +63,13 @@ public class EmailResetPasswordService implements ResetPasswordService {
         }
     }
 
+    @Override
+    public void resetPassword(String code, String password) {
+
+    }
+
     private String getEmailText(String code) {
-        return "Click the link to reset your password <a href=\"https://localhost:8080/login/reset_password?code=" + code + "\">Reset Password</a>";
+        return "Click the link to reset your password <a href=\"http://localhost:8080/login/reset_password?code=" + code + "\">Reset Password</a>";
     }
 
     private Session getSession() {

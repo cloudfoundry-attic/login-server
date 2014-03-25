@@ -26,15 +26,19 @@
 <body id="micro">
 <div class="content">
     <article class="container">
-        <p>Enter your email to reset your password.</p>
-        <form id="forgotPasswordForm" action="<c:url value="/forgot_password.do"/>" method="POST" novalidate>
+        <p>Enter a new password below.</p>
+        <form id="resetPasswordForm" action="<c:url value="/reset_password.do"/>" method="POST" novalidate>
+            <c:if test="${not empty message}">
+            <div class="flash">${message}</div>
+            </c:if>
             <div>
-                <c:if test="${not empty success}">
-                    <div class="flash">An email has been sent with password reset instructions.</div>
-                </c:if>
-                <input type="email" name="email" />
+                <input type="password" name="password" />
             </div>
-            <button type="submit" class="button">Reset Password</button>
+            <div>
+                <input type="password" name="password_confirmation" />
+            </div>
+            <input type="hidden" name="code" value="${code}"/>
+            <button type="submit" class="button">Change Password</button>
         </form>
     </article>
 </div>
