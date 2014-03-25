@@ -22,7 +22,7 @@ import org.springframework.test.context.SmartContextLoader;
 import org.springframework.test.context.web.WebMergedContextConfiguration;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 
-public class IntegrationTestContextLoader implements SmartContextLoader {
+public class DefaultTestConfigContextLoader implements SmartContextLoader {
 
     @Override
     public void processContextConfiguration(ContextConfigurationAttributes configAttributes) {
