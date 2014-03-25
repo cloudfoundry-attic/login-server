@@ -8,5 +8,7 @@ install:
 script: 
   - ./.run-script.sh
   - mvn test
+  - cd login-server-integration-tests && mvn verify
+  - cd $TRAVIS_BUILD_DIR
   - kill -9 `cat mvn.pid`
   - rm -f mvn.pid

@@ -19,7 +19,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 import org.cloudfoundry.identity.uaa.login.test.DefaultTestConfig;
-import org.cloudfoundry.identity.uaa.login.test.IntegrationTestContextLoader;
+import org.cloudfoundry.identity.uaa.login.test.DefaultTestConfigContextLoader;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,7 +34,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
-@ContextConfiguration(classes = DefaultTestConfig.class, loader = IntegrationTestContextLoader.class)
+@ContextConfiguration(classes = DefaultTestConfig.class, loader = DefaultTestConfigContextLoader.class)
 public class LoginIntegrationTests {
 
     @Autowired

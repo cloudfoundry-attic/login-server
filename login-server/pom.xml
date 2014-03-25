@@ -41,7 +41,6 @@
         <packaging>war</packaging>
         <generatePom>true</generatePom>
         <m2eclipse.wtp.contextRoot>/login</m2eclipse.wtp.contextRoot>
-        <integration.test.port>8080</integration.test.port>
     </properties>
 
     <build>
@@ -51,12 +50,6 @@
                 <filtering>true</filtering>
             </resource>
         </resources>
-        <testResources>
-            <testResource>
-                <directory>src/test/resources</directory>
-                <filtering>true</filtering>
-            </testResource>
-        </testResources>
         <plugins>
             <plugin>
                 <groupId>pl.project13.maven</groupId>
@@ -76,53 +69,6 @@
                     <generateGitPropertiesFilename>src/main/resources/git.properties</generateGitPropertiesFilename>
                     <dotGitDirectory>${dot.git.directory}</dotGitDirectory>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-failsafe-plugin</artifactId>
-                <version>2.16</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>integration-test</goal>
-                            <goal>verify</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.tomcat.maven</groupId>
-                <artifactId>tomcat7-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>start-tomcat</id>
-                        <phase>pre-integration-test</phase>
-                        <goals>
-                            <goal>run-war-only</goal>
-                        </goals>
-                        <configuration>
-                            <port>${integration.test.port}</port>
-                            <fork>true</fork>
-                            <webapps>
-                                <webapp>
-                                    <groupId>org.cloudfoundry.identity</groupId>
-                                    <artifactId>cloudfoundry-identity-uaa</artifactId>
-                                    <version>${identity.version}</version>
-                                    <type>war</type>
-                                    <contextPath>uaa</contextPath>
-                                    <asWebapp>true</asWebapp>
-                                </webapp>
-                            </webapps>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>stop-tomcat</id>
-                        <phase>post-integration-test</phase>
-                        <goals>
-                            <goal>shutdown</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
         <pluginManagement>
@@ -450,20 +396,6 @@
             <groupId>org.hamcrest</groupId>
             <artifactId>hamcrest-all</artifactId>
             <version>1.3</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.seleniumhq.selenium</groupId>
-            <artifactId>selenium-java</artifactId>
-            <version>2.39.0</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.github.detro.ghostdriver</groupId>
-            <artifactId>phantomjsdriver</artifactId>
-            <version>1.1.0</version>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 
