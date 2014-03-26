@@ -12,13 +12,19 @@
  *******************************************************************************/
 package org.cloudfoundry.identity.uaa.login;
 
+import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withBadRequest;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
-import org.mockito.Mockito;
-import org.springframework.web.client.RestClientException;
+import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
 
 import com.dumbster.smtp.SimpleSmtpServer;
@@ -27,13 +33,14 @@ import com.dumbster.smtp.SmtpMessage;
 public class EmailResetPasswordServiceTests {
 
     private SimpleSmtpServer smtpServer;
-    private RestTemplate uaaTemplate;
     private EmailResetPasswordService emailResetPasswordService;
+    private MockRestServiceServer mockUaaServer;
 
     @Before
     public void setUp() throws Exception {
         smtpServer = SimpleSmtpServer.start(2525);
-        uaaTemplate = Mockito.mock(RestTemplate.class);
+        RestTemplate uaaTemplate = new RestTemplate();
+        mockUaaServer = MockRestServiceServer.createServer(uaaTemplate);
         emailResetPasswordService = new EmailResetPasswordService(uaaTemplate, "http://uaa.example.com/uaa", "localhost", 2525, "", "");
     }
 
@@ -44,9 +51,13 @@ public class EmailResetPasswordServiceTests {
 
     @Test
     public void testWhenAResetCodeIsReturnedByTheUaa() throws Exception {
-        Mockito.when(uaaTemplate.postForObject("http://uaa.example.com/uaa/password_resets", "user@example.com", String.class)).thenReturn("the_secret_code");
+        mockUaaServer.expect(requestTo("http://uaa.example.com/uaa/password_resets"))
+                .andExpect(method(POST))
+                .andRespond(withSuccess("the_secret_code", APPLICATION_JSON));
 
         emailResetPasswordService.forgotPassword("user@example.com");
+
+        mockUaaServer.verify();
 
         Assert.assertEquals(1, smtpServer.getReceivedEmailSize());
         SmtpMessage message = (SmtpMessage) smtpServer.getReceivedEmail().next();
@@ -56,16 +67,29 @@ public class EmailResetPasswordServiceTests {
 
     @Test
     public void testWhenTheCodeIsDenied() throws Exception {
-        Mockito.when(uaaTemplate.postForObject("http://uaa.example.com/uaa/password_resets", "user@example.com", String.class)).thenThrow(new RestClientException("no code for you"));
+        mockUaaServer.expect(requestTo("http://uaa.example.com/uaa/password_resets"))
+                .andExpect(method(POST))
+                .andRespond(withBadRequest());
 
         emailResetPasswordService.forgotPassword("user@example.com");
+
+        mockUaaServer.verify();
 
         Assert.assertEquals(0, smtpServer.getReceivedEmailSize());
     }
 
     @Test
-    @Ignore
     public void testChangingAPassword() throws Exception {
+        mockUaaServer.expect(requestTo("http://uaa.example.com/uaa/password_change"))
+                .andExpect(method(POST))
+                .andExpect(jsonPath("$.code").value("secret_code"))
+                .andExpect(jsonPath("$.new_password").value("new_secret"))
+                .andRespond(withSuccess("userman", APPLICATION_JSON));
 
+        String username = emailResetPasswordService.resetPassword("secret_code", "new_secret");
+
+        mockUaaServer.verify();
+
+        Assert.assertEquals("userman", username);
     }
 }

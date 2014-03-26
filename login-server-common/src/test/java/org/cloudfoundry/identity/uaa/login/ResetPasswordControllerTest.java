@@ -17,6 +17,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.flash;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
@@ -25,7 +26,6 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
@@ -83,19 +83,24 @@ public class ResetPasswordControllerTest {
                 .param("password", "password")
                 .param("password_confirmation", "password");
         mockMvc.perform(post)
-                .andExpect(status().isFound());
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("home"))
+                .andExpect(model().attributeDoesNotExist("code"))
+                .andExpect(model().attributeDoesNotExist("password"))
+                .andExpect(model().attributeDoesNotExist("password_confirmation"));
 
         Mockito.verify(resetPasswordService).resetPassword("secret_code", "password");
     }
 
     @Test
-    public void testResetPasswordFailure() throws Exception {
+    public void testResetPasswordFormValidationFailure() throws Exception {
         MockHttpServletRequestBuilder post = post("/reset_password.do")
                 .contentType(APPLICATION_FORM_URLENCODED)
                 .param("password", "pass")
                 .param("password_confirmation", "word");
         mockMvc.perform(post)
                 .andExpect(status().isUnprocessableEntity())
+                .andExpect(view().name("reset_password"))
                 .andExpect(model().attributeExists("message"));
 
         Mockito.verifyZeroInteractions(resetPasswordService);

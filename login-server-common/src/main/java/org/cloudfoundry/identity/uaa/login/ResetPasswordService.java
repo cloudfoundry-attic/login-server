@@ -14,5 +14,5 @@ package org.cloudfoundry.identity.uaa.login;
 
 public interface ResetPasswordService {
     void forgotPassword(String emailOrUsername);
-    void resetPassword(String code, String password);
+    String resetPassword(String code, String password);
 }

@@ -17,6 +17,8 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 import javax.mail.Authenticator;
 import javax.mail.Message;
@@ -47,25 +49,32 @@ public class EmailResetPasswordService implements ResetPasswordService {
     }
 
     @Override
-    public void forgotPassword(String emailOrUsername) {
+    public void forgotPassword(String email) {
         try {
-            String code = uaaTemplate.postForObject(uaaBaseUrl + "/password_resets", emailOrUsername, String.class);
+            String code = uaaTemplate.postForObject(uaaBaseUrl + "/password_resets", email, String.class);
             try {
                 MimeMessage message = new MimeMessage(getSession());
-                message.addRecipients(Message.RecipientType.TO, emailOrUsername);
+                message.addRecipients(Message.RecipientType.TO, email);
                 message.setSubject("Password Reset Instructions");
                 message.setText(getEmailText(code));
                 Transport.send(message);
             } catch (MessagingException e) {
-                logger.error("Exception raised while sending message to " + emailOrUsername, e);
+                logger.error("Exception raised while sending message to " + email, e);
             }
         } catch (RestClientException e) {
         }
     }
 
     @Override
-    public void resetPassword(String code, String password) {
+    public String resetPassword(String code, String newPassword) {
+        Map<String, String> uriVariables = new HashMap<String, String>();
+        uriVariables.put("baseUrl", uaaBaseUrl);
 
+        Map<String, String> formData = new HashMap<String, String>();
+        formData.put("code", code);
+        formData.put("new_password", newPassword);
+
+        return uaaTemplate.postForObject("{baseUrl}/password_change", formData, String.class, uriVariables);
     }
 
     private String getEmailText(String code) {

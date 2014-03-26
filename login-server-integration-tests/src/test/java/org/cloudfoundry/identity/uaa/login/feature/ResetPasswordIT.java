@@ -62,6 +62,7 @@ public class ResetPasswordIT {
     String uaaUrl;
 
     private String userEmail;
+    private String userName;
 
     @Before
     public void setUp() throws Exception {
@@ -72,7 +73,8 @@ public class ResetPasswordIT {
         createScimClient(adminAccessToken, scimClientId);
         String scimAccessToken = testClient.getOAuthAccessToken(scimClientId, "scimsecret", "client_credentials", "scim.read scim.write password.write");
         userEmail = "user" + randomInt + "@example.com";
-        createUser(scimAccessToken, "JOE" + randomInt, userEmail);
+        userName = "JOE" + randomInt;
+        createUser(scimAccessToken, userName, userEmail);
     }
 
     @Test
@@ -100,7 +102,15 @@ public class ResetPasswordIT {
 
         webDriver.findElement(By.xpath("//button[contains(text(),'Change Password')]")).click();
 
-        // TODO: assert the reset succeeded
+        Assert.assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), containsString("Welcome"));
+
+        webDriver.findElement(By.linkText("Sign out")).click();
+
+        webDriver.findElement(By.name("username")).sendKeys(userName);
+        webDriver.findElement(By.name("password")).sendKeys("newsecret");
+        webDriver.findElement(By.xpath("//button[contains(text(), 'Sign in')]")).click();
+
+        Assert.assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), containsString("Welcome"));
     }
 
     private String extractLink(String messageBody) {

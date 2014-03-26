@@ -12,7 +12,10 @@
  *******************************************************************************/
 package org.cloudfoundry.identity.uaa.login;
 
+import org.cloudfoundry.identity.uaa.user.UaaAuthority;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -21,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.Arrays;
 import javax.servlet.http.HttpServletResponse;
 
 @Controller
@@ -63,7 +67,12 @@ public class ResetPasswordController {
             response.setStatus(HttpStatus.UNPROCESSABLE_ENTITY.value());
             return "reset_password";
         }
-        resetPasswordService.resetPassword(code, password);
+        String username = resetPasswordService.resetPassword(code, password);
+
+        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username, null, Arrays.asList(UaaAuthority.UAA_USER));
+        SecurityContextHolder.getContext().setAuthentication(token);
+
+        model.asMap().clear();
         return "redirect:home";
     }
 }
