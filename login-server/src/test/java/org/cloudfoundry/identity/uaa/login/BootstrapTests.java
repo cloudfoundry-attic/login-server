@@ -13,15 +13,20 @@
 package org.cloudfoundry.identity.uaa.login;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 
 import org.cloudfoundry.identity.uaa.config.YamlPropertiesFactoryBean;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.support.GenericXmlApplicationContext;
 import org.springframework.core.env.PropertiesPropertySource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.security.ldap.authentication.LdapAuthenticationProvider;
+import org.springframework.security.saml.log.SAMLDefaultLogger;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.ViewResolver;
 
@@ -48,37 +53,38 @@ public class BootstrapTests {
 
     @Test
     public void testRootContextDefaults() throws Exception {
-        context = getServletContext("file:./src/main/webapp/WEB-INF/spring-servlet.xml");
+        context = getServletContext(null, "./src/test/resources/test/config/login.yml", "file:./src/main/webapp/WEB-INF/spring-servlet.xml");
         assertNotNull(context.getBean("viewResolver", ViewResolver.class));
+        assertNotNull(context.getBean("resetPasswordController", ResetPasswordController.class));
     }
 
     @Test
     public void testLdapProfile() throws Exception {
-        context = getServletContext("ldap", "file:./src/main/webapp/WEB-INF/spring-servlet.xml");
+        context = getServletContext("ldap", "./src/test/resources/test/config/login.yml", "file:./src/main/webapp/WEB-INF/spring-servlet.xml");
         assertNotNull(context.getBean("viewResolver", ViewResolver.class));
+        assertNotNull(context.getBean("ldapAuthProvider", LdapAuthenticationProvider.class));
     }
 
-    private GenericXmlApplicationContext getServletContext(String... resources) {
-
-        String profiles = null;
-        String[] resourcesToLoad = resources;
-        if (!resources[0].endsWith(".xml")) {
-            profiles = resources[0];
-            resourcesToLoad = new String[resources.length - 1];
-            System.arraycopy(resources, 1, resourcesToLoad, 0, resourcesToLoad.length);
+    @Test
+    public void testSamlProfile() throws Exception {
+        context = getServletContext("saml", "./src/test/resources/test/config/saml.yml", "file:./src/main/webapp/WEB-INF/spring-servlet.xml");
+        assertNotNull(context.getBean("viewResolver", ViewResolver.class));
+        assertNotNull(context.getBean("samlLogger", SAMLDefaultLogger.class));
         }
 
+    private GenericXmlApplicationContext getServletContext(String profiles, String loginYmlPath, String... resources) {
         GenericXmlApplicationContext context = new GenericXmlApplicationContext();
-        context.load(resourcesToLoad);
 
         if (profiles != null) {
             context.getEnvironment().setActiveProfiles(StringUtils.commaDelimitedListToStringArray(profiles));
         }
 
+        context.load(resources);
+
         // Simulate what happens in the webapp when the
         // YamlServletProfileInitializer kicks in
         YamlPropertiesFactoryBean factory = new YamlPropertiesFactoryBean();
-        factory.setResources(new Resource[] { new FileSystemResource("./src/test/resources/test/config/login.yml") });
+        factory.setResources(new Resource[] { new FileSystemResource(loginYmlPath) });
         context.getEnvironment().getPropertySources()
                         .addLast(new PropertiesPropertySource("servletProperties", factory.getObject()));
 
