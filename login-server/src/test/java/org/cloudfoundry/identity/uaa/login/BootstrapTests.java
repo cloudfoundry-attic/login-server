@@ -55,6 +55,7 @@ public class BootstrapTests {
     public void testRootContextDefaults() throws Exception {
         context = getServletContext(null, "./src/test/resources/test/config/login.yml", "file:./src/main/webapp/WEB-INF/spring-servlet.xml");
         assertNotNull(context.getBean("viewResolver", ViewResolver.class));
+        assertNotNull(context.getBean("resetPasswordController", ResetPasswordController.class));
     }
 
     @Test
@@ -62,6 +63,11 @@ public class BootstrapTests {
         context = getServletContext("ldap", "./src/test/resources/test/config/login.yml", "file:./src/main/webapp/WEB-INF/spring-servlet.xml");
         assertNotNull(context.getBean("viewResolver", ViewResolver.class));
         assertNotNull(context.getBean("ldapAuthProvider", LdapAuthenticationProvider.class));
+        try {
+            context.getBean("resetPasswordController", ResetPasswordController.class);
+            fail("Bean resetPasswordController found in ldap profile.");
+        } catch (NoSuchBeanDefinitionException e) {
+        }
     }
 
     @Test
@@ -69,7 +75,12 @@ public class BootstrapTests {
         context = getServletContext("saml", "./src/main/resources/login.yml", "file:./src/main/webapp/WEB-INF/spring-servlet.xml");
         assertNotNull(context.getBean("viewResolver", ViewResolver.class));
         assertNotNull(context.getBean("samlLogger", SAMLDefaultLogger.class));
+        try {
+            context.getBean("resetPasswordController", ResetPasswordController.class);
+            fail("Bean resetPasswordController found in saml profile.");
+        } catch (NoSuchBeanDefinitionException e) {
         }
+    }
 
     private GenericXmlApplicationContext getServletContext(String profiles, String loginYmlPath, String... resources) {
         GenericXmlApplicationContext context = new GenericXmlApplicationContext();
@@ -90,7 +101,5 @@ public class BootstrapTests {
         context.refresh();
 
         return context;
-
     }
-
 }
