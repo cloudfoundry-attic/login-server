@@ -55,7 +55,6 @@ public class BootstrapTests {
     public void testRootContextDefaults() throws Exception {
         context = getServletContext(null, "./src/test/resources/test/config/login.yml", "file:./src/main/webapp/WEB-INF/spring-servlet.xml");
         assertNotNull(context.getBean("viewResolver", ViewResolver.class));
-        assertNotNull(context.getBean("resetPasswordController", ResetPasswordController.class));
     }
 
     @Test
