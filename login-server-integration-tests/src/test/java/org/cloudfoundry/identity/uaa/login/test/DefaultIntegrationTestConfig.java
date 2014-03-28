@@ -29,7 +29,7 @@ import com.dumbster.smtp.SimpleSmtpServer;
 public class DefaultIntegrationTestConfig {
 
     @Bean
-    public PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
+    public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
         return new PropertySourcesPlaceholderConfigurer();
     }
 
