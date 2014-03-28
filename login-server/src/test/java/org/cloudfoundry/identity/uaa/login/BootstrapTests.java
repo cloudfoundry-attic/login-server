@@ -66,7 +66,7 @@ public class BootstrapTests {
 
     @Test
     public void testSamlProfile() throws Exception {
-        context = getServletContext("saml", "./src/test/resources/test/config/saml.yml", "file:./src/main/webapp/WEB-INF/spring-servlet.xml");
+        context = getServletContext("saml", "./src/main/resources/login.yml", "file:./src/main/webapp/WEB-INF/spring-servlet.xml");
         assertNotNull(context.getBean("viewResolver", ViewResolver.class));
         assertNotNull(context.getBean("samlLogger", SAMLDefaultLogger.class));
         }
