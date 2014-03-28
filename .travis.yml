@@ -6,15 +6,23 @@ env:
 before_install:
   - git pull --unshallow
   - wget -O tomcat.tar.gz http://archive.apache.org/dist/tomcat/tomcat-7/v7.0.52/bin/apache-tomcat-7.0.52.tar.gz
-install: 
+  - $TRAVIS_BUILD_DIR/.clone_matched_uaa_branch.sh
+install:
+  - cd $TRAVIS_BUILD_DIR/uaa
   - mvn -U clean --quiet -DskipTests=true
   - mvn -U install --quiet -DskipTests=true
-  - mkdir -p target/tomcat && tar zxf tomcat.tar.gz -C target/tomcat --strip-components 1 && rm -rf target/tomcat/webapps/*
-  - UAA_VERSION=`mvn org.apache.maven.plugins:maven-help-plugin:2.1.1:evaluate -Dexpression=identity.version | grep -v "[\\[|Download]"`
-  - mvn dependency:get -pl login-server -Dartifact=org.cloudfoundry.identity:cloudfoundry-identity-uaa:$UAA_VERSION
-  - cp $HOME/.m2/repository/org/cloudfoundry/identity/cloudfoundry-identity-uaa/$UAA_VERSION/cloudfoundry-identity-uaa-$UAA_VERSION.war target/tomcat/webapps/uaa.war
-  - mvn -Dwar.exploded.dir=`pwd`/target/tomcat/webapps/login --quiet -pl login-server war:exploded
-script: 
+  - cd $TRAVIS_BUILD_DIR
+  - mvn -U clean --quiet -DskipTests=true
+  - mvn -U install --quiet -DskipTests=true
+  - cd $TRAVIS_BUILD_DIR
+  - mkdir -p target/tomcat
+  - tar zvxf tomcat.tar.gz -C target/tomcat --strip-components 1
+  - rm -rf target/tomcat/webapps/*
+  - cd $TRAVIS_BUILD_DIR/uaa
+  - mvn -Dwar.exploded.dir=$TRAVIS_BUILD_DIR/target/tomcat/webapps/uaa -pl uaa war:exploded
+  - cd $TRAVIS_BUILD_DIR
+  - mvn -Dwar.exploded.dir=$TRAVIS_BUILD_DIR/target/tomcat/webapps/login -pl login-server war:exploded
+script:
   - ./.run-script.sh start
   - mvn -Dtest=org.cloudfoundry.identity.uaa.integration.* -DfailIfNoTests=false test --quiet
   - cd login-server-integration-tests && mvn verify --quiet
