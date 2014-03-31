@@ -34,6 +34,8 @@
     <security:http pattern="/login" security="none" />
     <security:http pattern="/info" security="none" />
     <security:http pattern="/error" security="none" />
+    <security:http pattern="/forgot_password*" security="none" />
+    <security:http pattern="/reset_password" security="none" />
 
     <!-- TODO: Move the autologin related beans from the login server and saml login server to login common -->
     <bean id="abstractRemoteUaaController" abstract="true">
@@ -86,6 +88,12 @@
         <security:form-login login-page="/login" username-parameter="username" password-parameter="password"
             login-processing-url="/login.do" authentication-failure-url="/login?error=true" />
         <security:logout logout-url="/logout.do" success-handler-ref="logoutHandler" />
+    </security:http>
+
+    <security:http pattern="/reset_password.do" disable-url-rewriting="true"
+                   entry-point-ref="loginEntryPoint">
+        <security:intercept-url pattern="/reset_password.do" access="IS_AUTHENTICATED_ANONYMOUSLY" />
+        <security:anonymous enabled="true" />
     </security:http>
 
     <!-- Owner password flow for external authentication (SAML) -->
@@ -296,6 +304,23 @@
             </bean>
         </property>
     </bean>
+
+    <beans profile="!ldap">
+        <beans profile="!saml">
+            <bean id="resetPasswordService" class="org.cloudfoundry.identity.uaa.login.EmailResetPasswordService">
+                <constructor-arg ref="authorizationTemplate"/>
+                <constructor-arg value="${uaa.url:http://localhost:8080/uaa}"/>
+                <constructor-arg value="${smtp.host:localhost}"/>
+                <constructor-arg value="${smtp.port:25}"/>
+                <constructor-arg value="${smtp.user:}"/>
+                <constructor-arg value="${smtp.password:}"/>
+            </bean>
+
+            <bean id="resetPasswordController" class="org.cloudfoundry.identity.uaa.login.ResetPasswordController">
+                <constructor-arg ref="resetPasswordService"/>
+            </bean>
+        </beans>
+    </beans>
 
     <beans profile="fileMetadata">
         <bean id="metadataProviderList" class="java.util.ArrayList">

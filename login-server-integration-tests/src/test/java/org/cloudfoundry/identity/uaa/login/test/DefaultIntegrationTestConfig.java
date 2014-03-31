@@ -15,25 +15,44 @@ package org.cloudfoundry.identity.uaa.login.test;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import org.springframework.web.client.RestTemplate;
+
+import com.dumbster.smtp.SimpleSmtpServer;
 
 @Configuration
 @PropertySource("classpath:integration.test.properties")
 public class DefaultIntegrationTestConfig {
 
     @Bean
-    public PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
+    public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
         return new PropertySourcesPlaceholderConfigurer();
     }
 
-    @Bean
+    @Bean(destroyMethod = "quit")
     public PhantomJSDriver webDriver() {
         DesiredCapabilities desiredCapabilities = new DesiredCapabilities();
         PhantomJSDriver driver = new PhantomJSDriver(desiredCapabilities);
         driver.manage().window().setSize(new Dimension(800, 600));
         return driver;
+    }
+
+    @Bean(destroyMethod = "stop")
+    public SimpleSmtpServer simpleSmtpServer(@Value("${smtp.port}") int port) {
+        return SimpleSmtpServer.start(port);
+    }
+
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
+
+    @Bean
+    public TestClient testClient(RestTemplate restTemplate, @Value("${integration.test.uaa_url}") String baseUrl) {
+        return new TestClient(restTemplate, baseUrl);
     }
 }

@@ -76,7 +76,9 @@
     <a style="text-decoration: none;" href='${rootUrl}'>PIVOTAL</a>
    </div>
    <div class="header-link">
-    <a href="${links.passwd}" class="h4">Forgot Password</a>
+    <c:if test="${not empty links.passwd}">
+      <a href="${links.passwd}" class="h4">Forgot Password</a>
+    </c:if>
    </div>
   </div>
 
