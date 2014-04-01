@@ -316,8 +316,18 @@
                 <constructor-arg value="${smtp.password:}"/>
             </bean>
 
+            <bean id="changePasswordService" class="org.cloudfoundry.identity.uaa.login.UaaChangePasswordService">
+                <constructor-arg ref="authorizationTemplate"/>
+                <constructor-arg ref="restTemplate"/>
+                <constructor-arg value="${uaa.url:http://localhost:8080/uaa}"/>
+            </bean>
+
             <bean id="resetPasswordController" class="org.cloudfoundry.identity.uaa.login.ResetPasswordController">
                 <constructor-arg ref="resetPasswordService"/>
+            </bean>
+
+            <bean id="changePasswordController" class="org.cloudfoundry.identity.uaa.login.ChangePasswordController">
+                <constructor-arg ref="changePasswordService"/>
             </bean>
         </beans>
     </beans>
