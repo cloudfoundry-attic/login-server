@@ -52,7 +52,9 @@ public class DefaultIntegrationTestConfig {
     }
 
     @Bean
-    public TestClient testClient(RestTemplate restTemplate, @Value("${integration.test.uaa_url}") String baseUrl) {
-        return new TestClient(restTemplate, baseUrl);
+    public TestClient testClient(RestTemplate restTemplate,
+                                 @Value("${integration.test.uaa_url}") String baseUrl,
+                                 @Value("${integration.test.uaa_url}") String uaaUrl) {
+        return new TestClient(restTemplate, baseUrl, uaaUrl);
     }
 }
