@@ -1,15 +1,15 @@
-/*
- * Cloud Foundry 2012.02.03 Beta
- * Copyright (c) [2009-2012] VMware, Inc. All Rights Reserved.
+/*******************************************************************************
+ *     Cloud Foundry 
+ *     Copyright (c) [2009-2014] Pivotal Software, Inc. All Rights Reserved.
  *
- * This product is licensed to you under the Apache License, Version 2.0 (the "License").
- * You may not use this product except in compliance with the License.
+ *     This product is licensed to you under the Apache License, Version 2.0 (the "License").
+ *     You may not use this product except in compliance with the License.
  *
- * This product includes a number of subcomponents with
- * separate copyright notices and license terms. Your use of these
- * subcomponents is subject to the terms and conditions of the
- * subcomponent's license, as noted in the LICENSE file.
- */
+ *     This product includes a number of subcomponents with
+ *     separate copyright notices and license terms. Your use of these
+ *     subcomponents is subject to the terms and conditions of the
+ *     subcomponent's license, as noted in the LICENSE file.
+ *******************************************************************************/
 
 package org.cloudfoundry.identity.uaa.login;
 
@@ -42,30 +42,32 @@ import org.springframework.web.client.RestOperations;
  */
 public class RemoteUaaAuthenticationManagerTests {
 
-	private RemoteUaaAuthenticationManager authenticationManager = new RemoteUaaAuthenticationManager();
+    private RemoteUaaAuthenticationManager authenticationManager = new RemoteUaaAuthenticationManager();
 
-	private RestOperations restTemplate = mock(RestOperations.class);
+    private RestOperations restTemplate = mock(RestOperations.class);
 
-	private HttpHeaders responseHeaders = new HttpHeaders();
+    private HttpHeaders responseHeaders = new HttpHeaders();
 
-	@Before
-	public void start() {
-		authenticationManager.setRestTemplate(restTemplate);
-	}
+    @Before
+    public void start() {
+        authenticationManager.setRestTemplate(restTemplate);
+    }
 
-	@Test
-	public void testAuthenticate() throws Exception {
-		responseHeaders.setLocation(new URI("https://uaa.cloudfoundry.com/"));
-		Map<String,String> response = new HashMap<String, String>();
-		response.put("username", "marissa");
-		@SuppressWarnings("rawtypes")
-		ResponseEntity<Map> expectedResponse = new ResponseEntity<Map>(response, responseHeaders, HttpStatus.OK);
-		when(restTemplate.exchange(endsWith("/authenticate"), eq(HttpMethod.POST), any(HttpEntity.class), eq(Map.class)))
-				.thenReturn(expectedResponse);
-		Authentication result = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken("marissa",
-				"foo"));
-		assertEquals("marissa", result.getName());
-		assertTrue(result.isAuthenticated());
-	}
+    @Test
+    public void testAuthenticate() throws Exception {
+        responseHeaders.setLocation(new URI("https://uaa.cloudfoundry.com/"));
+        Map<String, String> response = new HashMap<String, String>();
+        response.put("username", "marissa");
+        @SuppressWarnings("rawtypes")
+        ResponseEntity<Map> expectedResponse = new ResponseEntity<Map>(response, responseHeaders, HttpStatus.OK);
+        when(
+                        restTemplate.exchange(endsWith("/authenticate"), eq(HttpMethod.POST), any(HttpEntity.class),
+                                        eq(Map.class)))
+                        .thenReturn(expectedResponse);
+        Authentication result = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken("marissa",
+                        "foo"));
+        assertEquals("marissa", result.getName());
+        assertTrue(result.isAuthenticated());
+    }
 
 }

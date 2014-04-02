@@ -1,13 +1,13 @@
 .home-main-content {
-    text-align: center;
-    padding: 16px 100px 42px;
+ text-align: center;
+ padding: 16px 100px 42px;
 }
 
-.web-services, .enterprise-software {
-    margin: 32px 0;
+.web-services,.enterprise-software {
+ margin: 32px 0;
 }
 
-.web-services a, .enterprise-software a {
-    width: 100%;
-    padding: 8px 0;
+.web-services a,.enterprise-software a {
+ width: 100%;
+ padding: 8px 0;
 }

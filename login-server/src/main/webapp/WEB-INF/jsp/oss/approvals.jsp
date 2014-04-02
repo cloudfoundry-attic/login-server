@@ -37,14 +37,15 @@
 <meta charset='utf-8'>
 <meta content='IE=edge,chrome=1' http-equiv='X-UA-Compatible'>
 <meta content='Pivotal Software, Inc' name='author' />
-<meta content='Copyright 2013 Pivotal Software Inc. All Rights Reserved.' 
-    name='copyright' />
-<link href='${rootUrl}favicon.ico' rel='shortcut icon' />
+<meta
+ content='Copyright 2013 Pivotal Software Inc. All Rights Reserved.'
+ name='copyright' />
+<link href='${baseUrl}/images/favicon.ico' rel='shortcut icon' />
 <meta content='all' name='robots' />
 <link href='${baseUrl}/stylesheets/print.css' media='print'
-    rel='stylesheet' type='text/css' />
+ rel='stylesheet' type='text/css' />
 <link href='${baseUrl}/stylesheets/login.css' media='screen'
-    rel='stylesheet' type='text/css' />
+ rel='stylesheet' type='text/css' />
 <!--[if IE 9 ]> <link href="${baseUrl}/stylesheets/ie9.css" media="screen" rel="stylesheet" type="text/css" /> <![endif]-->
 <!--[if lt IE 9 ]> <link href="${baseUrl}/stylesheets/ie.css" media="screen" rel="stylesheet" type="text/css" /> <![endif]-->
 <!--[if lt IE 8 ]> <link href="${baseUrl}/stylesheets/ie7.css" media="screen" rel="stylesheet" type="text/css" /> <![endif]-->
@@ -111,113 +112,113 @@
 </script>
 </head>
 <body id="micro">
-    <div class="approvals">
-        <a href='${links.home}/'><img
-            alt="Cloud Foundry: The Industry's Open Platform As A Service"
-            class="logo" src='${baseUrl}/images/logo-cloudfoundry.png'></img> </a>
-        <div style="float: right;">
-            <ul class='super-nav'>
-                <li><span>Welcome <a href="${rootUrl}profile"><strong>${fn:escapeXml(pageContext.request.userPrincipal.name)}</strong></a></span>
-                    / <a href="${rootUrl}logout.do">Logout</a> &nbsp;</li>
-            </ul>
-        </div>
-        <div class="bg-content-approvals">
-            <c:if test="${error!=null}">
-                <div class="error" title="${fn:escapeXml(error)}">
-                    <div class="content-title-approvals">
-                        <h2>Sorry</h2>
-                    </div>
-                    <div class="content-inner-approvals">
-                        <p>There was an error. The request for authorization was
-                            invalid.</p>
-                    </div>
-                </div>
-            </c:if>
-
-            <c:if test="${error==null}">
-
-                <div class="content-title-approvals">
-                    <h2>Account Settings</h2>
-                </div>
-
-                <div class="content-inner-approvals">
-                    <p>
-                        <strong>Username:</strong>
-                        ${fn:escapeXml(pageContext.request.userPrincipal.name)}
-                    </p>
-                    <p>
-                        <strong>Password:</strong> ********** <a href="${links.passwd}">Reset
-                            password</a>
-                    </p>
-
-                    <c:if test="${! empty approvals}">
-                        <hr>
-
-                        <p>
-                            <strong>Application Approvals</strong>
-                        </p>
-                        <p>These applications have been granted access to your
-                            CloudFoundry.com account.</p>
-
-                        <c:forEach items="${approvals}" var="client">
-                            <form id="revokeApprovalsForm" action="profile" method="post">
-                                <input type="hidden" name="clientId" value="${client.key}" /> <a
-                                    href="#" id="firstlink">
-                                    <div id="firstdiv" style="display: block">
-                                        <div class="app-approval-container1">
-                                            <div class='row'>
-                                                <input class="delete-icon right" title="Delete"
-                                                    type='submit' name="delete" value="" /> <span
-                                                    class="linklike">${client.key}</span>
-                                                <div class="edit-icon right" title="Edit "></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </a>
-                                <div id="seconddiv" style="display: none">
-                                    <div class="app-approval-container2">
-                                        <input class="btn-secondary-medium right" name="delete"
-                                            type='submit' value="Delete" /> <span class="linklike">${client.key}</span>
-                                        <div id="approvals-list-container">
-                                            <br>
-
-                                            <c:forEach items="${client.value}" var="approval">
-                                                <div class="approvals-list-div">
-                                                    <input type="checkbox" name="checkedScopes"
-                                                        value="${approval.clientId}-${approval.scope}"
-                                                        ${approval.status eq 'APPROVED' ? 'checked=checked' : '' }>
-                                                    <spring:message code="scope.${approval.scope}" />
-                                                </div>
-                                            </c:forEach>
-
-                                            <input class="btn-primary-medium right" name="update"
-                                                type="submit" value="Update"> <a id="cancel"
-                                                style="cursor: pointer"><input
-                                                class="btn-secondary-medium right" type='button'
-                                                value="Cancel" /></a>
-
-                                        </div>
-                                    </div>
-                                </div>
-                            </form>
-                        </c:forEach>
-
-                    </c:if>
-                </div>
-
-            </c:if>
-
-        </div>
-
-        <div class="footer"
-            title="Version: ${app.version}, Commit: ${commit_id}, Timestamp: ${timestamp}, UAA: ${links.uaa}">
-            &copy;
-            <fmt:formatDate value="<%=new java.util.Date()%>" pattern="yyyy" />
-            Pivotal Software, Inc. All rights reserved.
-        </div>    
+ <div class="approvals">
+  <a href='${links.home}/'><img
+   alt="Cloud Foundry: The Industry's Open Platform As A Service"
+   class="logo" src='${baseUrl}/images/logo-cloudfoundry.png'></img> </a>
+  <div style="float: right;">
+   <ul class='super-nav'>
+    <li><span>Welcome <a href="${rootUrl}profile"><strong>${fn:escapeXml(pageContext.request.userPrincipal.name)}</strong></a></span>
+     / <a href="${rootUrl}logout.do">Logout</a> &nbsp;</li>
+   </ul>
+  </div>
+  <div class="bg-content-approvals">
+   <c:if test="${error!=null}">
+    <div class="error" title="${fn:escapeXml(error)}">
+     <div class="content-title-approvals">
+      <h2>Sorry</h2>
+     </div>
+     <div class="content-inner-approvals">
+      <p>There was an error. The request for authorization was
+       invalid.</p>
+     </div>
     </div>
-    <c:if test="${not empty analytics}">
-        <script>
+   </c:if>
+
+   <c:if test="${error==null}">
+
+    <div class="content-title-approvals">
+     <h2>Account Settings</h2>
+    </div>
+
+    <div class="content-inner-approvals">
+     <p>
+      <strong>Username:</strong>
+      ${fn:escapeXml(pageContext.request.userPrincipal.name)}
+     </p>
+     <p>
+      <strong>Password:</strong> ********** <a href="${links.passwd}">Reset
+       password</a>
+     </p>
+
+     <c:if test="${! empty approvals}">
+      <hr>
+
+      <p>
+       <strong>Application Approvals</strong>
+      </p>
+      <p>These applications have been granted access to your
+       CloudFoundry.com account.</p>
+
+      <c:forEach items="${approvals}" var="client">
+       <form id="revokeApprovalsForm" action="profile" method="post">
+        <input type="hidden" name="clientId" value="${client.key}" /> <a
+         href="#" id="firstlink">
+         <div id="firstdiv" style="display: block">
+          <div class="app-approval-container1">
+           <div class='row'>
+            <input class="delete-icon right" title="Delete"
+             type='submit' name="delete" value="" /> <span
+             class="linklike">${client.key}</span>
+            <div class="edit-icon right" title="Edit "></div>
+           </div>
+          </div>
+         </div>
+        </a>
+        <div id="seconddiv" style="display: none">
+         <div class="app-approval-container2">
+          <input class="btn-secondary-medium right" name="delete"
+           type='submit' value="Delete" /> <span class="linklike">${client.key}</span>
+          <div id="approvals-list-container">
+           <br>
+
+           <c:forEach items="${client.value}" var="approval">
+            <div class="approvals-list-div">
+             <input type="checkbox" name="checkedScopes"
+              value="${approval.clientId}-${approval.scope}"
+              ${approval.status eq 'APPROVED' ? 'checked=checked' : '' }>
+              <spring:message code="scope.${approval.scope}" text="scope.${approval.scope}" />
+            </div>
+           </c:forEach>
+
+           <input class="btn-primary-medium right" name="update"
+            type="submit" value="Update"> <a id="cancel"
+            style="cursor: pointer"><input
+            class="btn-secondary-medium right" type='button'
+            value="Cancel" /></a>
+
+          </div>
+         </div>
+        </div>
+       </form>
+      </c:forEach>
+
+     </c:if>
+    </div>
+
+   </c:if>
+
+  </div>
+
+  <div class="footer"
+   title="Version: ${app.version}, Commit: ${commit_id}, Timestamp: ${timestamp}, UAA: ${links.uaa}">
+   &copy;
+   <fmt:formatDate value="<%=new java.util.Date()%>" pattern="yyyy" />
+   Pivotal Software, Inc. All rights reserved.
+  </div>
+ </div>
+ <c:if test="${not empty analytics}">
+  <script>
             (function(i, s, o, g, r, a, m) {
                 i['GoogleAnalyticsObject'] = r;
                 i[r] = i[r] || function() {
@@ -233,6 +234,6 @@
             ga('create', '${analytics.code}', '${analytics.domain}');
             ga('send', 'pageview');
         </script>
-    </c:if>
+ </c:if>
 </body>
 </html>

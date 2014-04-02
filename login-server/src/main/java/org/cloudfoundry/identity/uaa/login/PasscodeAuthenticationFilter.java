@@ -1,15 +1,15 @@
-/*
- * Cloud Foundry 2012.02.03 Beta
- * Copyright (c) [2009-2012] VMware, Inc. All Rights Reserved.
+/*******************************************************************************
+ *     Cloud Foundry 
+ *     Copyright (c) [2009-2014] Pivotal Software, Inc. All Rights Reserved.
  *
- * This product is licensed to you under the Apache License, Version 2.0 (the "License").
- * You may not use this product except in compliance with the License.
+ *     This product is licensed to you under the Apache License, Version 2.0 (the "License").
+ *     You may not use this product except in compliance with the License.
  *
- * This product includes a number of subcomponents with
- * separate copyright notices and license terms. Your use of these
- * subcomponents is subject to the terms and conditions of the
- * subcomponent's license, as noted in the LICENSE file.
- */
+ *     This product includes a number of subcomponents with
+ *     separate copyright notices and license terms. Your use of these
+ *     subcomponents is subject to the terms and conditions of the
+ *     subcomponent's license, as noted in the LICENSE file.
+ *******************************************************************************/
 
 package org.cloudfoundry.identity.uaa.login;
 
@@ -34,10 +34,16 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.cloudfoundry.identity.uaa.authentication.AuthzAuthenticationRequest;
 import org.cloudfoundry.identity.uaa.authentication.UaaAuthenticationDetails;
+import org.cloudfoundry.identity.uaa.codestore.ExpiringCode;
 import org.cloudfoundry.identity.uaa.user.UaaAuthority;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -46,126 +52,173 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.provider.error.OAuth2AuthenticationEntryPoint;
 import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.web.client.RestTemplate;
 
 /**
- * Authentication filter to verify one time passwords with what's cached in the one time password store.
- *
+ * Authentication filter to verify one time passwords with what's cached in the
+ * one time password store.
+ * 
  * @author jdsa
- *
+ * 
  */
 public class PasscodeAuthenticationFilter implements Filter {
 
-	private final Log logger = LogFactory.getLog(getClass());
+    private final Log logger = LogFactory.getLog(getClass());
 
-	private List<String> parameterNames = Collections.emptyList();
+    private List<String> parameterNames = Collections.emptyList();
 
-	private final Set<String> methods = Collections.singleton(HttpMethod.POST.toString());
+    private final Set<String> methods = Collections.singleton(HttpMethod.POST.toString());
 
-	private final AuthenticationEntryPoint authenticationEntryPoint = new OAuth2AuthenticationEntryPoint();
+    private final AuthenticationEntryPoint authenticationEntryPoint = new OAuth2AuthenticationEntryPoint();
 
-	private final ObjectMapper mapper = new ObjectMapper();
+    private final ObjectMapper mapper = new ObjectMapper();
 
-	private PasscodeStore store = null;
+    private AuthenticationManager authenticationManager;
 
-	private AuthenticationManager authenticationManager;
+    private RestTemplate authorizationTemplate;
 
-	@Override
-	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
-			ServletException {
+    private String uaaBaseUrl;
 
-		HttpServletRequest req = (HttpServletRequest) request;
-		HttpServletResponse res = (HttpServletResponse) response;
+    public String getUaaBaseUrl() {
+        return uaaBaseUrl;
+    }
 
-		Map<String, String> loginInfo = getCredentials(req);
+    public void setUaaBaseUrl(String uaaBaseUrl) {
+        this.uaaBaseUrl = uaaBaseUrl;
+    }
 
-		String username = loginInfo.get("username");
-		String password = loginInfo.get("password");
-		String passcode = loginInfo.get("passcode");
+    public RestTemplate getAuthorizationTemplate() {
+        return authorizationTemplate;
+    }
 
-		if (loginInfo.isEmpty()) {
-			throw new BadCredentialsException("Request does not contain credentials.");
-		}
-		else if (null == password && null != passcode) {
-			//Validate passcode
-			logger.debug("Located credentials in request, with keys: " + loginInfo.keySet());
-			if (methods != null && !methods.contains(req.getMethod().toUpperCase())) {
-				throw new BadCredentialsException("Credentials must be sent by (one of methods): " + methods);
-			}
+    public void setAuthorizationTemplate(RestTemplate authorizationTemplate) {
+        this.authorizationTemplate = authorizationTemplate;
+    }
 
-			PasscodeInformation pi = store.validatePasscode(new PasscodeInformation(username), passcode);
-			if (pi != null) {
-				logger.info("Successful authentication request for " + username);
+    @Override
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
+                    ServletException {
 
-				Collection<GrantedAuthority> externalAuthorities = null;
+        HttpServletRequest req = (HttpServletRequest) request;
+        HttpServletResponse res = (HttpServletResponse) response;
 
-				if (null != pi.getAuthorizationParameters()) {
-					externalAuthorities = (Collection<GrantedAuthority>) pi.getAuthorizationParameters().get("authorities");
-				}
+        Map<String, String> loginInfo = getCredentials(req);
 
-				Authentication result = new UsernamePasswordAuthenticationToken(username, null,
-						externalAuthorities == null ? UaaAuthority.USER_AUTHORITIES : externalAuthorities);
+        String username = loginInfo.get("username");
+        String password = loginInfo.get("password");
+        String passcode = loginInfo.get("passcode");
 
-				SecurityContextHolder.getContext().setAuthentication(result);
-			}
-			else {
-				authenticationEntryPoint.commence(req, res, new BadCredentialsException("Invalid passcode"));
-			}
-		}
-		else {
-			//Authenticate user against the UAA
-			logger.debug("Located credentials in request, with keys: " + loginInfo.keySet());
-			if (methods != null && !methods.contains(req.getMethod().toUpperCase())) {
-				throw new BadCredentialsException("Credentials must be sent by (one of methods): " + methods);
-			}
-			Authentication result = authenticationManager.authenticate(new AuthzAuthenticationRequest(loginInfo,
-					new UaaAuthenticationDetails(req)));
-			SecurityContextHolder.getContext().setAuthentication(result);
-		}
+        if (loginInfo.isEmpty()) {
+            throw new BadCredentialsException("Request does not contain credentials.");
+        } else if (null == password && null != passcode) {
+            // Validate passcode
+            logger.debug("Located credentials in request, with keys: " + loginInfo.keySet());
+            if (methods != null && !methods.contains(req.getMethod().toUpperCase())) {
+                throw new BadCredentialsException("Credentials must be sent by (one of methods): " + methods);
+            }
 
-		chain.doFilter(request, response);
-	}
+            ExpiringCode eCode = doRetrieveCode(passcode);
+            PasscodeInformation pi = null;
+            if (eCode != null && eCode.getData() != null) {
+                pi = new ObjectMapper().readValue(eCode.getData(), PasscodeInformation.class);
+            }
+            if (!pi.getUserId().equals(username)) {
+                throw new BadCredentialsException("Username mismatch");
+            }
 
-	private Map<String, String> getCredentials(HttpServletRequest request) {
-		Map<String, String> credentials = new HashMap<String, String>();
+            if (pi != null) {
+                logger.info("Successful authentication request for " + username);
 
-		for (String paramName : parameterNames) {
-			String value = request.getParameter(paramName);
-			if (value != null) {
-				if (value.startsWith("{")) {
-					try {
-						Map<String, String> jsonCredentials = mapper.readValue(value,
-								new TypeReference<Map<String, String>>() {
-								});
-						credentials.putAll(jsonCredentials);
-					}
-					catch (IOException e) {
-						logger.warn("Unknown format of value for request param: " + paramName + ". Ignoring.");
-					}
-				}
-				else {
-					credentials.put(paramName, value);
-				}
-			}
-		}
+                Collection<GrantedAuthority> externalAuthorities = null;
 
-		return credentials;
-	}
+                if (null != pi.getAuthorizationParameters()) {
+                    externalAuthorities = (Collection<GrantedAuthority>) pi.getAuthorizationParameters().get(
+                                    "authorities");
+                }
 
-	@Override
-	public void init(FilterConfig filterConfig) throws ServletException {
-	}
+                Authentication result = new UsernamePasswordAuthenticationToken(username, null,
+                                externalAuthorities == null ? UaaAuthority.USER_AUTHORITIES : externalAuthorities);
 
-	@Override
-	public void destroy() {
-	}
+                SecurityContextHolder.getContext().setAuthentication(result);
+            }
+            else {
+                authenticationEntryPoint.commence(req, res, new BadCredentialsException("Invalid passcode"));
+            }
+        }
+        else {
+            // Authenticate user against the UAA
+            logger.debug("Located credentials in request, with keys: " + loginInfo.keySet());
+            if (methods != null && !methods.contains(req.getMethod().toUpperCase())) {
+                throw new BadCredentialsException("Credentials must be sent by (one of methods): " + methods);
+            }
+            Authentication result = authenticationManager.authenticate(new AuthzAuthenticationRequest(loginInfo,
+                            new UaaAuthenticationDetails(req)));
+            SecurityContextHolder.getContext().setAuthentication(result);
+        }
 
-	public void setParameterNames(List<String> parameterNames) {
-		this.parameterNames = parameterNames;
-	}
+        chain.doFilter(request, response);
+    }
 
-	public PasscodeAuthenticationFilter(PasscodeStore store, AuthenticationManager authenticationManager) {
-		this.store = store;
-		this.authenticationManager = authenticationManager;
-	}
+    public ExpiringCode doRetrieveCode(String code) {
+        HttpHeaders requestHeaders = new HttpHeaders();
+        requestHeaders.add("Accept", MediaType.APPLICATION_JSON_VALUE);
+
+        HttpEntity<ExpiringCode> requestEntity = new HttpEntity<ExpiringCode>(null, requestHeaders);
+
+        ResponseEntity<ExpiringCode> response = authorizationTemplate.exchange(getUaaBaseUrl() + "/Codes/" + code,
+                        HttpMethod.GET,
+                        requestEntity, ExpiringCode.class);
+
+        if (response.getStatusCode().equals(HttpStatus.NOT_FOUND)) {
+            return null;
+        } else if (response.getStatusCode() != HttpStatus.OK) {
+            logger.warn("Request failed: " + requestEntity);
+            // TODO throw exception with the correct error
+            throw new BadCredentialsException("Unable to retrieve passcode:" + String.valueOf(response.getStatusCode()));
+        }
+
+        return response.getBody();
+    }
+
+    private Map<String, String> getCredentials(HttpServletRequest request) {
+        Map<String, String> credentials = new HashMap<String, String>();
+
+        for (String paramName : parameterNames) {
+            String value = request.getParameter(paramName);
+            if (value != null) {
+                if (value.startsWith("{")) {
+                    try {
+                        Map<String, String> jsonCredentials = mapper.readValue(value,
+                                        new TypeReference<Map<String, String>>() {
+                                        });
+                        credentials.putAll(jsonCredentials);
+                    } catch (IOException e) {
+                        logger.warn("Unknown format of value for request param: " + paramName + ". Ignoring.");
+                    }
+                }
+                else {
+                    credentials.put(paramName, value);
+                }
+            }
+        }
+
+        return credentials;
+    }
+
+    @Override
+    public void init(FilterConfig filterConfig) throws ServletException {
+    }
+
+    @Override
+    public void destroy() {
+    }
+
+    public void setParameterNames(List<String> parameterNames) {
+        this.parameterNames = parameterNames;
+    }
+
+    public PasscodeAuthenticationFilter(AuthenticationManager authenticationManager) {
+        this.authenticationManager = authenticationManager;
+    }
 
 }

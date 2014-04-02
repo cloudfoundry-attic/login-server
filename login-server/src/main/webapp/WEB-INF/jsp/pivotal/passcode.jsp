@@ -24,89 +24,129 @@
 <c:url var="authorizeUrl" value="/oauth/authorize" />
 
 <!DOCTYPE html>
-<!--[if IE]>  <![endif]-->
-<!--[if lt IE 7 ]> <html lang="en" dir="ltr" class="no-js old_ie ie6"> <![endif]-->
-<!--[if IE 7 ]> <html lang="en" dir="ltr" class="no-js old_ie ie7"> <![endif]-->
-<!--[if IE 8 ]> <html lang="en" dir="ltr" class="no-js ie8"> <![endif]-->
-<!--[if IE 9 ]> <html lang="en" dir="ltr" class="no-js ie9"> <![endif]-->
-<!--[if (gt IE 9)|!(IE)]> ><! <![endif]-->
 <html class='no-js' dir='ltr' lang='en'>
-<!-- <![endif] -->
 <head>
-<title>Passcode | Cloud Foundry</title>
+<title>Temporary Authentication Code | Pivotal</title>
 <meta charset='utf-8'>
 <meta content='IE=edge,chrome=1' http-equiv='X-UA-Compatible'>
 <meta content='Pivotal Software, Inc' name='author' />
-<meta content='Copyright 2013 Pivotal Software Inc. All Rights Reserved.' 
-    name='copyright' />
-<link href='${rootUrl}favicon.ico' rel='shortcut icon' />
+<meta
+ content='Copyright 2013 Pivotal Software Inc. All Rights Reserved.'
+ name='copyright' />
+<link href='${baseUrl}/images/favicon.ico' rel='shortcut icon' />
 <meta content='all' name='robots' />
 <link href='${baseUrl}/stylesheets/print.css' media='print'
-    rel='stylesheet' type='text/css' />
-<link href='${baseUrl}/stylesheets/login.css' media='screen'
-    rel='stylesheet' type='text/css' />
-<!--[if IE 9 ]> <link href="${baseUrl}/stylesheets/ie9.css" media="screen" rel="stylesheet" type="text/css" /> <![endif]-->
-<!--[if lt IE 9 ]> <link href="${baseUrl}/stylesheets/ie.css" media="screen" rel="stylesheet" type="text/css" /> <![endif]-->
-<!--[if lt IE 8 ]> <link href="${baseUrl}/stylesheets/ie7.css" media="screen" rel="stylesheet" type="text/css" /> <![endif]-->
+ rel='stylesheet' type='text/css' />
+<link href='${baseUrl}/stylesheets/style.css' media='screen'
+ rel='stylesheet' type='text/css' />
+<link href='${baseUrl}/stylesheets/font-awesome.css' media='screen'
+ rel='stylesheet' type='text/css' />
+<link href='${baseUrl}/stylesheets/permissions.css' media='screen'
+ rel='stylesheet' type='text/css' />
+<link href='${baseUrl}/stylesheets/approvals.css' media='screen'
+ rel='stylesheet' type='text/css' />
 <meta content='' name='Description' />
 <meta content='' name='keywords' />
 <script type="text/javascript" src="${baseUrl}/javascripts/jquery.js"></script>
+<script type="text/javascript">
+    (function() {
+        // force ssl if cf.com
+        var loc = window.location;
+        if (loc.hostname.indexOf('cloudfoundry.com') >= 0
+                && loc.protocol == "http:") {
+            window.location = "https://" + loc.host + loc.pathname + loc.search
+                    + loc.hash;
+        }
+    })();
+
+    function deleteApprovalsFor(client) {
+        $(
+                '<form action="approvals/delete" method="post"><input name="clientId" value="' + client + '"></input></form>')
+                .submit();
+    }
+
+    $(function() {
+        var showPermissions = function(e) {
+            var $approvedAppDiv = $(e.target).parents('.approved-app');
+            $approvedAppDiv.find('.permissions-container').toggleClass('hidden');
+            $approvedAppDiv.find('.revoke-access-action').toggleClass('hidden');
+
+            $approvedAppActions = $approvedAppDiv.find('.approved-app-actions');
+
+            if($approvedAppActions.hasClass('hidden')) {
+                setTimeout(function() {
+                    $approvedAppActions.removeClass('hidden');
+                }, 200);
+
+            } else {
+                $approvedAppActions.addClass('hidden');
+            }
+
+            return false;
+        }
+
+        $('i.icon-edit-sign').click(showPermissions);
+        $('.actions-cancel button').click(showPermissions);
+    });
+</script>
+<script src="//use.typekit.net/zwc8anl.js"></script>
+<script>
+  try { Typekit.load(); } catch (e) { }
+</script>
 </head>
-<body id="micro">
-    <div class="approvals">
-        <a href='${links.home}/'><img
-            alt="Cloud Foundry: The Industry's Open Platform As A Service"
-            class="logo" src='${baseUrl}/images/logo_cloud_foundry_by_pivotal.png'
-            width='414' height='70'></img> </a>
-        <div style="float: right;">
-            <ul class='super-nav'>
-                <li><span>Welcome <a href="${rootUrl}profile"><strong>${fn:escapeXml(pageContext.request.userPrincipal.name)}</strong></a></span>
-                    / <a href="${rootUrl}logout.do">Logout</a> &nbsp;</li>
-            </ul>
-        </div>
-        <div class="bg-content-approvals">
-            <c:if test="${error!=null}">
-                <div class="error" title="${fn:escapeXml(error)}">
-                    <div class="content-title-approvals">
-                        <h2>Sorry</h2>
-                    </div>
-                    <div class="content-inner-approvals">
-                        <p>There was an error. The request for authorization was
-                            invalid.</p>
-                    </div>
-                </div>
-            </c:if>
+<body>
+ <div class="container container-large">
+  <div class="header">
+   <a style="text-decoration: none;" href='${rootUrl}'><div
+     class="image-logo"></div></a>
+   <div class="logo">
+    <a style="text-decoration: none;" href='${rootUrl}'>PIVOTAL</a>
+   </div>
+   <div class="header-link">
+    <a href="${rootUrl}logout.do" class="h4">Sign out</a>
+   </div>
+  </div>
 
-            <c:if test="${error==null}">
-
-                <div class="content-title-approvals">
-                    <h2>Passcode</h2>
-                </div>
-
-                <div class="content-inner-approvals">
-                    <p>
-                        <strong>Username:</strong>
-                        ${fn:escapeXml(pageContext.request.userPrincipal.name)}
-                    </p>
-                    <p>
-                        <strong>Passcode:</strong>
-                        ${passcode}
-                    </p>
-                </div>
-
-            </c:if>
-
-        </div>
-
-        <div class="footer"
-            title="Version: ${app.version}, Commit: ${commit_id}, Timestamp: ${timestamp}, UAA: ${links.uaa}">
-            &copy;
-            <fmt:formatDate value="<%=new java.util.Date()%>" pattern="yyyy" />
-            Pivotal Software, Inc. All rights reserved.
-        </div>    
+  <div class="main-content approvals-container">
+   <c:if test="${error!=null}">
+    <div class="error" title="${fn:escapeXml(error)}">
+     <div class="content-title-approvals">
+      <h2>Sorry</h2>
+     </div>
+     <div class="content-inner-approvals">
+      <p>There was an error. The request for authorization was
+       invalid.</p>
+     </div>
     </div>
-    <c:if test="${not empty analytics}">
-        <script>
+   </c:if>
+
+   <c:if test="${error==null}">
+    <h1>Temporary Authentication Code</h1>
+
+    <div class="account-info">
+     <div class="h2">Username:
+      ${fn:escapeXml(pageContext.request.userPrincipal.name)}</div>
+     <div class="h2">Passcode: ${passcode}</div>
+    </div>
+
+   </c:if>
+  </div>
+ </div>
+ <div class='footer'
+  title="Version: ${app.version}, Commit: ${commit_id}, Timestamp: ${timestamp}, UAA: ${links.uaa}">
+  <div class='copyright'>
+   &copy;
+   <fmt:formatDate value="<%=new java.util.Date()%>" pattern="yyyy" />
+   Pivotal Software, Inc. - All rights reserved
+  </div>
+  <div class='powered-by'>
+   Powered by
+   <div class='logo'>Pivotal</div>
+  </div>
+ </div>
+
+ <c:if test="${not empty analytics}">
+  <script>
             (function(i, s, o, g, r, a, m) {
                 i['GoogleAnalyticsObject'] = r;
                 i[r] = i[r] || function() {
@@ -122,6 +162,6 @@
             ga('create', '${analytics.code}', '${analytics.domain}');
             ga('send', 'pageview');
         </script>
-    </c:if>
+ </c:if>
 </body>
 </html>

@@ -18,18 +18,26 @@ directories with a common parent):
     $ (cd uaa; mvn clean install)
     $ cd login-server
     $ mvn clean install
-    $ mvn tomcat:run -P integration
-
-(Note that the `tomcat7` plugin at the moment does not support running
-multiple apps in the same container - it's a bug that is fixed but not
-released as of September 2012.)
+    $ mvn tomcat7:run -P integration
 
 You can run the Login Server integration tests using the command line
 as well (as long as the UAA project is built and installed first as
 above):
 
-    $ mvn test -P integration
-    
+    $ mvn test
+
+Headless browser Selenium tests can be run from the login-server-integration-tests
+directory. These tests fail if a Login Server and UAA have not been
+started locally. They have been placed in their own module, so that they
+need not be run when installing the login-server, and are *not* run when
+performing a ````mvn install```` from the login-server directory.
+
+These tests require [PhantomJS](http://phantomjs.org/download.html) to be installed.
+
+    $ cd login-server-integration-tests
+    $ mvn tomcat7:run -P integration
+    $ mvn verify
+
 There are two documents that can help you configure the login server in your environment.
     
 [Login Server Configuration in deployment manifest](docs/Login-Server-Configuration.md)

@@ -1,27 +1,40 @@
-/*
- * Cloud Foundry 2012.02.03 Beta
- * Copyright (c) [2009-2012] VMware, Inc. All Rights Reserved.
+/*******************************************************************************
+ *     Cloud Foundry 
+ *     Copyright (c) [2009-2014] Pivotal Software, Inc. All Rights Reserved.
  *
- * This product is licensed to you under the Apache License, Version 2.0 (the "License").
- * You may not use this product except in compliance with the License.
+ *     This product is licensed to you under the Apache License, Version 2.0 (the "License").
+ *     You may not use this product except in compliance with the License.
  *
- * This product includes a number of subcomponents with
- * separate copyright notices and license terms. Your use of these
- * subcomponents is subject to the terms and conditions of the
- * subcomponent's license, as noted in the LICENSE file.
- */
+ *     This product includes a number of subcomponents with
+ *     separate copyright notices and license terms. Your use of these
+ *     subcomponents is subject to the terms and conditions of the
+ *     subcomponent's license, as noted in the LICENSE file.
+ *******************************************************************************/
 
 package org.cloudfoundry.identity.uaa.login;
 
+import java.io.IOException;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.cloudfoundry.identity.uaa.authentication.AuthzAuthenticationRequest;
 import org.cloudfoundry.identity.uaa.authentication.UaaAuthenticationDetails;
+import org.cloudfoundry.identity.uaa.client.SocialClientUserDetails;
+import org.cloudfoundry.identity.uaa.codestore.ExpiringCode;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.web.client.RestTemplate;
 
 /**
  * @author Dave Syer
@@ -29,52 +42,94 @@ import org.springframework.security.core.AuthenticationException;
  */
 public class AutologinAuthenticationManager implements AuthenticationManager {
 
-	private AutologinCodeStore codeStore = new DefaultAutologinCodeStore();
+    private Log logger = LogFactory.getLog(getClass());
 
-	/**
-	 * @param codeStore the codeStore to set
-	 */
-	public void setCodeStore(AutologinCodeStore codeStore) {
-		this.codeStore = codeStore;
-	}
+    private RestTemplate authorizationTemplate;
+    private String uaaBaseUrl;
 
-	@Override
-	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+    public String getUaaBaseUrl() {
+        return uaaBaseUrl;
+    }
 
-		if (!(authentication instanceof AuthzAuthenticationRequest)) {
-			return null;
-		}
+    public void setUaaBaseUrl(String uaaBaseUrl) {
+        this.uaaBaseUrl = uaaBaseUrl;
+    }
 
-		AuthzAuthenticationRequest request = (AuthzAuthenticationRequest) authentication;
-		Map<String, String> info = request.getInfo();
-		String code = info.get("code");
-		Authentication user = codeStore.getUser(code);
-		if (user == null) {
-			throw new BadCredentialsException("Cannot redeem provided code for user");
-		}
-		
-		//ensure that we stored clientId
-		String clientId = (String)user.getDetails();
-		if (clientId == null){
+    public RestTemplate getAuthorizationTemplate() {
+        return authorizationTemplate;
+    }
+
+    public void setAuthorizationTemplate(RestTemplate authorizationTemplate) {
+        this.authorizationTemplate = authorizationTemplate;
+    }
+
+    public ExpiringCode doRetrieveCode(String code) {
+        HttpHeaders requestHeaders = new HttpHeaders();
+        requestHeaders.add("Accept", MediaType.APPLICATION_JSON_VALUE);
+
+        HttpEntity<ExpiringCode> requestEntity = new HttpEntity<ExpiringCode>(null, requestHeaders);
+
+        ResponseEntity<ExpiringCode> response = authorizationTemplate.exchange(getUaaBaseUrl() + "/Codes/" + code,
+                        HttpMethod.GET,
+                        requestEntity, ExpiringCode.class);
+
+        if (response.getStatusCode().equals(HttpStatus.NOT_FOUND)) {
+            return null;
+        } else if (response.getStatusCode() != HttpStatus.OK) {
+            logger.warn("Request failed: " + requestEntity);
+            // TODO throw exception with the correct error
+            throw new RuntimeException(String.valueOf(response.getStatusCode()));
+        }
+
+        return response.getBody();
+    }
+
+    @Override
+    public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+
+        if (!(authentication instanceof AuthzAuthenticationRequest)) {
+            return null;
+        }
+
+        AuthzAuthenticationRequest request = (AuthzAuthenticationRequest) authentication;
+        Map<String, String> info = request.getInfo();
+        String code = info.get("code");
+
+        ExpiringCode ec = doRetrieveCode(code);
+        Authentication user = null;
+        try {
+            if (ec != null) {
+                user = new ObjectMapper().readValue(ec.getData(), SocialClientUserDetails.class);
+            }
+        } catch (IOException x) {
+            throw new BadCredentialsException("JsonConversion error", x);
+        }
+
+        if (user == null) {
+            throw new BadCredentialsException("Cannot redeem provided code for user");
+        }
+
+        // ensure that we stored clientId
+        String clientId = (String) user.getDetails();
+        if (clientId == null) {
             throw new BadCredentialsException("Cannot redeem provided code for user, client id missing");
         }
-		
-		//validate the client Id
-		if (!(authentication.getDetails() instanceof UaaAuthenticationDetails)) {
-		    throw new BadCredentialsException("Cannot redeem provided code for user, auth details missing");
-		}
-		
-		UaaAuthenticationDetails details = (UaaAuthenticationDetails)authentication.getDetails();
-		if (!clientId.equals(details.getClientId())) {
-		    throw new BadCredentialsException("Cannot redeem provided code for user, client mismatch");
-		}
-		
 
-		UsernamePasswordAuthenticationToken result = new UsernamePasswordAuthenticationToken(user, null,
-				user.getAuthorities());
-		result.setDetails(authentication.getDetails());
-		return result;
+        // validate the client Id
+        if (!(authentication.getDetails() instanceof UaaAuthenticationDetails)) {
+            throw new BadCredentialsException("Cannot redeem provided code for user, auth details missing");
+        }
 
-	}
+        UaaAuthenticationDetails details = (UaaAuthenticationDetails) authentication.getDetails();
+        if (!clientId.equals(details.getClientId())) {
+            throw new BadCredentialsException("Cannot redeem provided code for user, client mismatch");
+        }
+
+        UsernamePasswordAuthenticationToken result = new UsernamePasswordAuthenticationToken(user, null,
+                        user.getAuthorities());
+        result.setDetails(authentication.getDetails());
+        return result;
+
+    }
 
 }

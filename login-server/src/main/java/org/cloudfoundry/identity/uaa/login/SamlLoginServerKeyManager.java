@@ -1,3 +1,15 @@
+/*******************************************************************************
+ *     Cloud Foundry 
+ *     Copyright (c) [2009-2014] Pivotal Software, Inc. All Rights Reserved.
+ *
+ *     This product is licensed to you under the Apache License, Version 2.0 (the "License").
+ *     You may not use this product except in compliance with the License.
+ *
+ *     This product includes a number of subcomponents with
+ *     separate copyright notices and license terms. Your use of these
+ *     subcomponents is subject to the terms and conditions of the
+ *     subcomponent's license, as noted in the LICENSE file.
+ *******************************************************************************/
 package org.cloudfoundry.identity.uaa.login;
 
 import java.io.ByteArrayInputStream;
@@ -23,96 +35,100 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.saml.key.JKSKeyManager;
 import org.springframework.security.saml.key.KeyManager;
 
-
 public class SamlLoginServerKeyManager implements KeyManager {
 
     protected final static Logger logger = LoggerFactory.getLogger(SamlLoginServerKeyManager.class);
     private JKSKeyManager keyManager = null;
 
-	public SamlLoginServerKeyManager(String key, String password, String certificate) {
-	    Security.addProvider(new BouncyCastleProvider());
+    public SamlLoginServerKeyManager(String key, String password, String certificate) {
+        Security.addProvider(new BouncyCastleProvider());
 
-	    if (null == password) {
-	        password = "";
-	    }
+        if (null == password) {
+            password = "";
+        }
 
-		try {
-		    PEMReader reader = new PEMReader(new InputStreamReader(new ByteArrayInputStream(certificate.getBytes())));
-		    X509Certificate cert = (X509Certificate)reader.readObject();
+        try {
+            PEMReader reader = new PEMReader(new InputStreamReader(new ByteArrayInputStream(certificate.getBytes())));
+            X509Certificate cert = (X509Certificate) reader.readObject();
 
-		    reader = new PEMReader(new InputStreamReader(new ByteArrayInputStream(key.getBytes())), new StringPasswordFinder(password));
-		    KeyPair pkey = (KeyPair)reader.readObject();
+            reader = new PEMReader(new InputStreamReader(new ByteArrayInputStream(key.getBytes())),
+                            new StringPasswordFinder(password));
+            KeyPair pkey = (KeyPair) reader.readObject();
 
-		    KeyStore keystore = KeyStore.getInstance("JKS");
-		    keystore.load(null);
-		    keystore.setCertificateEntry("service-provider-cert", cert);
-		    keystore.setKeyEntry("service-provider-cert", pkey.getPrivate(), password.toCharArray(), new Certificate[] {cert});
+            KeyStore keystore = KeyStore.getInstance("JKS");
+            keystore.load(null);
+            keystore.setCertificateEntry("service-provider-cert", cert);
+            keystore.setKeyEntry("service-provider-cert", pkey.getPrivate(), password.toCharArray(),
+                            new Certificate[] { cert });
 
-		    KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
-		    kmf.init(keystore, password.toCharArray());
+            KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
+            kmf.init(keystore, password.toCharArray());
 
-		    keyManager = new JKSKeyManager(keystore, Collections.singletonMap("service-provider-cert", password), "service-provider-cert");
+            keyManager = new JKSKeyManager(keystore, Collections.singletonMap("service-provider-cert", password),
+                            "service-provider-cert");
 
-		    if (null == keyManager) {
-		    	throw new IllegalArgumentException("Could not load service provider certificate. Check serviceProviderKey and certificate parameters");
-		    }
+            if (null == keyManager) {
+                throw new IllegalArgumentException(
+                                "Could not load service provider certificate. Check serviceProviderKey and certificate parameters");
+            }
 
-		    logger.info("Loaded service provider certificate " + keyManager.getDefaultCredentialName());
-		} catch (Throwable t) {
-			logger.error("Could not load certificate", t);
-			throw new  IllegalArgumentException("Could not load service provider certificate. Check serviceProviderKey and certificate parameters", t);
-		}
-	}
+            logger.info("Loaded service provider certificate " + keyManager.getDefaultCredentialName());
+        } catch (Throwable t) {
+            logger.error("Could not load certificate", t);
+            throw new IllegalArgumentException(
+                            "Could not load service provider certificate. Check serviceProviderKey and certificate parameters",
+                            t);
+        }
+    }
 
-	private class StringPasswordFinder implements PasswordFinder {
+    private class StringPasswordFinder implements PasswordFinder {
 
-		private String password = null;
+        private String password = null;
 
-		public StringPasswordFinder(String password) {
-			this.password = password;
-		}
+        public StringPasswordFinder(String password) {
+            this.password = password;
+        }
 
-		@Override
-		public char[] getPassword() {
-			return password.toCharArray();
-		}
+        @Override
+        public char[] getPassword() {
+            return password.toCharArray();
+        }
 
-	}
+    }
 
-	@Override
-	public Iterable<Credential> resolve(CriteriaSet criteria) throws SecurityException {
-		return keyManager.resolve(criteria);
-	}
+    @Override
+    public Iterable<Credential> resolve(CriteriaSet criteria) throws SecurityException {
+        return keyManager.resolve(criteria);
+    }
 
-	@Override
-	public Credential resolveSingle(CriteriaSet criteria) throws SecurityException {
-		return keyManager.resolveSingle(criteria);
-	}
+    @Override
+    public Credential resolveSingle(CriteriaSet criteria) throws SecurityException {
+        return keyManager.resolveSingle(criteria);
+    }
 
-	@Override
-	public Credential getCredential(String keyName) {
-		return keyManager.getCredential(keyName);
-	}
+    @Override
+    public Credential getCredential(String keyName) {
+        return keyManager.getCredential(keyName);
+    }
 
-	@Override
-	public Credential getDefaultCredential() {
-		return keyManager.getDefaultCredential();
-	}
+    @Override
+    public Credential getDefaultCredential() {
+        return keyManager.getDefaultCredential();
+    }
 
-	@Override
-	public String getDefaultCredentialName() {
-		return keyManager.getDefaultCredentialName();
-	}
+    @Override
+    public String getDefaultCredentialName() {
+        return keyManager.getDefaultCredentialName();
+    }
 
-	@Override
-	public Set<String> getAvailableCredentials() {
-		return keyManager.getAvailableCredentials();
-	}
+    @Override
+    public Set<String> getAvailableCredentials() {
+        return keyManager.getAvailableCredentials();
+    }
 
-	@Override
-	public X509Certificate getCertificate(String alias) {
-		return keyManager.getCertificate(alias);
-	}
-
+    @Override
+    public X509Certificate getCertificate(String alias) {
+        return keyManager.getCertificate(alias);
+    }
 
 }

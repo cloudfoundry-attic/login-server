@@ -1,3 +1,15 @@
+/*******************************************************************************
+ *     Cloud Foundry 
+ *     Copyright (c) [2009-2014] Pivotal Software, Inc. All Rights Reserved.
+ *
+ *     This product is licensed to you under the Apache License, Version 2.0 (the "License").
+ *     You may not use this product except in compliance with the License.
+ *
+ *     This product includes a number of subcomponents with
+ *     separate copyright notices and license terms. Your use of these
+ *     subcomponents is subject to the terms and conditions of the
+ *     subcomponent's license, as noted in the LICENSE file.
+ *******************************************************************************/
 package org.cloudfoundry.identity.uaa.login;
 
 import static org.junit.Assert.assertEquals;
@@ -14,87 +26,88 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.util.MultiValueMap;
+
 /**
  * @author Arjen Poutsma
  * @author fhanik
  */
 public class LinkedMaskingMultiValueMapTests {
 
-	private LinkedMaskingMultiValueMap<String, String> map;
-	private LinkedMaskingMultiValueMap<Object, Object> objectMap;
+    private LinkedMaskingMultiValueMap<String, String> map;
+    private LinkedMaskingMultiValueMap<Object, Object> objectMap;
 
-	@Before
-	public void setUp() {
-		map = new LinkedMaskingMultiValueMap<String, String>("password");
-		objectMap = new LinkedMaskingMultiValueMap<Object, Object>("password");
-	}
+    @Before
+    public void setUp() {
+        map = new LinkedMaskingMultiValueMap<String, String>("password");
+        objectMap = new LinkedMaskingMultiValueMap<Object, Object>("password");
+    }
 
-	@Test
-	public void add() {
-		map.add("key", "value1");
-		map.add("key", "value2");
-		assertEquals(1, map.size());
-		List<String> expected = new ArrayList<String>(2);
-		expected.add("value1");
-		expected.add("value2");
-		assertEquals(expected, map.get("key"));
-	}
+    @Test
+    public void add() {
+        map.add("key", "value1");
+        map.add("key", "value2");
+        assertEquals(1, map.size());
+        List<String> expected = new ArrayList<String>(2);
+        expected.add("value1");
+        expected.add("value2");
+        assertEquals(expected, map.get("key"));
+    }
 
-	@Test
-	public void getFirst() {
-		List<String> values = new ArrayList<String>(2);
-		values.add("value1");
-		values.add("value2");
-		map.put("key", values);
-		assertEquals("value1", map.getFirst("key"));
-		assertNull(map.getFirst("other"));
-	}
+    @Test
+    public void getFirst() {
+        List<String> values = new ArrayList<String>(2);
+        values.add("value1");
+        values.add("value2");
+        map.put("key", values);
+        assertEquals("value1", map.getFirst("key"));
+        assertNull(map.getFirst("other"));
+    }
 
-	@Test
-	public void set() {
-		map.set("key", "value1");
-		map.set("key", "value2");
-		assertEquals(1, map.size());
-		assertEquals(Collections.singletonList("value2"), map.get("key"));
-	}
+    @Test
+    public void set() {
+        map.set("key", "value1");
+        map.set("key", "value2");
+        assertEquals(1, map.size());
+        assertEquals(Collections.singletonList("value2"), map.get("key"));
+    }
 
-	@Test
-	public void equals() {
-		map.set("key1", "value1");
-		assertEquals(map, map);
-		MultiValueMap<String, String> o1 = new LinkedMaskingMultiValueMap<String, String>();
-		o1.set("key1", "value1");
-		assertEquals(map, o1);
-		assertEquals(o1, map);
-		Map<String, List<String>> o2 = new HashMap<String, List<String>>();
-		o2.put("key1", Collections.singletonList("value1"));
-		assertEquals(map, o2);
-		assertEquals(o2, map);
-	}
-	
-	@Test
-	public void testSelfReferenceKey() {
-	    objectMap.add(objectMap, "value1");
-	    String s = objectMap.toString();
-	    assertTrue(s.indexOf("this map")>=0);
-	}
+    @Test
+    public void equals() {
+        map.set("key1", "value1");
+        assertEquals(map, map);
+        MultiValueMap<String, String> o1 = new LinkedMaskingMultiValueMap<String, String>();
+        o1.set("key1", "value1");
+        assertEquals(map, o1);
+        assertEquals(o1, map);
+        Map<String, List<String>> o2 = new HashMap<String, List<String>>();
+        o2.put("key1", Collections.singletonList("value1"));
+        assertEquals(map, o2);
+        assertEquals(o2, map);
+    }
+
+    @Test
+    public void testSelfReferenceKey() {
+        objectMap.add(objectMap, "value1");
+        String s = objectMap.toString();
+        assertTrue(s.indexOf("this map") >= 0);
+    }
 
     @Test
     public void testSelfReferenceValue() {
         objectMap.add("key1", objectMap);
         String s = objectMap.toString();
-        assertTrue(s.indexOf("this map")>=0);
+        assertTrue(s.indexOf("this map") >= 0);
     }
-    
+
     @Test
     public void doNotPrintPassword() {
         map.add("password", "password-value");
         String s = map.toString();
-        assertTrue(s.indexOf("password")>=0);
-        assertFalse(s.indexOf("password-value")>=0);
-        assertTrue(s.indexOf("PROTECTED")>=0);
+        assertTrue(s.indexOf("password") >= 0);
+        assertFalse(s.indexOf("password-value") >= 0);
+        assertTrue(s.indexOf("PROTECTED") >= 0);
     }
-    
+
     @Test
     public void testHash() {
         map.add("key1", "value1");
@@ -110,7 +123,8 @@ public class LinkedMaskingMultiValueMapTests {
     public void testCyclicKeyHash() {
         objectMap.add(objectMap, "value1");
         objectMap.add(objectMap, "value2");
-        LinkedMaskingMultiValueMap<Object, Object> objectMap2 = new LinkedMaskingMultiValueMap<Object, Object>("password");
+        LinkedMaskingMultiValueMap<Object, Object> objectMap2 = new LinkedMaskingMultiValueMap<Object, Object>(
+                        "password");
         objectMap2.add(objectMap2, "value1");
         objectMap2.add(objectMap2, "value2");
         int hash1 = objectMap.hashCode();
@@ -123,10 +137,11 @@ public class LinkedMaskingMultiValueMapTests {
         objectMap.add("key1", "value1");
         objectMap.add("key1", objectMap);
 
-        LinkedMaskingMultiValueMap<Object, Object> objectMap2 = new LinkedMaskingMultiValueMap<Object, Object>("password");
+        LinkedMaskingMultiValueMap<Object, Object> objectMap2 = new LinkedMaskingMultiValueMap<Object, Object>(
+                        "password");
         objectMap2.add("key1", "value1");
         objectMap2.add("key1", objectMap2);
-        
+
         int hash1 = objectMap.hashCode();
         int hash2 = objectMap2.hashCode();
         assertEquals(hash1, hash2);

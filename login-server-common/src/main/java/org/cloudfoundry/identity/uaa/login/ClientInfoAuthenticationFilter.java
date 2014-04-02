@@ -1,15 +1,15 @@
-/*
- * Cloud Foundry 2012.02.03 Beta
- * Copyright (c) [2009-2012] VMware, Inc. All Rights Reserved.
+/*******************************************************************************
+ *     Cloud Foundry 
+ *     Copyright (c) [2009-2014] Pivotal Software, Inc. All Rights Reserved.
  *
- * This product is licensed to you under the Apache License, Version 2.0 (the "License").
- * You may not use this product except in compliance with the License.
+ *     This product is licensed to you under the Apache License, Version 2.0 (the "License").
+ *     You may not use this product except in compliance with the License.
  *
- * This product includes a number of subcomponents with
- * separate copyright notices and license terms. Your use of these
- * subcomponents is subject to the terms and conditions of the
- * subcomponent's license, as noted in the LICENSE file.
- */
+ *     This product includes a number of subcomponents with
+ *     separate copyright notices and license terms. Your use of these
+ *     subcomponents is subject to the terms and conditions of the
+ *     subcomponent's license, as noted in the LICENSE file.
+ *******************************************************************************/
 
 package org.cloudfoundry.identity.uaa.login;
 
@@ -50,130 +50,131 @@ import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 
 /**
- * Authentication filter accepting basic authorization header and using it to relay to a remote <code>/clientinfo</code>
- * endpoint. Allows rejecting of clients based on id or authorized grant type.
+ * Authentication filter accepting basic authorization header and using it to
+ * relay to a remote <code>/clientinfo</code> endpoint. Allows rejecting of
+ * clients based on id or authorized grant type.
  * 
  * @author Dave Syer
  * 
  */
 public class ClientInfoAuthenticationFilter implements Filter {
 
-	protected final Log logger = LogFactory.getLog(getClass());
+    protected final Log logger = LogFactory.getLog(getClass());
 
-	private Set<String> allowedClients = Collections.singleton(".*");
+    private Set<String> allowedClients = Collections.singleton(".*");
 
-	private Set<String> allowedGrantTypes = Collections.singleton(".*");
+    private Set<String> allowedGrantTypes = Collections.singleton(".*");
 
-	private RestOperations restTemplate = new RestTemplate();
+    private RestOperations restTemplate = new RestTemplate();
 
-	private String clientInfoUrl;
+    private String clientInfoUrl;
 
-	private AuthenticationEntryPoint authenticationEntryPoint = new BasicAuthenticationEntryPoint();
+    private AuthenticationEntryPoint authenticationEntryPoint = new BasicAuthenticationEntryPoint();
 
-	public void setRestTemplate(RestOperations restTemplate) {
-		this.restTemplate = restTemplate;
-	}
+    public void setRestTemplate(RestOperations restTemplate) {
+        this.restTemplate = restTemplate;
+    }
 
-	public void setClientInfoUrl(String clientInfoUrl) {
-		this.clientInfoUrl = clientInfoUrl;
-	}
+    public void setClientInfoUrl(String clientInfoUrl) {
+        this.clientInfoUrl = clientInfoUrl;
+    }
 
-	/**
-	 * @param allowedClients the allowedClients to set
-	 */
-	public void setAllowedClients(Set<String> allowedClients) {
-		this.allowedClients = new HashSet<String>(allowedClients);
-	}
+    /**
+     * @param allowedClients the allowedClients to set
+     */
+    public void setAllowedClients(Set<String> allowedClients) {
+        this.allowedClients = new HashSet<String>(allowedClients);
+    }
 
-	/**
-	 * @param allowedGrantTypes the allowedGrantTypes to set
-	 */
-	public void setAllowedGrantTypes(Set<String> allowedGrantTypes) {
-		this.allowedGrantTypes = allowedGrantTypes;
-	}
+    /**
+     * @param allowedGrantTypes the allowedGrantTypes to set
+     */
+    public void setAllowedGrantTypes(Set<String> allowedGrantTypes) {
+        this.allowedGrantTypes = allowedGrantTypes;
+    }
 
-	/**
-	 * @param authenticationEntryPoint the authenticationEntryPoint to set
-	 */
-	public void setAuthenticationEntryPoint(AuthenticationEntryPoint authenticationEntryPoint) {
-		this.authenticationEntryPoint = authenticationEntryPoint;
-	}
+    /**
+     * @param authenticationEntryPoint the authenticationEntryPoint to set
+     */
+    public void setAuthenticationEntryPoint(AuthenticationEntryPoint authenticationEntryPoint) {
+        this.authenticationEntryPoint = authenticationEntryPoint;
+    }
 
-	/**
-	 * Populates the Spring Security context with a {@link UsernamePasswordAuthenticationToken} referring to the client
-	 * that authenticates using the basic authorization header.
-	 */
-	@Override
-	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
-			ServletException {
+    /**
+     * Populates the Spring Security context with a
+     * {@link UsernamePasswordAuthenticationToken} referring to the client
+     * that authenticates using the basic authorization header.
+     */
+    @Override
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
+                    ServletException {
 
-		HttpServletRequest servletRequest = (HttpServletRequest) request;
-		String header = servletRequest.getHeader("Authorization");
-		if (header == null || !header.startsWith("Basic ")) {
-			chain.doFilter(request, response);
-			return;
-		}
+        HttpServletRequest servletRequest = (HttpServletRequest) request;
+        String header = servletRequest.getHeader("Authorization");
+        if (header == null || !header.startsWith("Basic ")) {
+            chain.doFilter(request, response);
+            return;
+        }
 
-		HttpHeaders headers = new HttpHeaders();
-		headers.set("Authorization", header);
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", header);
 
-		try {
+        try {
 
-			ResponseEntity<BaseClientDetails> result = restTemplate.exchange(clientInfoUrl, HttpMethod.GET,
-					new HttpEntity<Void>(headers), BaseClientDetails.class);
+            ResponseEntity<BaseClientDetails> result = restTemplate.exchange(clientInfoUrl, HttpMethod.GET,
+                            new HttpEntity<Void>(headers), BaseClientDetails.class);
 
-			ClientDetails client = result.getBody();
-			String clientId = client.getClientId();
-			validateClient(client);
+            ClientDetails client = result.getBody();
+            String clientId = client.getClientId();
+            validateClient(client);
 
-			Authentication authResult = new UsernamePasswordAuthenticationToken(clientId, "<NONE>",
-					client.getAuthorities());
-			SecurityContextHolder.getContext().setAuthentication(authResult);
+            Authentication authResult = new UsernamePasswordAuthenticationToken(clientId, "<NONE>",
+                            client.getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(authResult);
 
-		}
-		catch (RuntimeException e) {
-			logger.debug("Authentication failed");
-			authenticationEntryPoint.commence(servletRequest, (HttpServletResponse) response,
-					new BadCredentialsException("Could not authenticate", e));
-			return;
-		}
+        } catch (RuntimeException e) {
+            logger.debug("Authentication failed");
+            authenticationEntryPoint.commence(servletRequest, (HttpServletResponse) response,
+                            new BadCredentialsException("Could not authenticate", e));
+            return;
+        }
 
-		chain.doFilter(request, response);
+        chain.doFilter(request, response);
 
-	}
+    }
 
-	protected void validateClient(ClientDetails client) {
-		String clientId = client.getClientId();
-		for (String pattern : allowedClients) {
-			if (!clientId.matches(pattern)) {
-				throw new BadCredentialsException("Client not permitted: " + clientId);
-			}
-		}
-		Set<String> grantTypes = client.getAuthorizedGrantTypes();
-		boolean matched = false;
-		for (String pattern : allowedGrantTypes) {
-			for (String grantType : grantTypes) {
-				if (grantType.matches(pattern)) {
-					matched = true;
-				}
-			}
-		}
-		if (!matched) {
-			throw new BadCredentialsException("Client not permitted (wrong grant type): " + clientId);
-		}
-	}
+    protected void validateClient(ClientDetails client) {
+        String clientId = client.getClientId();
+        for (String pattern : allowedClients) {
+            if (!clientId.matches(pattern)) {
+                throw new BadCredentialsException("Client not permitted: " + clientId);
+            }
+        }
+        Set<String> grantTypes = client.getAuthorizedGrantTypes();
+        boolean matched = false;
+        for (String pattern : allowedGrantTypes) {
+            for (String grantType : grantTypes) {
+                if (grantType.matches(pattern)) {
+                    matched = true;
+                }
+            }
+        }
+        if (!matched) {
+            throw new BadCredentialsException("Client not permitted (wrong grant type): " + clientId);
+        }
+    }
 
-	protected List<GrantedAuthority> getAuthorities(Collection<String> authorities) {
-		return AuthorityUtils.commaSeparatedStringToAuthorityList(StringUtils
-				.collectionToCommaDelimitedString(authorities));
-	}
+    protected List<GrantedAuthority> getAuthorities(Collection<String> authorities) {
+        return AuthorityUtils.commaSeparatedStringToAuthorityList(StringUtils
+                        .collectionToCommaDelimitedString(authorities));
+    }
 
-	@Override
-	public void init(FilterConfig filterConfig) throws ServletException {
-	}
+    @Override
+    public void init(FilterConfig filterConfig) throws ServletException {
+    }
 
-	@Override
-	public void destroy() {
-	}
+    @Override
+    public void destroy() {
+    }
 
 }
