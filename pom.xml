@@ -19,12 +19,12 @@
     <parent>
         <groupId>org.cloudfoundry.identity</groupId>
         <artifactId>cloudfoundry-identity-parent</artifactId>
-        <version>1.6.0-SNAPSHOT</version>
+        <version>1.6.0</version>
     </parent>
 
     <groupId>com.cloudfoundry.identity</groupId>
     <artifactId>cloudfoundry-login-server-parent</artifactId>
-    <version>1.4.3-SNAPSHOT</version>
+    <version>1.5.0</version>
     <packaging>pom</packaging>
     <name>Cloud Foundry Login</name>
     <description>Cloud Foundry Login Servers</description>
@@ -112,7 +112,7 @@
     </developers>
 
     <properties>
-        <identity.version>1.6.0-SNAPSHOT</identity.version>
+        <identity.version>1.6.0</identity.version>
         <spring.version>3.2.8.RELEASE</spring.version>
         <spring.security.version>3.2.2.RELEASE</spring.security.version>
         <groupId>${project.groupId}</groupId>
