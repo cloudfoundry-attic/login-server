@@ -58,9 +58,12 @@ public class ChangePasswordIT {
         int randomInt = new SecureRandom().nextInt();
 
         String adminAccessToken = testClient.getOAuthAccessToken("admin", "adminsecret", "client_credentials", "clients.read clients.write clients.secret");
+
         String scimClientId = "scim" + randomInt;
         testClient.createScimClient(adminAccessToken, scimClientId);
+
         String scimAccessToken = testClient.getOAuthAccessToken(scimClientId, "scimsecret", "client_credentials", "scim.read scim.write password.write");
+
         userEmail = "user" + randomInt + "@example.com";
         userName = "JOE" + randomInt;
         testClient.createUser(scimAccessToken, userName, userEmail, "secret");

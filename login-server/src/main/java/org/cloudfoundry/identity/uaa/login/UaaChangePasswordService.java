@@ -20,13 +20,11 @@ import java.util.Map;
 
 public class UaaChangePasswordService implements ChangePasswordService {
 
-    private final RestTemplate authorizationTemplate;
-    private final RestTemplate restTemplate;
+    private final RestTemplate uaaTemplate;
     private final String uaaBaseUrl;
 
-    public UaaChangePasswordService(RestTemplate authorizationTemplate, RestTemplate restTemplate, String uaaBaseUrl) {
-        this.authorizationTemplate = authorizationTemplate;
-        this.restTemplate = restTemplate;
+    public UaaChangePasswordService(RestTemplate authorizationTemplate, String uaaBaseUrl) {
+        this.uaaTemplate = authorizationTemplate;
         this.uaaBaseUrl = uaaBaseUrl;
     }
 
@@ -37,7 +35,7 @@ public class UaaChangePasswordService implements ChangePasswordService {
         Map<String, String> getUrlVariables = new HashMap<String, String>(1);
         getUrlVariables.put("filter", "userName eq '" + username + "'");
 
-        String userId = authorizationTemplate.getForObject(uaaBaseUrl + getUsersUri, String.class, getUrlVariables);
+        String userId = uaaTemplate.getForObject(uaaBaseUrl + getUsersUri, String.class, getUrlVariables);
 
         String changePasswordUri = "/Users/{userId}/password";
         Map<String, String> putUrlVariables = new HashMap<String, String>(1);
@@ -47,6 +45,6 @@ public class UaaChangePasswordService implements ChangePasswordService {
         passwordChangeRequest.setOldPassword(currentPassword);
         passwordChangeRequest.setPassword(newPassword);
 
-        restTemplate.put(uaaBaseUrl + changePasswordUri, passwordChangeRequest, putUrlVariables);
+        uaaTemplate.put(uaaBaseUrl + changePasswordUri, passwordChangeRequest, putUrlVariables);
     }
 }

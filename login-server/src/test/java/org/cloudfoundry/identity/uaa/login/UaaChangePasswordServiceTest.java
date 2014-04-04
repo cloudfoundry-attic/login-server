@@ -33,7 +33,7 @@ public class UaaChangePasswordServiceTest {
     public void setUp() throws Exception {
         RestTemplate uaaTemplate = new RestTemplate();
         mockUaaServer = MockRestServiceServer.createServer(uaaTemplate);
-        subject = new UaaChangePasswordService(uaaTemplate, uaaTemplate, "http://uaa.example.com/uaa");
+        subject = new UaaChangePasswordService(uaaTemplate, "http://uaa.example.com/uaa");
     }
 
     @Test

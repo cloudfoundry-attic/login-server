@@ -318,7 +318,6 @@
 
             <bean id="changePasswordService" class="org.cloudfoundry.identity.uaa.login.UaaChangePasswordService">
                 <constructor-arg ref="authorizationTemplate"/>
-                <constructor-arg ref="restTemplate"/>
                 <constructor-arg value="${uaa.url:http://localhost:8080/uaa}"/>
             </bean>
 
