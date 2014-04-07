@@ -12,7 +12,6 @@
  *******************************************************************************/
 package org.cloudfoundry.identity.uaa.login;
 
-import org.cloudfoundry.identity.uaa.message.PasswordChangeRequest;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
@@ -30,21 +29,11 @@ public class UaaChangePasswordService implements ChangePasswordService {
 
     @Override
     public void changePassword(String username, String currentPassword, String newPassword) {
+        Map<String, String> formData = new HashMap<String, String>();
+        formData.put("username", username);
+        formData.put("current_password", currentPassword);
+        formData.put("new_password", newPassword);
 
-        String getUsersUri = "/Users?filter={filter}&attributes=id";
-        Map<String, String> getUrlVariables = new HashMap<String, String>(1);
-        getUrlVariables.put("filter", "userName eq '" + username + "'");
-
-        String userId = uaaTemplate.getForObject(uaaBaseUrl + getUsersUri, String.class, getUrlVariables);
-
-        String changePasswordUri = "/Users/{userId}/password";
-        Map<String, String> putUrlVariables = new HashMap<String, String>(1);
-        putUrlVariables.put("userId", userId);
-
-        PasswordChangeRequest passwordChangeRequest = new PasswordChangeRequest();
-        passwordChangeRequest.setOldPassword(currentPassword);
-        passwordChangeRequest.setPassword(newPassword);
-
-        uaaTemplate.put(uaaBaseUrl + changePasswordUri, passwordChangeRequest, putUrlVariables);
+        uaaTemplate.postForObject(uaaBaseUrl + "/password_change", formData, String.class);
     }
 }
