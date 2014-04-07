@@ -62,8 +62,9 @@ public class ResetPasswordController {
                                 @ModelAttribute("password_confirmation") String passwordConfirmation,
                                 HttpServletResponse response) {
 
-        if (password.isEmpty() || passwordConfirmation.isEmpty() || !password.equals(passwordConfirmation)) {
-            model.addAttribute("message", "Passwords must match and not be empty");
+        ChangePasswordValidation validation = new ChangePasswordValidation(password, passwordConfirmation);
+        if (!validation.valid()) {
+            model.addAttribute("message", validation.getMessage());
             response.setStatus(HttpStatus.UNPROCESSABLE_ENTITY.value());
             return "reset_password";
         }

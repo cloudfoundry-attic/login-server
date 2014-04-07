@@ -16,16 +16,24 @@ import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.flash;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
+import org.cloudfoundry.identity.uaa.user.UaaAuthority;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.common.exceptions.OAuth2Exception;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
+
+import java.util.Arrays;
 
 public class ChangePasswordControllerTest {
     private MockMvc mockMvc;
@@ -54,6 +62,8 @@ public class ChangePasswordControllerTest {
 
     @Test
     public void testForgotPassword() throws Exception {
+        setupSecurityContext();
+
         MockHttpServletRequestBuilder post = post("/change_password.do")
                 .contentType(APPLICATION_FORM_URLENCODED)
                 .param("current_password", "secret")
@@ -62,8 +72,56 @@ public class ChangePasswordControllerTest {
 
         mockMvc.perform(post)
                 .andExpect(status().isFound())
-                .andExpect(flash().attributeExists("success"));
+                .andExpect(flash().attribute("message", "Your password has been changed"));
 
-        Mockito.verify(changePasswordService).changePassword("", "secret", "new secret");
+        Mockito.verify(changePasswordService).changePassword("bob", "secret", "new secret");
+    }
+
+    @Test
+    public void testForgotPasswordValidation() throws Exception {
+        setupSecurityContext();
+
+        MockHttpServletRequestBuilder post = post("/change_password.do")
+                .contentType(APPLICATION_FORM_URLENCODED)
+                .param("current_password", "secret")
+                .param("new_password", "new secret")
+                .param("confirm_password", "newsecret");
+
+        mockMvc.perform(post)
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(view().name("change_password"))
+                .andExpect(model().attribute("message", "Passwords must match and not be empty"));
+
+        Mockito.verifyZeroInteractions(changePasswordService);
+    }
+
+    @Test
+    public void testForgotPasswordWrongPassword() throws Exception {
+        setupSecurityContext();
+
+        Mockito.doThrow(new OAuth2Exception("wrong password")).when(changePasswordService).changePassword("bob", "secret", "new secret");
+
+        MockHttpServletRequestBuilder post = post("/change_password.do")
+                .contentType(APPLICATION_FORM_URLENCODED)
+                .param("current_password", "secret")
+                .param("new_password", "new secret")
+                .param("confirm_password", "new secret");
+
+        mockMvc.perform(post)
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(view().name("change_password"))
+                .andExpect(model().attribute("message", "wrong password"));
+
+        Mockito.verify(changePasswordService).changePassword("bob", "secret", "new secret");
+    }
+
+    private void setupSecurityContext() {
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+                        "bob",
+                        "secret",
+                        Arrays.asList(UaaAuthority.UAA_USER)
+        );
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 }
