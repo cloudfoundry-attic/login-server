@@ -29,14 +29,11 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.client.RestTemplate;
 
 import com.dumbster.smtp.SimpleSmtpServer;
-import com.dumbster.smtp.SmtpMessage;
 import java.security.SecureRandom;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = DefaultIntegrationTestConfig.class)
-public class ResetPasswordIT {
+public class ChangePasswordIT {
 
     @Autowired
     WebDriver webDriver;
@@ -52,7 +49,7 @@ public class ResetPasswordIT {
 
     @Value("${integration.test.base_url}")
     String baseUrl;
-
+    
     private String userEmail;
     private String userName;
 
@@ -61,54 +58,44 @@ public class ResetPasswordIT {
         int randomInt = new SecureRandom().nextInt();
 
         String adminAccessToken = testClient.getOAuthAccessToken("admin", "adminsecret", "client_credentials", "clients.read clients.write clients.secret");
+
         String scimClientId = "scim" + randomInt;
         testClient.createScimClient(adminAccessToken, scimClientId);
+
         String scimAccessToken = testClient.getOAuthAccessToken(scimClientId, "scimsecret", "client_credentials", "scim.read scim.write password.write");
+
         userEmail = "user" + randomInt + "@example.com";
         userName = "JOE" + randomInt;
         testClient.createUser(scimAccessToken, userName, userEmail, "secret");
     }
 
     @Test
-    public void resettingAPassword() throws Exception {
-        webDriver.get(baseUrl + "/login");
-        Assert.assertEquals("Pivotal", webDriver.getTitle());
-
-        webDriver.findElement(By.linkText("Forgot Password")).click();
-
-        webDriver.findElement(By.name("email")).sendKeys(userEmail);
-        webDriver.findElement(By.xpath("//button[contains(text(),'Reset Password')]")).click();
-
-        Assert.assertEquals(1, simpleSmtpServer.getReceivedEmailSize());
-        SmtpMessage message = (SmtpMessage) simpleSmtpServer.getReceivedEmail().next();
-        Assert.assertEquals(userEmail, message.getHeaderValue("To"));
-        Assert.assertThat(message.getBody(), containsString("Click the link to reset your password"));
-
-        Assert.assertEquals("An email has been sent with password reset instructions.", webDriver.findElement(By.cssSelector(".flash")).getText());
-
-        String link = extractLink(message.getBody());
-        webDriver.get(link);
-
-        webDriver.findElement(By.name("password")).sendKeys("newsecret");
-        webDriver.findElement(By.name("password_confirmation")).sendKeys("newsecret");
-
-        webDriver.findElement(By.xpath("//button[contains(text(),'Change Password')]")).click();
-
-        Assert.assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), containsString("Welcome"));
-
-        webDriver.findElement(By.linkText("Sign out")).click();
-
-        webDriver.findElement(By.name("username")).sendKeys(userName);
-        webDriver.findElement(By.name("password")).sendKeys("newsecret");
-        webDriver.findElement(By.xpath("//button[contains(text(), 'Sign in')]")).click();
-
-        Assert.assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), containsString("Welcome"));
+    public void testChangePassword() throws Exception {
+        signIn(userName, "secret");
+        changePassword("secret", "newsecret", "newsecret");
+        signOut();
+        signIn(userName, "newsecret");
     }
 
-    private String extractLink(String messageBody) {
-        Pattern linkPattern = Pattern.compile("<a href=\"(.*?)\">.*?</a>");
-        Matcher matcher = linkPattern.matcher(messageBody);
-        matcher.find();
-        return matcher.group(1);
+    private void changePassword(String originalPassword, String newPassword, String confirmPassword) {
+        webDriver.findElement(By.linkText("Manage 3rd party access")).click();
+        webDriver.findElement(By.linkText("Change password")).click();
+        webDriver.findElement(By.name("current_password")).sendKeys(originalPassword);
+        webDriver.findElement(By.name("new_password")).sendKeys(newPassword);
+        webDriver.findElement(By.name("confirm_password")).sendKeys(confirmPassword);
+
+        webDriver.findElement(By.xpath("//button[contains(text(), 'Change password')]")).click();
+    }
+
+    private void signOut() {
+        webDriver.findElement(By.linkText("Sign out")).click();
+    }
+
+    private void signIn(String userName, String password) {
+        webDriver.get(baseUrl + "/login");
+        webDriver.findElement(By.name("username")).sendKeys(userName);
+        webDriver.findElement(By.name("password")).sendKeys(password);
+        webDriver.findElement(By.xpath("//button[contains(text(), 'Sign in')]")).click();
+        Assert.assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), containsString("Welcome"));
     }
 }

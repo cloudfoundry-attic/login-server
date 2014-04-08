@@ -127,7 +127,7 @@
      <div class="h2">Username:
       ${fn:escapeXml(pageContext.request.userPrincipal.name)}</div>
      <div class="h2">
-      Password: ********** <a href="${links.passwd}">Reset Password</a>
+      Password: ********** <a href="<c:url value="/change_password"/>">Change password</a>
      </div>
     </div>
 
