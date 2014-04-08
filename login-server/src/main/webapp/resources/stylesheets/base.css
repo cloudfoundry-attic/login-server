@@ -1,0 +1,23 @@
+@import url('normalize.css');
+
+body {
+    background-color: #f8f8f8;
+    font-family: sans-serif;
+}
+
+h1 {
+    text-align: center;
+}
+
+.island {
+    margin-top: 130px;
+}
+
+.island-content {
+    width: 200px;
+    margin: 0 auto 0 auto;
+}
+
+input {
+    display: block;
+}
