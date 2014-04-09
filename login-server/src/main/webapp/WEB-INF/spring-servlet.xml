@@ -283,11 +283,14 @@
     <mvc:annotation-driven />
     <mvc:default-servlet-handler />
 
-    <bean id="templateResolver" class="org.thymeleaf.templateresolver.ServletContextTemplateResolver">
-        <property name="prefix" value="/WEB-INF/thymeleaf/" />
+    <bean id="templateResolver" class="org.thymeleaf.templateresolver.TemplateResolver">
+        <property name="resourceResolver">
+            <bean class="org.thymeleaf.spring3.resourceresolver.SpringResourceResourceResolver" />
+        </property>
+        <property name="prefix" value="classpath:/templates/" />
         <property name="suffix" value=".html" />
         <property name="templateMode" value="HTML5" />
-        <property name="cacheable" value="false" />
+        <!--<property name="cacheable" value="false" />-->
     </bean>
 
     <bean id="templateEngine" class="org.thymeleaf.spring3.SpringTemplateEngine">
