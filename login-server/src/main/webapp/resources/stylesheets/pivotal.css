@@ -1,10 +1,5 @@
 @import url('base.css');
 
-body {
-    font-family: freight-sans-pro;
-}
-
 h1 {
-    color: #03786e;
-    font-weight: 300;
+    color: #01786e;
 }

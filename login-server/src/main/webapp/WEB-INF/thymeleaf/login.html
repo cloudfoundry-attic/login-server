@@ -12,40 +12,46 @@
     <link href="resources/stylesheets/pivotal.css" th:href="@{'/resources/stylesheets/'+${brand}+'.css'}" rel="stylesheet"/>
 
     <!--<script type="text/javascript" src="resources/javascripts/jquery.js"></script>-->
-    <script src="//use.typekit.net/zwc8anl.js" th:src="@{//use.typekit.net/zwc8anl.js}"></script>
-    <script>
-        try { Typekit.load(); } catch (e) { }
-    </script>
 </head>
-<body>
-    <div class="island">
-        <h1>Welcome!</h1>
-        <div class="island-content">
-            <form th:action="@{/login.do}" method="post" novalidate="novalidate">
-                <input th:each="prompt : ${prompts}" th:name="${prompt.key}" th:type="${prompt.value[0]}"
-                       th:placeholder="${prompt.value[1]}" th:autocomplete="${prompt.value[0] != 'password'}"/>
-                <input type="submit" value="Sign in"/>
-            </form>
-            <span><a href="/register" th:href="${links.get('register')}">Create account</a></span>
-            <span th:if="${links.get('passwd')}"><a href="/forgot_password" th:href="${links.get('passwd')}">Reset password</a></span>
+<body th:style="'background-image: url('+@{/resources/pivotal/images/pivotal-logo.png}+');'">
+    <div class="content-area">
+        <div class="island">
+            <h1>Welcome!</h1>
+            <div class="island-content">
+                <form th:action="@{/login.do}" method="post" novalidate="novalidate">
+                    <input th:each="prompt,iter : ${prompts}"
+                           th:name="${prompt.key}"
+                           th:type="${prompt.value[0]}"
+                           th:placeholder="${prompt.value[1]}"
+                           th:autocomplete="${prompt.value[0] != 'password'}"
+                           th:autofocus="${iter.index} == 0"
+                           class="form-control"/>
+                    <input type="submit" value="Sign in" class="button btn btn-alternate btn-lg btn-block"/>
+                </form>
+                <span class="left">
+                    <a href="/register" th:href="${links.get('register')}" class="link-lowlight">Create account</a>
+                </span><span class="right" th:if="${links.get('passwd')}">
+                    <a href="/forgot_password" th:href="${links.get('passwd')}" class="link-lowlight">Reset password</a>
+                </span>
+            </div>
         </div>
+
+        <script th:if="${analytics.size() > 0}">
+            (function(i, s, o, g, r, a, m) {
+                i['GoogleAnalyticsObject'] = r;
+                i[r] = i[r] || function() {
+                    (i[r].q = i[r].q || []).push(arguments)
+                }, i[r].l = 1 * new Date();
+                a = s.createElement(o), m = s.getElementsByTagName(o)[0];
+                a.async = 1;
+                a.src = g;
+                m.parentNode.insertBefore(a, m)
+            })(window, document, 'script',
+                    '//www.google-analytics.com/analytics.js', 'ga');
+
+            ga('create', '${analytics.code}', '${analytics.domain}');
+            ga('send', 'pageview');
+        </script>
     </div>
-
-    <script th:if="${analytics.size() > 0}">
-        (function(i, s, o, g, r, a, m) {
-            i['GoogleAnalyticsObject'] = r;
-            i[r] = i[r] || function() {
-                (i[r].q = i[r].q || []).push(arguments)
-            }, i[r].l = 1 * new Date();
-            a = s.createElement(o), m = s.getElementsByTagName(o)[0];
-            a.async = 1;
-            a.src = g;
-            m.parentNode.insertBefore(a, m)
-        })(window, document, 'script',
-                '//www.google-analytics.com/analytics.js', 'ga');
-
-        ga('create', '${analytics.code}', '${analytics.domain}');
-        ga('send', 'pageview');
-    </script>
 </body>
 </html>

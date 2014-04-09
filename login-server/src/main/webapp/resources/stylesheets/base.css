@@ -1,23 +1,62 @@
-@import url('normalize.css');
+@import url(http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700);
+@import url('application.css');
 
 body {
     background-color: #f8f8f8;
-    font-family: sans-serif;
+    background-position: top;
+    background-repeat: no-repeat;
 }
 
 h1 {
     text-align: center;
+    font-size: 32px;
+    font-weight: 300;
+    text-transform: none;
 }
 
 .island {
-    margin-top: 130px;
+    padding-top: 130px;
 }
 
 .island-content {
-    width: 200px;
+    width: 196px;
     margin: 0 auto 0 auto;
+}
+
+form {
+    margin-bottom: 8px;
 }
 
 input {
     display: block;
+    margin-bottom: 16px;
+}
+
+.btn-alternate {
+    text-transform: uppercase;
+    font-size: 14px;
+    height: 34px;
+    padding: 0;
+    line-height: 14px;
+}
+
+.form-control {
+    font-size: 14px;
+    height: 34px;
+}
+
+.left {
+    display: inline-block;
+    width: 50%;
+}
+.right {
+    display: inline-block;
+    text-align: right;
+    width: 50%;
+}
+
+.link-lowlight {
+    color: #7f7f7f;
+    font-size: 12px;
+    font-weight: 300;
 }
