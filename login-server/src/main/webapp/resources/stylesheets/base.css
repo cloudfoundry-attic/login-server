@@ -10,6 +10,7 @@ h1 {
     font-size: 32px;
     font-weight: 300;
     text-transform: none;
+    margin-bottom: 16px;
 }
 
 .island {
@@ -27,7 +28,7 @@ form {
 
 input {
     display: block;
-    margin-bottom: 16px;
+    margin-bottom: 20px;
 }
 
 .btn-alternate {
@@ -57,4 +58,15 @@ input {
     color: #7f7f7f;
     font-size: 12px;
     font-weight: 300;
+}
+
+.error-message {
+    background-color: #febfc1;
+    color: #ab2a2a;
+    width: 100%;
+    font-size: 11px;
+    text-align: center;
+    padding: 12px 0;
+    line-height: 12px;
+    margin-bottom: 20px;
 }

@@ -19,6 +19,10 @@
             <h1>Welcome!</h1>
             <div class="island-content">
                 <form th:action="@{/login.do}" method="post" novalidate="novalidate">
+                    <div th:if="${param.error}" class="error-message">
+                        Unable to verify email or password.<br />
+                        Please try again.
+                    </div>
                     <input th:each="prompt,iter : ${prompts}"
                            th:name="${prompt.key}"
                            th:type="${prompt.value[0]}"
