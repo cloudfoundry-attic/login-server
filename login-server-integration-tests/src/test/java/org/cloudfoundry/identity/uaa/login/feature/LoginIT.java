@@ -41,7 +41,7 @@ public class LoginIT {
 
         webDriver.findElement(By.name("username")).sendKeys("marissa");
         webDriver.findElement(By.name("password")).sendKeys("koala");
-        webDriver.findElement(By.xpath("//button[contains(text(), 'Sign in')]")).click();
+        webDriver.findElement(By.xpath("//input[@value='Sign in']")).click();
 
         Assert.assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), Matchers.containsString("Welcome"));
     }

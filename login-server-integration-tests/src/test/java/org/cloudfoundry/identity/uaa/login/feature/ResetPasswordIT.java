@@ -74,7 +74,7 @@ public class ResetPasswordIT {
         webDriver.get(baseUrl + "/login");
         Assert.assertEquals("Pivotal", webDriver.getTitle());
 
-        webDriver.findElement(By.linkText("Forgot Password")).click();
+        webDriver.findElement(By.linkText("Reset password")).click();
 
         webDriver.findElement(By.name("email")).sendKeys(userEmail);
         webDriver.findElement(By.xpath("//button[contains(text(),'Reset Password')]")).click();
@@ -100,7 +100,7 @@ public class ResetPasswordIT {
 
         webDriver.findElement(By.name("username")).sendKeys(userName);
         webDriver.findElement(By.name("password")).sendKeys("newsecret");
-        webDriver.findElement(By.xpath("//button[contains(text(), 'Sign in')]")).click();
+        webDriver.findElement(By.xpath("//input[@value='Sign in']")).click();
 
         Assert.assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), containsString("Welcome"));
     }
