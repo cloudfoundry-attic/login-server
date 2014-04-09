@@ -214,7 +214,6 @@ public class RemoteUaaController extends AbstractControllerInfo {
         String path = extractPath(request);
         model.putAll(getLoginInfo(getUaaBaseUrl() + "/" + path, getRequestHeaders(headers)));
         populateBuildAndLinkInfo(model);
-        model.put("brand", environment.getProperty("login.brand"));
         model.put("analytics", analytics);
         if (principal == null) {
             return "login";
