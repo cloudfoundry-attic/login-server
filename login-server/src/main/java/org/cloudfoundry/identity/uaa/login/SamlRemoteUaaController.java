@@ -67,8 +67,8 @@ public class SamlRemoteUaaController extends RemoteUaaController {
     @Value("${login.entityID}")
     public String entityID = "";
 
-    public SamlRemoteUaaController(Environment environment, RestTemplate restTemplate) {
-        super(environment, restTemplate);
+    public SamlRemoteUaaController(RestTemplate restTemplate) {
+        super(restTemplate);
     }
 
     @Override

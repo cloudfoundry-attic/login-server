@@ -39,7 +39,6 @@
 
     <!-- TODO: Move the autologin related beans from the login server and saml login server to login common -->
     <bean id="abstractRemoteUaaController" abstract="true">
-        <constructor-arg ref="environment" />
         <constructor-arg>
             <bean class="org.springframework.web.client.RestTemplate" />
         </constructor-arg>
@@ -315,7 +314,7 @@
             <list>
                 <bean class="org.thymeleaf.spring3.view.ThymeleafViewResolver">
                     <property name="templateEngine" ref="templateEngine" />
-                    <property name="viewNames" value="login" />
+                    <property name="viewNames" value="login,error" />
                 </bean>
                 <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
                     <property name="prefix" value="/WEB-INF/jsp/${login.brand:oss}/" />

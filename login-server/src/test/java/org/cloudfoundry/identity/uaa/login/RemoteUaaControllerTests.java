@@ -13,13 +13,10 @@
 
 package org.cloudfoundry.identity.uaa.login;
 
-import java.security.Principal;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-import org.cloudfoundry.identity.uaa.authentication.login.Prompt;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
@@ -29,7 +26,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mock.env.MockEnvironment;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.util.MultiValueMap;
@@ -38,15 +34,17 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.RedirectView;
 
-import static org.junit.Assert.*;
+import java.security.Principal;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Dave Syer
- * 
  */
 public class RemoteUaaControllerTests {
 
-    private RemoteUaaController controller = new RemoteUaaController(new MockEnvironment(), new RestTemplate());
+    private RemoteUaaController controller = new RemoteUaaController(new RestTemplate());
 
     private MockHttpServletRequest request = new MockHttpServletRequest();
 

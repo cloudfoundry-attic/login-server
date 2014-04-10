@@ -38,7 +38,7 @@ public class SamlRemoteUaaControllerMockMvcTests {
         MockEnvironment environment = new MockEnvironment();
         environment.setActiveProfiles("saml");
 
-        RemoteUaaController controller = new SamlRemoteUaaController(environment, new RestTemplate());
+        RemoteUaaController controller = new SamlRemoteUaaController(new RestTemplate());
         Prompt first = new Prompt("how", "text", "How did I get here?");
         Prompt second = new Prompt("passcode", "password", "This should be filtered out of the UI but not the API.");
         controller.setPrompts(Arrays.asList(first, second));

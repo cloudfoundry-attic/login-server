@@ -12,7 +12,6 @@
  *******************************************************************************/
 package org.cloudfoundry.identity.uaa.login;
 
-import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.not;
 import static org.springframework.http.HttpMethod.GET;
@@ -29,7 +28,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.cloudfoundry.identity.uaa.authentication.login.Prompt;
 import org.junit.Test;
-import org.springframework.mock.env.MockEnvironment;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -42,7 +40,7 @@ public class RemoteUaaControllerMockMvcTests {
 
     @Test
     public void testLoginWithExplicitPrompts() throws Exception {
-        RemoteUaaController controller = new RemoteUaaController(new MockEnvironment(), new RestTemplate());
+        RemoteUaaController controller = new RemoteUaaController(new RestTemplate());
         Prompt first = new Prompt("how", "text", "How did I get here?");
         Prompt second = new Prompt("where", "password", "Where does that highway go to?");
         controller.setPrompts(Arrays.asList(first, second));
@@ -60,7 +58,7 @@ public class RemoteUaaControllerMockMvcTests {
     @Test
     public void testLoginWithRemoteUaaPrompts() throws Exception {
         RestTemplate restTemplate = new RestTemplate();
-        RemoteUaaController controller = new RemoteUaaController(new MockEnvironment(), restTemplate);
+        RemoteUaaController controller = new RemoteUaaController(restTemplate);
         controller.setUaaBaseUrl("https://uaa.example.com");
 
         MockMvc mockMvc = getMockMvc(controller);
@@ -93,7 +91,7 @@ public class RemoteUaaControllerMockMvcTests {
     @Test
     public void testLoginWithDefaultPrompts() throws Exception {
         RestTemplate restTemplate = new RestTemplate();
-        RemoteUaaController controller = new RemoteUaaController(new MockEnvironment(), restTemplate);
+        RemoteUaaController controller = new RemoteUaaController(restTemplate);
         controller.setUaaBaseUrl("https://uaa.example.com");
 
         MockMvc mockMvc = getMockMvc(controller);
@@ -109,31 +107,6 @@ public class RemoteUaaControllerMockMvcTests {
                 .andExpect(view().name("login"))
                 .andExpect(model().attribute("prompts", hasKey("username")))
                 .andExpect(model().attribute("prompts", hasKey("password")));
-    }
-
-    @Test
-    public void testLoginWithoutAnalytics() throws Exception {
-        MockEnvironment environment = new MockEnvironment();
-        MockMvc mockMvc = getMockMvc(new RemoteUaaController(environment, new RestTemplate()));
-
-        mockMvc.perform(get("/login"))
-                        .andExpect(status().isOk())
-                        .andExpect(view().name("login"))
-                        .andExpect(model().attributeDoesNotExist("analytics"));
-    }
-
-    @Test
-    public void testLoginWithAnalytics() throws Exception {
-        MockEnvironment environment = new MockEnvironment();
-        environment.setProperty("analytics.code", "secret_code");
-        environment.setProperty("analytics.domain", "example.com");
-        MockMvc mockMvc = getMockMvc(new RemoteUaaController(environment, new RestTemplate()));
-
-        mockMvc.perform(get("/login"))
-                        .andExpect(status().isOk())
-                        .andExpect(view().name("login"))
-                        .andExpect(model().attribute("analytics", hasEntry("code", "secret_code")))
-                        .andExpect(model().attribute("analytics", hasEntry("domain", "example.com")));
     }
 
     private MockMvc getMockMvc(RemoteUaaController controller) {

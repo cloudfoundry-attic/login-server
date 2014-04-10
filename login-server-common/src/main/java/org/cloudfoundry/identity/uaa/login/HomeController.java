@@ -41,14 +41,13 @@ public class HomeController extends AbstractControllerInfo {
     public String error500(Model model, HttpServletRequest request) {
         logger.error("Internal error", (Throwable) request.getAttribute("javax.servlet.error.exception"));
 
-        model.addAttribute("error", "Something went wrong. Please try again later.");
+        populateBuildAndLinkInfo(model);
         return "error";
     }
 
     @RequestMapping("/error404")
     public String error404(Model model) {
-        model.addAttribute("error", "That page couldn't be found.");
+        populateBuildAndLinkInfo(model);
         return "error";
     }
-
 }

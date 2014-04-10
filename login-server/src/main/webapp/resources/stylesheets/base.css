@@ -23,15 +23,21 @@ body {
 }
 
 h1 {
-    text-align: center;
     font-size: 32px;
     font-weight: 300;
     text-transform: none;
+    margin-top: 0;
     margin-bottom: 16px;
 }
 
+h2 {
+    font-size: 24px;
+    font-weight: 300;
+    color: #939393;
+}
+
 .island {
-    padding-top: 130px;
+    text-align: center;
 }
 
 .island-content {
@@ -63,6 +69,7 @@ input {
 
 .left {
     display: inline-block;
+    text-align: left;
     width: 50%;
 }
 .right {
@@ -82,7 +89,6 @@ input {
     color: #ab2a2a;
     width: 100%;
     font-size: 11px;
-    text-align: center;
     padding: 12px 0;
     line-height: 12px;
     margin-bottom: 20px;
@@ -95,7 +101,6 @@ input {
     line-height: 18px;
     margin-bottom: 10px;
     padding: 10px 0;
-    text-align: center;
 }
 
 .saml-login-link {
