@@ -5,6 +5,23 @@ body {
     background-color: #f8f8f8;
 }
 
+.content {
+    min-height: 100%;
+    height: auto !important;
+    height: 100%;
+    margin: 0 auto -40px;
+}
+
+.footer, .footer-spacer {
+    height: 40px;
+}
+
+.footer {
+    padding-left: 40px;
+    color: #9faaad;
+    font-size: 12px;
+}
+
 h1 {
     text-align: center;
     font-size: 32px;
