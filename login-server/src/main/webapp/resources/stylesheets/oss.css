@@ -1,1 +1,9 @@
 @import url('base.css');
+
+h1 {
+    color: #424242;
+}
+
+.island {
+    padding-top: 180px;
+}
