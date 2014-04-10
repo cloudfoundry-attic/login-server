@@ -32,6 +32,10 @@
                            class="form-control"/>
                     <input type="submit" value="Sign in" class="button btn btn-alternate btn-lg btn-block"/>
                 </form>
+                <div th:if="${saml}" class="saml-login">
+                    OR<br/>
+                    <a href="" th:href="@{saml/discovery(returnIDParam=idp,entityID=${entityID})}" class="saml-login-link">Use your corporate credentials</a>
+                </div>
                 <span class="left">
                     <a href="/register" th:href="${links.get('register')}" class="link-lowlight">Create account</a>
                 </span><span class="right" th:if="${links.get('passwd')}">

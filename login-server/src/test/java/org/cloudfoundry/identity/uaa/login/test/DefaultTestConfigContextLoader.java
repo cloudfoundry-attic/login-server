@@ -43,6 +43,7 @@ public class DefaultTestConfigContextLoader implements SmartContextLoader {
         if (parent != null) {
             context.setParent(parent);
         }
+        context.getEnvironment().setActiveProfiles(mergedConfig.getActiveProfiles());
         MockServletContext servletContext = new MockServletContext();
         MockServletConfig servletConfig = new MockServletConfig(servletContext);
         servletConfig.addInitParameter("environmentConfigDefaults", "login.yml");

@@ -70,3 +70,17 @@ input {
     line-height: 12px;
     margin-bottom: 20px;
 }
+
+.saml-login {
+    border-bottom: 1px solid #cccccc;
+    color: #cccccc;
+    font-size: 11px;
+    line-height: 18px;
+    margin-bottom: 10px;
+    padding: 10px 0;
+    text-align: center;
+}
+
+.saml-login-link {
+    font-weight: 700;
+}
