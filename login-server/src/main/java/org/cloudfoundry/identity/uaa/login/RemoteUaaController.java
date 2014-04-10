@@ -158,16 +158,6 @@ public class RemoteUaaController extends AbstractControllerInfo {
     }
 
     /**
-     * The rest template used to grab prompts and do stuff that doesn't require
-     * authentication.
-     * 
-     * @param defaultTemplate the defaultTemplate to set
-     */
-    public void setDefaultTemplate(RestOperations defaultTemplate) {
-        this.defaultTemplate = defaultTemplate;
-    }
-
-    /**
      * @param authorizationTemplate the authorizationTemplate to set
      */
     public void setAuthorizationTemplate(RestOperations authorizationTemplate) {
@@ -183,12 +173,11 @@ public class RemoteUaaController extends AbstractControllerInfo {
         }
     }
 
-    public RemoteUaaController(Environment environment) {
+    public RemoteUaaController(Environment environment, RestTemplate restTemplate) {
         this.environment = environment;
 
-        RestTemplate template = new RestTemplate();
         // The default java.net client doesn't allow you to handle 4xx responses
-        template.setRequestFactory(new HttpComponentsClientHttpRequestFactory() {
+        restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory() {
             @Override
             public HttpClient getHttpClient() {
                 HttpClient client = super.getHttpClient();
@@ -196,14 +185,14 @@ public class RemoteUaaController extends AbstractControllerInfo {
                 return client;
             }
         });
-        template.setErrorHandler(new DefaultResponseErrorHandler() {
+        restTemplate.setErrorHandler(new DefaultResponseErrorHandler() {
             @Override
             public boolean hasError(ClientHttpResponse response) throws IOException {
                 HttpStatus statusCode = response.getStatusCode();
                 return statusCode.series() == HttpStatus.Series.SERVER_ERROR;
             }
         });
-        defaultTemplate = template;
+        defaultTemplate = restTemplate;
         initProperties();
         initAnalytics();
     }

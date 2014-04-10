@@ -13,6 +13,11 @@
 
 package org.cloudfoundry.identity.uaa.login;
 
+import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.TEXT_HTML_VALUE;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
@@ -39,7 +44,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
@@ -52,6 +56,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.client.RestTemplate;
 
 public class SamlRemoteUaaController extends RemoteUaaController {
 
@@ -62,18 +67,31 @@ public class SamlRemoteUaaController extends RemoteUaaController {
     @Value("${login.entityID}")
     public String entityID = "";
 
-    public SamlRemoteUaaController(Environment environment) {
-        super(environment);
+    public SamlRemoteUaaController(Environment environment, RestTemplate restTemplate) {
+        super(environment, restTemplate);
     }
 
     @Override
-    @RequestMapping(value = { "/info", "/login" }, method = RequestMethod.GET)
+    @RequestMapping(value = { "/info", "/login" }, method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
     public String prompts(HttpServletRequest request, @RequestHeader HttpHeaders headers, Map<String, Object> model,
                     Principal principal) throws Exception {
         // Entity ID to start the discovery
         model.put("entityID", entityID);
         model.put("saml", Boolean.TRUE);
         return super.prompts(request, headers, model, principal);
+    }
+
+    @RequestMapping(value = { "/info", "/login" }, method = RequestMethod.GET, produces = TEXT_HTML_VALUE)
+    public String samlUiPrompts(HttpServletRequest request, @RequestHeader HttpHeaders headers, Map<String, Object> model,
+                          Principal principal) throws Exception {
+
+        String logicalViewName = prompts(request, headers, model, principal);
+
+        Map<String,Object> prompts = new LinkedHashMap<String, Object>((Map<String, Object>) model.get("prompts"));
+        prompts.remove("passcode");
+        model.put("prompts", prompts);
+
+        return logicalViewName;
     }
 
     @Override
@@ -169,8 +187,8 @@ public class SamlRemoteUaaController extends RemoteUaaController {
                 requestHeaders.remove(AUTHORIZATION.toLowerCase());
                 requestHeaders.remove(ACCEPT.toLowerCase());
                 requestHeaders.remove(CONTENT_TYPE.toLowerCase());
-                requestHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-                requestHeaders.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+                requestHeaders.setContentType(APPLICATION_FORM_URLENCODED);
+                requestHeaders.setAccept(Arrays.asList(APPLICATION_JSON));
                 requestHeaders.remove(COOKIE);
                 requestHeaders.remove(COOKIE.toLowerCase());
 
