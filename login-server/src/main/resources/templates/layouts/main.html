@@ -19,9 +19,9 @@
     <div class="footer-spacer"></div>
 </div>
 <div class="footer"
-     th:text="|&copy; ${#dates.year(#dates.createNow())} Pivotal Software, Inc. All Rights Reserved.|"
+     th:utext="|&#169; ${#dates.year(#dates.createNow())} Pivotal Software, Inc. All Rights Reserved.|"
      th:title="|Version: ${app.get('version')}, Commit: ${commit_id}, Timestamp: ${timestamp}, UAA: ${links.get('uaa')}|">
-    &copy; 2014 Pivotal Software, Inc. All Rights Reserved.
+    &#169; 2014 Pivotal Software, Inc. All Rights Reserved.
 </div>
 
 <script th:if="${analytics.size() > 0}">
