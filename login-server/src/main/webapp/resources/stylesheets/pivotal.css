@@ -7,3 +7,33 @@ h1 {
 .island {
     padding-top: 130px;
 }
+
+.pivotal-links {
+    list-style: none outside none;
+    margin-top: 40px;
+    padding: 0;
+}
+.pivotal-links li {
+    display: inline-block;
+    margin-left: 32px;
+}
+.pivotal-links li:first-child {
+    margin-left: 0;
+}
+
+.pivotal-links a {
+    background-color: #ffffff;
+    background-repeat: no-repeat;
+    background-position: 68% 48%;
+    border: 1px solid #cccccc;
+    display: block;
+    height: 116px;
+    overflow: hidden;
+    text-indent: -10000px;
+    width: 158px;
+}
+
+.image-preload {
+    background-repeat: no-repeat;
+    background-position: -99999px -99999px;
+}

@@ -314,7 +314,7 @@
             <list>
                 <bean class="org.thymeleaf.spring3.view.ThymeleafViewResolver">
                     <property name="templateEngine" ref="templateEngine" />
-                    <property name="viewNames" value="login,error" />
+                    <property name="viewNames" value="login,home,error" />
                 </bean>
                 <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
                     <property name="prefix" value="/WEB-INF/jsp/${login.brand:oss}/" />

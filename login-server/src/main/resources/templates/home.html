@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layouts/main">
+<head>
+    <style th:inline="text">
+        #network-link {
+            background-image: url([[@{/resources/pivotal/images/network-logo-gray.png}]]);
+        }
+
+        #network-link:hover, #network-link-preload {
+            background-image: url([[@{/resources/pivotal/images/network-logo-teal.png}]]);
+        }
+
+        #web-services-link {
+            background-image: url([[@{/resources/pivotal/images/pws-logo-gray.png}]]);
+        }
+
+        #web-services-link:hover, #web-services-link-preload {
+            background-image: url([[@{/resources/pivotal/images/pws-logo-teal.png}]]);
+        }
+    </style>
+</head>
+<body>
+    <div class="island" layout:fragment="page-content" th:if="${brand} == 'pivotal'">
+        <h1>Where to?</h1>
+        <ul class="pivotal-links">
+            <li><a href="http://network.gopivotal.com" th:href="${links.get('network')}" id="network-link">Pivotal Network</a></li>
+            <li><a href="http://console.run.pivotal.io" th:href="${links.get('home')}" id="web-services-link">Pivotal Web Services</a></li>
+        </ul>
+        <div id="network-link-preload" class="image-preload"></div>
+        <div id="web-services-link-preload" class="image-preload"></div>
+    </div>
+</body>
+</html>
