@@ -94,15 +94,16 @@ public class ResetPasswordIT {
 
         webDriver.findElement(By.xpath("//button[contains(text(),'Change Password')]")).click();
 
-        Assert.assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), containsString("Welcome"));
+        Assert.assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), containsString("Where to?"));
 
-        webDriver.findElement(By.linkText("Sign out")).click();
+        webDriver.findElement(By.xpath("//*[text()='"+userName+"']")).click();
+        webDriver.findElement(By.linkText("Sign Out")).click();
 
         webDriver.findElement(By.name("username")).sendKeys(userName);
         webDriver.findElement(By.name("password")).sendKeys("newsecret");
         webDriver.findElement(By.xpath("//input[@value='Sign in']")).click();
 
-        Assert.assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), containsString("Welcome"));
+        Assert.assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), containsString("Where to?"));
     }
 
     private String extractLink(String messageBody) {

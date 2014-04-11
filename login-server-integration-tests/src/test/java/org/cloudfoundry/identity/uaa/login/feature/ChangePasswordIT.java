@@ -78,7 +78,8 @@ public class ChangePasswordIT {
     }
 
     private void changePassword(String originalPassword, String newPassword, String confirmPassword) {
-        webDriver.findElement(By.linkText("Manage 3rd party access")).click();
+        webDriver.findElement(By.xpath("//*[text()='"+userName+"']")).click();
+        webDriver.findElement(By.linkText("Account Settings")).click();
         webDriver.findElement(By.linkText("Change password")).click();
         webDriver.findElement(By.name("current_password")).sendKeys(originalPassword);
         webDriver.findElement(By.name("new_password")).sendKeys(newPassword);
@@ -96,6 +97,6 @@ public class ChangePasswordIT {
         webDriver.findElement(By.name("username")).sendKeys(userName);
         webDriver.findElement(By.name("password")).sendKeys(password);
         webDriver.findElement(By.xpath("//input[@value='Sign in']")).click();
-        Assert.assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), containsString("Welcome"));
+        Assert.assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), containsString("Where to?"));
     }
 }

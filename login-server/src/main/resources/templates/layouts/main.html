@@ -15,6 +15,7 @@
 </head>
 <body th:style="|background: #f8f8f8 url(@{'/resources/'+${brand}+'/images/logo.png'}) no-repeat 50% ${brand == 'oss' ? 40 : 0}px;|">
 <div class="content">
+    <div layout:fragment="page-header"></div>
     <div layout:fragment="page-content"></div>
     <div class="footer-spacer"></div>
 </div>

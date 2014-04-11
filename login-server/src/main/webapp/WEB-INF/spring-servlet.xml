@@ -300,6 +300,7 @@
         <property name="additionalDialects">
             <set>
                 <bean class="nz.net.ultraq.thymeleaf.LayoutDialect" />
+                <bean class="org.thymeleaf.extras.springsecurity3.dialect.SpringSecurityDialect"/>
             </set>
         </property>
     </bean>

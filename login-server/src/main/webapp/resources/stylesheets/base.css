@@ -106,3 +106,43 @@ input {
 .saml-login-link {
     font-weight: 700;
 }
+
+.nav {
+    position: relative;
+    font-size: 12px;
+    float: right;
+    margin: 12px 18px 0 0;
+    min-width: 120px;
+    color: #9faaad;
+}
+
+.dropdown-trigger {
+    cursor: pointer;
+    padding: 4px 8px;
+}
+
+.dropdown-content {
+    position: absolute;
+    top: 110%;
+    list-style: none outside none;
+    padding: 0;
+    display: none;
+}
+
+.dropdown-trigger.open, .dropdown-content.open {
+    background-color: #ffffff;
+    display: block;
+    color: #7f7f7f;
+}
+
+.dropdown-trigger:hover, .dropdown-content a:hover {
+    background-color: #e0e4e5;
+    color: #43575c;
+}
+
+.dropdown-content a {
+    display: block;
+    min-width: 120px;
+    min-height: 18px;
+    padding: 4px 8px;
+}

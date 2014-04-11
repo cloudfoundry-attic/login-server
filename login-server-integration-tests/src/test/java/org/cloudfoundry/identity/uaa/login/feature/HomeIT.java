@@ -18,8 +18,8 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.ContextConfiguration;
@@ -27,7 +27,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = DefaultIntegrationTestConfig.class)
-public class LoginIT {
+public class HomeIT {
 
     @Autowired
     WebDriver webDriver;
@@ -36,24 +36,52 @@ public class LoginIT {
     String baseUrl;
 
     @Test
-    public void testLoggingIn() throws Exception {
-        webDriver.get(baseUrl + "/login");
-        Assert.assertEquals("Pivotal", webDriver.getTitle());
+    public void theHeaderDropdown() throws Exception {
+        webDriver.get(baseUrl + "/logout.do");
 
+        webDriver.get(baseUrl + "/login");
         webDriver.findElement(By.name("username")).sendKeys("marissa");
         webDriver.findElement(By.name("password")).sendKeys("koala");
         webDriver.findElement(By.xpath("//input[@value='Sign in']")).click();
 
-        Assert.assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), Matchers.containsString("Where to?"));
+        HomePagePerspective asOnHomePage = new HomePagePerspective(webDriver, "marissa");
+        Assert.assertNotNull(asOnHomePage.getUsernameElement());
+        Assert.assertFalse(asOnHomePage.getAccountSettingsElement().isDisplayed());
+        Assert.assertFalse(asOnHomePage.getSignOutElement().isDisplayed());
+
+        asOnHomePage.getUsernameElement().click();
+
+        Assert.assertTrue(asOnHomePage.getAccountSettingsElement().isDisplayed());
+        Assert.assertTrue(asOnHomePage.getSignOutElement().isDisplayed());
+
+        asOnHomePage.getAccountSettingsElement().click();
+
+        Assert.assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), Matchers.containsString("Account Settings"));
     }
 
-    @Test
-    public void testGoogleAnalytics() throws Exception {
-        webDriver.get(baseUrl + "/login");
-        if (webDriver instanceof JavascriptExecutor) {
-            Assert.assertNotNull(((JavascriptExecutor) webDriver).executeScript("return window.ga;"));
-        } else {
-            Assert.fail("expected a JavascriptExecutor WebDriver");
+    static class HomePagePerspective {
+        private final WebDriver webDriver;
+        private final String username;
+
+        public HomePagePerspective(WebDriver webDriver, String username) {
+            this.webDriver = webDriver;
+            this.username = username;
+        }
+
+        public WebElement getUsernameElement() {
+            return getWebElementWithText(username);
+        }
+
+        public WebElement getAccountSettingsElement() {
+            return getWebElementWithText("Account Settings");
+        }
+
+        public WebElement getSignOutElement() {
+            return getWebElementWithText("Sign Out");
+        }
+
+        private WebElement getWebElementWithText(String text) {
+            return webDriver.findElement(By.xpath("//*[text()='" + text + "']"));
         }
     }
 }
