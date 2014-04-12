@@ -129,6 +129,10 @@ input {
     display: none;
 }
 
+.dropdown-content a {
+    color: #7f7f7f;
+}
+
 .dropdown-trigger.open, .dropdown-content.open {
     background-color: #ffffff;
     display: block;
