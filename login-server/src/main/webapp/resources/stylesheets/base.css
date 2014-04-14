@@ -67,6 +67,10 @@ input {
     height: 34px;
 }
 
+.forgot-password {
+    letter-spacing: 0;
+}
+
 .left {
     display: inline-block;
     text-align: left;
