@@ -71,6 +71,16 @@ input {
     letter-spacing: 0;
 }
 
+.fa-envelope-o {
+    font-size: 36px;
+    color: #d4d9da;
+    margin-bottom: 18px;
+}
+
+.instructions-sent {
+    color: #9faaad;
+}
+
 .left {
     display: inline-block;
     text-align: left;

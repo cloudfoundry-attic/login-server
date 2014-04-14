@@ -36,6 +36,7 @@
     <security:http pattern="/error" security="none" />
     <security:http pattern="/forgot_password*" security="none" />
     <security:http pattern="/reset_password" security="none" />
+    <security:http pattern="/email_sent" security="none" />
 
     <!-- TODO: Move the autologin related beans from the login server and saml login server to login common -->
     <bean id="abstractRemoteUaaController" abstract="true">
@@ -315,7 +316,7 @@
             <list>
                 <bean class="org.thymeleaf.spring3.view.ThymeleafViewResolver">
                     <property name="templateEngine" ref="templateEngine" />
-                    <property name="viewNames" value="login,home,change_password,forgot_password,error,nav" />
+                    <property name="viewNames" value="login,home,change_password,forgot_password,email_sent,error,nav" />
                 </bean>
                 <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
                     <property name="prefix" value="/WEB-INF/jsp/${login.brand:oss}/" />
