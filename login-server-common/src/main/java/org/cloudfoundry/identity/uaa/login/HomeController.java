@@ -26,10 +26,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class HomeController extends AbstractControllerInfo {
     private final Log logger = LogFactory.getLog(getClass());
 
-    public HomeController() {
-        initProperties();
-    }
-
     @RequestMapping(value = { "/", "/home" })
     public String home(Model model, Principal principal) {
         model.addAttribute("principal", principal);

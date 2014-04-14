@@ -56,4 +56,12 @@ public class LoginIT {
             Assert.fail("expected a JavascriptExecutor WebDriver");
         }
     }
+
+    @Test
+    public void testBuildInfo() throws Exception {
+        webDriver.get(baseUrl + "/login");
+
+        String regex = "Version: \\S+, Commit: \\w{7}, Timestamp: \\S+, UAA: http://localhost:8080/uaa";
+        Assert.assertTrue(webDriver.findElement(By.className("footer")).getAttribute("title").matches(regex));
+    }
 }

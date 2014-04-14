@@ -21,7 +21,7 @@
 </div>
 <div class="footer"
      th:utext="|&#169; ${#dates.year(#dates.createNow())} Pivotal Software, Inc. All Rights Reserved.|"
-     th:title="|Version: ${app.get('version')}, Commit: ${commit_id}, Timestamp: ${timestamp}, UAA: ${links.get('uaa')}|">
+     th:title="|Version: ${@buildInfo.version}, Commit: ${@buildInfo.commitId}, Timestamp: ${@buildInfo.timestamp}, UAA: ${@buildInfo.uaaUrl}|">
     &#169; 2014 Pivotal Software, Inc. All Rights Reserved.
 </div>
 
