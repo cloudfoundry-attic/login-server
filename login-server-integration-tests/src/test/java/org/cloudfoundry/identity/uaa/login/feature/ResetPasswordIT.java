@@ -92,7 +92,7 @@ public class ResetPasswordIT {
         webDriver.findElement(By.name("password")).sendKeys("newsecret");
         webDriver.findElement(By.name("password_confirmation")).sendKeys("newsecret");
 
-        webDriver.findElement(By.xpath("//button[contains(text(),'Change Password')]")).click();
+        webDriver.findElement(By.xpath("//input[@value='Create new password']")).click();
 
         Assert.assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), containsString("Where to?"));
 

@@ -87,6 +87,12 @@ input {
     color: #9faaad;
 }
 
+.email-display {
+    color: #7f7f7f;
+    font-size: 14px;
+    margin-bottom: 16px;
+}
+
 .left {
     display: inline-block;
     text-align: left;
