@@ -1,4 +1,4 @@
-@import url(http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700);
+@import url(http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700);
 @import url('application.css');
 
 body {
@@ -175,4 +175,76 @@ input {
     min-width: 120px;
     min-height: 18px;
     padding: 4px 8px;
+}
+
+.panel-container {
+    padding-top: 130px;
+}
+
+.panel {
+    background-color: #ffffff;
+    width: 460px;
+    padding: 40px;
+    margin: 0 auto 0;
+    text-align: center;
+}
+
+.panel-content {
+    color: #7f7f7f;
+    text-align: left;
+    margin-top: 16px;
+}
+
+.panel-content h2 {
+    color: #43575c;
+}
+
+.panel-content p {
+    margin-top: 10px;
+}
+
+.application-link {
+    font-size: 14px;
+}
+
+.application-scopes {
+    border: 1px solid #cccccc;
+    margin: 12px 0;
+    padding: 0px;
+    list-style: none outside none;
+}
+
+.application-scopes li {
+    padding: 0 16px 16px 16px;
+}
+
+.application-scopes li:first-child {
+    padding-top: 16px;
+}
+
+.application-scopes input {
+    display: inline-block;
+    margin: 6px 0;
+    vertical-align: top;
+}
+
+.application-scopes label {
+    width: 300px;
+    margin-left: 10px;
+}
+
+.application-scopes .undecided label {
+    font-weight: 600;
+}
+
+.actions {
+    margin-top: 40px;
+    text-align: center;
+}
+
+.actions button[type='submit'] {
+    height: 30px;
+    line-height: 12px;
+    margin: 0 10px;
+    min-width: 120px;
 }
