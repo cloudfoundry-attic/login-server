@@ -23,6 +23,7 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.web.client.RestTemplate;
 
 import com.dumbster.smtp.SimpleSmtpServer;
+import java.util.concurrent.TimeUnit;
 
 @Configuration
 @PropertySource("classpath:integration.test.properties")
@@ -37,7 +38,10 @@ public class DefaultIntegrationTestConfig {
     public PhantomJSDriver webDriver() {
         DesiredCapabilities desiredCapabilities = new DesiredCapabilities();
         PhantomJSDriver driver = new PhantomJSDriver(desiredCapabilities);
-        driver.manage().window().setSize(new Dimension(800, 600));
+        driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+        driver.manage().timeouts().pageLoadTimeout(5, TimeUnit.SECONDS);
+        driver.manage().timeouts().setScriptTimeout(5, TimeUnit.SECONDS);
+        driver.manage().window().setSize(new Dimension(1024, 768));
         return driver;
     }
 
