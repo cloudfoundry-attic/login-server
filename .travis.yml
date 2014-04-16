@@ -3,6 +3,7 @@ env:
   global:
     - CATALINA_PID=/tmp/tomcat.pid
     - CATALINA_OUT=/tmp/tomcat.log
+    - CATALINA_OPTS="-XX:MaxPermSize=512M -DUAA_PROFILE=local"
 before_install:
   - git pull --unshallow
   - wget -O tomcat.tar.gz http://archive.apache.org/dist/tomcat/tomcat-7/v7.0.52/bin/apache-tomcat-7.0.52.tar.gz
@@ -16,10 +17,12 @@ install:
   - mvn -U install --quiet -DskipTests=true
   - cd $TRAVIS_BUILD_DIR
   - mkdir -p target/tomcat
-  - tar zvxf tomcat.tar.gz -C target/tomcat --strip-components 1
+  - tar zxf tomcat.tar.gz -C target/tomcat --strip-components 1
   - rm -rf target/tomcat/webapps/*
   - cd $TRAVIS_BUILD_DIR/uaa
   - mvn -Dwar.exploded.dir=$TRAVIS_BUILD_DIR/target/tomcat/webapps/uaa -pl uaa war:exploded
+  - mvn -Dwar.exploded.dir=$TRAVIS_BUILD_DIR/target/tomcat/webapps/app -pl samples/app war:exploded
+  - mvn -Dwar.exploded.dir=$TRAVIS_BUILD_DIR/target/tomcat/webapps/api -pl samples/api war:exploded
   - cd $TRAVIS_BUILD_DIR
   - mvn -Dwar.exploded.dir=$TRAVIS_BUILD_DIR/target/tomcat/webapps/login -pl login-server war:exploded
 script:
