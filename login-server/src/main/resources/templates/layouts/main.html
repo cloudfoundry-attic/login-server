@@ -2,14 +2,14 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" dir="ltr" lang="en" th:with="brand=${@environment.getProperty('login.brand')}">
 <head>
     <title>Pivotal</title>
-    <link href='resources/pivotal/images/favicon.ico' rel='shortcut icon' />
+    <link href='/resources/pivotal/images/favicon.ico' th:href="@{'/resources/'+${brand}+'/images/favicon.ico'}" rel='shortcut icon' />
     <meta charset='utf-8' />
     <meta name='author' content='Pivotal Software, Inc' />
     <meta name='copyright' content='Copyright 2014 Pivotal Software, Inc. All Rights Reserved.' />
     <meta name='robots' content='all' />
     <meta name='Description' content=""/>
     <meta name='keywords' content=""/>
-    <link href="resources/stylesheets/pivotal.css" th:href="@{'/resources/stylesheets/'+${brand}+'.css'}" rel="stylesheet"/>
+    <link href="/resources/pivotal/stylesheets/brand.css" th:href="@{'/resources/'+${brand}+'/stylesheets/brand.css'}" rel="stylesheet"/>
 </head>
 <body th:style="|background: #f8f8f8 url(@{'/resources/'+${brand}+'/images/logo.png'}) no-repeat 50% ${brand == 'oss' ? 40 : 0}px;|">
 <div class="content">
