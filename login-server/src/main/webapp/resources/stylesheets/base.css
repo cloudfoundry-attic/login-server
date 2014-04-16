@@ -335,3 +335,8 @@ input {
     margin: 0 4px;
     min-width: 100px;
 }
+
+.passcode input {
+    text-align: center;
+    font-size: 18px;
+}
