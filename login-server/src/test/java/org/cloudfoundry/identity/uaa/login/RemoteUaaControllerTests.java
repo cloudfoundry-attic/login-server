@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.cloudfoundry.identity.uaa.authentication.login.Prompt;
-import org.hamcrest.Matcher;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
@@ -33,7 +32,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.mock.env.MockEnvironment;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.servlet.ModelAndView;
