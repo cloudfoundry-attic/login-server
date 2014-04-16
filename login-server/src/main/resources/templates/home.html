@@ -20,8 +20,7 @@
             background-image: url([[@{/resources/pivotal/images/pws-logo-teal.png}]]);
         }
     </style>
-    <script type="text/javascript" src="resources/javascripts/jquery.js" th:src="@{'/resources/javascripts/jquery.js'}"></script>
-    <script type="text/javascript" src="resources/javascripts/nav.js" th:src="@{'/resources/javascripts/nav.js'}"></script>
+    <th:block layout:include="nav :: head"></th:block>
 </head>
 <body>
     <div class="header" layout:fragment="page-header">
