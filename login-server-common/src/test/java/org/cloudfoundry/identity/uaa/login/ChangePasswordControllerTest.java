@@ -15,8 +15,8 @@ package org.cloudfoundry.identity.uaa.login;
 import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.flash;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
@@ -61,7 +61,7 @@ public class ChangePasswordControllerTest {
     }
 
     @Test
-    public void testForgotPassword() throws Exception {
+    public void testChangePassword() throws Exception {
         setupSecurityContext();
 
         MockHttpServletRequestBuilder post = post("/change_password.do")
@@ -72,13 +72,13 @@ public class ChangePasswordControllerTest {
 
         mockMvc.perform(post)
                 .andExpect(status().isFound())
-                .andExpect(flash().attribute("message", "Your password has been changed"));
+                .andExpect(redirectedUrl("profile"));
 
         Mockito.verify(changePasswordService).changePassword("bob", "secret", "new secret");
     }
 
     @Test
-    public void testForgotPasswordValidation() throws Exception {
+    public void testChangePasswordValidation() throws Exception {
         setupSecurityContext();
 
         MockHttpServletRequestBuilder post = post("/change_password.do")
@@ -96,7 +96,7 @@ public class ChangePasswordControllerTest {
     }
 
     @Test
-    public void testForgotPasswordWrongPassword() throws Exception {
+    public void testChangePasswordWrongPassword() throws Exception {
         setupSecurityContext();
 
         Mockito.doThrow(new OAuth2Exception("wrong password")).when(changePasswordService).changePassword("bob", "secret", "new secret");

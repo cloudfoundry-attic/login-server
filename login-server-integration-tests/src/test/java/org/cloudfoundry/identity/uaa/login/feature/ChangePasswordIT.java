@@ -22,6 +22,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.ContextConfiguration;
@@ -72,30 +73,39 @@ public class ChangePasswordIT {
     @Test
     public void testChangePassword() throws Exception {
         signIn(userName, "secret");
+
+        changePassword("secret", "newsecret", "new");
+        WebElement errorMessage = webDriver.findElement(By.className("error-message"));
+        Assert.assertTrue(errorMessage.isDisplayed());
+        Assert.assertEquals("Passwords must match and not be empty", errorMessage.getText());
+
         changePassword("secret", "newsecret", "newsecret");
         signOut();
+
         signIn(userName, "newsecret");
     }
 
     private void changePassword(String originalPassword, String newPassword, String confirmPassword) {
-        webDriver.findElement(By.linkText("Manage 3rd party access")).click();
-        webDriver.findElement(By.linkText("Change password")).click();
+        webDriver.findElement(By.xpath("//*[text()='"+userName+"']")).click();
+        webDriver.findElement(By.linkText("Account Settings")).click();
+        webDriver.findElement(By.linkText("Change Password")).click();
         webDriver.findElement(By.name("current_password")).sendKeys(originalPassword);
         webDriver.findElement(By.name("new_password")).sendKeys(newPassword);
         webDriver.findElement(By.name("confirm_password")).sendKeys(confirmPassword);
 
-        webDriver.findElement(By.xpath("//button[contains(text(), 'Change password')]")).click();
+        webDriver.findElement(By.xpath("//input[@value='Change password']")).click();
     }
 
     private void signOut() {
-        webDriver.findElement(By.linkText("Sign out")).click();
+        webDriver.findElement(By.xpath("//*[text()='"+userName+"']")).click();
+        webDriver.findElement(By.linkText("Sign Out")).click();
     }
 
     private void signIn(String userName, String password) {
         webDriver.get(baseUrl + "/login");
         webDriver.findElement(By.name("username")).sendKeys(userName);
         webDriver.findElement(By.name("password")).sendKeys(password);
-        webDriver.findElement(By.xpath("//button[contains(text(), 'Sign in')]")).click();
-        Assert.assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), containsString("Welcome"));
+        webDriver.findElement(By.xpath("//input[@value='Sign in']")).click();
+        Assert.assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), containsString("Where to?"));
     }
 }

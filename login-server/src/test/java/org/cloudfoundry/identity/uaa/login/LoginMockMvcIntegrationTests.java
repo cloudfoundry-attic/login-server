@@ -72,8 +72,6 @@ public class LoginMockMvcIntegrationTests {
                         .andExpect(model().attributeExists("app"))
                         .andExpect(model().attributeExists("commit_id"))
                         .andExpect(model().attributeExists("timestamp"))
-                        .andExpect(model().attributeDoesNotExist("saml"))
-                        .andExpect(model().attribute("analytics", hasEntry("code", "secret_code")))
-                        .andExpect(model().attribute("analytics", hasEntry("domain", "example.com")));
+                        .andExpect(model().attributeDoesNotExist("saml"));
     }
 }

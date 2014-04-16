@@ -103,6 +103,7 @@ public class ProfileController extends AbstractControllerInfo implements Initial
 
             result.put(clientId, approvalList);
         }
+        // TODO: sort the scopes on the entries for view stability
         return result;
     }
 

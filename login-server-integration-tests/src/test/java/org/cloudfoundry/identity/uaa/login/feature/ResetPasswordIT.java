@@ -74,17 +74,17 @@ public class ResetPasswordIT {
         webDriver.get(baseUrl + "/login");
         Assert.assertEquals("Pivotal", webDriver.getTitle());
 
-        webDriver.findElement(By.linkText("Forgot Password")).click();
+        webDriver.findElement(By.linkText("Reset password")).click();
 
         webDriver.findElement(By.name("email")).sendKeys(userEmail);
-        webDriver.findElement(By.xpath("//button[contains(text(),'Reset Password')]")).click();
+        webDriver.findElement(By.xpath("//input[@value='Send reset password link']")).click();
 
         Assert.assertEquals(1, simpleSmtpServer.getReceivedEmailSize());
         SmtpMessage message = (SmtpMessage) simpleSmtpServer.getReceivedEmail().next();
         Assert.assertEquals(userEmail, message.getHeaderValue("To"));
         Assert.assertThat(message.getBody(), containsString("Click the link to reset your password"));
 
-        Assert.assertEquals("An email has been sent with password reset instructions.", webDriver.findElement(By.cssSelector(".flash")).getText());
+        Assert.assertEquals("Check your email for a reset password link.", webDriver.findElement(By.cssSelector(".instructions-sent")).getText());
 
         String link = extractLink(message.getBody());
         webDriver.get(link);
@@ -92,17 +92,18 @@ public class ResetPasswordIT {
         webDriver.findElement(By.name("password")).sendKeys("newsecret");
         webDriver.findElement(By.name("password_confirmation")).sendKeys("newsecret");
 
-        webDriver.findElement(By.xpath("//button[contains(text(),'Change Password')]")).click();
+        webDriver.findElement(By.xpath("//input[@value='Create new password']")).click();
 
-        Assert.assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), containsString("Welcome"));
+        Assert.assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), containsString("Where to?"));
 
-        webDriver.findElement(By.linkText("Sign out")).click();
+        webDriver.findElement(By.xpath("//*[text()='"+userName+"']")).click();
+        webDriver.findElement(By.linkText("Sign Out")).click();
 
         webDriver.findElement(By.name("username")).sendKeys(userName);
         webDriver.findElement(By.name("password")).sendKeys("newsecret");
-        webDriver.findElement(By.xpath("//button[contains(text(), 'Sign in')]")).click();
+        webDriver.findElement(By.xpath("//input[@value='Sign in']")).click();
 
-        Assert.assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), containsString("Welcome"));
+        Assert.assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), containsString("Where to?"));
     }
 
     private String extractLink(String messageBody) {

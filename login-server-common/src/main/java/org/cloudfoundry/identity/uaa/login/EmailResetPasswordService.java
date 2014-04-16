@@ -16,6 +16,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -49,14 +50,14 @@ public class EmailResetPasswordService implements ResetPasswordService {
     }
 
     @Override
-    public void forgotPassword(String email) {
+    public void forgotPassword(UriComponentsBuilder uriComponentsBuilder, String email) {
         try {
             String code = uaaTemplate.postForObject(uaaBaseUrl + "/password_resets", email, String.class);
             try {
                 MimeMessage message = new MimeMessage(getSession());
                 message.addRecipients(Message.RecipientType.TO, email);
                 message.setSubject("Password Reset Instructions");
-                message.setText(getEmailText(code));
+                message.setText(getEmailText(uriComponentsBuilder, code, email));
                 Transport.send(message);
             } catch (MessagingException e) {
                 logger.error("Exception raised while sending message to " + email, e);
@@ -77,8 +78,14 @@ public class EmailResetPasswordService implements ResetPasswordService {
         return uaaTemplate.postForObject("{baseUrl}/password_change", formData, String.class, uriVariables);
     }
 
-    private String getEmailText(String code) {
-        return "Click the link to reset your password <a href=\"http://localhost:8080/login/reset_password?code=" + code + "\">Reset Password</a>";
+    private String getEmailText(UriComponentsBuilder uriComponentsBuilder, String code, String email) {
+        String resetUrl = uriComponentsBuilder
+                .path("/reset_password")
+                .queryParam("code", code)
+                .queryParam("email", email)
+                .build().toUriString();
+
+        return "Click the link to reset your password <a href=\"" + resetUrl + "\">Reset Password</a>";
     }
 
     private Session getSession() {

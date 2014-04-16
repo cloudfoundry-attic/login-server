@@ -18,6 +18,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -41,8 +42,26 @@ public class LoginIT {
 
         webDriver.findElement(By.name("username")).sendKeys("marissa");
         webDriver.findElement(By.name("password")).sendKeys("koala");
-        webDriver.findElement(By.xpath("//button[contains(text(), 'Sign in')]")).click();
+        webDriver.findElement(By.xpath("//input[@value='Sign in']")).click();
 
-        Assert.assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), Matchers.containsString("Welcome"));
+        Assert.assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), Matchers.containsString("Where to?"));
+    }
+
+    @Test
+    public void testGoogleAnalytics() throws Exception {
+        webDriver.get(baseUrl + "/login");
+        if (webDriver instanceof JavascriptExecutor) {
+            Assert.assertNotNull(((JavascriptExecutor) webDriver).executeScript("return window.ga;"));
+        } else {
+            Assert.fail("expected a JavascriptExecutor WebDriver");
+        }
+    }
+
+    @Test
+    public void testBuildInfo() throws Exception {
+        webDriver.get(baseUrl + "/login");
+
+        String regex = "Version: \\S+, Commit: \\w{7}, Timestamp: \\S+, UAA: http://localhost:8080/uaa";
+        Assert.assertTrue(webDriver.findElement(By.className("footer")).getAttribute("title").matches(regex));
     }
 }

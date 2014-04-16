@@ -21,8 +21,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.Arrays;
 import javax.servlet.http.HttpServletResponse;
@@ -42,16 +41,18 @@ public class ResetPasswordController {
     }
 
     @RequestMapping(value = "/forgot_password.do", method = RequestMethod.POST)
-    public String forgotPassword(@ModelAttribute("email") String email, RedirectAttributes redirectAttributes) {
-        resetPasswordService.forgotPassword(email);
-        redirectAttributes.addFlashAttribute("success", Boolean.TRUE);
-        return "redirect:forgot_password";
+    public String forgotPassword(@ModelAttribute("email") String email) {
+        resetPasswordService.forgotPassword(ServletUriComponentsBuilder.fromCurrentContextPath(), email);
+        return "redirect:email_sent";
+    }
+
+    @RequestMapping(value = "/email_sent", method = RequestMethod.GET)
+    public String emailSentPage() {
+        return "email_sent";
     }
 
     @RequestMapping(value = "/reset_password", method = RequestMethod.GET)
-    public String resetPasswordPage(@RequestParam String code, Model model) {
-        model.addAttribute("code", code);
-
+    public String resetPasswordPage() {
         return "reset_password";
     }
 

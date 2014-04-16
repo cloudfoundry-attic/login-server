@@ -38,7 +38,6 @@ import org.cloudfoundry.identity.uaa.client.SocialClientUserDetails;
 import org.cloudfoundry.identity.uaa.codestore.ExpiringCode;
 import org.cloudfoundry.identity.uaa.user.UaaAuthority;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -52,7 +51,6 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.common.exceptions.OAuth2Exception;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.Assert;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -112,11 +110,7 @@ public class RemoteUaaController extends AbstractControllerInfo {
 
     private List<Prompt> prompts;
 
-    private Map<String, String> analytics;
-
     private boolean addNew = false;
-
-    private final Environment environment;
 
     private long codeExpirationMillis = 5 * 60 * 1000;
 
@@ -158,16 +152,6 @@ public class RemoteUaaController extends AbstractControllerInfo {
     }
 
     /**
-     * The rest template used to grab prompts and do stuff that doesn't require
-     * authentication.
-     * 
-     * @param defaultTemplate the defaultTemplate to set
-     */
-    public void setDefaultTemplate(RestOperations defaultTemplate) {
-        this.defaultTemplate = defaultTemplate;
-    }
-
-    /**
      * @param authorizationTemplate the authorizationTemplate to set
      */
     public void setAuthorizationTemplate(RestOperations authorizationTemplate) {
@@ -183,12 +167,10 @@ public class RemoteUaaController extends AbstractControllerInfo {
         }
     }
 
-    public RemoteUaaController(Environment environment) {
-        this.environment = environment;
+    public RemoteUaaController(RestTemplate restTemplate) {
 
-        RestTemplate template = new RestTemplate();
         // The default java.net client doesn't allow you to handle 4xx responses
-        template.setRequestFactory(new HttpComponentsClientHttpRequestFactory() {
+        restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory() {
             @Override
             public HttpClient getHttpClient() {
                 HttpClient client = super.getHttpClient();
@@ -196,16 +178,15 @@ public class RemoteUaaController extends AbstractControllerInfo {
                 return client;
             }
         });
-        template.setErrorHandler(new DefaultResponseErrorHandler() {
+        restTemplate.setErrorHandler(new DefaultResponseErrorHandler() {
             @Override
             public boolean hasError(ClientHttpResponse response) throws IOException {
                 HttpStatus statusCode = response.getStatusCode();
                 return statusCode.series() == HttpStatus.Series.SERVER_ERROR;
             }
         });
-        defaultTemplate = template;
+        defaultTemplate = restTemplate;
         initProperties();
-        initAnalytics();
     }
 
     @RequestMapping(value = { "/login", "/info" }, method = RequestMethod.GET)
@@ -214,7 +195,6 @@ public class RemoteUaaController extends AbstractControllerInfo {
         String path = extractPath(request);
         model.putAll(getLoginInfo(getUaaBaseUrl() + "/" + path, getRequestHeaders(headers)));
         populateBuildAndLinkInfo(model);
-        model.put("analytics", analytics);
         if (principal == null) {
             return "login";
         }
@@ -525,18 +505,5 @@ public class RemoteUaaController extends AbstractControllerInfo {
 
     public RestOperations getDefaultTemplate() {
         return defaultTemplate;
-    }
-
-    private void initAnalytics() {
-        String code = environment.getProperty("analytics.code");
-        String domain = environment.getProperty("analytics.domain");
-        Assert.isTrue(!(code != null ^ domain != null),
-                        "analytics.code and analytics.domain properties must both be set");
-        if (code != null && domain != null) {
-            HashMap<String, String> map = new HashMap<String, String>();
-            map.put("code", code);
-            map.put("domain", domain);
-            analytics = map;
-        }
     }
 }

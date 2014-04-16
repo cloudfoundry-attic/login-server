@@ -1,0 +1,342 @@
+@import url(http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700);
+@import url('application.css');
+
+body {
+    background-color: #f8f8f8;
+}
+
+.content {
+    min-height: 100%;
+    height: auto !important;
+    height: 100%;
+    margin: 0 auto -40px;
+}
+
+.footer, .footer-spacer {
+    height: 40px;
+}
+
+.footer {
+    padding-left: 40px;
+    color: #9faaad;
+    font-size: 12px;
+}
+
+h1 {
+    font-size: 32px;
+    font-weight: 300;
+    text-transform: none;
+    margin-top: 0;
+    margin-bottom: 16px;
+}
+
+h2 {
+    font-size: 24px;
+    font-weight: 300;
+    color: #939393;
+}
+
+.island {
+    text-align: center;
+}
+
+.island-content {
+    width: 196px;
+    margin: 0 auto 0 auto;
+}
+
+form {
+    margin-bottom: 8px;
+}
+
+input {
+    display: block;
+    margin-bottom: 20px;
+}
+
+.btn-alternate {
+    text-transform: uppercase;
+    font-size: 14px;
+    height: 34px;
+    padding: 0;
+    line-height: 14px;
+}
+
+.form-control {
+    font-size: 14px;
+    height: 34px;
+}
+
+.forgot-password {
+    letter-spacing: 0;
+}
+
+.fa-envelope-o {
+    font-size: 36px;
+    color: #d4d9da;
+    margin-bottom: 18px;
+}
+
+.fa-chevron-down {
+    float: right;
+    font-size: 10px;
+    margin-top: 4px;
+}
+
+.instructions-sent {
+    color: #9faaad;
+}
+
+.email-display {
+    color: #7f7f7f;
+    font-size: 14px;
+    margin-bottom: 16px;
+}
+
+.left {
+    display: inline-block;
+    text-align: left;
+    width: 50%;
+}
+.right {
+    display: inline-block;
+    text-align: right;
+    width: 50%;
+}
+
+.link-lowlight {
+    color: #7f7f7f;
+    font-size: 12px;
+    font-weight: 300;
+}
+
+.error-message {
+    background-color: #febfc1;
+    color: #ab2a2a;
+    width: 100%;
+    font-size: 11px;
+    padding: 12px 0;
+    line-height: 12px;
+    margin-bottom: 20px;
+}
+
+.saml-login {
+    border-bottom: 1px solid #cccccc;
+    color: #cccccc;
+    font-size: 11px;
+    line-height: 18px;
+    margin-bottom: 10px;
+    padding: 10px 0;
+}
+
+.saml-login-link {
+    font-weight: 700;
+}
+
+.nav {
+    position: relative;
+    font-size: 12px;
+    float: right;
+    margin: 12px 18px 0 0;
+    min-width: 120px;
+    color: #9faaad;
+}
+
+.dropdown-trigger {
+    cursor: pointer;
+    padding: 4px 8px;
+}
+
+.dropdown-content {
+    position: absolute;
+    top: 110%;
+    list-style: none outside none;
+    padding: 0;
+    display: none;
+}
+
+.dropdown-content a {
+    color: #7f7f7f;
+}
+
+.dropdown-trigger.open, .dropdown-content.open {
+    background-color: #ffffff;
+    display: block;
+    color: #7f7f7f;
+}
+
+.dropdown-trigger:hover, .dropdown-content a:hover {
+    background-color: #e0e4e5;
+    color: #43575c;
+}
+
+.dropdown-content a {
+    display: block;
+    min-width: 120px;
+    min-height: 18px;
+    padding: 4px 8px;
+}
+
+.panel-container {
+    padding-top: 130px;
+}
+
+.panel {
+    background-color: #ffffff;
+    width: 460px;
+    padding: 40px;
+    margin: 0 auto 0;
+    text-align: center;
+}
+
+.panel-content {
+    color: #7f7f7f;
+    text-align: left;
+    margin-top: 16px;
+}
+
+.panel-content h2 {
+    color: #43575c;
+}
+
+.panel-content p {
+    margin-top: 10px;
+}
+
+.panel-content ul {
+    padding: 0px;
+    list-style: none outside none;
+}
+
+.application-link {
+    font-size: 14px;
+}
+
+.application-scopes {
+    border: 1px solid #cccccc;
+    margin: 12px 0;
+    padding: 20px;
+}
+
+.application-scopes li {
+    padding: 0 16px 16px 16px;
+}
+
+.application-scopes li:first-child {
+    padding-top: 16px;
+}
+
+.application-scopes input {
+    display: inline-block;
+    margin: 6px 0;
+    vertical-align: top;
+}
+
+.application-scopes label {
+    width: 300px;
+    margin-left: 10px;
+}
+
+.application-scopes .undecided label {
+    font-weight: 600;
+}
+
+.actions {
+    margin-top: 40px;
+    text-align: center;
+}
+
+.actions button[type='submit'] {
+    height: 30px;
+    line-height: 12px;
+    margin: 0 10px;
+    min-width: 120px;
+}
+
+.profile span {
+    display: inline-block;
+    width: 60%;
+}
+
+.profile a {
+    display: inline-block;
+    width: 40%;
+    text-align: right;
+}
+
+.client-scopes .application-scopes label {
+    width: 278px;
+}
+
+.application-label h3 {
+    display: inline-block;
+    width: 70%;
+}
+
+.application-label a {
+    display: inline-block;
+    width: 30%;
+
+}
+
+.revocation-scrim {
+    background-color: rgba(0, 0, 0, 0.4);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 100;
+    display: none;
+}
+
+.revocation-modal {
+    background-color: #ffffff;
+    z-index: 1000;
+    width: 400px;
+    margin: 200px auto 0 auto;
+}
+
+.revocation-modal-header {
+    padding: 18px;
+    border-bottom: 1px solid #d4d9da;
+}
+
+.revocation-modal-header h3 {
+    display: inline-block;
+    width: 80%;
+    height: auto;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 14px;
+    color: #424242;
+    text-transform: uppercase;
+}
+
+.revocation-modal-header .close-icon {
+    display: inline-block;
+    width: 20%;
+    text-align: right;
+    cursor: pointer;
+}
+
+.revocation-modal p {
+    padding: 4px 18px 4px 18px;
+}
+
+.revocation-actions {
+    padding: 8px 18px 18px 0;
+    text-align: right;
+}
+
+.revocation-actions button {
+    height: 28px;
+    line-height: 12px;
+    margin: 0 4px;
+    min-width: 100px;
+}
+
+.passcode input {
+    text-align: center;
+    font-size: 18px;
+}
