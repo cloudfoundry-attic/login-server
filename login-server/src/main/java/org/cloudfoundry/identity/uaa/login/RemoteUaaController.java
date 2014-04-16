@@ -13,6 +13,8 @@
 package org.cloudfoundry.identity.uaa.login;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.security.Principal;
 import java.sql.Timestamp;
@@ -267,6 +269,13 @@ public class RemoteUaaController extends AbstractControllerInfo {
 
         MultiValueMap<String, String> map = new LinkedMaskingMultiValueMap<String, String>();
         map.setAll(parameters);
+
+        String redirectUri = parameters.get("redirect-uri");
+        if (redirectUri != null && !redirectUri.matches("(http:|https:)?//.*")) {
+            redirectUri = "http://" + redirectUri;
+            map.set("redirect-uri", redirectUri);
+        }
+
         if (principal != null) {
             map.set("source", "login");
             map.set("add_new", String.valueOf(isAddNew()));
