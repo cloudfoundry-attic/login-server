@@ -88,7 +88,7 @@ public class ChangePasswordIT {
     private void changePassword(String originalPassword, String newPassword, String confirmPassword) {
         webDriver.findElement(By.xpath("//*[text()='"+userName+"']")).click();
         webDriver.findElement(By.linkText("Account Settings")).click();
-        webDriver.findElement(By.linkText("Change password")).click();
+        webDriver.findElement(By.linkText("Change Password")).click();
         webDriver.findElement(By.name("current_password")).sendKeys(originalPassword);
         webDriver.findElement(By.name("new_password")).sendKeys(newPassword);
         webDriver.findElement(By.name("confirm_password")).sendKeys(confirmPassword);

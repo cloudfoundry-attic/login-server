@@ -23,7 +23,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -44,7 +43,6 @@ public class ChangePasswordController {
     @RequestMapping(value="/change_password.do", method = POST)
     public String changePassword(
             Model model,
-            RedirectAttributes redirectAttributes,
             @RequestParam("current_password") String currentPassword,
             @RequestParam("new_password") String newPassword,
             @RequestParam("confirm_password") String confirmPassword,
@@ -62,8 +60,7 @@ public class ChangePasswordController {
 
         try {
             changePasswordService.changePassword(username, currentPassword, newPassword);
-            redirectAttributes.addFlashAttribute("message", "Your password has been changed");
-            return "redirect:change_password";
+            return "redirect:profile";
         } catch (OAuth2Exception e) {
             model.addAttribute("message", e.getMessage());
         }
