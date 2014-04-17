@@ -28,6 +28,7 @@
 
     <security:http pattern="/saml/web/**" security="none" />
     <security:http pattern="/resources/**" security="none" />
+    <security:http pattern="/vendor/**" security="none" />
     <security:http pattern="/healthz/**" security="none" />
     <security:http request-matcher-ref="oauthTokenAuthcodeFlow" security="none" />
     <security:http request-matcher-ref="oauthTokenRefresh" security="none" />
