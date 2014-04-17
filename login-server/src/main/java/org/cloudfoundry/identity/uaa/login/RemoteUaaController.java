@@ -194,7 +194,7 @@ public class RemoteUaaController extends AbstractControllerInfo {
                     Principal principal) throws Exception {
         String path = extractPath(request);
         model.putAll(getLoginInfo(getUaaBaseUrl() + "/" + path, getRequestHeaders(headers)));
-        populateBuildAndLinkInfo(model);
+        model.put("links", getLinksInfo());
         if (principal == null) {
             return "login";
         }
@@ -408,7 +408,6 @@ public class RemoteUaaController extends AbstractControllerInfo {
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
         Map<String, Object> model = new HashMap<String, Object>();
         model.putAll(getLoginInfo(getUaaBaseUrl() + "/login", getRequestHeaders(headers)));
-        model.putAll(getBuildInfo());
         Map<String, String> error = new LinkedHashMap<String, String>();
         error.put("error", "rest_client_error");
         error.put("error_description", e.getMessage());

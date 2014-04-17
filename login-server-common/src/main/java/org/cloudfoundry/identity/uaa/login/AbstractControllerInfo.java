@@ -13,25 +13,18 @@
 
 package org.cloudfoundry.identity.uaa.login;
 
-import java.io.IOException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.http.HttpHeaders;
+import org.springframework.ui.Model;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
-
 import javax.servlet.http.HttpServletRequest;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.cloudfoundry.identity.uaa.util.UaaStringUtils;
-import org.springframework.core.io.support.PropertiesLoaderUtils;
-import org.springframework.http.HttpHeaders;
-import org.springframework.ui.Model;
 
 /**
  * Contains basic information used by the
@@ -45,10 +38,6 @@ public abstract class AbstractControllerInfo {
     private Map<String, String> links = new HashMap<String, String>();
     private static String DEFAULT_BASE_UAA_URL = "https://uaa.cloudfoundry.com";
     protected static final String HOST = "Host";
-
-    private Properties gitProperties = new Properties();
-
-    private Properties buildProperties = new Properties();
 
     private String baseUrl;
 
@@ -67,16 +56,6 @@ public abstract class AbstractControllerInfo {
 
     protected void initProperties() {
         setUaaBaseUrl(DEFAULT_BASE_UAA_URL);
-        try {
-            gitProperties = PropertiesLoaderUtils.loadAllProperties("git.properties");
-        } catch (IOException e) {
-            // Ignore
-        }
-        try {
-            buildProperties = PropertiesLoaderUtils.loadAllProperties("build.properties");
-        } catch (IOException e) {
-            // Ignore
-        }
     }
 
     /**
@@ -97,17 +76,6 @@ public abstract class AbstractControllerInfo {
 
     protected String getUaaHost() {
         return uaaHost;
-    }
-
-    protected Map<String, ?> getBuildInfo() {
-        Map<String, Object> model = new HashMap<String, Object>();
-        model.put("commit_id", gitProperties.getProperty("git.commit.id.abbrev", "UNKNOWN"));
-        model.put(
-                        "timestamp",
-                        gitProperties.getProperty("git.commit.time",
-                                        new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date())));
-        model.put("app", UaaStringUtils.getMapFromProperties(buildProperties, "build."));
-        return model;
     }
 
     protected Map<String, ?> getLinksInfo() {
@@ -150,14 +118,8 @@ public abstract class AbstractControllerInfo {
 
     protected void populateBuildAndLinkInfo(Model model) {
         Map<String, Object> attributes = new HashMap<String, Object>();
-        populateBuildAndLinkInfo(attributes);
+        attributes.put("links", getLinksInfo());
         model.addAllAttributes(attributes);
         model.addAttribute("links", getLinks());
     }
-
-    protected void populateBuildAndLinkInfo(Map<String, Object> model) {
-        model.putAll(getBuildInfo());
-        model.put("links", getLinksInfo());
-    }
-
 }
