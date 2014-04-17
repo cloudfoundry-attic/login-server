@@ -20,7 +20,7 @@
                th:href="${redirect_uri}"
                th:text="${redirect_uri}">https://cloudfoundry.cloudbees.com/authenticate</a>
             <p>
-                <span th:text="${client_id}">Cloudbees</span> has requested permission to
+                <th:block th:text="${client_id}">Cloudbees</th:block> has requested permission to
                 access your Pivotal account. If you do not recognize this application or
                 its URL, you should click deny. The application will not see your password.
             </p>
@@ -53,7 +53,7 @@
             <p>
                 You can change your approval of permissions or revoke access for this application
                 at any time from account settings. By approving access, you agree to
-                <span th:text="${client_id}">Cloudbees</span>'s terms of service and privacy policy.
+                <th:block th:text="${client_id}">Cloudbees</th:block>'s terms of service and privacy policy.
             </p>
             <div class="actions">
                 <button id="deny"

@@ -81,6 +81,8 @@ public class AppApprovalIT {
         // Revoke app
         webDriver.findElement(By.linkText("Revoke Access")).click();
 
+        Assert.assertEquals("Are you sure you want to revoke access to app?", webDriver.findElement(By.cssSelector(".revocation-modal p")).getText());
+
         // click cancel
         webDriver.findElement(By.cssSelector("#app-form .revocation-cancel")).click();
 
