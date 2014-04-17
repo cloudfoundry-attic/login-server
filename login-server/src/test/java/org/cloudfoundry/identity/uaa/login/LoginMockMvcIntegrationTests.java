@@ -69,9 +69,6 @@ public class LoginMockMvcIntegrationTests {
                         .andExpect(model().attribute("links", hasEntry("uaa", "http://localhost:8080/uaa")))
                         .andExpect(model().attribute("links", hasEntry("login", "http://localhost:8080/login")))
                         .andExpect(model().attributeExists("prompts"))
-                        .andExpect(model().attributeExists("app"))
-                        .andExpect(model().attributeExists("commit_id"))
-                        .andExpect(model().attributeExists("timestamp"))
                         .andExpect(model().attributeDoesNotExist("saml"));
     }
 }
