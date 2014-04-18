@@ -24,11 +24,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.client.RestTemplate;
@@ -58,9 +53,6 @@ public class ResetPasswordIT {
     @Value("${integration.test.base_url}")
     String baseUrl;
 
-    @Value("${integration.test.uaa_url}")
-    String uaaUrl;
-
     private String userEmail;
     private String userName;
 
@@ -70,11 +62,11 @@ public class ResetPasswordIT {
 
         String adminAccessToken = testClient.getOAuthAccessToken("admin", "adminsecret", "client_credentials", "clients.read clients.write clients.secret");
         String scimClientId = "scim" + randomInt;
-        createScimClient(adminAccessToken, scimClientId);
+        testClient.createScimClient(adminAccessToken, scimClientId);
         String scimAccessToken = testClient.getOAuthAccessToken(scimClientId, "scimsecret", "client_credentials", "scim.read scim.write password.write");
         userEmail = "user" + randomInt + "@example.com";
         userName = "JOE" + randomInt;
-        createUser(scimAccessToken, userName, userEmail);
+        testClient.createUser(scimAccessToken, userName, userEmail, "secret");
     }
 
     @Test
@@ -82,17 +74,17 @@ public class ResetPasswordIT {
         webDriver.get(baseUrl + "/login");
         Assert.assertEquals("Pivotal", webDriver.getTitle());
 
-        webDriver.findElement(By.linkText("Forgot Password")).click();
+        webDriver.findElement(By.linkText("Reset password")).click();
 
         webDriver.findElement(By.name("email")).sendKeys(userEmail);
-        webDriver.findElement(By.xpath("//button[contains(text(),'Reset Password')]")).click();
+        webDriver.findElement(By.xpath("//input[@value='Send reset password link']")).click();
 
         Assert.assertEquals(1, simpleSmtpServer.getReceivedEmailSize());
         SmtpMessage message = (SmtpMessage) simpleSmtpServer.getReceivedEmail().next();
         Assert.assertEquals(userEmail, message.getHeaderValue("To"));
         Assert.assertThat(message.getBody(), containsString("Click the link to reset your password"));
 
-        Assert.assertEquals("An email has been sent with password reset instructions.", webDriver.findElement(By.cssSelector(".flash")).getText());
+        Assert.assertEquals("Check your email for a reset password link.", webDriver.findElement(By.cssSelector(".instructions-sent")).getText());
 
         String link = extractLink(message.getBody());
         webDriver.get(link);
@@ -100,17 +92,18 @@ public class ResetPasswordIT {
         webDriver.findElement(By.name("password")).sendKeys("newsecret");
         webDriver.findElement(By.name("password_confirmation")).sendKeys("newsecret");
 
-        webDriver.findElement(By.xpath("//button[contains(text(),'Change Password')]")).click();
+        webDriver.findElement(By.xpath("//input[@value='Create new password']")).click();
 
-        Assert.assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), containsString("Welcome"));
+        Assert.assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), containsString("Where to?"));
 
-        webDriver.findElement(By.linkText("Sign out")).click();
+        webDriver.findElement(By.xpath("//*[text()='"+userName+"']")).click();
+        webDriver.findElement(By.linkText("Sign Out")).click();
 
         webDriver.findElement(By.name("username")).sendKeys(userName);
         webDriver.findElement(By.name("password")).sendKeys("newsecret");
-        webDriver.findElement(By.xpath("//button[contains(text(), 'Sign in')]")).click();
+        webDriver.findElement(By.xpath("//input[@value='Sign in']")).click();
 
-        Assert.assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), containsString("Welcome"));
+        Assert.assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), containsString("Where to?"));
     }
 
     private String extractLink(String messageBody) {
@@ -118,47 +111,5 @@ public class ResetPasswordIT {
         Matcher matcher = linkPattern.matcher(messageBody);
         matcher.find();
         return matcher.group(1);
-    }
-
-    private void createScimClient(String adminAccessToken, String clientId) throws Exception {
-        restfulCreate(
-                adminAccessToken,
-                "{" +
-                        "\"scope\":[\"uaa.none\"]," +
-                        "\"client_id\":\"" + clientId + "\"," +
-                        "\"client_secret\":\"scimsecret\"," +
-                        "\"resource_ids\":[\"oauth\"]," +
-                        "\"authorized_grant_types\":[\"client_credentials\"]," +
-                        "\"authorities\":[\"password.write\",\"scim.write\",\"scim.read\",\"oauth.approvals\"]" +
-                        "}",
-                uaaUrl + "/oauth/clients"
-        );
-    }
-
-    private void createUser(String scimAccessToken, String userName, String email) throws Exception {
-        restfulCreate(
-                scimAccessToken,
-                "{" +
-                        "\"meta\":{\"version\":0,\"created\":\"2014-03-24T18:01:24.584Z\"}," +
-                        "\"userName\":\"" + userName + "\"," +
-                        "\"name\":{\"formatted\":\"Joe User\",\"familyName\":\"User\",\"givenName\":\"Joe\"}," +
-                        "\"emails\":[{\"value\":\"" + email + "\"}]," +
-                        "\"active\":true," +
-                        "\"verified\":false," +
-                        "\"schemas\":[\"urn:scim:schemas:core:1.0\"]" +
-                        "}",
-                uaaUrl + "/Users"
-        );
-    }
-
-    private void restfulCreate(String adminAccessToken, String json, String url) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", "Bearer " + adminAccessToken);
-        headers.add("Accept", "application/json");
-        headers.add("Content-Type", "application/json");
-
-        HttpEntity<String> requestEntity = new HttpEntity<String>(json, headers);
-        ResponseEntity<Void> exchange = restTemplate.exchange(url, HttpMethod.POST, requestEntity, Void.class);
-        Assert.assertEquals(HttpStatus.CREATED, exchange.getStatusCode());
     }
 }

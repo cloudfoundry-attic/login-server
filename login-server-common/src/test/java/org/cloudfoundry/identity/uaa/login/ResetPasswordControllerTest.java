@@ -27,6 +27,7 @@ import org.mockito.Mockito;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 public class ResetPasswordControllerTest {
@@ -63,7 +64,7 @@ public class ResetPasswordControllerTest {
                 .andExpect(status().isFound())
                 .andExpect(flash().attributeExists("success"));
 
-        Mockito.verify(resetPasswordService).forgotPassword("user@example.com");
+        Mockito.verify(resetPasswordService).forgotPassword(ServletUriComponentsBuilder.fromCurrentContextPath(), "user@example.com");
     }
 
     @Test

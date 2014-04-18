@@ -13,9 +13,12 @@
 package org.cloudfoundry.identity.uaa.login.test;
 
 import org.apache.commons.codec.binary.Base64;
+import org.junit.Assert;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -27,10 +30,12 @@ public class TestClient {
 
     private final RestTemplate restTemplate;
     private final String baseUrl;
+    private final String uaaUrl;
 
-    public TestClient(RestTemplate restTemplate, String baseUrl) {
+    public TestClient(RestTemplate restTemplate, String baseUrl, String uaaUrl ) {
         this.restTemplate = restTemplate;
         this.baseUrl = baseUrl;
+        this.uaaUrl =uaaUrl;
     }
 
     public String getOAuthAccessToken(String username, String password, String grantType, String scope) {
@@ -49,5 +54,49 @@ public class TestClient {
         ResponseEntity<Map> exchange = restTemplate.exchange(baseUrl + "/oauth/token", HttpMethod.POST, requestEntity, Map.class);
 
         return exchange.getBody().get("access_token").toString();
+    }
+
+    public void createScimClient(String adminAccessToken, String clientId) throws Exception {
+        restfulCreate(
+                adminAccessToken,
+                "{" +
+                        "\"scope\":[\"uaa.none\"]," +
+                        "\"client_id\":\"" + clientId + "\"," +
+                        "\"client_secret\":\"scimsecret\"," +
+                        "\"resource_ids\":[\"oauth\"]," +
+                        "\"authorized_grant_types\":[\"client_credentials\"]," +
+                        "\"authorities\":[\"password.write\",\"scim.write\",\"scim.read\",\"oauth.approvals\"]" +
+                        "}",
+                uaaUrl + "/oauth/clients"
+        );
+    }
+
+    public void createUser(String scimAccessToken, String userName, String email, String password) throws Exception {
+
+        restfulCreate(
+                scimAccessToken,
+                "{" +
+                        "\"meta\":{\"version\":0,\"created\":\"2014-03-24T18:01:24.584Z\"}," +
+                        "\"userName\":\"" + userName + "\"," +
+                        "\"name\":{\"formatted\":\"Joe User\",\"familyName\":\"User\",\"givenName\":\"Joe\"}," +
+                        "\"emails\":[{\"value\":\"" + email + "\"}]," +
+                        "\"password\":\"" + password + "\"," +
+                        "\"active\":true," +
+                        "\"verified\":false," +
+                        "\"schemas\":[\"urn:scim:schemas:core:1.0\"]" +
+                        "}",
+                uaaUrl + "/Users"
+        );
+    }
+
+    private void restfulCreate(String adminAccessToken, String json, String url) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + adminAccessToken);
+        headers.add("Accept", "application/json");
+        headers.add("Content-Type", "application/json");
+
+        HttpEntity<String> requestEntity = new HttpEntity<String>(json, headers);
+        ResponseEntity<Void> exchange = restTemplate.exchange(url, HttpMethod.POST, requestEntity, Void.class);
+        Assert.assertEquals(HttpStatus.CREATED, exchange.getStatusCode());
     }
 }

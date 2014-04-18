@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layouts/main">
+<head>
+    <th:block layout:include="pivotal_links :: style"></th:block>
+</head>
+<body>
+    <div class="island" layout:fragment="page-content" th:if="${brand} == 'pivotal'">
+        <h1>Create an Account</h1>
+        <ul class="pivotal-links">
+            <li><a href="https://network.gopivotal.com/registrations/new" th:href="${@links.get('registerNetwork')}" id="network-link">Pivotal Network</a></li>
+            <li><a href="https://www.cloudfoundry.com/signup" th:href="${@links.get('register')}" id="web-services-link">Pivotal Web Services</a></li>
+        </ul>
+        <div id="network-link-preload" class="image-preload"></div>
+        <div id="web-services-link-preload" class="image-preload"></div>
+    </div>
+</body>
+</html>

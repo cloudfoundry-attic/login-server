@@ -27,6 +27,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -61,7 +62,11 @@ public class ResetPasswordControllerIntegrationTests {
     public void testResetPasswordPage() throws Exception {
         // any code will render the page, but only a valid code actually sets a password
 
-        mockMvc.perform(get("/reset_password").param("code", "any_code_will_show_the_page"))
+        MockHttpServletRequestBuilder get = get("/reset_password")
+                .param("code", "any_code_will_show_the_page")
+                .param("email", "user@example.com");
+
+        mockMvc.perform(get)
                 .andExpect(status().isOk())
                 .andExpect(view().name("reset_password"));
     }

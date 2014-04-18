@@ -17,6 +17,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.xpath;
 
 import org.cloudfoundry.identity.uaa.login.test.DefaultTestConfig;
 import org.cloudfoundry.identity.uaa.login.test.DefaultTestConfigContextLoader;
@@ -31,6 +32,8 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+
+import java.util.Map;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
@@ -65,15 +68,21 @@ public class LoginMockMvcIntegrationTests {
                         .andExpect(model().attribute("links",
                                         hasEntry("network", "https://network.gopivotal.com/login")))
                         .andExpect(model().attribute("links",
-                                        hasEntry("registerNetwork", "https://network.gopivotal.com/registrations/new")))
+                                hasEntry("registerNetwork", "https://network.gopivotal.com/registrations/new")))
                         .andExpect(model().attribute("links", hasEntry("uaa", "http://localhost:8080/uaa")))
                         .andExpect(model().attribute("links", hasEntry("login", "http://localhost:8080/login")))
                         .andExpect(model().attributeExists("prompts"))
-                        .andExpect(model().attributeExists("app"))
-                        .andExpect(model().attributeExists("commit_id"))
-                        .andExpect(model().attributeExists("timestamp"))
-                        .andExpect(model().attributeDoesNotExist("saml"))
-                        .andExpect(model().attribute("analytics", hasEntry("code", "secret_code")))
-                        .andExpect(model().attribute("analytics", hasEntry("domain", "example.com")));
+                        .andExpect(model().attributeDoesNotExist("saml"));
+    }
+
+    @Test
+    public void testLoginWithEmptyLinks() throws Exception {
+        Map<String, String> links = (Map<String, String>) webApplicationContext.getBean("links", Map.class);
+        links.put("passwd", "");
+
+        mockMvc.perform(get("/login"))
+                .andExpect(status().isOk())
+                .andExpect(model().attribute("links", hasEntry("passwd", "")))
+                .andExpect(xpath("//a[text()='Reset password']").doesNotExist());
     }
 }

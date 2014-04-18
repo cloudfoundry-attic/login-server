@@ -14,16 +14,11 @@
 package org.cloudfoundry.identity.uaa.login;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.security.Principal;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.cloudfoundry.identity.uaa.authentication.login.Prompt;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.springframework.http.HttpEntity;
@@ -31,19 +26,25 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mock.env.MockEnvironment;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestOperations;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.view.RedirectView;
+
+import java.security.Principal;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Dave Syer
- * 
  */
 public class RemoteUaaControllerTests {
 
-    private RemoteUaaController controller = new RemoteUaaController(new MockEnvironment());
+    private RemoteUaaController controller = new RemoteUaaController(new RestTemplate());
 
     private MockHttpServletRequest request = new MockHttpServletRequest();
 
@@ -59,30 +60,6 @@ public class RemoteUaaControllerTests {
 
     public RemoteUaaControllerTests() {
         controller.setAuthorizationTemplate(authorizationTemplate);
-    }
-
-    @Test
-    public void testVanillaPrompts() throws Exception {
-        controller.setDefaultTemplate(authorizationTemplate);
-        setResponse(
-                        Collections.<String, Object> singletonMap("prompts",
-                                        Collections.singletonMap("foo", new Prompt("foo", "text", "Foo").getDetails())),
-                        null, HttpStatus.OK);
-        controller.prompts(request, headers, model, principal);
-        assertTrue(model.containsKey("prompts"));
-        @SuppressWarnings("rawtypes")
-        Map map = (Map) model.get("prompts");
-        assertTrue(map.containsKey("foo"));
-    }
-
-    @Test
-    public void testOverridePrompts() throws Exception {
-        controller.setPrompts(Arrays.asList(new Prompt("foo", "text", "Foo")));
-        controller.prompts(request, headers, model, principal);
-        assertTrue(model.containsKey("prompts"));
-        @SuppressWarnings("rawtypes")
-        Map map = (Map) model.get("prompts");
-        assertTrue(map.containsKey("foo"));
     }
 
     @Test
@@ -107,10 +84,68 @@ public class RemoteUaaControllerTests {
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.add("Set-Cookie", "__VCAP_ID__=BAR");
         responseHeaders.add("Set-Cookie", "JSESSIONID=FOO; Path=/; HttpOnly");
-        setResponse(Collections.<String, Object> singletonMap("options", "{}"), responseHeaders, HttpStatus.OK);
+        setResponse(Collections.<String, Object>singletonMap("options", "{}"), responseHeaders, HttpStatus.OK);
         ModelAndView result = controller.startAuthorization(request, parameters, model, headers, principal);
         assertEquals("access_confirmation", result.getViewName());
         assertEquals("__VCAP_ID__=BAR;JSESSIONID=FOO", model.get("cookie"));
+    }
+
+    @Test
+    public void testRedirectUri() throws Exception {
+        Map<String, String> requestParams = new HashMap<String, String>();
+        requestParams.put("redirect-uri", "http://www.google.com");
+
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.add("Location", "http://www.example.com");
+        setResponse(null, responseHeaders, HttpStatus.FOUND);
+
+        ModelAndView result = controller.startAuthorization(request, requestParams, model, headers, principal);
+
+        RedirectView view = (RedirectView) result.getView();
+        assertTrue(view.toString().contains("http://www.example.com"));
+
+        ArgumentCaptor<HttpEntity> uaaRequest = ArgumentCaptor.forClass(HttpEntity.class);
+        Mockito.verify(authorizationTemplate).exchange(Matchers.anyString(), Matchers.any(HttpMethod.class), uaaRequest.capture(), Matchers.any(Class.class));
+        MultiValueMap<String, String> uaaRequestBody = (MultiValueMap<String, String>) uaaRequest.getValue().getBody();
+        String requestUri = uaaRequestBody.getFirst("redirect-uri");
+        assertTrue(requestUri.contains("http://www.google.com"));
+        assertFalse(requestUri.contains("http://http://www.google.com"));
+    }
+
+    @Test
+    public void testRedirectUriWithMissingProtocol() throws Exception {
+        Map<String, String> requestParams = new HashMap<String, String>();
+        requestParams.put("redirect-uri", "www.google.com");
+
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.add("Location", "http://www.example.com");
+        setResponse(null, responseHeaders, HttpStatus.FOUND);
+
+        controller.startAuthorization(request, requestParams, model, headers, principal);
+
+        ArgumentCaptor<HttpEntity> uaaRequest = ArgumentCaptor.forClass(HttpEntity.class);
+        Mockito.verify(authorizationTemplate).exchange(Matchers.anyString(), Matchers.any(HttpMethod.class), uaaRequest.capture(), Matchers.any(Class.class));
+        MultiValueMap<String, String> uaaRequestBody = (MultiValueMap<String, String>) uaaRequest.getValue().getBody();
+        assertTrue(uaaRequestBody.getFirst("redirect-uri").contains("http://www.google.com"));
+    }
+
+    @Test
+    public void testProtocolRelativeRedirectUri() throws Exception {
+        Map<String, String> requestParams = new HashMap<String, String>();
+        requestParams.put("redirect-uri", "//www.google.com");
+
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.add("Location", "http://www.example.com");
+        setResponse(null, responseHeaders, HttpStatus.FOUND);
+
+        controller.startAuthorization(request, requestParams, model, headers, principal);
+
+        ArgumentCaptor<HttpEntity> uaaRequest = ArgumentCaptor.forClass(HttpEntity.class);
+        Mockito.verify(authorizationTemplate).exchange(Matchers.anyString(), Matchers.any(HttpMethod.class), uaaRequest.capture(), Matchers.any(Class.class));
+        MultiValueMap<String, String> uaaRequestBody = (MultiValueMap<String, String>) uaaRequest.getValue().getBody();
+        String requestUri = uaaRequestBody.getFirst("redirect-uri");
+        assertTrue(requestUri.contains("www.google.com"));
+        assertFalse(requestUri.contains("http://www.google.com"));
     }
 
     private void setResponse(Map<String, Object> body, HttpHeaders headers, HttpStatus status) {

@@ -36,10 +36,14 @@
     <security:http pattern="/error" security="none" />
     <security:http pattern="/forgot_password*" security="none" />
     <security:http pattern="/reset_password" security="none" />
+    <security:http pattern="/email_sent" security="none" />
+    <security:http pattern="/accounts/new" security="none" />
 
     <!-- TODO: Move the autologin related beans from the login server and saml login server to login common -->
     <bean id="abstractRemoteUaaController" abstract="true">
-        <constructor-arg ref="environment" />
+        <constructor-arg>
+            <bean class="org.springframework.web.client.RestTemplate" />
+        </constructor-arg>
         <property name="remoteAuthenticationManager" ref="remoteAuthenticationManager" />
         <property name="uaaBaseUrl" value="${uaa.url:http://localhost:8080/uaa}" />
         <property name="authorizationTemplate" ref="authorizationTemplate" />
@@ -283,6 +287,26 @@
     <mvc:annotation-driven />
     <mvc:default-servlet-handler />
 
+    <bean id="templateResolver" class="org.thymeleaf.templateresolver.TemplateResolver">
+        <property name="resourceResolver">
+            <bean class="org.thymeleaf.spring3.resourceresolver.SpringResourceResourceResolver" />
+        </property>
+        <property name="prefix" value="classpath:/templates/" />
+        <property name="suffix" value=".html" />
+        <property name="templateMode" value="HTML5" />
+        <!--<property name="cacheable" value="false" />-->
+    </bean>
+
+    <bean id="templateEngine" class="org.thymeleaf.spring3.SpringTemplateEngine">
+        <property name="templateResolver" ref="templateResolver" />
+        <property name="additionalDialects">
+            <set>
+                <bean class="nz.net.ultraq.thymeleaf.LayoutDialect" />
+                <bean class="org.thymeleaf.extras.springsecurity3.dialect.SpringSecurityDialect"/>
+            </set>
+        </property>
+    </bean>
+
     <bean id="viewResolver" class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
         <property name="mediaTypes">
             <map>
@@ -291,9 +315,8 @@
         </property>
         <property name="viewResolvers">
             <list>
-                <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
-                    <property name="prefix" value="/WEB-INF/jsp/${login.brand:oss}/" />
-                    <property name="suffix" value=".jsp" />
+                <bean class="org.thymeleaf.spring3.view.ThymeleafViewResolver">
+                    <property name="templateEngine" ref="templateEngine" />
                 </bean>
                 <bean class="org.springframework.web.servlet.view.BeanNameViewResolver" />
             </list>
@@ -304,6 +327,10 @@
             </bean>
         </property>
     </bean>
+
+    <bean id="buildInfo" class="org.cloudfoundry.identity.uaa.login.BuildInfo" />
+
+    <bean id="accountsController" class="org.cloudfoundry.identity.uaa.login.AccountsController" />
 
     <beans profile="!ldap">
         <beans profile="!saml">
@@ -316,8 +343,17 @@
                 <constructor-arg value="${smtp.password:}"/>
             </bean>
 
+            <bean id="changePasswordService" class="org.cloudfoundry.identity.uaa.login.UaaChangePasswordService">
+                <constructor-arg ref="authorizationTemplate"/>
+                <constructor-arg value="${uaa.url:http://localhost:8080/uaa}"/>
+            </bean>
+
             <bean id="resetPasswordController" class="org.cloudfoundry.identity.uaa.login.ResetPasswordController">
                 <constructor-arg ref="resetPasswordService"/>
+            </bean>
+
+            <bean id="changePasswordController" class="org.cloudfoundry.identity.uaa.login.ChangePasswordController">
+                <constructor-arg ref="changePasswordService"/>
             </bean>
         </beans>
     </beans>

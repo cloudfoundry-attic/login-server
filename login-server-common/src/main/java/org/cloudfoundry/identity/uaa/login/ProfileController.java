@@ -13,6 +13,7 @@
 package org.cloudfoundry.identity.uaa.login;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -23,6 +24,8 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -44,6 +47,9 @@ public class ProfileController extends AbstractControllerInfo implements Initial
     private final RestOperations restTemplate;
 
     private final Log logger = LogFactory.getLog(getClass());
+    
+    @Autowired
+    private Environment environment;
 
     public ProfileController(RestOperations restTemplate) {
         this.restTemplate = restTemplate;
@@ -68,7 +74,13 @@ public class ProfileController extends AbstractControllerInfo implements Initial
         model.addAttribute("approvals", approvals);
         populateBuildAndLinkInfo(model);
         model.addAttribute("links", getLinks());
+        model.addAttribute("showChangePasswordLink", showChangePasswordLink());
         return "approvals";
+    }
+
+    private boolean showChangePasswordLink() {
+        List<String> activeProfiles = Arrays.asList(environment.getActiveProfiles());
+        return !activeProfiles.contains("saml") && !activeProfiles.contains("ldap");
     }
 
     private Map<String, List<Object>> getCurrentApprovals() {
@@ -103,6 +115,7 @@ public class ProfileController extends AbstractControllerInfo implements Initial
 
             result.put(clientId, approvalList);
         }
+        // TODO: sort the scopes on the entries for view stability
         return result;
     }
 
@@ -150,7 +163,7 @@ public class ProfileController extends AbstractControllerInfo implements Initial
 
     private void deleteApprovalsForClient(String clientId) {
         ResponseEntity<String> response = restTemplate.exchange(approvalsUri + "?clientId=" + clientId,
-                        HttpMethod.DELETE, null, String.class);
+                HttpMethod.DELETE, null, String.class);
         logger.debug("Delete approvals request for client " + clientId + " resulted in " + response);
     }
 
