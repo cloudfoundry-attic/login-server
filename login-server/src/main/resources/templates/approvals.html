@@ -31,7 +31,7 @@
         <div class="panel-content">
             <h2>Profile</h2>
             <p class="profile">
-                <span sec:authentication="principal">user@example.com</span><a href="/change_password" th:href="@{/change_password}">Change Password</a>
+                <span sec:authentication="principal">user@example.com</span><a href="/change_password" th:href="@{/change_password}" th:if="${showChangePasswordLink}">Change Password</a>
             </p>
             <h2>Third Party Access</h2>
             <p>
