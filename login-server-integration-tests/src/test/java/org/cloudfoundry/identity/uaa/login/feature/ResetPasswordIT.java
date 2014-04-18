@@ -82,7 +82,7 @@ public class ResetPasswordIT {
         Assert.assertEquals(1, simpleSmtpServer.getReceivedEmailSize());
         SmtpMessage message = (SmtpMessage) simpleSmtpServer.getReceivedEmail().next();
         Assert.assertEquals(userEmail, message.getHeaderValue("To"));
-        Assert.assertThat(message.getBody(), containsString("Click the link to reset your password"));
+        Assert.assertThat(message.getBody(), containsString("Reset your password"));
 
         Assert.assertEquals("Check your email for a reset password link.", webDriver.findElement(By.cssSelector(".instructions-sent")).getText());
 

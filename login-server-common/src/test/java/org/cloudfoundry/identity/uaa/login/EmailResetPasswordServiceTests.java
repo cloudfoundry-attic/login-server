@@ -12,6 +12,7 @@
  *******************************************************************************/
 package org.cloudfoundry.identity.uaa.login;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
@@ -44,7 +45,7 @@ public class EmailResetPasswordServiceTests {
         RestTemplate uaaTemplate = new RestTemplate();
         mockUaaServer = MockRestServiceServer.createServer(uaaTemplate);
         uriComponentsBuilder = UriComponentsBuilder.fromUriString("http://login.example.com/login");
-        emailResetPasswordService = new EmailResetPasswordService(uaaTemplate, "http://uaa.example.com/uaa", "localhost", 2525, "", "");
+        emailResetPasswordService = new EmailResetPasswordService(uaaTemplate, "http://uaa.example.com/uaa", "localhost", 2525, "", "", "pivotal");
     }
 
     @After
@@ -65,7 +66,7 @@ public class EmailResetPasswordServiceTests {
         Assert.assertEquals(1, smtpServer.getReceivedEmailSize());
         SmtpMessage message = (SmtpMessage) smtpServer.getReceivedEmail().next();
         Assert.assertEquals("user@example.com", message.getHeaderValue("To"));
-        Assert.assertEquals("Click the link to reset your password <a href=\"http://login.example.com/login/reset_password?code=the_secret_code&email=user@example.com\">Reset Password</a>", message.getBody());
+        Assert.assertThat(message.getBody(), containsString("<a href=\"http://login.example.com/login/reset_password?code=the_secret_code&email=user@example.com\">Reset your password</a>"));
     }
 
     @Test

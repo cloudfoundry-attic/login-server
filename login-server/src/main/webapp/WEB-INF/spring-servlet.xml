@@ -341,6 +341,7 @@
                 <constructor-arg value="${smtp.port:25}"/>
                 <constructor-arg value="${smtp.user:}"/>
                 <constructor-arg value="${smtp.password:}"/>
+                <constructor-arg value="${login.brand:oss}"/>
             </bean>
 
             <bean id="changePasswordService" class="org.cloudfoundry.identity.uaa.login.UaaChangePasswordService">
