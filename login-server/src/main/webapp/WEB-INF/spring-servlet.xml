@@ -37,6 +37,7 @@
     <security:http pattern="/forgot_password*" security="none" />
     <security:http pattern="/reset_password" security="none" />
     <security:http pattern="/email_sent" security="none" />
+    <security:http pattern="/accounts/new" security="none" />
 
     <!-- TODO: Move the autologin related beans from the login server and saml login server to login common -->
     <bean id="abstractRemoteUaaController" abstract="true">
@@ -328,6 +329,8 @@
     </bean>
 
     <bean id="buildInfo" class="org.cloudfoundry.identity.uaa.login.BuildInfo" />
+
+    <bean id="accountsController" class="org.cloudfoundry.identity.uaa.login.AccountsController" />
 
     <beans profile="!ldap">
         <beans profile="!saml">

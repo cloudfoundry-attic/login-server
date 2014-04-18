@@ -64,4 +64,14 @@ public class LoginIT {
         String regex = "Version: \\S+, Commit: \\w{7}, Timestamp: \\S+, UAA: http://localhost:8080/uaa";
         Assert.assertTrue(webDriver.findElement(By.className("footer")).getAttribute("title").matches(regex));
     }
+
+    @Test
+    public void testSignupPage() throws Exception {
+        webDriver.get(baseUrl + "/login");
+
+        webDriver.findElement(By.linkText("Create account")).click();
+
+        Assert.assertEquals("https://network.gopivotal.com/registrations/new", webDriver.findElement(By.linkText("Pivotal Network")).getAttribute("href"));
+        Assert.assertEquals("https://console.10.244.0.34.xip.io/register", webDriver.findElement(By.linkText("Pivotal Web Services")).getAttribute("href"));
+    }
 }
