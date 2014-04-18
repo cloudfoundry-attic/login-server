@@ -26,7 +26,7 @@
             </div>
             <span class="left">
                 <a href="/accounts/new" th:href="@{/accounts/new}" class="link-lowlight">Create account</a>
-            </span><span class="right" th:if="${links.get('passwd')}">
+            </span><span class="right" th:unless="${#strings.isEmpty(links.get('passwd'))}">
                 <a href="/forgot_password" th:href="${links.get('passwd')}" class="link-lowlight">Reset password</a>
             </span>
         </div>
