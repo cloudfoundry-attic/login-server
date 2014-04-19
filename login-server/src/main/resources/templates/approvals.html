@@ -50,17 +50,17 @@
                             </a>
                         </div>
                         <ul>
-                            <th:block th:each="approval, iter : ${client.value}" th:with="code=${'scope.' + approval.get('scope')}">
+                            <th:block th:each="approval, iter : ${client.value}" th:with="code=${'scope.' + approval.scope}">
                                 <li>
                                     <input type="checkbox"
                                            name="checkedScopes"
                                            id="scope.0"
-                                           th:id="|scope.${index}|"
-                                           th:value="|${approval.get('clientId')}-${approval.get('scope')}|"
-                                           th:checked="${approval.get('status')} == 'APPROVED'" />
+                                           th:id="|scope.${iter.index}|"
+                                           th:value="|${approval.clientId}-${approval.scope}|"
+                                           th:checked="${approval.status.toString() == 'APPROVED'}" />
                                     <label for="scope.0"
-                                           th:for="|scope.${index}|"
-                                           th:utext="${#messages.msgOrNull(code) ?: code}">Something new.</label>
+                                           th:for="|scope.${iter.index}|"
+                                           th:utext="${#messages.msgOrNull(code) ?: approval.description}">Something new.</label>
                                 </li>
                             </th:block>
                         </ul>

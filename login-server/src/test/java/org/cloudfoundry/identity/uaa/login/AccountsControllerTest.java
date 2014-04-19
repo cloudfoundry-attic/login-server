@@ -47,5 +47,4 @@ public class AccountsControllerTest {
                 .setViewResolvers(viewResolver)
                 .build();
     }
-
 }
