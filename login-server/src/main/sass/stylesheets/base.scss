@@ -19,6 +19,11 @@ $red: #ab2a2a;
 $shadow1: rgba(0, 0, 0, 0.16);
 $shadow2: rgba(66, 66, 66, 0.7);
 
+$light: 300;
+$regular: 400;
+$semi-bold: 600;
+$bold: 700;
+
 $footer-space: 40px;
 
 body {
@@ -44,7 +49,7 @@ body {
 
 h1 {
     font-size: 32px;
-    font-weight: 300;
+    font-weight: $light;
     text-transform: none;
     margin-top: 0;
     margin-bottom: 16px;
@@ -52,7 +57,7 @@ h1 {
 
 h2 {
     font-size: 24px;
-    font-weight: 300;
+    font-weight: $light;
     color: #939393;
 }
 
@@ -127,7 +132,7 @@ input {
 .link-lowlight {
     color: $gray5;
     font-size: 12px;
-    font-weight: 300;
+    font-weight: $light;
 }
 
 .error-message {
@@ -149,7 +154,7 @@ input {
     padding: 10px 0;
 
     .saml-login-link {
-        font-weight: 700;
+        font-weight: $bold;
     }
 }
 
@@ -250,7 +255,7 @@ input {
     }
 
     .undecided label {
-        font-weight: 600;
+        font-weight: $semi-bold;
     }
 }
 
@@ -326,7 +331,7 @@ input {
                 width: 80%;
                 height: auto;
                 font-size: 14px;
-                font-weight: 600;
+                font-weight: $semi-bold;
                 line-height: 14px;
                 color: $gray7;
                 text-transform: uppercase;
