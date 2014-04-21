@@ -32,6 +32,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.params.ClientPNames;
 import org.apache.http.client.params.CookiePolicy;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.cloudfoundry.identity.uaa.authentication.AuthzAuthenticationRequest;
 import org.cloudfoundry.identity.uaa.authentication.login.Prompt;
 import org.cloudfoundry.identity.uaa.client.SocialClientUserDetails;
@@ -173,9 +174,7 @@ public class RemoteUaaController extends AbstractControllerInfo {
         restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory() {
             @Override
             public HttpClient getHttpClient() {
-                HttpClient client = super.getHttpClient();
-                client.getParams().setParameter(ClientPNames.COOKIE_POLICY, CookiePolicy.IGNORE_COOKIES);
-                return client;
+                return HttpClientBuilder.create().useSystemProperties().disableCookieManagement().build();
             }
         });
         restTemplate.setErrorHandler(new DefaultResponseErrorHandler() {
