@@ -58,11 +58,11 @@ h2 {
 
 .island {
     text-align: center;
-}
 
-.island-content {
-    width: 196px;
-    margin: 0 auto 0 auto;
+    .island-content {
+        width: 196px;
+        margin: 0 auto 0 auto;
+    }
 }
 
 form {
@@ -147,10 +147,10 @@ input {
     line-height: 18px;
     margin-bottom: 10px;
     padding: 10px 0;
-}
 
-.saml-login-link {
-    font-weight: 700;
+    .saml-login-link {
+        font-weight: 700;
+    }
 }
 
 .nav {
@@ -173,10 +173,14 @@ input {
     list-style: none outside none;
     padding: 0;
     display: none;
-}
 
-.dropdown-content a {
-    color: $gray5;
+    a {
+        color: $gray5;
+        display: block;
+        min-width: 120px;
+        min-height: 18px;
+        padding: 4px 8px;
+    }
 }
 
 .dropdown-trigger.open, .dropdown-content.open {
@@ -190,38 +194,31 @@ input {
     color: $gray6;
 }
 
-.dropdown-content a {
-    display: block;
-    min-width: 120px;
-    min-height: 18px;
-    padding: 4px 8px;
-}
-
 .panel {
     background-color: $white;
     width: 460px;
     padding: 40px;
     margin: 0 auto 0;
     text-align: center;
-}
 
-.panel-content {
-    color: $gray5;
-    text-align: left;
-    margin-top: 16px;
-}
+    .panel-content {
+        color: $gray5;
+        text-align: left;
+        margin-top: 16px;
 
-.panel-content h2 {
-    color: $gray6;
-}
+        h2 {
+            color: $gray6;
+        }
 
-.panel-content p {
-    margin-top: 10px;
-}
+        p {
+            margin-top: 10px;
+        }
 
-.panel-content ul {
-    padding: 0px;
-    list-style: none outside none;
+        ul {
+            padding: 0px;
+            list-style: none outside none;
+        }
+    }
 }
 
 .application-link {
@@ -232,67 +229,71 @@ input {
     border: 1px solid #cccccc;
     margin: 12px 0;
     padding: 20px;
-}
 
-.application-scopes li {
-    padding: 0 16px 16px 16px;
-}
+    li {
+        padding: 0 16px 16px 16px;
 
-.application-scopes li:first-child {
-    padding-top: 16px;
-}
+        &:first-child {
+            padding-top: 16px;
+        }
+    }
 
-.application-scopes input {
-    display: inline-block;
-    margin: 6px 0;
-    vertical-align: top;
-}
+    input {
+        display: inline-block;
+        margin: 6px 0;
+        vertical-align: top;
+    }
 
-.application-scopes label {
-    width: 298px;
-    margin-left: 10px;
-}
+    label {
+        width: 298px;
+        margin-left: 10px;
+    }
 
-.application-scopes .undecided label {
-    font-weight: 600;
+    .undecided label {
+        font-weight: 600;
+    }
 }
 
 .actions {
     margin-top: 40px;
     text-align: center;
+
+    button[type='submit'] {
+        height: 30px;
+        line-height: 12px;
+        margin: 0 10px;
+        min-width: 120px;
+    }
 }
 
-.actions button[type='submit'] {
-    height: 30px;
-    line-height: 12px;
-    margin: 0 10px;
-    min-width: 120px;
-}
+.profile {
+    span {
+        display: inline-block;
+        width: 60%;
+    }
 
-.profile span {
-    display: inline-block;
-    width: 60%;
-}
-
-.profile a {
-    display: inline-block;
-    width: 40%;
-    text-align: right;
+    a {
+        display: inline-block;
+        width: 40%;
+        text-align: right;
+    }
 }
 
 .client-scopes .application-scopes label {
     width: 276px;
 }
 
-.application-label h3 {
-    display: inline-block;
-    width: 70%;
-}
+.application-label {
+    h3 {
+        display: inline-block;
+        width: 70%;
+    }
 
-.application-label a {
-    display: inline-block;
-    width: 30%;
+    a {
+        display: inline-block;
+        width: 30%;
 
+    }
 }
 
 .revocation-scrim {
@@ -304,53 +305,53 @@ input {
     height: 100%;
     z-index: 100;
     display: none;
-}
 
-.revocation-modal {
-    background-color: $white;
-    z-index: 1000;
-    width: 400px;
-    margin: 200px auto 0 auto;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-}
+    .revocation-modal {
+        background-color: $white;
+        z-index: 1000;
+        width: 400px;
+        margin: 200px auto 0 auto;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
 
-.revocation-modal-header {
-    padding: 18px;
-    border-bottom: 1px solid $gray3;
-}
+        p {
+          padding: 4px 18px 4px 18px;
+        }
 
-.revocation-modal-header h3 {
-    display: inline-block;
-    width: 80%;
-    height: auto;
-    font-size: 14px;
-    font-weight: 600;
-    line-height: 14px;
-    color: $gray7;
-    text-transform: uppercase;
-}
+        .revocation-modal-header {
+            padding: 18px;
+            border-bottom: 1px solid $gray3;
 
-.revocation-modal-header .close-icon {
-    display: inline-block;
-    width: 20%;
-    text-align: right;
-    cursor: pointer;
-}
+            h3 {
+                display: inline-block;
+                width: 80%;
+                height: auto;
+                font-size: 14px;
+                font-weight: 600;
+                line-height: 14px;
+                color: $gray7;
+                text-transform: uppercase;
+            }
 
-.revocation-modal p {
-    padding: 4px 18px 4px 18px;
-}
+            .close-icon {
+                display: inline-block;
+                width: 20%;
+                text-align: right;
+                cursor: pointer;
+            }
+        }
 
-.revocation-actions {
-    padding: 8px 18px 18px 0;
-    text-align: right;
-}
+        .revocation-actions {
+            padding: 8px 18px 18px 0;
+            text-align: right;
 
-.revocation-actions button {
-    height: 28px;
-    line-height: 12px;
-    margin: 0 4px;
-    min-width: 100px;
+            button {
+                height: 28px;
+                line-height: 12px;
+                margin: 0 4px;
+                min-width: 100px;
+            }
+        }
+    }
 }
 
 .passcode input {
