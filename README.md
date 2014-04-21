@@ -34,8 +34,8 @@ performing a ````mvn install```` from the login-server directory.
 
 These tests require [PhantomJS](http://phantomjs.org/download.html) to be installed.
 
-    $ cd login-server-integration-tests
     $ mvn tomcat7:run -P integration
+    $ cd login-server-integration-tests
     $ mvn verify
 
 There are two documents that can help you configure the login server in your environment.
