@@ -114,7 +114,7 @@
     <properties>
         <identity.version>1.6.3-SNAPSHOT</identity.version>
         <spring.version>4.0.3.RELEASE</spring.version>
-        <spring.security.version>3.2.2.RELEASE</spring.security.version>
+        <spring.security.version>3.2.3.RELEASE</spring.security.version>
         <groupId>${project.groupId}</groupId>
         <version>${project.version}</version>
         <generatePom>true</generatePom>
