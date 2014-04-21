@@ -44,6 +44,14 @@ There are two documents that can help you configure the login server in your env
 
 [OpenAM Configuration](docs/OpenAM-Configuration.md)
 
+## Stylesheets
+
+The Login Server uses [SASS](http://sass-lang.com/) to preprocess CSS stylesheets.
+These get compiled in the generate-resources phase of the Maven build.
+To watch the SCSS files and auto-recompile them during development, use:
+
+    $ mvn -pl login-server sass:watch
+
 # Contributing to the Login Server
 
 Here are some ways for you to get involved in the community:

@@ -9,7 +9,9 @@
     <meta name='robots' content='all' />
     <meta name='Description' content=""/>
     <meta name='keywords' content=""/>
-    <link href="/resources/pivotal/stylesheets/brand.css" th:href="@{'/resources/'+${brand}+'/stylesheets/brand.css'}" rel="stylesheet"/>
+    <link href="/vendor/font-awesome/css/font-awesome.min.css" th:href="@{/vendor/font-awesome/css/font-awesome.min.css}" rel="stylesheet"/>
+    <link href="/vendor/pivotal-one-styles/css/application.css" th:href="@{/vendor/pivotal-one-styles/css/application.css}" rel="stylesheet"/>
+    <link href="/resources/pivotal/stylesheets/application.css" th:href="@{'/resources/'+${brand}+'/stylesheets/application.css'}" rel="stylesheet"/>
 </head>
 <body th:style="|background: #f8f8f8 url(@{'/resources/'+${brand}+'/images/logo.png'}) no-repeat 50% ${brand == 'oss' ? 40 : 0}px;|">
 <div class="content">

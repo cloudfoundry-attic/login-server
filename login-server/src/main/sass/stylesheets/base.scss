@@ -1,0 +1,365 @@
+@import url(http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700);
+
+$white: #ffffff;
+$gray1: #f8f8f8;
+$gray2: #e0e4e5;
+$gray3: #d4d9da;
+$gray4: #9faaad;
+$gray5: #7f7f7f;
+$gray6: #43575c;
+$gray7: #424242;
+
+$teal: #01786e;
+$light-blue: #49a8d5;
+$blue: #2185c5;
+$dark-blue: #1f74ac;
+$pink: #febfc1;
+$red: #ab2a2a;
+
+$shadow1: rgba(0, 0, 0, 0.16);
+$shadow2: rgba(66, 66, 66, 0.7);
+
+$light: 300;
+$regular: 400;
+$semi-bold: 600;
+$bold: 700;
+
+$footer-space: 40px;
+
+body {
+    background-color: $gray1;
+}
+
+.content {
+    min-height: 100%;
+    height: auto !important;
+    height: 100%;
+    margin: 0 auto (-$footer-space);
+}
+
+.footer, .footer-spacer {
+    height: $footer-space;
+}
+
+.footer {
+    padding-left: 40px;
+    color: $gray4;
+    font-size: 12px;
+}
+
+h1 {
+    font-size: 32px;
+    font-weight: $light;
+    text-transform: none;
+    margin-top: 0;
+    margin-bottom: 16px;
+}
+
+h2 {
+    font-size: 24px;
+    font-weight: $light;
+    color: #939393;
+}
+
+.island {
+    text-align: center;
+
+    .island-content {
+        width: 196px;
+        margin: 0 auto 0 auto;
+    }
+}
+
+form {
+    margin-bottom: 8px;
+}
+
+input {
+    display: block;
+    margin-bottom: 20px;
+}
+
+.btn-alternate {
+    text-transform: uppercase;
+    font-size: 14px;
+    height: 34px;
+    padding: 0;
+    line-height: 14px;
+}
+
+.form-control {
+    font-size: 14px;
+    height: 34px;
+}
+
+.forgot-password {
+    letter-spacing: 0;
+}
+
+.fa-envelope-o {
+    font-size: 36px;
+    color: $gray3;
+    margin-bottom: 18px;
+}
+
+.fa-chevron-down {
+    float: right;
+    font-size: 10px;
+    margin-top: 4px;
+}
+
+.instructions-sent {
+    color: $gray4;
+}
+
+.email-display {
+    color: $gray5;
+    font-size: 14px;
+    margin-bottom: 16px;
+}
+
+.left {
+    display: inline-block;
+    text-align: left;
+    width: 50%;
+}
+.right {
+    display: inline-block;
+    text-align: right;
+    width: 50%;
+}
+
+.link-lowlight {
+    color: $gray5;
+    font-size: 12px;
+    font-weight: $light;
+}
+
+.error-message {
+    background-color: $pink;
+    color: $red;
+    width: 100%;
+    font-size: 11px;
+    padding: 12px 0;
+    line-height: 12px;
+    margin-bottom: 20px;
+}
+
+.saml-login {
+    border-bottom: 1px solid #cccccc;
+    color: #cccccc;
+    font-size: 11px;
+    line-height: 18px;
+    margin-bottom: 10px;
+    padding: 10px 0;
+
+    .saml-login-link {
+        font-weight: $bold;
+    }
+}
+
+.nav {
+    position: relative;
+    font-size: 12px;
+    float: right;
+    margin: 12px 18px 0 0;
+    min-width: 120px;
+    color: $gray4;
+}
+
+.dropdown-trigger {
+    cursor: pointer;
+    padding: 4px 8px;
+}
+
+.dropdown-content {
+    position: absolute;
+    top: 110%;
+    list-style: none outside none;
+    padding: 0;
+    display: none;
+
+    a {
+        color: $gray5;
+        display: block;
+        min-width: 120px;
+        min-height: 18px;
+        padding: 4px 8px;
+    }
+}
+
+.dropdown-trigger.open, .dropdown-content.open {
+    background-color: $white;
+    display: block;
+    color: $gray5;
+}
+
+.dropdown-trigger:hover, .dropdown-content a:hover {
+    background-color: $gray2;
+    color: $gray6;
+}
+
+.panel {
+    background-color: $white;
+    width: 460px;
+    padding: 40px;
+    margin: 0 auto 0;
+    text-align: center;
+
+    .panel-content {
+        color: $gray5;
+        text-align: left;
+        margin-top: 16px;
+
+        h2 {
+            color: $gray6;
+        }
+
+        p {
+            margin-top: 10px;
+        }
+
+        ul {
+            padding: 0px;
+            list-style: none outside none;
+        }
+    }
+}
+
+.application-link {
+    font-size: 14px;
+}
+
+.application-scopes {
+    border: 1px solid #cccccc;
+    margin: 12px 0;
+    padding: 20px;
+
+    li {
+        padding: 0 16px 16px 16px;
+
+        &:first-child {
+            padding-top: 16px;
+        }
+    }
+
+    input {
+        display: inline-block;
+        margin: 6px 0;
+        vertical-align: top;
+    }
+
+    label {
+        width: 298px;
+        margin-left: 10px;
+    }
+
+    .undecided label {
+        font-weight: $semi-bold;
+    }
+}
+
+.actions {
+    margin-top: 40px;
+    text-align: center;
+
+    button[type='submit'] {
+        height: 30px;
+        line-height: 12px;
+        margin: 0 10px;
+        min-width: 120px;
+    }
+}
+
+.profile {
+    span {
+        display: inline-block;
+        width: 60%;
+    }
+
+    a {
+        display: inline-block;
+        width: 40%;
+        text-align: right;
+    }
+}
+
+.client-scopes .application-scopes label {
+    width: 276px;
+}
+
+.application-label {
+    h3 {
+        display: inline-block;
+        width: 70%;
+    }
+
+    a {
+        display: inline-block;
+        width: 30%;
+
+    }
+}
+
+.revocation-scrim {
+    background-color: $shadow2;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 100;
+    display: none;
+
+    .revocation-modal {
+        background-color: $white;
+        z-index: 1000;
+        width: 400px;
+        margin: 200px auto 0 auto;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+
+        p {
+          padding: 4px 18px 4px 18px;
+        }
+
+        .revocation-modal-header {
+            padding: 18px;
+            border-bottom: 1px solid $gray3;
+
+            h3 {
+                display: inline-block;
+                width: 80%;
+                height: auto;
+                font-size: 14px;
+                font-weight: $semi-bold;
+                line-height: 14px;
+                color: $gray7;
+                text-transform: uppercase;
+            }
+
+            .close-icon {
+                display: inline-block;
+                width: 20%;
+                text-align: right;
+                cursor: pointer;
+            }
+        }
+
+        .revocation-actions {
+            padding: 8px 18px 18px 0;
+            text-align: right;
+
+            button {
+                height: 28px;
+                line-height: 12px;
+                margin: 0 4px;
+                min-width: 100px;
+            }
+        }
+    }
+}
+
+.passcode input {
+    text-align: center;
+    font-size: 18px;
+}
