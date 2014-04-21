@@ -8,6 +8,7 @@ before_install:
   - git pull --unshallow
   - wget -O tomcat.tar.gz http://archive.apache.org/dist/tomcat/tomcat-7/v7.0.52/bin/apache-tomcat-7.0.52.tar.gz
   - $TRAVIS_BUILD_DIR/.clone_matched_uaa_branch.sh
+  - unset GEM_PATH # for compatibility with the maven-sass-plugin
 install:
   - cd $TRAVIS_BUILD_DIR/uaa
   - mvn -U clean --quiet -DskipTests=true
