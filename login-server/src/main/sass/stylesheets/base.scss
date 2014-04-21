@@ -19,6 +19,8 @@ $red: #ab2a2a;
 $shadow1: rgba(0, 0, 0, 0.16);
 $shadow2: rgba(66, 66, 66, 0.7);
 
+$footer-space: 40px;
+
 body {
     background-color: $gray1;
 }
@@ -27,11 +29,11 @@ body {
     min-height: 100%;
     height: auto !important;
     height: 100%;
-    margin: 0 auto -40px;
+    margin: 0 auto (-$footer-space);
 }
 
 .footer, .footer-spacer {
-    height: 40px;
+    height: $footer-space;
 }
 
 .footer {
@@ -193,10 +195,6 @@ input {
     min-width: 120px;
     min-height: 18px;
     padding: 4px 8px;
-}
-
-.panel-container {
-    padding-top: 130px;
 }
 
 .panel {

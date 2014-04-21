@@ -1,11 +1,17 @@
 @import '../../stylesheets/base';
 
+$header-space: 130px;
+
 h1 {
     color: $teal;
 }
 
 .island {
-    padding-top: 130px;
+    padding-top: $header-space;
+}
+
+.panel-container {
+  padding-top: $header-space;
 }
 
 .pivotal-links {

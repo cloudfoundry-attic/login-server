@@ -1,13 +1,15 @@
 @import '../../stylesheets/base';
 
+$header-space: 200px;
+
 h1 {
     color: $gray7;
 }
 
 .island {
-    padding-top: 200px;
+    padding-top: $header-space;
 }
 
 .panel-container {
-    padding-top: 200px;
+    padding-top: $header-space;
 }
