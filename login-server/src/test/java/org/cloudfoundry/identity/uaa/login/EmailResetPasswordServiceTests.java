@@ -21,7 +21,7 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withBadRequest;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
-import org.junit.After;
+import org.cloudfoundry.identity.uaa.login.test.FakeJavaMailSender;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,28 +29,24 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.dumbster.smtp.SimpleSmtpServer;
-import com.dumbster.smtp.SmtpMessage;
+import java.util.Arrays;
+import javax.mail.Message;
+import javax.mail.internet.InternetAddress;
 
 public class EmailResetPasswordServiceTests {
 
-    private SimpleSmtpServer smtpServer;
     private EmailResetPasswordService emailResetPasswordService;
     private MockRestServiceServer mockUaaServer;
     private UriComponentsBuilder uriComponentsBuilder;
+    private FakeJavaMailSender mailSender;
 
     @Before
     public void setUp() throws Exception {
-        smtpServer = SimpleSmtpServer.start(2525);
         RestTemplate uaaTemplate = new RestTemplate();
         mockUaaServer = MockRestServiceServer.createServer(uaaTemplate);
         uriComponentsBuilder = UriComponentsBuilder.fromUriString("http://login.example.com/login");
-        emailResetPasswordService = new EmailResetPasswordService(uaaTemplate, "http://uaa.example.com/uaa", "localhost", 2525, "", "", "pivotal");
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        smtpServer.stop();
+        mailSender = new FakeJavaMailSender();
+        emailResetPasswordService = new EmailResetPasswordService(uaaTemplate, "http://uaa.example.com/uaa", mailSender, "pivotal");
     }
 
     @Test
@@ -63,10 +59,11 @@ public class EmailResetPasswordServiceTests {
 
         mockUaaServer.verify();
 
-        Assert.assertEquals(1, smtpServer.getReceivedEmailSize());
-        SmtpMessage message = (SmtpMessage) smtpServer.getReceivedEmail().next();
-        Assert.assertEquals("user@example.com", message.getHeaderValue("To"));
-        Assert.assertThat(message.getBody(), containsString("<a href=\"http://login.example.com/login/reset_password?code=the_secret_code&email=user@example.com\">Reset your password</a>"));
+        Assert.assertEquals(1, mailSender.getSentMessages().size());
+
+        FakeJavaMailSender.MimeMessageWrapper messageWrapper = mailSender.getSentMessages().get(0);
+        Assert.assertEquals(Arrays.asList(new InternetAddress("user@example.com")), messageWrapper.getRecipients(Message.RecipientType.TO));
+        Assert.assertThat(messageWrapper.getContentString(), containsString("<a href=\"http://login.example.com/login/reset_password?code=the_secret_code&email=user@example.com\">Reset your password</a>"));
     }
 
     @Test
@@ -79,7 +76,7 @@ public class EmailResetPasswordServiceTests {
 
         mockUaaServer.verify();
 
-        Assert.assertEquals(0, smtpServer.getReceivedEmailSize());
+        Assert.assertEquals(0, mailSender.getSentMessages().size());
     }
 
     @Test

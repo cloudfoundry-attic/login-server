@@ -338,10 +338,14 @@
             <bean id="resetPasswordService" class="org.cloudfoundry.identity.uaa.login.EmailResetPasswordService">
                 <constructor-arg ref="authorizationTemplate"/>
                 <constructor-arg value="${uaa.url:http://localhost:8080/uaa}"/>
-                <constructor-arg value="${smtp.host:localhost}"/>
-                <constructor-arg value="${smtp.port:25}"/>
-                <constructor-arg value="${smtp.user:}"/>
-                <constructor-arg value="${smtp.password:}"/>
+                <constructor-arg>
+                    <bean class="org.springframework.mail.javamail.JavaMailSenderImpl">
+                        <property name="host" value="${smtp.host:localhost}"/>
+                        <property name="port" value="${smtp.port:25}"/>
+                        <property name="username" value="${smtp.user:}"/>
+                        <property name="password" value="${smtp.password:}"/>
+                    </bean>
+                </constructor-arg>
                 <constructor-arg value="${login.brand:oss}"/>
             </bean>
 
