@@ -1,0 +1,335 @@
+.headers {
+  // first header
+  margin-bottom: 20px;
+  .nav-list-wrapper{
+    background-color: #f8f8f8;
+  }
+  .nav-list {
+    @extend .list-inline;
+    text-align: right;
+    margin: 0;
+    a {
+      color: $nav-list-link-color;
+      padding: 5px 8px;
+      display: inline-block;
+      &:hover, &:active {
+        color: $nav-list-link-hover-color;
+      }
+    }
+  }
+
+  // second header (main)
+  .navbar-brand {
+    font-size: 17px;
+    font-weight: 200;
+    //min-width: 174px;
+
+    .image-logo {
+      width: $logo-width;
+      height: $logo-height;
+      margin-right: 10px;
+      display: inline-block;
+      vertical-align: middle;
+      background-position: top left;
+      background-repeat: no-repeat;
+      background-image: image-url("logo-pws.png");
+      .on_premise & {
+        background-image: image-url("logo-pcf.png");
+      }
+    }
+
+    strong {
+      display: block;
+      margin-left: 2px;
+      font-size: 18px;
+      font-weight: 600;
+    }
+    .on_premise & strong {
+      display: inline;
+    }
+  }
+
+  .navbar-list-divider {
+    text-align: right;
+
+    font-size: 0;
+    margin-top: 18px;
+    > li {
+      font-size: $font-size-base;
+      display: inline-block;
+      border-left: 1px solid $nav-list-divider-border-color;
+
+      min-height: 43px;
+      padding-left: 18px;
+      margin-left: 18px;
+
+      &:first-child {
+        border: none;
+        padding-left: 0;
+        margin-left: 0;
+      }
+
+    }
+  }
+
+  .navbar-nav {
+    margin-left: 0;
+    margin-right: 0;
+    > li > a {
+      padding-top: 11px;
+      padding-bottom: 12px;
+    }
+  }
+
+  .dropdown-nav {
+    margin-right: 10px;
+    width: 250px;
+
+    .dropdown-toggle{
+      .org-name{
+        display: block;
+        @include ellipsis;
+      }
+      .user-email {
+        display: inline-block;
+        width: 200px;
+        @include ellipsis;
+      }
+      .caret {
+        float: right;
+      }
+    }
+    &.open {
+      .dropdown-toggle {
+        background-color: $dropdown-nav-bg-hover !important; // needs important to override bootstrap;
+        border-bottom-right-radius: 0;
+        border-bottom-left-radius: 0;
+      }
+      .dropdown-menu {
+        width: auto !important;
+        border-top: none;
+        text-align: left;
+        right: 2px;
+        left: 2px;
+        box-shadow: none;
+        border-radius: 0;
+
+        li {
+          &.divider {
+            background-color: $dropdown-nav-divider-color;
+            margin-left: 13px;
+            margin-right: 13px;
+          }
+          a {
+            color: $type-accent-4;
+            padding-left: 13px;
+            @include ellipsis;
+          }
+        }
+        li.item-organization {
+          a {
+            color: $type-primary-4;
+          }
+        }
+      }
+    }
+
+    .dropdown-toggle {
+      //width: 221px;
+      color: $type-inverse !important; // needs important to override bootstrap
+      text-align: left;
+      font-size: 15px;
+      padding: 5px 10px;
+      margin: 6px 2px 0 2px;
+      border-radius: $border-radius-small;
+      background-color: $dropdown-nav-bg !important; // needs important to override bootstrap
+      .caret {
+        border-top-color: $dropdown-nav-caret-color !important; // needs important to override bootstrap
+        border-bottom-color: $dropdown-nav-caret-color !important; // needs important to override bootstrap
+        float: right;
+        margin-top: 8px;
+      }
+
+    }
+  }
+
+  .navbar-main {
+    > li > a {
+      text-transform: uppercase;
+    }
+
+    .active:after { // makes the arrow which points down, add outlines to .active and .active:after to debug.
+      content: "";
+      display: block;
+
+      // these styles position the triangle
+      position: absolute;
+      left: 50%;
+      margin-left: -27px;
+
+      // the following styles create a css triangle
+      border-style: solid;
+      border-width: 21px 28px 0 28px;
+      border-color: $teal-4 transparent transparent transparent;
+    }
+  }
+
+  .dropdown-nav-secondary {
+
+    width: auto;
+    a.dropdown-toggle {
+      color: $type-inverse !important; // needs important to override bootstrap
+      font-weight: 200;
+      text-transform: uppercase;
+      font-size: 13px;
+      @include ellipsis;
+      background-color: transparent !important;
+
+      .fa-user {
+        font-size: 18px;
+        margin-right: 5px;
+      }
+      .caret {
+        border-top-color: $type-inverse !important; // needs important to override bootstrap
+        border-bottom-color: $type-inverse !important; // needs important to override bootstrap
+      }
+      .user-email {
+
+        vertical-align: middle;
+        padding-right: 7px;
+      }
+    }
+
+    &.open {
+      a.dropdown-toggle {
+        background-color: red;
+      }
+    }
+  }
+
+  .navbar-signin {
+    color: $type-inverse;
+    a {
+      display: inline-block;
+      color: $type-inverse;
+    }
+  }
+
+  .subnav {
+    background-color: $navbar-subnav-bg;
+    @include border-bottom-radius($navbar-subnav-border-radius);
+    padding: 20px 20px 10px 20px;
+  }
+
+  @media (min-width: $grid-float-breakpoint) {
+    .navbar-collapse {
+      &.in {
+        overflow-y: visible; // bootstrap override, prevents scrollbar in nav after opening menu in small screen, and then expanding to large screen
+      }
+    }
+  }
+
+  @media all and (max-width: $screen-lg-min) {
+    .dropdown-nav-secondary {
+      &.open {
+        .dropdown-menu {
+          left: auto;
+        }
+      }
+    }
+  }
+
+  @media all and (max-width: $screen-lg-min) and (min-width: $screen-sm-min) {
+    .dropdown-nav-secondary {
+      a.dropdown-toggle {
+        width: 47px;
+
+        .user-email {
+          display:none;
+        }
+      }
+    }
+  }
+
+  @media all and (max-width: $screen-md-min) and (min-width:$screen-sm-min) {
+    .dropdown-nav-secondary {
+      .dropdown-menu {
+        left: -111px;
+      }
+    }
+  }
+
+  @media all and (max-width: $screen-md-min - 2px) {
+    .navbar-list-divider {
+      > li {
+        padding-left: 8px;
+        margin-left: 8px;
+      }
+    }
+
+    .dropdown-nav {
+      width: 100px;
+    }
+
+    .dropdown-nav-secondary {
+      width: auto;
+    }
+  }
+
+  @media all and (max-width: $screen-sm-min - 2px) {
+    .navbar-list-divider {
+      text-align: left;
+
+      > li {
+        border-left-width: 0;
+        border-top: 1px solid $nav-list-divider-border-color;
+
+        display: block;
+
+        padding-left: 0;
+        margin-left: 0;
+      }
+    }
+
+    .dropdown-nav {
+      width: auto;
+      margin: 11px 10px 12px 10px;
+
+      .dropdown-toggle {
+        .user-email {
+          width: auto;
+        }
+      }
+
+      &.open {
+        .dropdown-menu {
+          background-color: #fff; //bootstrap override
+          margin-right: 2px;
+          margin-left: 2px;
+
+          li {
+            a {
+              &:focus, &:hover {
+                color: $type-accent-4;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  @media (max-width: $grid-float-breakpoint) {
+    .container-subnav{
+      padding: 0;
+      .subnav {
+        @include border-bottom-radius(0);
+        padding: 10px ;
+      }
+    }
+  }
+}
+
+
+
+

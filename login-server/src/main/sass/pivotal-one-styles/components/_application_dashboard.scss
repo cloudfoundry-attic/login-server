@@ -1,0 +1,60 @@
+/*doc
+---
+title: Application Dashboard
+name: application_dashboard
+category: Base CSS
+---
+
+This is a hacky one-off to center the panel content + size the text
+
+
+```haml_example
+.row.application-dashboard
+  .col-sm-8
+    .panel.panel-simple.panel-square.application-health-panel
+      .panel-heading.panel-heading-simple
+        %h6 Status
+      .panel-body
+        .health.stopped.editable.health-indicator-large
+          %form
+            %input.indicator
+            .value Stopped
+  .col-sm-8
+    .panel.panel-simple.panel-square
+      .panel-heading.panel-heading-simple
+        %h6 Instances
+      .panel-body.txt-c
+        1
+  .col-sm-8
+    .panel.panel-simple.panel-square
+      .panel-heading.panel-heading-simple
+        %h6 Memory
+      .panel-body.txt-c
+        128
+        %span.units MB
+```
+
+*/
+
+.application-dashboard {
+  .panel-square {
+    position: relative;
+    .panel-body {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      overflow: auto;
+      margin: auto;
+      font-size: 24px;
+      padding-top: 50%;
+      margin-top: -1em;
+    }
+  }
+  .application-health-panel {
+    .panel-body {
+      margin-top: -32px;
+    }
+  }
+}

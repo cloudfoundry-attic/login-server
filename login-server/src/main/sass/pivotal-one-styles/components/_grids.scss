@@ -1,0 +1,49 @@
+/*doc
+---
+title: Grids
+name: grids
+category: Base CSS
+---
+
+This library includes a responsive, mobile first fluid grid system that appropriately
+scales up to 24 columns as the device or viewport size increases.
+
+```haml_example
+.container
+  .row.grid-show
+    .col-md-3
+      col-md-3
+    .col-md-3
+      col-md-3
+    .col-md-3
+      col-md-3
+    .col-md-3
+      col-md-3
+    .col-md-3
+      col-md-3
+    .col-md-3
+      col-md-3
+    .col-md-3
+      col-md-3
+    .col-md-3
+      col-md-3
+
+  .row.grid-show
+    .col-md-4
+      col-md-4
+    .col-md-8
+      col-md-8
+    .col-md-6
+      col-md-6
+    .col-md-6
+      col-md-6
+
+  .row.grid-show
+    .col-md-12
+      col-md-12
+    .col-md-12
+      col-md-12
+
+```
+
+*/

@@ -1,0 +1,62 @@
+*{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}
+
+html {
+  background-color: $html-bg;
+}
+
+html, body {
+  padding: 0;
+  margin: 0;
+  height: 100%;
+  font-size: $font-size-base;
+}
+
+// b-flat layout
+
+.page-wrapper {
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex-direction: column;
+  flex-direction: column;
+  min-height: 100%;
+  .page-body {
+    flex: 1;
+  }
+  .page-footer {
+  }
+}
+
+
+
+
+
+// login pages layout
+
+.footer-login {
+  padding: 13px 85px;
+  width: 100%;
+  background: $footer-login-bg;
+  color: $footer-login-color;
+}
+
+.page-wrap-login {
+  overflow: auto;
+  min-height: 100%;
+  margin-bottom: -$footer-login-height;
+}
+
+.page-wrap-login:after {
+  content: "";
+  display: block;
+}
+
+.footer-login, .page-wrap-login:after {
+  height: $footer-login-height;
+  @include clearfix-me(stubborn);
+}
+
+.page-login {
+  width: 550px;
+  margin: 100px auto 0 auto;
+}
+ // end login page layout
