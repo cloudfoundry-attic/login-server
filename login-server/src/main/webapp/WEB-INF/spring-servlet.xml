@@ -288,18 +288,32 @@
     <mvc:annotation-driven />
     <mvc:default-servlet-handler />
 
+    <bean id="springResourceResourceResolver"
+          class="org.thymeleaf.spring3.resourceresolver.SpringResourceResourceResolver"/>
+
     <bean id="templateResolver" class="org.thymeleaf.templateresolver.TemplateResolver">
-        <property name="resourceResolver">
-            <bean class="org.thymeleaf.spring3.resourceresolver.SpringResourceResourceResolver" />
-        </property>
-        <property name="prefix" value="classpath:/templates/" />
+        <property name="resourceResolver" ref="springResourceResourceResolver"/>
+        <property name="prefix" value="classpath:/templates/web/" />
+        <property name="suffix" value=".html"/>
+        <property name="templateMode" value="HTML5"/>
+        <property name="order" value="1" />
+    </bean>
+
+    <bean id="emailTemplateResolver" class="org.thymeleaf.templateresolver.TemplateResolver">
+        <property name="resourceResolver" ref="springResourceResourceResolver"/>
+        <property name="prefix" value="classpath:/templates/mail/" />
         <property name="suffix" value=".html" />
         <property name="templateMode" value="HTML5" />
-        <!--<property name="cacheable" value="false" />-->
+        <property name="order" value="2" />
     </bean>
 
     <bean id="templateEngine" class="org.thymeleaf.spring3.SpringTemplateEngine">
-        <property name="templateResolver" ref="templateResolver" />
+        <property name="templateResolvers">
+            <set>
+                <ref bean="templateResolver" />
+                <ref bean="emailTemplateResolver" />
+            </set>
+        </property>
         <property name="additionalDialects">
             <set>
                 <bean class="nz.net.ultraq.thymeleaf.LayoutDialect" />
