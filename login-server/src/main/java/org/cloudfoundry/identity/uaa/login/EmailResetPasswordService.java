@@ -68,6 +68,7 @@ public class EmailResetPasswordService implements ResetPasswordService {
                 logger.error("Exception raised while sending message to " + email, e);
             }
         } catch (RestClientException e) {
+            logger.info("Exception raised while creating password reset for " + email, e);
         }
     }
 
