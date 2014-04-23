@@ -291,35 +291,32 @@
     <bean id="springResourceResourceResolver"
           class="org.thymeleaf.spring3.resourceresolver.SpringResourceResourceResolver"/>
 
-    <bean id="templateResolver" class="org.thymeleaf.templateresolver.TemplateResolver">
+    <bean id="webTemplateResolver" class="org.thymeleaf.templateresolver.TemplateResolver">
         <property name="resourceResolver" ref="springResourceResourceResolver"/>
         <property name="prefix" value="classpath:/templates/web/" />
         <property name="suffix" value=".html"/>
         <property name="templateMode" value="HTML5"/>
-        <property name="order" value="1" />
     </bean>
 
-    <bean id="emailTemplateResolver" class="org.thymeleaf.templateresolver.TemplateResolver">
+    <bean id="mailTemplateResolver" class="org.thymeleaf.templateresolver.TemplateResolver">
         <property name="resourceResolver" ref="springResourceResourceResolver"/>
         <property name="prefix" value="classpath:/templates/mail/" />
         <property name="suffix" value=".html" />
         <property name="templateMode" value="HTML5" />
-        <property name="order" value="2" />
     </bean>
 
-    <bean id="templateEngine" class="org.thymeleaf.spring3.SpringTemplateEngine">
-        <property name="templateResolvers">
-            <set>
-                <ref bean="templateResolver" />
-                <ref bean="emailTemplateResolver" />
-            </set>
-        </property>
+    <bean id="webTemplateEngine" class="org.thymeleaf.spring3.SpringTemplateEngine">
+        <property name="templateResolver" ref="webTemplateResolver" />
         <property name="additionalDialects">
             <set>
                 <bean class="nz.net.ultraq.thymeleaf.LayoutDialect" />
                 <bean class="org.thymeleaf.extras.springsecurity3.dialect.SpringSecurityDialect"/>
             </set>
         </property>
+    </bean>
+
+    <bean id="mailTemplateEngine" class="org.thymeleaf.spring3.SpringTemplateEngine">
+        <property name="templateResolver" ref="mailTemplateResolver" />
     </bean>
 
     <bean id="viewResolver" class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
@@ -331,7 +328,7 @@
         <property name="viewResolvers">
             <list>
                 <bean class="org.thymeleaf.spring3.view.ThymeleafViewResolver">
-                    <property name="templateEngine" ref="templateEngine" />
+                    <property name="templateEngine" ref="webTemplateEngine" />
                 </bean>
                 <bean class="org.springframework.web.servlet.view.BeanNameViewResolver" />
             </list>
@@ -350,6 +347,7 @@
     <beans profile="!ldap">
         <beans profile="!saml">
             <bean id="resetPasswordService" class="org.cloudfoundry.identity.uaa.login.EmailResetPasswordService">
+                <constructor-arg ref="mailTemplateEngine" />
                 <constructor-arg ref="authorizationTemplate"/>
                 <constructor-arg value="${uaa.url:http://localhost:8080/uaa}"/>
                 <constructor-arg>
@@ -361,6 +359,7 @@
                     </bean>
                 </constructor-arg>
                 <constructor-arg value="${login.brand:oss}"/>
+                <constructor-arg value="${login.url:http://localhost:8080/login}"/>
             </bean>
 
             <bean id="changePasswordService" class="org.cloudfoundry.identity.uaa.login.UaaChangePasswordService">

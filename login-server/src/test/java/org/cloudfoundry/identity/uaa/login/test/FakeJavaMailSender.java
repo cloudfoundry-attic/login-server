@@ -96,6 +96,10 @@ public class FakeJavaMailSender implements JavaMailSender {
             return Arrays.asList(mimeMessage.getRecipients(recipientType));
         }
 
+        public List<Address> getFrom() throws MessagingException {
+            return Arrays.asList(mimeMessage.getFrom());
+        }
+
         public String getContentString() throws MessagingException, IOException {
             return IOUtils.toString(mimeMessage.getDataHandler().getInputStream());
         }
