@@ -288,24 +288,35 @@
     <mvc:annotation-driven />
     <mvc:default-servlet-handler />
 
-    <bean id="templateResolver" class="org.thymeleaf.templateresolver.TemplateResolver">
-        <property name="resourceResolver">
-            <bean class="org.thymeleaf.spring3.resourceresolver.SpringResourceResourceResolver" />
-        </property>
-        <property name="prefix" value="classpath:/templates/" />
-        <property name="suffix" value=".html" />
-        <property name="templateMode" value="HTML5" />
-        <!--<property name="cacheable" value="false" />-->
+    <bean id="springResourceResourceResolver"
+          class="org.thymeleaf.spring3.resourceresolver.SpringResourceResourceResolver"/>
+
+    <bean id="webTemplateResolver" class="org.thymeleaf.templateresolver.TemplateResolver">
+        <property name="resourceResolver" ref="springResourceResourceResolver"/>
+        <property name="prefix" value="classpath:/templates/web/" />
+        <property name="suffix" value=".html"/>
+        <property name="templateMode" value="HTML5"/>
     </bean>
 
-    <bean id="templateEngine" class="org.thymeleaf.spring3.SpringTemplateEngine">
-        <property name="templateResolver" ref="templateResolver" />
+    <bean id="mailTemplateResolver" class="org.thymeleaf.templateresolver.TemplateResolver">
+        <property name="resourceResolver" ref="springResourceResourceResolver"/>
+        <property name="prefix" value="classpath:/templates/mail/" />
+        <property name="suffix" value=".html" />
+        <property name="templateMode" value="HTML5" />
+    </bean>
+
+    <bean id="webTemplateEngine" class="org.thymeleaf.spring3.SpringTemplateEngine">
+        <property name="templateResolver" ref="webTemplateResolver" />
         <property name="additionalDialects">
             <set>
                 <bean class="nz.net.ultraq.thymeleaf.LayoutDialect" />
                 <bean class="org.thymeleaf.extras.springsecurity3.dialect.SpringSecurityDialect"/>
             </set>
         </property>
+    </bean>
+
+    <bean id="mailTemplateEngine" class="org.thymeleaf.spring3.SpringTemplateEngine">
+        <property name="templateResolver" ref="mailTemplateResolver" />
     </bean>
 
     <bean id="viewResolver" class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
@@ -317,7 +328,7 @@
         <property name="viewResolvers">
             <list>
                 <bean class="org.thymeleaf.spring3.view.ThymeleafViewResolver">
-                    <property name="templateEngine" ref="templateEngine" />
+                    <property name="templateEngine" ref="webTemplateEngine" />
                 </bean>
                 <bean class="org.springframework.web.servlet.view.BeanNameViewResolver" />
             </list>
@@ -336,13 +347,19 @@
     <beans profile="!ldap">
         <beans profile="!saml">
             <bean id="resetPasswordService" class="org.cloudfoundry.identity.uaa.login.EmailResetPasswordService">
+                <constructor-arg ref="mailTemplateEngine" />
                 <constructor-arg ref="authorizationTemplate"/>
                 <constructor-arg value="${uaa.url:http://localhost:8080/uaa}"/>
-                <constructor-arg value="${smtp.host:localhost}"/>
-                <constructor-arg value="${smtp.port:25}"/>
-                <constructor-arg value="${smtp.user:}"/>
-                <constructor-arg value="${smtp.password:}"/>
+                <constructor-arg>
+                    <bean class="org.springframework.mail.javamail.JavaMailSenderImpl">
+                        <property name="host" value="${smtp.host:localhost}"/>
+                        <property name="port" value="${smtp.port:25}"/>
+                        <property name="username" value="${smtp.user:}"/>
+                        <property name="password" value="${smtp.password:}"/>
+                    </bean>
+                </constructor-arg>
                 <constructor-arg value="${login.brand:oss}"/>
+                <constructor-arg value="${login.url:http://localhost:8080/login}"/>
             </bean>
 
             <bean id="changePasswordService" class="org.cloudfoundry.identity.uaa.login.UaaChangePasswordService">

@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.HtmlUtils;
 
 import com.dumbster.smtp.SimpleSmtpServer;
 import com.dumbster.smtp.SmtpMessage;
@@ -110,6 +111,7 @@ public class ResetPasswordIT {
         Pattern linkPattern = Pattern.compile("<a href=\"(.*?)\">.*?</a>");
         Matcher matcher = linkPattern.matcher(messageBody);
         matcher.find();
-        return matcher.group(1);
+        String encodedLink = matcher.group(1);
+        return HtmlUtils.htmlUnescape(encodedLink);
     }
 }

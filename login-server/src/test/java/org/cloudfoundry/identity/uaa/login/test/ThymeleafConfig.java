@@ -22,6 +22,7 @@ import org.thymeleaf.spring3.view.ThymeleafViewResolver;
 import org.thymeleaf.templateresolver.TemplateResolver;
 
 import java.util.HashSet;
+import java.util.Set;
 import nz.net.ultraq.thymeleaf.LayoutDialect;
 
 @Configuration
@@ -30,26 +31,48 @@ public class ThymeleafConfig {
     @Bean
     public ThymeleafViewResolver thymeleafViewResolver() {
         ThymeleafViewResolver viewResolver = new ThymeleafViewResolver();
-        viewResolver.setTemplateEngine(springTemplateEngine());
+        viewResolver.setTemplateEngine(webTemplateEngine());
         return viewResolver;
     }
 
     @Bean
-    public SpringTemplateEngine springTemplateEngine() {
+    public SpringTemplateEngine webTemplateEngine() {
         SpringTemplateEngine springTemplateEngine = new SpringTemplateEngine();
-        springTemplateEngine.setTemplateResolver(templateResolver());
-        HashSet<IDialect> additionalDialects = new HashSet<IDialect>();
+
+        springTemplateEngine.setTemplateResolver(webTemplateResolver());
+
+        Set<IDialect> additionalDialects = new HashSet<IDialect>();
         additionalDialects.add(new LayoutDialect());
         additionalDialects.add(new SpringSecurityDialect());
         springTemplateEngine.setAdditionalDialects(additionalDialects);
+
         return springTemplateEngine;
     }
 
     @Bean
-    public TemplateResolver templateResolver() {
+    public TemplateResolver webTemplateResolver() {
+        TemplateResolver templateResolver = baseHtmlTemplateResolver();
+        templateResolver.setPrefix("classpath:/templates/web/");
+        return templateResolver;
+    }
+
+    @Bean
+    public SpringTemplateEngine mailTemplateEngine() {
+        SpringTemplateEngine springTemplateEngine = new SpringTemplateEngine();
+        springTemplateEngine.setTemplateResolver(mailTemplateResolver());
+        return springTemplateEngine;
+    }
+
+    @Bean
+    public TemplateResolver mailTemplateResolver() {
+        TemplateResolver templateResolver = baseHtmlTemplateResolver();
+        templateResolver.setPrefix("classpath:/templates/mail/");
+        return templateResolver;
+    }
+
+    private TemplateResolver baseHtmlTemplateResolver() {
         TemplateResolver templateResolver = new TemplateResolver();
         templateResolver.setResourceResolver(springResourceResourceResolver());
-        templateResolver.setPrefix("classpath:/templates/");
         templateResolver.setSuffix(".html");
         templateResolver.setTemplateMode("HTML5");
         return templateResolver;
