@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" dir="ltr" lang="en" th:with="brand=${@environment.getProperty('login.brand')}">
 <head>
-    <title>Pivotal</title>
+    <title th:inline="text">[[${brand == 'pivotal' ? 'Pivotal' : 'Cloud Foundry'}]]</title>
     <link href='/resources/pivotal/images/favicon.ico' th:href="@{'/resources/'+${brand}+'/images/favicon.ico'}" rel='shortcut icon' />
     <meta charset='utf-8' />
     <meta name='author' content='Pivotal Software, Inc' />
