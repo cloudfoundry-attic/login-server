@@ -15,7 +15,9 @@ package org.cloudfoundry.identity.uaa.login.feature;
 import static org.hamcrest.Matchers.containsString;
 
 import org.cloudfoundry.identity.uaa.login.test.DefaultIntegrationTestConfig;
+import org.cloudfoundry.identity.uaa.login.test.LoginServerClassRunner;
 import org.cloudfoundry.identity.uaa.login.test.TestClient;
+import org.cloudfoundry.identity.uaa.login.test.UnlessProfileActive;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,8 +37,9 @@ import java.security.SecureRandom;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@RunWith(LoginServerClassRunner.class)
 @ContextConfiguration(classes = DefaultIntegrationTestConfig.class)
+@UnlessProfileActive(values = {"saml", "ldap"})
 public class ResetPasswordIT {
 
     @Autowired
