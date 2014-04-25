@@ -34,7 +34,7 @@
                     </th:block>
                 </th:block>
                 <th:block th:each="scope, iter : ${approved_scopes}">
-                    <th:block th:with="index=${iter.index + undefined_scopes.size()},code=${scope.get('code')}">
+                    <th:block th:with="index=${iter.index + undecided_scopes.size()},code=${scope.get('code')}">
                         <li>
                             <input type="checkbox" checked="checked" name="scope.1" id="scope.1" th:name="|scope.${index}|" th:value="${code}" th:id="|scope.${index}|"/>
                             <label for="scope.1" th:for="|scope.${index}|" th:utext="${#messages.msgOrNull(code) ?: code}">Something already approved.</label>
@@ -42,9 +42,9 @@
                     </th:block>
                 </th:block>
                 <th:block th:each="scope, iter : ${denied_scopes}">
-                    <th:block th:with="index=${iter.index + undefined_scopes.size() + approved_scopes.size()},code=${scope.get('code')}">
+                    <th:block th:with="index=${iter.index + undecided_scopes.size() + approved_scopes.size()},code=${scope.get('code')}">
                         <li>
-                            <input type="checkbox" checked="checked" name="scope.2" id="scope.2" th:name="|scope.${index}|" th:value="${code}" th:id="|scope.${index}|"/>
+                            <input type="checkbox" name="scope.2" id="scope.2" th:name="|scope.${index}|" th:value="${code}" th:id="|scope.${index}|"/>
                             <label for="scope.2" th:for="|scope.${index}|" th:utext="${#messages.msgOrNull(code) ?: code}">Something previously denied.</label>
                         </li>
                     </th:block>
