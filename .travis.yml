@@ -6,7 +6,7 @@ env:
     - CATALINA_OPTS="-XX:MaxPermSize=512M -DUAA_PROFILE=local"
   matrix:
     - SPRING_PROFILES=
-    - SPRING_PROFILES=saml
+    - SPRING_PROFILES=default,saml
 before_install:
   - git pull --unshallow
   - wget -O tomcat.tar.gz http://archive.apache.org/dist/tomcat/tomcat-7/v7.0.52/bin/apache-tomcat-7.0.52.tar.gz
