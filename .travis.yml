@@ -34,7 +34,8 @@ install:
 script:
   - ./.run-script.sh start
   - mvn -Dtest=org.cloudfoundry.identity.uaa.integration.* -DfailIfNoTests=false test --quiet
-  - cd login-server-integration-tests && mvn verify --quiet
+  - cd login-server-integration-tests
+  - mvn -Dspring.profiles.active=${SPRING_PROFILES} verify --quiet
   - cd $TRAVIS_BUILD_DIR
   - ./.run-script.sh stop
   - mvn -Dspring.profiles.active=$TESTENV test --quiet
