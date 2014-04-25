@@ -17,24 +17,51 @@ import org.springframework.test.annotation.ProfileValueSource;
 import org.springframework.test.annotation.ProfileValueUtils;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 public class ProfileActiveUtils {
     public static boolean isTestEnabledInThisEnvironment(Class<?> testClass) {
         IfProfileActive ifProfileActive = AnnotationUtils.findAnnotation(testClass, IfProfileActive.class);
-        return isTestEnabledInThisEnvironment(ProfileValueUtils.retrieveProfileValueSource(testClass), ifProfileActive);
+        UnlessProfileActive unlessProfileActive = AnnotationUtils.findAnnotation(testClass, UnlessProfileActive.class);
+        return isTestEnabledInThisEnvironment(ProfileValueUtils.retrieveProfileValueSource(testClass), ifProfileActive, unlessProfileActive);
     }
 
-    private static boolean isTestEnabledInThisEnvironment(ProfileValueSource profileValueSource, IfProfileActive ifProfileActive) {
-        if (ifProfileActive == null) {
+    private static boolean isTestEnabledInThisEnvironment(ProfileValueSource profileValueSource, IfProfileActive ifProfileActive, UnlessProfileActive unlessProfileActive) {
+        if (ifProfileActive == null && unlessProfileActive == null) {
             return true;
         }
 
-        if (!StringUtils.hasText(ifProfileActive.value())) {
-            throw new IllegalArgumentException("An empty 'value' attribute of @IfProfileActive is not allowed.");
+        List<String> blacklist = getBlacklist(unlessProfileActive);
+        Set<String> activeProfiles = StringUtils.commaDelimitedListToSet(profileValueSource.get("spring.profiles.active"));
+
+        boolean enabled = true;
+        if (ifProfileActive != null && StringUtils.hasText(ifProfileActive.value())) {
+            enabled = activeProfiles.contains(ifProfileActive.value());
+        }
+        for (String profile : blacklist) {
+            if (activeProfiles.contains(profile)) {
+                enabled = false;
+                continue;
+            }
         }
 
-        Set<String> activeProfiles = StringUtils.commaDelimitedListToSet(profileValueSource.get("spring.profiles.active"));
-        return activeProfiles.contains(ifProfileActive.value());
+        return enabled;
+    }
+
+    private static List<String> getBlacklist(UnlessProfileActive unlessProfileActive) {
+        List<String> blacklist = new ArrayList<String>();
+        if (unlessProfileActive != null) {
+            if (StringUtils.hasText(unlessProfileActive.value())) {
+                blacklist.add(unlessProfileActive.value());
+            }
+            if (unlessProfileActive.values() != null) {
+                for (String s : unlessProfileActive.values()) {
+                    blacklist.add(s);
+                }
+            }
+        }
+        return blacklist;
     }
 }
