@@ -85,4 +85,14 @@ public class LoginMockMvcIntegrationTests {
                 .andExpect(model().attribute("links", hasEntry("passwd", "")))
                 .andExpect(xpath("//a[text()='Reset password']").doesNotExist());
     }
+
+    @Test
+    public void testLoginWithAnalytics() throws Exception {
+        System.setProperty("analytics.code", "secret_code");
+        System.setProperty("analytics.domain", "example.com");
+
+        mockMvc.perform(get("/login"))
+                .andExpect(status().isOk())
+                .andExpect(xpath("//body/script[contains(text(),'example.com')]").exists());
+    }
 }
