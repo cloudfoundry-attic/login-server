@@ -13,6 +13,7 @@
 package org.cloudfoundry.identity.uaa.login;
 
 import static org.hamcrest.Matchers.hasEntry;
+import static org.springframework.http.MediaType.TEXT_HTML;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -21,10 +22,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.cloudfoundry.identity.uaa.login.test.DefaultTestConfig;
 import org.cloudfoundry.identity.uaa.login.test.DefaultTestConfigContextLoader;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.web.FilterChainProxy;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -33,6 +36,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.util.Arrays;
 import java.util.Map;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -44,6 +48,7 @@ public class LoginMockMvcIntegrationTests {
     WebApplicationContext webApplicationContext;
 
     @Autowired
+    @Qualifier("springSecurityFilterChain")
     FilterChainProxy filterChainProxy;
 
     private MockMvc mockMvc;
@@ -71,8 +76,25 @@ public class LoginMockMvcIntegrationTests {
                                 hasEntry("registerNetwork", "https://network.gopivotal.com/registrations/new")))
                         .andExpect(model().attribute("links", hasEntry("uaa", "http://localhost:8080/uaa")))
                         .andExpect(model().attribute("links", hasEntry("login", "http://localhost:8080/login")))
-                        .andExpect(model().attributeExists("prompts"))
-                        .andExpect(model().attributeDoesNotExist("saml"));
+                        .andExpect(model().attributeExists("prompts"));
+    }
+
+    @Test
+    public void testLoginNoSaml() throws Exception {
+        Assume.assumeFalse("Functionality is disabled by the saml profile", Arrays.asList(webApplicationContext.getEnvironment().getActiveProfiles()).contains("saml"));
+
+        mockMvc.perform(get("/login"))
+                .andExpect(status().isOk())
+                .andExpect(model().attributeDoesNotExist("saml"));
+    }
+
+    @Test
+    public void testLoginSaml() throws Exception {
+        Assume.assumeTrue("Functionality is enabled by the saml profile", Arrays.asList(webApplicationContext.getEnvironment().getActiveProfiles()).contains("saml"));
+
+        mockMvc.perform(get("/login"))
+                .andExpect(status().isOk())
+                .andExpect(model().attributeExists("saml"));
     }
 
     @Test
@@ -80,7 +102,7 @@ public class LoginMockMvcIntegrationTests {
         Map<String, String> links = (Map<String, String>) webApplicationContext.getBean("links", Map.class);
         links.put("passwd", "");
 
-        mockMvc.perform(get("/login"))
+        mockMvc.perform(get("/login").accept(TEXT_HTML))
                 .andExpect(status().isOk())
                 .andExpect(model().attribute("links", hasEntry("passwd", "")))
                 .andExpect(xpath("//a[text()='Reset password']").doesNotExist());
@@ -91,7 +113,7 @@ public class LoginMockMvcIntegrationTests {
         System.setProperty("analytics.code", "secret_code");
         System.setProperty("analytics.domain", "example.com");
 
-        mockMvc.perform(get("/login"))
+        mockMvc.perform(get("/login").accept(TEXT_HTML))
                 .andExpect(status().isOk())
                 .andExpect(xpath("//body/script[contains(text(),'example.com')]").exists());
     }
