@@ -93,7 +93,20 @@ public class ProfileControllerTests {
                 .andExpect(status().isOk())
                 .andExpect(model().attribute("approvals", hasKey("app")))
                 .andExpect(content().contentTypeCompatibleWith(TEXT_HTML))
+                .andExpect(content().string(containsString("These applications have been granted access to your account.")))
                 .andExpect(content().string(containsString("Change Password")));
+    }
+
+    @Test
+    public void testSpecialMessageWhenNoAppsAreAuthorized() throws Exception {
+        Map<String, List<UaaApprovalsService.DescribedApproval>> approvalsByClientId = new HashMap<String, List<UaaApprovalsService.DescribedApproval>>();
+        Mockito.when(approvalsService.getCurrentApprovalsByClientId()).thenReturn(approvalsByClientId);
+
+        mockMvc.perform(get("/profile"))
+                .andExpect(status().isOk())
+                .andExpect(model().attributeExists("approvals"))
+                .andExpect(content().contentTypeCompatibleWith(TEXT_HTML))
+                .andExpect(content().string(containsString("You have not yet authorized any third party applications.")));
     }
 
     @Test

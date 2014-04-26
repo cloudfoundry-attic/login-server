@@ -34,7 +34,7 @@
                 <span sec:authentication="principal">user@example.com</span><a href="/change_password" th:href="@{/change_password}" th:if="${showChangePasswordLink}">Change Password</a>
             </p>
             <h2>Third Party Access</h2>
-            <p>
+            <p th:text="${approvals.size() > 0 ? 'These applications have been granted access to your account.' : 'You have not yet authorized any third party applications.'}">
                 These applications have been granted access to your account.
             </p>
             <th:block th:each="client : ${approvals}">
