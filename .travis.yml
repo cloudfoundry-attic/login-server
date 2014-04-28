@@ -39,6 +39,8 @@ script:
   - cd $TRAVIS_BUILD_DIR
   - ./.run-script.sh stop
   - mvn -Dspring.profiles.active=$TESTENV test --quiet
+after_success:
+  - mvn -pl login-server clean cobertura:cobertura coveralls:cobertura
 after_failure:
   - cat $CATALINA_OUT
 after_script:
