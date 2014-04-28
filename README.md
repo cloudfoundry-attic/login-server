@@ -17,6 +17,7 @@ directories with a common parent):
 
     $ (cd uaa; mvn clean install)
     $ cd login-server
+    $ unset GEM_PATH (see https://www.pivotaltracker.com/story/show/70172968)
     $ mvn clean install
     $ mvn tomcat7:run -P integration
 
