@@ -13,8 +13,12 @@
 
 package org.cloudfoundry.identity.uaa.login;
 
+import static org.cloudfoundry.identity.uaa.oauth.approval.Approval.ApprovalStatus.APPROVED;
+import static org.cloudfoundry.identity.uaa.oauth.approval.Approval.ApprovalStatus.DENIED;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasKey;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.hasValue;
 import static org.hamcrest.Matchers.not;
 import static org.springframework.http.MediaType.TEXT_HTML;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -25,10 +29,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.cloudfoundry.identity.uaa.login.test.ThymeleafConfig;
-import org.cloudfoundry.identity.uaa.oauth.approval.Approval;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -74,24 +79,34 @@ public class ProfileControllerTests {
     @Before
     public void setUp() throws Exception {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+
+        Map<String, List<UaaApprovalsService.DescribedApproval>> approvalsByClientId = new HashMap<String, List<UaaApprovalsService.DescribedApproval>>();
+
+        UaaApprovalsService.DescribedApproval readApproval = new UaaApprovalsService.DescribedApproval();
+        readApproval.setUserId("user");
+        readApproval.setClientId("app");
+        readApproval.setScope("thing.read");
+        readApproval.setStatus(APPROVED);
+        readApproval.setDescription("Read your thing resources");
+
+        UaaApprovalsService.DescribedApproval writeApproval = new UaaApprovalsService.DescribedApproval();
+        writeApproval.setUserId("user");
+        writeApproval.setClientId("app");
+        writeApproval.setScope("thing.write");
+        writeApproval.setStatus(APPROVED);
+        writeApproval.setDescription("Write to your thing resources");
+
+        approvalsByClientId.put("app", Arrays.asList(readApproval, writeApproval));
+
+        Mockito.when(approvalsService.getCurrentApprovalsByClientId()).thenReturn(approvalsByClientId);
     }
 
     @Test
     public void testGetProfile() throws Exception {
-        Map<String, List<UaaApprovalsService.DescribedApproval>> approvalsByClientId = new HashMap<String, List<UaaApprovalsService.DescribedApproval>>();
-        UaaApprovalsService.DescribedApproval describedApproval = new UaaApprovalsService.DescribedApproval();
-        describedApproval.setUserId("user");
-        describedApproval.setClientId("app");
-        describedApproval.setScope("thing.write");
-        describedApproval.setStatus(Approval.ApprovalStatus.APPROVED);
-        describedApproval.setDescription("Write to your thing resources");
-        approvalsByClientId.put("app", Arrays.asList(describedApproval));
-
-        Mockito.when(approvalsService.getCurrentApprovalsByClientId()).thenReturn(approvalsByClientId);
-        
         mockMvc.perform(get("/profile"))
                 .andExpect(status().isOk())
                 .andExpect(model().attribute("approvals", hasKey("app")))
+                .andExpect(model().attribute("approvals", hasValue(hasSize(2))))
                 .andExpect(content().contentTypeCompatibleWith(TEXT_HTML))
                 .andExpect(content().string(containsString("These applications have been granted access to your account.")))
                 .andExpect(content().string(containsString("Change Password")));
@@ -121,14 +136,28 @@ public class ProfileControllerTests {
     @Test
     public void testUpdateProfile() throws Exception {
         MockHttpServletRequestBuilder post = post("/profile")
-                .param("checkedScopes", "app-resource.read")
-                .param("checkedScopes", "app-resource.write")
+                .param("checkedScopes", "app-thing.read")
                 .param("update", "")
                 .param("clientId", "app");
 
         mockMvc.perform(post)
                 .andExpect(status().isFound())
                 .andExpect(redirectedUrl("profile"));
+
+        ArgumentCaptor<List<UaaApprovalsService.DescribedApproval>> captor = ArgumentCaptor.forClass((Class)List.class);
+        Mockito.verify(approvalsService).updateApprovals(captor.capture());
+
+        UaaApprovalsService.DescribedApproval readApproval = captor.getValue().get(0);
+        Assert.assertEquals("user", readApproval.getUserName());
+        Assert.assertEquals("app", readApproval.getClientId());
+        Assert.assertEquals("thing.read", readApproval.getScope());
+        Assert.assertEquals(APPROVED, readApproval.getStatus());
+
+        UaaApprovalsService.DescribedApproval writeApproval = captor.getValue().get(1);
+        Assert.assertEquals("user", writeApproval.getUserName());
+        Assert.assertEquals("app", writeApproval.getClientId());
+        Assert.assertEquals("thing.write", writeApproval.getScope());
+        Assert.assertEquals(DENIED, writeApproval.getStatus());
     }
 
     @Test
@@ -141,6 +170,8 @@ public class ProfileControllerTests {
         mockMvc.perform(post)
                 .andExpect(status().isFound())
                 .andExpect(redirectedUrl("profile"));
+
+        Mockito.verify(approvalsService).deleteApprovalsForClient("app");
     }
 
     @Configuration
