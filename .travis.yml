@@ -3,7 +3,7 @@ env:
   global:
     - CATALINA_PID=/tmp/tomcat.pid
     - CATALINA_OUT=/tmp/tomcat.log
-    - CATALINA_OPTS="-XX:MaxPermSize=512M -DUAA_PROFILE=local"
+    - CATALINA_OPTS="-XX:MaxPermSize=256M -DUAA_PROFILE=local"
   matrix:
     - SPRING_PROFILES=
     - SPRING_PROFILES=default,saml
