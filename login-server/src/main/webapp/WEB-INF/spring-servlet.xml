@@ -289,7 +289,7 @@
     <mvc:default-servlet-handler />
 
     <bean id="springResourceResourceResolver"
-          class="org.thymeleaf.spring3.resourceresolver.SpringResourceResourceResolver"/>
+          class="org.thymeleaf.spring4.resourceresolver.SpringResourceResourceResolver"/>
 
     <bean id="webTemplateResolver" class="org.thymeleaf.templateresolver.TemplateResolver">
         <property name="resourceResolver" ref="springResourceResourceResolver"/>
@@ -305,7 +305,7 @@
         <property name="templateMode" value="HTML5" />
     </bean>
 
-    <bean id="webTemplateEngine" class="org.thymeleaf.spring3.SpringTemplateEngine">
+    <bean id="webTemplateEngine" class="org.thymeleaf.spring4.SpringTemplateEngine">
         <property name="templateResolver" ref="webTemplateResolver" />
         <property name="additionalDialects">
             <set>
@@ -315,7 +315,7 @@
         </property>
     </bean>
 
-    <bean id="mailTemplateEngine" class="org.thymeleaf.spring3.SpringTemplateEngine">
+    <bean id="mailTemplateEngine" class="org.thymeleaf.spring4.SpringTemplateEngine">
         <property name="templateResolver" ref="mailTemplateResolver" />
     </bean>
 
@@ -327,7 +327,7 @@
         </property>
         <property name="viewResolvers">
             <list>
-                <bean class="org.thymeleaf.spring3.view.ThymeleafViewResolver">
+                <bean class="org.thymeleaf.spring4.view.ThymeleafViewResolver">
                     <property name="templateEngine" ref="webTemplateEngine" />
                 </bean>
                 <bean class="org.springframework.web.servlet.view.BeanNameViewResolver" />

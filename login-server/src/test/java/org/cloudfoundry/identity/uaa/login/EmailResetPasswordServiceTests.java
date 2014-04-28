@@ -34,7 +34,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-import org.thymeleaf.spring3.SpringTemplateEngine;
+import org.thymeleaf.spring4.SpringTemplateEngine;
 
 import java.util.Arrays;
 import javax.mail.Message;
