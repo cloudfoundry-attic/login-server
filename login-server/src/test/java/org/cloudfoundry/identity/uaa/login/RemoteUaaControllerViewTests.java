@@ -17,6 +17,7 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.xpath;
@@ -91,6 +92,7 @@ public class RemoteUaaControllerViewTests {
                 .andExpect(model().attribute("undecided_scopes", hasSize(2)))
                 .andExpect(model().attribute("approved_scopes", hasSize(1)))
                 .andExpect(model().attribute("denied_scopes", hasSize(1)))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
                 .andExpect(xpath("//h1[text()='Application Authorization']").exists())
                 .andExpect(xpath("//input[@type='checkbox' and @name='scope.0' and @value='scope.cloud_controller.write' and @checked='checked']").exists())
                 .andExpect(xpath("//input[@type='checkbox' and @name='scope.1' and @value='scope.scim.userids' and @checked='checked']").exists())
