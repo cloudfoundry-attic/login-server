@@ -3,9 +3,9 @@
 [![Build Status](https://travis-ci.org/cloudfoundry/login-server.svg?branch=develop)](https://travis-ci.org/cloudfoundry/login-server)
 [![Coverage Status](https://coveralls.io/repos/cloudfoundry/login-server/badge.png?branch=develop)](https://coveralls.io/r/cloudfoundry/login-server?branch=develop)
 
-Handles authentication on `cloudfoundry.com` and delegates all other
+Handles authentication on `run.pivotal.io` and delegates all other
 identity management tasks to the UAA.  Also provides OAuth2 endpoints
-issuing tokens to client apps for `cloudfoundry.com` (the tokens come
+issuing tokens to client apps for `run.pivotal.io` (the tokens come
 from the UAA and no data are stored locally).
 
 ## Running and Testing the Login Server
@@ -55,6 +55,64 @@ These get compiled in the generate-resources phase of the Maven build.
 To watch the SCSS files and auto-recompile them during development, use:
 
     $ mvn -pl login-server sass:watch
+
+## The Login Application
+
+The UAA can authenticate user accounts, but only if it manages them
+itself, and it only provides a basic UI.  The Login app can be branded
+and customized for non-native authentication and for more complicated
+UI flows, like user registration and password reset.
+
+The login application is actually itself an OAuth2 endpoint provider,
+but delegates those features to the UAA server.  Configuration for the
+login application therefore consists of locating the UAA through its
+OAuth2 endpoint URLs, and registering the login application itself as
+a client of the UAA.  There is a `login.yml` for the UAA locations,
+e.g. for a local `vcap` instance:
+
+    uaa:
+      url: http://uaa.vcap.me
+      token:
+        url: http://uaa.vcap.me/oauth/token
+      login:
+        url: http://uaa.vcap.me/login.do
+
+and there is an environment variable (or Java System property),
+`LOGIN_SECRET` for the client secret that the app uses when it
+authenticates itself with the UAA.  The Login app is registered by
+default in the UAA only if there are no active Spring profiles (so not
+at all in `vcap`).  In the UAA you can find the registration in the
+`oauth-clients.xml` config file.  Here's a summary:
+
+    id: login
+    secret: loginsecret
+    authorized-grant-types: client_credentials
+    authorities: ROLE_LOGIN
+    resource-ids: oauth
+
+### Use Cases
+
+1. Authenticate
+
+        GET /login
+
+    The Login Server presents a form login interface for the backend
+    UAA, or with other services (such as LDAP or SAML).
+
+2. Approve OAuth2 token grant
+
+        GET /oauth/authorize?client_id=app&response_type=code...
+
+    Standard OAuth2 Authorization Endpoint.  Client credentials and
+    all other features are handled by the UAA in the back end, and the
+    login server is used to render the UI (see
+    `access_confirmation.html`).
+
+3. Obtain access token
+
+        POST /oauth/token
+
+    Standard OAuth2 Authorization Endpoint passed through to the UAA.
 
 # Contributing to the Login Server
 
