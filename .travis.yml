@@ -30,7 +30,7 @@ install:
   - mvn -Dwar.exploded.dir=$WEBAPPS_DIR/login -pl login-server war:exploded
 script:
   - ./.run-script.sh start
-  - mvn -Dtest=org.cloudfoundry.identity.uaa.integration.* -DfailIfNoTests=false test --quiet
+  - mvn -Dtest=org.cloudfoundry.identity.uaa.login.integration.*Tests -DfailIfNoTests=false test --quiet
   - cd login-server-integration-tests
   - mvn -Dspring.profiles.active=${SPRING_PROFILES} verify --quiet
   - cd $TRAVIS_BUILD_DIR
