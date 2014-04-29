@@ -3,10 +3,10 @@
 
 
 if [ "$1" = "restart" ]; then
-  target/tomcat/bin/shutdown.sh -force
+  target/tomcat/bin/shutdown.sh
   rm -f $CATALINA_PID  
 elif [ "$1" = "stop" ]; then
-  target/tomcat/bin/shutdown.sh -force
+  target/tomcat/bin/shutdown.sh
   RETVAL=$?
   rm -f $CATALINA_PID
   exit 0
