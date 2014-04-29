@@ -413,6 +413,10 @@ public class ServerRunning implements MethodRule, RestTemplateHolder, UrlHelper 
         return client;
     }
 
+    public Environment getEnvironment() {
+        return environment;
+    }
+
     public UriBuilder buildUri(String url) {
         return UriBuilder.fromUri(url.startsWith("http:") ? url : getUrl(url));
     }

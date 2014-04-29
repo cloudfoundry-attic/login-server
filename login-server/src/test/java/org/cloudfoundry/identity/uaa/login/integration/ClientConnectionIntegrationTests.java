@@ -15,8 +15,10 @@ package org.cloudfoundry.identity.uaa.login.integration;
 
 import static org.junit.Assert.assertNotNull;
 
+import java.util.Arrays;
 import java.util.Map;
 
+import org.junit.Assume;
 import org.junit.Rule;
 import org.junit.Test;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +34,8 @@ public class ClientConnectionIntegrationTests {
 
     @Test
     public void testPrompts() {
+        Assume.assumeFalse("Functionality is disabled by the saml profile", Arrays.asList(serverRunning.getEnvironment().getActiveProfiles()).contains("saml"));
+
         @SuppressWarnings("rawtypes")
         ResponseEntity<Map> entity = serverRunning.getRestTemplate().getForEntity(serverRunning.getUrl("/login"),
                         Map.class);
