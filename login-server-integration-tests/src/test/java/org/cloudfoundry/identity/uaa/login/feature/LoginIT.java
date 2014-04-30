@@ -30,8 +30,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration(classes = DefaultIntegrationTestConfig.class)
 public class LoginIT {
 
-    @Autowired
-    @Rule
+    @Autowired @Rule
     public IntegrationTestRule integrationTestRule;
 
     @Autowired

@@ -13,8 +13,10 @@
 package org.cloudfoundry.identity.uaa.login.feature;
 
 import org.cloudfoundry.identity.uaa.login.test.DefaultIntegrationTestConfig;
+import org.cloudfoundry.identity.uaa.login.test.IntegrationTestRule;
 import org.cloudfoundry.identity.uaa.login.test.TestClient;
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
@@ -36,6 +38,9 @@ import java.util.Map;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = DefaultIntegrationTestConfig.class)
 public class AutologinIT {
+
+    @Autowired @Rule
+    public IntegrationTestRule integrationTestRule;
 
     @Autowired
     WebDriver webDriver;

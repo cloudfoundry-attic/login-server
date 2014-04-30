@@ -14,8 +14,10 @@ package org.cloudfoundry.identity.uaa.login.feature;
 
 import org.cloudfoundry.identity.uaa.login.test.DefaultIntegrationTestConfig;
 import org.cloudfoundry.identity.uaa.login.test.IfProfileActive;
+import org.cloudfoundry.identity.uaa.login.test.IntegrationTestRule;
 import org.cloudfoundry.identity.uaa.login.test.LoginServerClassRunner;
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
@@ -28,6 +30,9 @@ import org.springframework.test.context.ContextConfiguration;
 @ContextConfiguration(classes = DefaultIntegrationTestConfig.class)
 @IfProfileActive("saml")
 public class SamlLoginIT {
+
+    @Autowired @Rule
+    public IntegrationTestRule integrationTestRule;
 
     @Autowired
     WebDriver webDriver;

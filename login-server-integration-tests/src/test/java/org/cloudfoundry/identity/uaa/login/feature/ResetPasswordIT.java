@@ -15,11 +15,13 @@ package org.cloudfoundry.identity.uaa.login.feature;
 import static org.hamcrest.Matchers.containsString;
 
 import org.cloudfoundry.identity.uaa.login.test.DefaultIntegrationTestConfig;
+import org.cloudfoundry.identity.uaa.login.test.IntegrationTestRule;
 import org.cloudfoundry.identity.uaa.login.test.LoginServerClassRunner;
 import org.cloudfoundry.identity.uaa.login.test.TestClient;
 import org.cloudfoundry.identity.uaa.login.test.UnlessProfileActive;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
@@ -41,6 +43,9 @@ import java.util.regex.Pattern;
 @ContextConfiguration(classes = DefaultIntegrationTestConfig.class)
 @UnlessProfileActive(values = {"saml", "ldap"})
 public class ResetPasswordIT {
+
+    @Autowired @Rule
+    public IntegrationTestRule integrationTestRule;
 
     @Autowired
     WebDriver webDriver;

@@ -30,9 +30,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration(classes = DefaultIntegrationTestConfig.class)
 public class AppApprovalIT {
 
-    @Rule
-    @Autowired
-    IntegrationTestRule integrationTestRule;
+    @Autowired @Rule
+    public IntegrationTestRule integrationTestRule;
 
     @Autowired
     WebDriver webDriver;
