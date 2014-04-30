@@ -21,11 +21,12 @@ install:
   - tar zxf tomcat.tar.gz -C target/tomcat --strip-components 1
   - export WEBAPPS_DIR=$TRAVIS_BUILD_DIR/target/tomcat/webapps
   - rm -rf $WEBAPPS_DIR/*
-  - mvn dependency:copy -Dartifact=org.cloudfoundry.identity:cloudfoundry-identity-uaa:1.6.3-SNAPSHOT:war -DoutputDirectory=$WEBAPPS_DIR
+  - export IDENTITY_VERSION=`mvn help:evaluate -Dexpression=project.parent.version | grep -v "\["`
+  - mvn dependency:copy -Dartifact=org.cloudfoundry.identity:cloudfoundry-identity-uaa:$IDENTITY_VERSION:war -DoutputDirectory=$WEBAPPS_DIR
   - mv $WEBAPPS_DIR/cloudfoundry-identity-uaa-*.war $WEBAPPS_DIR/uaa.war
-  - mvn dependency:copy -Dartifact=org.cloudfoundry.identity:cloudfoundry-identity-app:1.6.3-SNAPSHOT:war -DoutputDirectory=$WEBAPPS_DIR
+  - mvn dependency:copy -Dartifact=org.cloudfoundry.identity:cloudfoundry-identity-app:$IDENTITY_VERSION:war -DoutputDirectory=$WEBAPPS_DIR
   - mv $WEBAPPS_DIR/cloudfoundry-identity-app-*.war $WEBAPPS_DIR/app.war
-  - mvn dependency:copy -Dartifact=org.cloudfoundry.identity:cloudfoundry-identity-api:1.6.3-SNAPSHOT:war -DoutputDirectory=$WEBAPPS_DIR
+  - mvn dependency:copy -Dartifact=org.cloudfoundry.identity:cloudfoundry-identity-api:$IDENTITY_VERSION:war -DoutputDirectory=$WEBAPPS_DIR
   - mv $WEBAPPS_DIR/cloudfoundry-identity-api-*.war $WEBAPPS_DIR/api.war
   - mvn -Dwar.exploded.dir=$WEBAPPS_DIR/login -pl login-server war:exploded
 script:
