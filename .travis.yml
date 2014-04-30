@@ -14,9 +14,7 @@ before_install:
 install:
   - $TRAVIS_BUILD_DIR/.apply_spring_profiles_to_login_yaml.sh $SPRING_PROFILES
   - cat login-server/src/main/resources/login.yml
-  - mvn -U clean --quiet -DskipTests=true
-  - mvn -U install --quiet -DskipTests=true
-  - cd $TRAVIS_BUILD_DIR
+  - mvn compile --quiet
   - mkdir -p target/tomcat
   - tar zxf tomcat.tar.gz -C target/tomcat --strip-components 1
   - export WEBAPPS_DIR=$TRAVIS_BUILD_DIR/target/tomcat/webapps
