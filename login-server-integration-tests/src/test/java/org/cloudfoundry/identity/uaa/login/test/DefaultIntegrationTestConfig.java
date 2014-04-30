@@ -30,6 +30,11 @@ import java.util.concurrent.TimeUnit;
 public class DefaultIntegrationTestConfig {
 
     @Bean
+    public IntegrationTestRule integrationTestRule(@Value("${integration.test.uaa_url}") String baseUrl) {
+        return new IntegrationTestRule(baseUrl);
+    }
+
+    @Bean
     public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
         return new PropertySourcesPlaceholderConfigurer();
     }
