@@ -96,7 +96,7 @@ public class AutologinAuthenticationManager implements AuthenticationManager {
         String code = info.get("code");
 
         ExpiringCode ec = doRetrieveCode(code);
-        Authentication user = null;
+        SocialClientUserDetails user = null;
         try {
             if (ec != null) {
                 user = new ObjectMapper().readValue(ec.getData(), SocialClientUserDetails.class);
@@ -125,7 +125,7 @@ public class AutologinAuthenticationManager implements AuthenticationManager {
             throw new BadCredentialsException("Cannot redeem provided code for user, client mismatch");
         }
 
-        UsernamePasswordAuthenticationToken result = new UsernamePasswordAuthenticationToken(user, null,
+        UsernamePasswordAuthenticationToken result = new UsernamePasswordAuthenticationToken(user.getUsername(), null,
                         user.getAuthorities());
         result.setDetails(authentication.getDetails());
         return result;
