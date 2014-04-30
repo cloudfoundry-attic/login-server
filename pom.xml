@@ -127,7 +127,6 @@
     <modules>
         <module>login-server</module>
         <module>doc-server</module>
-        <module>login-server-integration-tests</module>
     </modules>
 
     <build>

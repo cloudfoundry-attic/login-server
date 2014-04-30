@@ -29,7 +29,7 @@ install:
   - mvn -Dwar.exploded.dir=$WEBAPPS_DIR/login -pl login-server war:exploded
 script:
   - ./.run-script.sh start
-  - mvn -Dspring.profiles.active=${SPRING_PROFILES} verify --quiet
+  - mvn -Dspring.profiles.active=${SPRING_PROFILES} -DforceIntegrationTests verify --quiet
   - ./.run-script.sh stop
 after_success:
   - mvn -pl login-server clean cobertura:cobertura coveralls:cobertura
