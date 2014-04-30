@@ -32,14 +32,16 @@ public class IntegrationTestRule implements TestRule {
     private static Map<String,Boolean> sharedStatuses = new HashMap<>();
 
     private final String baseUrl;
+    private final boolean forceIntegrationTests;
 
-    public IntegrationTestRule(String baseUrl) {
+    public IntegrationTestRule(String baseUrl, boolean forceIntegrationTests) {
         this.baseUrl = baseUrl;
+        this.forceIntegrationTests = forceIntegrationTests;
     }
 
     @Override
     public Statement apply(Statement statement, Description description) {
-        Assume.assumeTrue("Test ignored as the server cannot be reached at " + baseUrl, getStatus());
+        Assume.assumeTrue("Test ignored as the server cannot be reached at " + baseUrl, forceIntegrationTests || getStatus());
         return statement;
     }
 

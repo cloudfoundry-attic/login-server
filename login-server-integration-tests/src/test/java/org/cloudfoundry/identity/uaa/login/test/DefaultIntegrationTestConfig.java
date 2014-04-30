@@ -20,6 +20,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import org.springframework.core.env.Environment;
 import org.springframework.web.client.RestTemplate;
 
 import com.dumbster.smtp.SimpleSmtpServer;
@@ -30,8 +31,9 @@ import java.util.concurrent.TimeUnit;
 public class DefaultIntegrationTestConfig {
 
     @Bean
-    public IntegrationTestRule integrationTestRule(@Value("${integration.test.uaa_url}") String baseUrl) {
-        return new IntegrationTestRule(baseUrl);
+    public IntegrationTestRule integrationTestRule(@Value("${integration.test.uaa_url}") String baseUrl, Environment environment) {
+        boolean forceIntegrationTests = environment.getProperty("forceIntegrationTests") != null;
+        return new IntegrationTestRule(baseUrl, forceIntegrationTests);
     }
 
     @Bean
