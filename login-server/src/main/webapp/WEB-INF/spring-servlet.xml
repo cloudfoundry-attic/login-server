@@ -346,6 +346,7 @@
 
     <beans profile="!ldap">
         <beans profile="!saml">
+        <beans profile="!keystone">
             <bean id="resetPasswordService" class="org.cloudfoundry.identity.uaa.login.EmailResetPasswordService">
                 <constructor-arg ref="mailTemplateEngine" />
                 <constructor-arg ref="authorizationTemplate"/>
@@ -374,6 +375,7 @@
             <bean id="changePasswordController" class="org.cloudfoundry.identity.uaa.login.ChangePasswordController">
                 <constructor-arg ref="changePasswordService"/>
             </bean>
+        </beans>
         </beans>
     </beans>
 
@@ -638,6 +640,13 @@
     <beans profile="ldap">
         <bean id="uaaController" class="org.cloudfoundry.identity.uaa.login.RemoteUaaController" parent="abstractRemoteUaaController" />
         <import resource="${ldap.profile.file:ldap/ldap-simple-bind.xml}" />
+    </beans>
+
+    <beans profile="keystone">
+        <bean id="uaaController" class="org.cloudfoundry.identity.uaa.login.RemoteUaaController" parent="abstractRemoteUaaController" />
+        <bean id="remoteAuthenticationManager" class="org.cloudfoundry.identity.uaa.keystone.KeystoneAuthenticationManager">
+            <property name="loginUrl" value="${keystone.authentication.url:http://localhost:35357/v2.0/tokens}"/>
+        </bean>
     </beans>
 
 

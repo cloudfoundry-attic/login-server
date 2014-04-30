@@ -146,7 +146,12 @@ smtp:
 
 #spring_profiles: ldap
 #spring_profiles: saml
+#spring_profiles: keystone
 
+keystone:
+  authentication:
+    url: http://localhost:35357/v2.0/tokens
+#    url: http://localhost:5000/v3/auth/tokens
 
 #ldap:
 #  profile:
