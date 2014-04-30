@@ -15,7 +15,9 @@ package org.cloudfoundry.identity.uaa.login.feature;
 import static org.hamcrest.Matchers.containsString;
 
 import org.cloudfoundry.identity.uaa.login.test.DefaultIntegrationTestConfig;
+import org.cloudfoundry.identity.uaa.login.test.LoginServerClassRunner;
 import org.cloudfoundry.identity.uaa.login.test.TestClient;
+import org.cloudfoundry.identity.uaa.login.test.UnlessProfileActive;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,6 +29,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.HtmlUtils;
 
 import com.dumbster.smtp.SimpleSmtpServer;
 import com.dumbster.smtp.SmtpMessage;
@@ -34,8 +37,9 @@ import java.security.SecureRandom;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@RunWith(LoginServerClassRunner.class)
 @ContextConfiguration(classes = DefaultIntegrationTestConfig.class)
+@UnlessProfileActive(values = {"saml", "ldap"})
 public class ResetPasswordIT {
 
     @Autowired
@@ -82,7 +86,7 @@ public class ResetPasswordIT {
         Assert.assertEquals(1, simpleSmtpServer.getReceivedEmailSize());
         SmtpMessage message = (SmtpMessage) simpleSmtpServer.getReceivedEmail().next();
         Assert.assertEquals(userEmail, message.getHeaderValue("To"));
-        Assert.assertThat(message.getBody(), containsString("Click the link to reset your password"));
+        Assert.assertThat(message.getBody(), containsString("Reset your password"));
 
         Assert.assertEquals("Check your email for a reset password link.", webDriver.findElement(By.cssSelector(".instructions-sent")).getText());
 
@@ -110,6 +114,7 @@ public class ResetPasswordIT {
         Pattern linkPattern = Pattern.compile("<a href=\"(.*?)\">.*?</a>");
         Matcher matcher = linkPattern.matcher(messageBody);
         matcher.find();
-        return matcher.group(1);
+        String encodedLink = matcher.group(1);
+        return HtmlUtils.htmlUnescape(encodedLink);
     }
 }

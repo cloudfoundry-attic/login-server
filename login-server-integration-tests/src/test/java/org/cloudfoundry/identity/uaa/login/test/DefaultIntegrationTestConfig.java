@@ -39,7 +39,7 @@ public class DefaultIntegrationTestConfig {
         DesiredCapabilities desiredCapabilities = new DesiredCapabilities();
         PhantomJSDriver driver = new PhantomJSDriver(desiredCapabilities);
         driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
-        driver.manage().timeouts().pageLoadTimeout(5, TimeUnit.SECONDS);
+        driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
         driver.manage().timeouts().setScriptTimeout(5, TimeUnit.SECONDS);
         driver.manage().window().setSize(new Dimension(1024, 768));
         return driver;

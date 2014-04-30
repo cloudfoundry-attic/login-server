@@ -1,0 +1,50 @@
+/*doc
+---
+title: Overlay
+name: overlay
+category: Base CSS
+---
+
+Sits over the div it's on, can be used w/ or w/o a shim to cover the underlying content.
+
+```haml_example
+.overlay.in
+  .overlay-shim.bkg-default-5
+  .overlay-content
+    OVERLAY CONTENT OVERLAY CONTENT yay
+  I'm the underlying content
+```
+*/
+
+
+.overlay {
+  position: relative;
+  .overlay-shim {
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: none;
+    position: absolute;
+    z-index: 1;
+    opacity: 0.5;
+  }
+  .overlay-content {
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: none;
+    position: absolute;
+    z-index: 2;
+  }
+  &.in {
+    .overlay-shim {
+      display: block;
+    }
+    .overlay-content {
+      display: block;
+    }
+  }
+}
+

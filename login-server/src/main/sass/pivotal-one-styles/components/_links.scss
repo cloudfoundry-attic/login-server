@@ -1,0 +1,50 @@
+/*doc
+---
+title: Links
+name: link
+category: Base CSS
+---
+
+There are four different kinds of links you can use to connect related content. In most cases (unless the designer specifically asks for another type of link) you should choose the default link.
+
+```haml_example
+%a{href: "http://google.com"}
+  %i.fa.fa-plus
+  link with an icon
+```
+
+Link                                                                      | Class              | Description
+------------------------------------------------------------------------- | ------------------ | -----------
+<a href="http://google.com">default link</a>                                     |                    | This is what buttons look like, this is the go to button style.
+<a class="link-highlight" href="http://google.com">highlight link</a>            | `link-highlight`   | Use this button as the primary call to action
+<a class="link-lowlight" href="http://google.com">lowlight link</a>              | `link-lowlight`    | I'm afraid I can't let you do that, yet.
+<span class="bkg-primary-3 phs pvs"><a class="link-inverse" href="http://google.com">inverse link</a></span> | `link-inverse`    | I go on a non-white background
+<a href="http://google.com"><i class="fa fa-plus"></i> link with an icon </a>     |                    | This button is for delete actions, these actions should also have a confirmation dialog
+*/
+
+a:hover {
+  text-decoration: none;
+}
+
+.link-highlight {
+  color: $link-highlight-color;
+  &:hover {
+    color: $link-highlight-hover-color;
+  }
+}
+
+.link-lowlight {
+  color: $link-lowlight-color;
+  &:hover {
+    color: $link-lowlight-hover-color;
+    text-decoration: underline;
+  }
+}
+
+.link-inverse {
+  color: $type-inverse;
+
+  &:hover {
+    color: $teal-5;
+  }
+}

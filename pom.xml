@@ -19,12 +19,12 @@
     <parent>
         <groupId>org.cloudfoundry.identity</groupId>
         <artifactId>cloudfoundry-identity-parent</artifactId>
-        <version>1.6.2</version>
+        <version>1.6.3</version>
     </parent>
 
     <groupId>com.cloudfoundry.identity</groupId>
     <artifactId>cloudfoundry-login-server-parent</artifactId>
-    <version>1.6.0</version>
+    <version>1.6.1</version>
     <packaging>pom</packaging>
     <name>Cloud Foundry Login</name>
     <description>Cloud Foundry Login Servers</description>
@@ -112,9 +112,9 @@
     </developers>
 
     <properties>
-        <identity.version>1.6.2</identity.version>
-        <spring.version>3.2.8.RELEASE</spring.version>
-        <spring.security.version>3.2.2.RELEASE</spring.security.version>
+        <identity.version>1.6.3</identity.version>
+        <spring.version>4.0.3.RELEASE</spring.version>
+        <spring.security.version>3.2.3.RELEASE</spring.security.version>
         <groupId>${project.groupId}</groupId>
         <version>${project.version}</version>
         <generatePom>true</generatePom>
@@ -125,13 +125,24 @@
     </profiles>
 
     <modules>
-        <module>login-server-common</module>
         <module>login-server</module>
         <module>doc-server</module>
     </modules>
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>versions-maven-plugin</artifactId>
+                <configuration>
+                    <properties>
+                        <property>
+                          <name>identity.version</name>
+                          <version>[${newIdentityVersion}]</version>
+                        </property>
+                    </properties>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -281,11 +292,6 @@
                     <version>2.2</version>
                 </plugin>
                 <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>maven-emma-plugin</artifactId>
-                    <version>1.0-alpha-3</version>
-                </plugin>
-                <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-release-plugin</artifactId>
                     <version>2.3.2</version>
@@ -323,13 +329,6 @@
                 <groupId>org.cloudfoundry.identity</groupId>
                 <artifactId>cloudfoundry-identity-scim</artifactId>
                 <version>${identity.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>cloudfoundry-login-server-common</artifactId>
-                <version>${project.version}</version>
-                <type>jar</type>
             </dependency>
 
             <dependency>
@@ -374,13 +373,11 @@
                 <version>${spring.version}</version>
             </dependency>
 
-
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-webmvc</artifactId>
                 <version>${spring.version}</version>
             </dependency>
-
 
             <dependency>
                 <groupId>org.springframework</groupId>
@@ -406,6 +403,12 @@
                 <groupId>org.springframework.security.oauth</groupId>
                 <artifactId>spring-security-oauth2</artifactId>
                 <version>${spring.security.oauth.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>commons-codec</groupId>
+                        <artifactId>commons-codec</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>
@@ -446,7 +449,7 @@
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpclient</artifactId>
-                <version>4.2.1</version>
+                <version>4.3.3</version>
                 <exclusions>
                     <exclusion>
                         <groupId>commons-logging</groupId>

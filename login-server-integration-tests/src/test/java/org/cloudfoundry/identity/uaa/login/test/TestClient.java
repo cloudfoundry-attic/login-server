@@ -14,7 +14,6 @@ package org.cloudfoundry.identity.uaa.login.test;
 
 import org.apache.commons.codec.binary.Base64;
 import org.junit.Assert;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -35,14 +34,16 @@ public class TestClient {
     public TestClient(RestTemplate restTemplate, String baseUrl, String uaaUrl ) {
         this.restTemplate = restTemplate;
         this.baseUrl = baseUrl;
-        this.uaaUrl =uaaUrl;
+        this.uaaUrl = uaaUrl;
+    }
+
+    public String getBasicAuthHeaderValue(String username, String password) {
+        return "Basic " + new String(Base64.encodeBase64((username + ":" + password).getBytes()));
     }
 
     public String getOAuthAccessToken(String username, String password, String grantType, String scope) {
         HttpHeaders headers = new HttpHeaders();
-        String basicDigestHeaderValue = "Basic "
-                + new String(Base64.encodeBase64((username + ":" + password).getBytes()));
-        headers.add("Authorization", basicDigestHeaderValue);
+        headers.add("Authorization", getBasicAuthHeaderValue(username, password));
 
         MultiValueMap<String, String> postParameters = new LinkedMultiValueMap<String, String>();
         postParameters.add("grant_type", grantType);
