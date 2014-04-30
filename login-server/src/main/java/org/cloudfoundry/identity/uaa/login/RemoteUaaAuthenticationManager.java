@@ -50,7 +50,7 @@ import org.springframework.web.client.RestTemplate;
  */
 public class RemoteUaaAuthenticationManager implements AuthenticationManager {
 
-    private final Log logger = LogFactory.getLog(getClass());
+    protected final Log logger = LogFactory.getLog(getClass());
 
     private RestOperations restTemplate = new RestTemplate();
 
@@ -64,12 +64,20 @@ public class RemoteUaaAuthenticationManager implements AuthenticationManager {
     public void setLoginUrl(String loginUrl) {
         this.loginUrl = loginUrl;
     }
+    
+    public String getLoginUrl() {
+        return loginUrl;
+    }
 
     /**
      * @param restTemplate a rest template to use
      */
     public void setRestTemplate(RestOperations restTemplate) {
         this.restTemplate = restTemplate;
+    }
+    
+    public RestOperations getRestTemplate() {
+        return restTemplate;
     }
 
     public RemoteUaaAuthenticationManager() {
@@ -90,22 +98,14 @@ public class RemoteUaaAuthenticationManager implements AuthenticationManager {
         String username = authentication.getName();
         String password = (String) authentication.getCredentials();
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-
-        MultiValueMap<String, Object> parameters = new LinkedMaskingMultiValueMap<String, Object>("password");
-        parameters.set("username", username);
-        parameters.set("password", password);
+        HttpHeaders headers = getHeaders();
 
         @SuppressWarnings("rawtypes")
         ResponseEntity<Map> response = restTemplate.exchange(loginUrl, HttpMethod.POST,
-                        new HttpEntity<MultiValueMap<String, Object>>(parameters, headers), Map.class);
+                        new HttpEntity<Object>(getParameters(username, password), headers), Map.class);
 
         if (response.getStatusCode() == HttpStatus.OK) {
-            String userFromUaa = (String) response.getBody().get("username");
-
-            if (userFromUaa.equals(userFromUaa)) {
+            if (evaluateResponse(authentication,response)) {
                 logger.info("Successful authentication request for " + authentication.getName());
                 return new UsernamePasswordAuthenticationToken(username, null, UaaAuthority.USER_AUTHORITIES);
             }
@@ -120,5 +120,27 @@ public class RemoteUaaAuthenticationManager implements AuthenticationManager {
         }
         throw new RuntimeException("Could not authenticate with remote server");
     }
+    
+    protected boolean evaluateResponse(Authentication authentication, ResponseEntity<Map> response) {
+        String userFromUaa = (String) response.getBody().get("username");
+        if (userFromUaa.equals(authentication.getPrincipal().toString())) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
+    protected Object getParameters(String username, String password) {
+        MultiValueMap<String, Object> parameters = new LinkedMaskingMultiValueMap<String, Object>("password");
+        parameters.set("username", username);
+        parameters.set("password", password);
+        return parameters;
+    }
+
+    protected HttpHeaders getHeaders() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        return headers;
+    }
 }
