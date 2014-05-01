@@ -20,13 +20,13 @@ install:
   - export WEBAPPS_DIR=$TRAVIS_BUILD_DIR/target/tomcat/webapps
   - rm -rf $WEBAPPS_DIR/*
   - export IDENTITY_VERSION=`mvn help:evaluate -Dexpression=project.parent.version | grep -v "\[" | tail -n 1`
-  - mvn dependency:copy -Dartifact=org.cloudfoundry.identity:cloudfoundry-identity-uaa:$IDENTITY_VERSION:war -DoutputDirectory=$WEBAPPS_DIR
+  - mvn dependency:copy -Dartifact=org.cloudfoundry.identity:cloudfoundry-identity-uaa:$IDENTITY_VERSION:war -DoutputDirectory=$WEBAPPS_DIR --quiet
   - mv $WEBAPPS_DIR/cloudfoundry-identity-uaa-*.war $WEBAPPS_DIR/uaa.war
-  - mvn dependency:copy -Dartifact=org.cloudfoundry.identity:cloudfoundry-identity-app:$IDENTITY_VERSION:war -DoutputDirectory=$WEBAPPS_DIR
+  - mvn dependency:copy -Dartifact=org.cloudfoundry.identity:cloudfoundry-identity-app:$IDENTITY_VERSION:war -DoutputDirectory=$WEBAPPS_DIR --quiet
   - mv $WEBAPPS_DIR/cloudfoundry-identity-app-*.war $WEBAPPS_DIR/app.war
-  - mvn dependency:copy -Dartifact=org.cloudfoundry.identity:cloudfoundry-identity-api:$IDENTITY_VERSION:war -DoutputDirectory=$WEBAPPS_DIR
+  - mvn dependency:copy -Dartifact=org.cloudfoundry.identity:cloudfoundry-identity-api:$IDENTITY_VERSION:war -DoutputDirectory=$WEBAPPS_DIR --quiet
   - mv $WEBAPPS_DIR/cloudfoundry-identity-api-*.war $WEBAPPS_DIR/api.war
-  - mvn -Dwar.exploded.dir=$WEBAPPS_DIR/login -pl login-server war:exploded
+  - mvn -Dwar.exploded.dir=$WEBAPPS_DIR/login -pl login-server war:exploded --quiet
 script:
   - ./.run-script.sh start
   - mvn -Dspring.profiles.active=${SPRING_PROFILES} verify -DforceIntegrationTests -DfailIfNoTests=false -Dtest="org.cloudfoundry.identity.uaa.login.feature.*"
