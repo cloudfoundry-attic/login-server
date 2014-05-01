@@ -14,31 +14,29 @@ before_install:
 install:
   - $TRAVIS_BUILD_DIR/.apply_spring_profiles_to_login_yaml.sh $SPRING_PROFILES
   - cat login-server/src/main/resources/login.yml
-  - mvn -U clean --quiet -DskipTests=true
-  - mvn -U install --quiet -DskipTests=true
-  - cd $TRAVIS_BUILD_DIR
+  - mvn compile
   - mkdir -p target/tomcat
   - tar zxf tomcat.tar.gz -C target/tomcat --strip-components 1
   - export WEBAPPS_DIR=$TRAVIS_BUILD_DIR/target/tomcat/webapps
   - rm -rf $WEBAPPS_DIR/*
   - export IDENTITY_VERSION=`mvn help:evaluate -Dexpression=project.parent.version | grep -v "\[" | tail -n 1`
-  - mvn dependency:copy -Dartifact=org.cloudfoundry.identity:cloudfoundry-identity-uaa:$IDENTITY_VERSION:war -DoutputDirectory=$WEBAPPS_DIR
+  - mvn dependency:copy -Dartifact=org.cloudfoundry.identity:cloudfoundry-identity-uaa:$IDENTITY_VERSION:war -DoutputDirectory=$WEBAPPS_DIR --quiet
   - mv $WEBAPPS_DIR/cloudfoundry-identity-uaa-*.war $WEBAPPS_DIR/uaa.war
-  - mvn dependency:copy -Dartifact=org.cloudfoundry.identity:cloudfoundry-identity-app:$IDENTITY_VERSION:war -DoutputDirectory=$WEBAPPS_DIR
+  - mvn dependency:copy -Dartifact=org.cloudfoundry.identity:cloudfoundry-identity-app:$IDENTITY_VERSION:war -DoutputDirectory=$WEBAPPS_DIR --quiet
   - mv $WEBAPPS_DIR/cloudfoundry-identity-app-*.war $WEBAPPS_DIR/app.war
-  - mvn dependency:copy -Dartifact=org.cloudfoundry.identity:cloudfoundry-identity-api:$IDENTITY_VERSION:war -DoutputDirectory=$WEBAPPS_DIR
+  - mvn dependency:copy -Dartifact=org.cloudfoundry.identity:cloudfoundry-identity-api:$IDENTITY_VERSION:war -DoutputDirectory=$WEBAPPS_DIR --quiet
   - mv $WEBAPPS_DIR/cloudfoundry-identity-api-*.war $WEBAPPS_DIR/api.war
   - mvn -Dwar.exploded.dir=$WEBAPPS_DIR/login -pl login-server war:exploded
+before_script:
+  - mvn test-compile
+  - export CI_LOGGING_CONFIG=$TRAVIS_BUILD_DIR/login-server/src/test/resources/log4j_ci.properties
 script:
   - ./.run-script.sh start
-  - mvn -Dtest=org.cloudfoundry.identity.uaa.login.integration.*Tests -DfailIfNoTests=false test --quiet
-  - cd login-server-integration-tests
-  - mvn -Dspring.profiles.active=${SPRING_PROFILES} verify --quiet
-  - cd $TRAVIS_BUILD_DIR
+  - mvn -Dspring.profiles.active=${SPRING_PROFILES} -Dlogging.config=file://$CI_LOGGING_CONFIG -Dlog4j.configuration=$CI_LOGGING_CONFIG verify -DforceIntegrationTests -DfailIfNoTests=false -Dtest="org.cloudfoundry.identity.uaa.login.feature.*"
   - ./.run-script.sh stop
-  - mvn -Dspring.profiles.active=$TESTENV test --quiet
+  - mvn -Dspring.profiles.active=${SPRING_PROFILES} -Dlogging.config=file://$CI_LOGGING_CONFIG -Dlog4j.configuration=$CI_LOGGING_CONFIG test
 after_success:
-  - mvn -pl login-server clean cobertura:cobertura coveralls:cobertura
+  - mvn -pl login-server clean cobertura:cobertura coveralls:cobertura --quiet
 after_failure:
   - cat $CATALINA_OUT
 after_script:

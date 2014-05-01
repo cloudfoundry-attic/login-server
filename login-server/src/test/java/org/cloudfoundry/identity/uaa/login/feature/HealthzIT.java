@@ -13,9 +13,9 @@
 package org.cloudfoundry.identity.uaa.login.feature;
 
 import org.cloudfoundry.identity.uaa.login.test.DefaultIntegrationTestConfig;
-import org.cloudfoundry.identity.uaa.login.test.IfProfileActive;
-import org.cloudfoundry.identity.uaa.login.test.LoginServerClassRunner;
+import org.cloudfoundry.identity.uaa.login.test.IntegrationTestRule;
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
@@ -23,11 +23,14 @@ import org.openqa.selenium.WebDriver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-@RunWith(LoginServerClassRunner.class)
+@RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = DefaultIntegrationTestConfig.class)
-@IfProfileActive("saml")
-public class SamlLoginIT {
+public class HealthzIT {
+
+    @Autowired @Rule
+    public IntegrationTestRule integrationTestRule;
 
     @Autowired
     WebDriver webDriver;
@@ -36,14 +39,8 @@ public class SamlLoginIT {
     String baseUrl;
 
     @Test
-    public void testSamlVariations() throws Exception {
-        webDriver.get(baseUrl + "/login");
-        Assert.assertEquals("Pivotal", webDriver.getTitle());
-
-        webDriver.findElement(By.name("username"));
-        webDriver.findElement(By.name("password"));
-        webDriver.findElement(By.xpath("//a[text()='Use your corporate credentials']"));
-        webDriver.findElement(By.xpath("//input[@value='Sign in']"));
-        Assert.assertEquals(3, webDriver.findElements(By.xpath("//input")).size());
+    public void testHealthz() throws Exception {
+        webDriver.get(baseUrl + "/healthz");
+        Assert.assertEquals("ok", webDriver.findElement(By.tagName("body")).getText());
     }
 }
