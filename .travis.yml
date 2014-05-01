@@ -27,11 +27,13 @@ install:
   - mvn dependency:copy -Dartifact=org.cloudfoundry.identity:cloudfoundry-identity-api:$IDENTITY_VERSION:war -DoutputDirectory=$WEBAPPS_DIR --quiet
   - mv $WEBAPPS_DIR/cloudfoundry-identity-api-*.war $WEBAPPS_DIR/api.war
   - mvn -Dwar.exploded.dir=$WEBAPPS_DIR/login -pl login-server war:exploded --quiet
+before_script:
+  - export LOGGING_CONFIG=$TRAVIS_BUILD_DIR/login-server/src/test/resources/log4j_ci.properties
 script:
   - ./.run-script.sh start
-  - mvn -Dspring.profiles.active=${SPRING_PROFILES} verify -DforceIntegrationTests -DfailIfNoTests=false -Dtest="org.cloudfoundry.identity.uaa.login.feature.*"
+  - mvn -Dspring.profiles.active=${SPRING_PROFILES} -Dlogging.config=file://$LOGGING_CONFIG -Dlog4j.configuration=$LOGGING_CONFIG verify -DforceIntegrationTests -DfailIfNoTests=false -Dtest="org.cloudfoundry.identity.uaa.login.feature.*"
   - ./.run-script.sh stop
-  - mvn -Dspring.profiles.active=${SPRING_PROFILES} test
+  - mvn -Dspring.profiles.active=${SPRING_PROFILES} -Dlogging.config=file://$LOGGING_CONFIG -Dlog4j.configuration=$LOGGING_CONFIG test
 after_success:
   - mvn -pl login-server clean cobertura:cobertura coveralls:cobertura
 after_failure:
