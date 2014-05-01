@@ -36,7 +36,7 @@ script:
   - ./.run-script.sh stop
   - mvn -Dspring.profiles.active=${SPRING_PROFILES} -Dlogging.config=file://$CI_LOGGING_CONFIG -Dlog4j.configuration=$CI_LOGGING_CONFIG test
 after_success:
-  - mvn -pl login-server clean cobertura:cobertura coveralls:cobertura
+  - mvn -pl login-server clean cobertura:cobertura coveralls:cobertura --quiet
 after_failure:
   - cat $CATALINA_OUT
 after_script:
