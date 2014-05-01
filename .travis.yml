@@ -29,7 +29,7 @@ install:
   - mvn -Dwar.exploded.dir=$WEBAPPS_DIR/login -pl login-server war:exploded
 script:
   - ./.run-script.sh start
-  - mvn -Dspring.profiles.active=${SPRING_PROFILES} verify -DforceIntegrationTests -Dtest="org.cloudfoundry.identity.uaa.login.feature.*"
+  - mvn -Dspring.profiles.active=${SPRING_PROFILES} verify -DforceIntegrationTests -DfailIfNoTests=false -Dtest="org.cloudfoundry.identity.uaa.login.feature.*"
   - ./.run-script.sh stop
   - mvn -Dspring.profiles.active=${SPRING_PROFILES} test
 after_success:
