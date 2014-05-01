@@ -14,7 +14,7 @@ before_install:
 install:
   - $TRAVIS_BUILD_DIR/.apply_spring_profiles_to_login_yaml.sh $SPRING_PROFILES
   - cat login-server/src/main/resources/login.yml
-  - mvn compile --quiet
+  - mvn compile
   - mkdir -p target/tomcat
   - tar zxf tomcat.tar.gz -C target/tomcat --strip-components 1
   - export WEBAPPS_DIR=$TRAVIS_BUILD_DIR/target/tomcat/webapps
@@ -26,8 +26,9 @@ install:
   - mv $WEBAPPS_DIR/cloudfoundry-identity-app-*.war $WEBAPPS_DIR/app.war
   - mvn dependency:copy -Dartifact=org.cloudfoundry.identity:cloudfoundry-identity-api:$IDENTITY_VERSION:war -DoutputDirectory=$WEBAPPS_DIR --quiet
   - mv $WEBAPPS_DIR/cloudfoundry-identity-api-*.war $WEBAPPS_DIR/api.war
-  - mvn -Dwar.exploded.dir=$WEBAPPS_DIR/login -pl login-server war:exploded --quiet
+  - mvn -Dwar.exploded.dir=$WEBAPPS_DIR/login -pl login-server war:exploded
 before_script:
+  - mvn test-compile
   - export CI_LOGGING_CONFIG=$TRAVIS_BUILD_DIR/login-server/src/test/resources/log4j_ci.properties
 script:
   - ./.run-script.sh start
