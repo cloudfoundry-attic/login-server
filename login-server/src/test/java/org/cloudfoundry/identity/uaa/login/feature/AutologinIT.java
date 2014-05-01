@@ -26,9 +26,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -58,19 +63,18 @@ public class AutologinIT {
     TestClient testClient;
 
     @Test
-    public void testAutologin() throws Exception {
+    public void testAutologinFlow() throws Exception {
         webDriver.get(baseUrl + "/logout.do");
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", testClient.getBasicAuthHeaderValue("app", "appclientsecret"));
+        HttpHeaders headers = getAppBasicAuthHttpHeaders();
 
-        Map<String, String> requestBody = new HashMap<String, String>();
+        Map<String, String> requestBody = new HashMap<>();
         requestBody.put("username", "marissa");
         requestBody.put("password", "koala");
 
         ResponseEntity<Map> autologinResponseEntity = restOperations.exchange(baseUrl + "/autologin",
                 HttpMethod.POST,
-                new HttpEntity<Map<String, String>>(requestBody, headers),
+                new HttpEntity<>(requestBody, headers),
                 Map.class);
         String autologinCode = (String) autologinResponseEntity.getBody().get("code");
 
@@ -88,5 +92,94 @@ public class AutologinIT {
         webDriver.get(baseUrl);
 
         Assert.assertEquals("marissa", webDriver.findElement(By.cssSelector(".header .nav")).getText());
+    }
+
+    @Test
+    public void testFormEncodedAutologinRequest() throws Exception {
+        HttpHeaders headers = getAppBasicAuthHttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        MultiValueMap<String, String> requestBody = new LinkedMultiValueMap<>();
+        requestBody.add("username", "marissa");
+        requestBody.add("password", "koala");
+
+        ResponseEntity<Map> autologinResponseEntity = restOperations.exchange(baseUrl + "/autologin",
+                HttpMethod.POST,
+                new HttpEntity<>(requestBody, headers),
+                Map.class);
+
+        String autologinCode = (String) autologinResponseEntity.getBody().get("code");
+        Assert.assertEquals(6, autologinCode.length());
+    }
+
+    @Test
+    public void testPasswordRequired() throws Exception {
+        HttpHeaders headers = getAppBasicAuthHttpHeaders();
+
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("username", "marissa");
+
+        try {
+            restOperations.exchange(baseUrl + "/autologin",
+                    HttpMethod.POST,
+                    new HttpEntity<>(requestBody, headers),
+                    Map.class);
+        } catch (HttpClientErrorException e) {
+            Assert.assertEquals(HttpStatus.UNAUTHORIZED, e.getStatusCode());
+        }
+    }
+
+    @Test
+    public void testClientAuthorization() throws Exception {
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("username", "marissa");
+        requestBody.put("password", "koala");
+
+        try {
+            restOperations.exchange(baseUrl + "/autologin",
+                    HttpMethod.POST,
+                    new HttpEntity<>(requestBody),
+                    Map.class);
+        } catch (HttpClientErrorException e) {
+            Assert.assertEquals(HttpStatus.UNAUTHORIZED, e.getStatusCode());
+        }
+    }
+
+    @Test
+    public void testClientIdMustBeConsistent() throws Exception {
+        webDriver.get(baseUrl + "/logout.do");
+
+        HttpHeaders headers = getAppBasicAuthHttpHeaders();
+
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("username", "marissa");
+        requestBody.put("password", "koala");
+
+        ResponseEntity<Map> autologinResponseEntity = restOperations.exchange(baseUrl + "/autologin",
+                HttpMethod.POST,
+                new HttpEntity<>(requestBody, headers),
+                Map.class);
+        String autologinCode = (String) autologinResponseEntity.getBody().get("code");
+
+        String authorizeUrl = UriComponentsBuilder.fromHttpUrl(baseUrl)
+                .path("/oauth/authorize")
+                .queryParam("redirect_uri", appUrl)
+                .queryParam("response_type", "code")
+                .queryParam("scope", "openid")
+                .queryParam("client_id", "stealer_of_codes")
+                .queryParam("code", autologinCode)
+                .build().toUriString();
+
+        try {
+            restOperations.exchange(authorizeUrl, HttpMethod.GET, null, Void.class);
+        } catch (HttpClientErrorException e) {
+            Assert.assertEquals(HttpStatus.UNAUTHORIZED, e.getStatusCode());
+        }
+    }
+
+    private HttpHeaders getAppBasicAuthHttpHeaders() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", testClient.getBasicAuthHeaderValue("app", "appclientsecret"));
+        return headers;
     }
 }
