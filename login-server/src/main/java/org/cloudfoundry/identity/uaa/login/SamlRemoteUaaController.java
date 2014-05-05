@@ -152,7 +152,7 @@ public class SamlRemoteUaaController extends RemoteUaaController {
 
         // Request has a password. Owner password grant with a UAA password
         if (null != request.getParameter("password")) {
-            return passthru(request, entity, model);
+            return passthru(request, entity, model, false);
         }
         else {
             //

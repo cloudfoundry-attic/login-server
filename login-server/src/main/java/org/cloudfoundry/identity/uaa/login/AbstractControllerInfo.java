@@ -38,6 +38,7 @@ public abstract class AbstractControllerInfo {
     private Map<String, String> links = new HashMap<String, String>();
     private static String DEFAULT_BASE_UAA_URL = "https://uaa.cloudfoundry.com";
     protected static final String HOST = "Host";
+    protected static final String AUTHORIZATON = "Authorization";
 
     private String baseUrl;
 
@@ -64,7 +65,12 @@ public abstract class AbstractControllerInfo {
     public void setUaaBaseUrl(String baseUrl) {
         this.baseUrl = baseUrl;
         try {
-            this.uaaHost = new URI(baseUrl).getHost();
+            URI uri = new URI(baseUrl);
+            this.uaaHost = uri.getHost();
+            if (uri.getPort()!=443 && uri.getPort()!=80 && uri.getPort()>0) {
+                //append non standard ports to the hostname
+                this.uaaHost += ":"+uri.getPort();
+            }
         } catch (URISyntaxException e) {
             throw new IllegalArgumentException("Could not extract host from URI: " + baseUrl);
         }

@@ -12,19 +12,6 @@
  *******************************************************************************/
 package org.cloudfoundry.identity.uaa.login;
 
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.security.Principal;
-import java.sql.Timestamp;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -70,6 +57,18 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.RedirectView;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.security.Principal;
+import java.sql.Timestamp;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Controller that manages OAuth authorization via a remote UAA service. Use
@@ -313,7 +312,59 @@ public class RemoteUaaController extends AbstractControllerInfo {
     public ResponseEntity<byte[]> approveOrDeny(HttpServletRequest request, HttpEntity<byte[]> entity,
                     Map<String, Object> model, SessionStatus sessionStatus) throws Exception {
         sessionStatus.setComplete();
-        return passthru(request, entity, model);
+        return passthru(request, entity, model, false);
+    }
+
+    @RequestMapping(value = { "/oauth/token" } , params = "grant_type=password")
+    @ResponseBody
+    public ResponseEntity<byte[]> passwordGrant(HttpServletRequest request,
+                                                @RequestHeader("Authorization") String authorization,
+                                                @RequestHeader HttpHeaders headers,
+                                                @RequestBody MultiValueMap<String, String> body,
+                                                Map<String, Object> model,
+                                                Principal principal) throws Exception {
+        logger.info("Passing through password grant token request for " + request.getServletPath());
+        body.setAll(getLoginCredentials(principal));
+
+        //for grant_type=password, we want to do user authentication
+        //in the login server rather than in UAA
+        String[] basic = extractAndDecodeHeader(authorization);
+        //create a modifiable list
+        headers = getRequestHeaders(headers);
+        headers.remove(AUTHORIZATION);
+        headers.remove(AUTHORIZATION.toLowerCase());
+        body.remove("client_id");
+        body.add("client_id", basic[0]);
+        body.add("client_secret", basic[1]);
+        body.add("source", "login");
+        body.add("add_new", String.valueOf(isAddNew()));
+        HttpEntity entity = new HttpEntity(body, headers);
+        return passthru(request, entity, model, true);
+    }
+
+    /**
+     * Decodes the header into a username and password.
+     *
+     * @throws BadCredentialsException if the Basic header is not present or is not valid Base64
+     */
+    private String[] extractAndDecodeHeader(String header) throws IOException {
+
+        byte[] base64Token = header.substring(6).getBytes("UTF-8");
+        byte[] decoded;
+        try {
+            decoded = org.springframework.security.crypto.codec.Base64.decode(base64Token);
+        } catch (IllegalArgumentException e) {
+            throw new BadCredentialsException("Failed to decode basic authentication token");
+        }
+
+        String token = new String(decoded, "UTF-8");
+
+        int delim = token.indexOf(":");
+
+        if (delim == -1) {
+            throw new BadCredentialsException("Invalid basic authentication token");
+        }
+        return new String[] {token.substring(0, delim), token.substring(delim + 1)};
     }
 
     @RequestMapping(value = { "/oauth/error", "oauth/token" })
@@ -321,7 +372,7 @@ public class RemoteUaaController extends AbstractControllerInfo {
     public ResponseEntity<byte[]> sundry(HttpServletRequest request, HttpEntity<byte[]> entity,
                     Map<String, Object> model) throws Exception {
         logger.info("Pass through request for " + request.getServletPath());
-        return passthru(request, entity, model);
+        return passthru(request, entity, model, false);
     }
 
     // We do not map /oauth/confirm_access because we want to remove the remote
@@ -396,7 +447,12 @@ public class RemoteUaaController extends AbstractControllerInfo {
     @ExceptionHandler(OAuth2Exception.class)
     public ModelAndView handleOAuth2Exception(OAuth2Exception e, ServletWebRequest webRequest) throws Exception {
         logger.info(e.getSummary());
-        webRequest.getResponse().setStatus(e.getHttpErrorCode());
+        int errorCode = e.getHttpErrorCode();
+        if (errorCode!=401 && "Bad credentials".equals(e.getMessage())) {
+            //https://github.com/spring-projects/spring-security-oauth/issues/191
+            errorCode = 401;
+        }
+        webRequest.getResponse().setStatus(errorCode);
         return new ModelAndView("forward:/home", Collections.singletonMap("error", e.getSummary()));
     }
 
@@ -454,11 +510,12 @@ public class RemoteUaaController extends AbstractControllerInfo {
         }
     }
 
-    protected ResponseEntity<byte[]> passthru(HttpServletRequest request, HttpEntity<byte[]> entity,
-                    Map<String, Object> model) throws Exception {
+    protected ResponseEntity<byte[]> passthru(HttpServletRequest request, HttpEntity entity,
+                    Map<String, Object> model, boolean loginClientRequired) throws Exception {
 
         String path = extractPath(request);
 
+        RestOperations template = loginClientRequired?getAuthorizationTemplate():getDefaultTemplate();
         HttpHeaders requestHeaders = new HttpHeaders();
         requestHeaders.putAll(getRequestHeaders(entity.getHeaders()));
         requestHeaders.remove(COOKIE);
@@ -472,10 +529,11 @@ public class RemoteUaaController extends AbstractControllerInfo {
             }
         }
 
-        ResponseEntity<byte[]> response = defaultTemplate.exchange(getUaaBaseUrl() + "/" + path,
-                        HttpMethod.valueOf(request.getMethod()), new HttpEntity<byte[]>(entity.getBody(),
-                                        requestHeaders),
-                        byte[].class);
+        ResponseEntity<byte[]> response = template.exchange(
+            getUaaBaseUrl() + "/" + path,
+            HttpMethod.valueOf(request.getMethod()),
+            new HttpEntity(entity.getBody(),requestHeaders),
+            byte[].class);
         HttpHeaders outgoingHeaders = getResponseHeaders(response.getHeaders());
         return new ResponseEntity<byte[]>(response.getBody(), outgoingHeaders, response.getStatusCode());
 
