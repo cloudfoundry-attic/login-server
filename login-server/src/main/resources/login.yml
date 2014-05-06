@@ -150,8 +150,8 @@ smtp:
 
 keystone:
   authentication:
-    url: http://localhost:35357/v2.0/tokens
-#    url: http://localhost:5000/v3/auth/tokens
+#    url: http://localhost:35357/v2.0/tokens
+    url: http://localhost:5000/v3/auth/tokens
 
 #ldap:
 #  profile:

@@ -104,7 +104,7 @@ public class RemoteUaaAuthenticationManager implements AuthenticationManager {
         ResponseEntity<Map> response = restTemplate.exchange(loginUrl, HttpMethod.POST,
                         new HttpEntity<Object>(getParameters(username, password), headers), Map.class);
 
-        if (response.getStatusCode() == HttpStatus.OK) {
+        if (response.getStatusCode() == HttpStatus.OK || response.getStatusCode() == HttpStatus.CREATED) {
             if (evaluateResponse(authentication,response)) {
                 logger.info("Successful authentication request for " + authentication.getName());
                 return new UsernamePasswordAuthenticationToken(username, null, UaaAuthority.USER_AUTHORITIES);
