@@ -126,7 +126,6 @@
 
     <modules>
         <module>login-server</module>
-        <module>doc-server</module>
     </modules>
 
     <build>
