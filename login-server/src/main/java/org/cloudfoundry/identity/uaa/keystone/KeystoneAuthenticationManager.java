@@ -13,11 +13,13 @@
 
 package org.cloudfoundry.identity.uaa.keystone;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
 
 import org.cloudfoundry.identity.uaa.login.RemoteUaaAuthenticationManager;
 import org.codehaus.jackson.annotate.JsonProperty;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -40,9 +42,14 @@ public class KeystoneAuthenticationManager extends RemoteUaaAuthenticationManage
     
     @Override
     protected boolean evaluateResponse(Authentication authentication, ResponseEntity<Map> response) {
+        boolean v2 = true;
         Map<String, Object> map = (Map<String, Object>)response.getBody().get("access");
+        if (map==null) {
+            v2 = false;
+            map = (Map<String, Object>)response.getBody().get("token");
+        }
         Map<String, Object> user = (Map<String, Object>)map.get("user");
-        return (authentication.getPrincipal().toString().equals(user.get("username")));
+        return (authentication.getPrincipal().toString().equals(user.get(v2?"username":"name")));
     }
 
     @Override
@@ -152,7 +159,7 @@ public class KeystoneAuthenticationManager extends RemoteUaaAuthenticationManage
             identity = new KeystoneIdentity(new KeystoneAuthentication(domain, username, password));
         }
 
-        @JsonProperty("identity")
+        @JsonProperty("auth")
         public KeystoneIdentity getIdentity() {
             return identity;
         }
@@ -163,12 +170,12 @@ public class KeystoneAuthenticationManager extends RemoteUaaAuthenticationManage
             }
 
             private KeystoneAuthentication auth;
-            @JsonProperty("auth")
+            @JsonProperty("identity")
             public KeystoneAuthentication getAuth() {
                 return auth;
             }
 
-            @JsonProperty("auth")
+            @JsonProperty("identity")
             public void setAuth(KeystoneAuthentication auth) {
                 this.auth = auth;
             }
@@ -223,20 +230,24 @@ public class KeystoneAuthenticationManager extends RemoteUaaAuthenticationManage
         }
 
         public static class KeystoneUser {
-            private String id;
+            private String name;
             private String password;
 
-            public KeystoneUser(String id, String password) {
-                this.id = id;
+            public KeystoneUser(String name, String password) {
+                this.name = name;
                 this.password = password;
             }
 
-            public String getId() {
-                return id;
+            public KeystoneDomain getDomain() {
+                return new KeystoneDomain();
             }
 
-            public void setId(String id) {
-                this.id = id;
+            public String getName() {
+                return name;
+            }
+
+            public void setName(String name) {
+                this.name = name;
             }
 
             public String getPassword() {
@@ -247,6 +258,12 @@ public class KeystoneAuthenticationManager extends RemoteUaaAuthenticationManage
                 this.password = password;
             }
 
+        }
+
+        public static class KeystoneDomain {
+            public String getName() {
+                return "Default";
+            }
         }
 
     }
