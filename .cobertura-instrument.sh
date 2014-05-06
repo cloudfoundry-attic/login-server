@@ -8,4 +8,4 @@ COBERTURA_CLASSPATH=`mvn -pl login-server dependency:build-classpath -P coverage
 
 set -x
 
-java -cp $COBERTURA_CLASSPATH net.sourceforge.cobertura.instrument.Main login-server/target/classes --ignore CoverageController
+java -cp $COBERTURA_CLASSPATH net.sourceforge.cobertura.instrument.Main login-server/target/classes

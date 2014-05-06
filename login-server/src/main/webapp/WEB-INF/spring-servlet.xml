@@ -650,7 +650,7 @@
     </beans>
 
     <beans profile="coverage">
-        <bean id="coverageController" class="org.cloudfoundry.identity.uaa.login.coverage.CoverageController" />
+        <bean id="coverageController" class="org.cloudfoundry.identity.uaa.coverage.CoverageController" />
     </beans>
 
 </beans>
