@@ -8,4 +8,4 @@ set -x
 
 echo "
 spring_profiles: ${@}
-" >> login-server/src/main/resources/login.yml
+" >> src/main/resources/login.yml

@@ -15,7 +15,7 @@ rm -f ${BUILD_DIR}/uaa/.travis.yml
 rm -f ${BUILD_DIR}/uaa/pom.xml
 rm -f ${BUILD_DIR}/uaa/LICENSE
 
-rm -rf ${BUILD_DIR}/login/login-server
+rm -rf ${BUILD_DIR}/login/src
 rm -rf ${BUILD_DIR}/login/docs
 
 rm -f ${BUILD_DIR}/login/README.md
