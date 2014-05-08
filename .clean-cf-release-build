@@ -20,6 +20,12 @@ rm -rf ${BUILD_DIR}/login/docs
 
 rm -f ${BUILD_DIR}/login/README.md
 rm -f ${BUILD_DIR}/login/NOTICE
+rm -f ${BUILD_DIR}/login/.apply_spring_profiles_to_login_yaml.sh
+rm -f ${BUILD_DIR}/login/.cobertura-instrument.sh
+rm -f ${BUILD_DIR}/login/.cobertura-report.sh
+rm -f ${BUILD_DIR}/login/.gitignore
+rm -f ${BUILD_DIR}/login/.gitreview
+rm -f ${BUILD_DIR}/login/cloudfoundry*.iml
 rm -f ${BUILD_DIR}/login/.run-script.sh
 rm -f ${BUILD_DIR}/login/.travis.yml
 rm -f ${BUILD_DIR}/login/pom.xml
