@@ -103,7 +103,7 @@ login:
   # URL of the IDP metadata
   idpMetadataURL: https://win2012-sso2:7444/websso/SAML2/Metadata/vsphere.local
   #if using file based, change the spring profile to 'fileMetadata'
-  #idpMetadataFile: /Users/johndoe/dev/login-server/saml-login-server/src/main/resources/security/idp.xml
+  #idpMetadataFile: /Users/johndoe/dev/login-server/src/main/resources/idp.xml
   #if using OpenAM one can set the URL
   #idpMetadataURL: http://openam.example.com:8181/openam/saml2/jsp/exportmetadata.jsp?entityid=http://openam.example.com:8181/openam
   

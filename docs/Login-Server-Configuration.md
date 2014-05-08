@@ -4,8 +4,8 @@ The saml_login server supports two additional features on top of what you get fr
 It adds LDAP authentication support, as well authentication using an external SAML source. We have tested our authentication with 
 Apache Directory Server, OpenLDAP, [OpenAM] [2] and the vCenter SSO appliance. 
 
-  [1]: https://github.com/cloudfoundry/login-server/tree/master/login-server "login-server"
-  [2]: https://github.com/cloudfoundry/login-server/tree/master/saml-login-server/OpenAM-README.md "OpenAM Installation Instructions"
+  [1]: https://github.com/cloudfoundry/login-server/tree/master "login-server"
+  [2]: https://github.com/cloudfoundry/login-server/tree/master/OpenAM-README.md "OpenAM Installation Instructions"
 
 
 ###Configuring cf-release for a saml_login deployment

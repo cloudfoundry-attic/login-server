@@ -31,7 +31,7 @@
 - Start up the login server, uaa and sample apps
   - `export MAVEN_OPTS="-Xmx768m -XX:MaxPermSize=256m"`
   - modify login.yml to contain spring_profiles: saml 
-  - `cd login-server/login-server; mvn tomcat7:run -Pintegration`
+  - `cd login-server; mvn tomcat7:run -Pintegration`
 
 - Create an OpenAM Hosted Identity provider and a circle of trust
 
