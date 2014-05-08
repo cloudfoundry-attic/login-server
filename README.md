@@ -126,7 +126,6 @@ Here are some ways for you to get involved in the community:
   [subscribing](http://blog.cloudfoundry.org) to the cloudfoundry.org
   blog
 
-
 ## The Cloud Foundry SAML Login Server
 
 The saml_login server supports two additional features on top of what you get from the regular [login-server] [1].
@@ -135,7 +134,6 @@ Apache Directory Server, OpenLDAP, [OpenAM] [2] and the vCenter SSO appliance.
 
   [1]: https://github.com/cloudfoundry/login-server/tree/master "login-server"
   [2]: https://github.com/cloudfoundry/login-server/tree/master/OpenAM-README.md "OpenAM Installation Instructions"
-
 
 ###Configuring cf-release for a saml_login deployment
 
@@ -239,6 +237,3 @@ at the same time.
         passwordEncoder: org.cloudfoundry.identity.uaa.login.ldap.DynamicPasswordComparator # required for search-and-compare
         localPasswordCompare: true # required for search-and-compare
   </pre>
-
-
-
