@@ -132,123 +132,123 @@ public class RemoteUaaControllerViewTests {
         }
     }
 
-    private static String UAA_JSON = "{\n" +
-            "    \"approved_scopes\": [{\n" +
-            "            \"code\": \"scope.password.write\",\n" +
-            "            \"text\": \"Access your 'password' resources with scope 'write'\"\n" +
-            "        }],\n" +
-            "    \"auth_request\": {\n" +
-            "        \"approvalParameters\": {},\n" +
-            "        \"approved\": false,\n" +
-            "        \"authorities\": [\n" +
-            "            {\n" +
-            "                \"authority\": \"uaa.resource\"\n" +
-            "            }\n" +
-            "        ],\n" +
-            "        \"authorizationParameters\": {\n" +
-            "            \"add_new\": \"false\",\n" +
-            "            \"client_id\": \"app\",\n" +
-            "            \"external_scopes\": \"\",\n" +
-            "            \"redirect_uri\": \"http://localhost:8080/app/\",\n" +
-            "            \"response_type\": \"code\",\n" +
-            "            \"scope\": \"cloud_controller.read cloud_controller.write openid password.write scim.userids\",\n" +
-            "            \"source\": \"login\",\n" +
-            "            \"state\": \"MSS7Nu\",\n" +
-            "            \"username\": \"marissa\"\n" +
-            "        },\n" +
-            "        \"clientId\": \"app\",\n" +
-            "        \"denied\": true,\n" +
-            "        \"redirectUri\": \"http://localhost:8080/app/\",\n" +
-            "        \"resourceIds\": [\n" +
-            "            \"scim\",\n" +
-            "            \"openid\",\n" +
-            "            \"cloud_controller\",\n" +
-            "            \"password\"\n" +
-            "        ],\n" +
-            "        \"responseTypes\": [\n" +
-            "            \"code\"\n" +
-            "        ],\n" +
-            "        \"scope\": [\n" +
-            "            \"cloud_controller.read\",\n" +
-            "            \"cloud_controller.write\",\n" +
-            "            \"openid\",\n" +
-            "            \"password.write\",\n" +
-            "            \"scim.userids\"\n" +
-            "        ],\n" +
-            "        \"state\": \"MSS7Nu\"\n" +
-            "    },\n" +
-            "    \"client\": {\n" +
-            "        \"authorities\": [\n" +
-            "            \"uaa.resource\"\n" +
-            "        ],\n" +
-            "        \"authorized_grant_types\": [\n" +
-            "            \"authorization_code\",\n" +
-            "            \"client_credentials\",\n" +
-            "            \"implicit\",\n" +
-            "            \"password\",\n" +
-            "            \"refresh_token\"\n" +
-            "        ],\n" +
-            "        \"client_id\": \"app\",\n" +
-            "        \"resource_ids\": [\n" +
-            "            \"none\"\n" +
-            "        ],\n" +
-            "        \"scope\": [\n" +
-            "            \"cloud_controller.read\",\n" +
-            "            \"cloud_controller.write\",\n" +
-            "            \"openid\",\n" +
-            "            \"organizations.acme\",\n" +
-            "            \"password.write\",\n" +
-            "            \"scim.userids\"\n" +
-            "        ]\n" +
-            "    },\n" +
-            "    \"client_id\": \"app\",\n" +
-            "    \"denied_scopes\": [{\n" +
-            "            \"code\": \"scope.cloud_controller.read\",\n" +
-            "            \"text\": \"Access your 'cloud_controller' resources with scope 'read'\"\n" +
-            "        }],\n" +
-            "    \"message\": \"To confirm or deny access POST to the following locations with the parameters requested.\",\n" +
-            "    \"options\": {\n" +
-            "        \"confirm\": {\n" +
-            "            \"key\": \"user_oauth_approval\",\n" +
-            "            \"location\": \"http://localhost/uaa/oauth/authorize\",\n" +
-            "            \"path\": \"/uaa/oauth/authorize\",\n" +
-            "            \"value\": \"true\"\n" +
-            "        },\n" +
-            "        \"deny\": {\n" +
-            "            \"key\": \"user_oauth_approval\",\n" +
-            "            \"location\": \"http://localhost/uaa/oauth/authorize\",\n" +
-            "            \"path\": \"/uaa/oauth/authorize\",\n" +
-            "            \"value\": \"false\"\n" +
-            "        }\n" +
-            "    },\n" +
-            "    \"redirect_uri\": \"http://localhost:8080/app/\",\n" +
-            "    \"scopes\": [\n" +
-            "        {\n" +
-            "            \"code\": \"scope.password.write\",\n" +
-            "            \"text\": \"Access your 'password' resources with scope 'write'\"\n" +
-            "        },\n" +
-            "        {\n" +
-            "            \"code\": \"scope.cloud_controller.read\",\n" +
-            "            \"text\": \"Access your 'cloud_controller' resources with scope 'read'\"\n" +
-            "        },\n" +
-            "        {\n" +
-            "            \"code\": \"scope.cloud_controller.write\",\n" +
-            "            \"text\": \"Access your 'cloud_controller' resources with scope 'write'\"\n" +
-            "        },\n" +
-            "        {\n" +
-            "            \"code\": \"scope.scim.userids\",\n" +
-            "            \"text\": \"Access your 'scim' resources with scope 'userids'\"\n" +
-            "        }\n" +
-            "    ],\n" +
-            "    \"undecided_scopes\": [\n" +
-            "        {\n" +
-            "            \"code\": \"scope.cloud_controller.write\",\n" +
-            "            \"text\": \"Access your 'cloud_controller' resources with scope 'write'\"\n" +
-            "        },\n" +
-            "        {\n" +
-            "            \"code\": \"scope.scim.userids\",\n" +
-            "            \"text\": \"Access your 'scim' resources with scope 'userids'\"\n" +
-            "        }\n" +
-            "    ]\n" +
-            "}\n";
+    private static String UAA_JSON = "{" +
+            "    \"approved_scopes\": [{" +
+            "            \"code\": \"scope.password.write\"," +
+            "            \"text\": \"Access your 'password' resources with scope 'write'\"" +
+            "        }]," +
+            "    \"auth_request\": {" +
+            "        \"approvalParameters\": {}," +
+            "        \"approved\": false," +
+            "        \"authorities\": [" +
+            "            {" +
+            "                \"authority\": \"uaa.resource\"" +
+            "            }" +
+            "        ]," +
+            "        \"authorizationParameters\": {" +
+            "            \"add_new\": \"false\"," +
+            "            \"client_id\": \"app\"," +
+            "            \"external_scopes\": \"\"," +
+            "            \"redirect_uri\": \"http://localhost:8080/app/\"," +
+            "            \"response_type\": \"code\"," +
+            "            \"scope\": \"cloud_controller.read cloud_controller.write openid password.write scim.userids\"," +
+            "            \"source\": \"login\"," +
+            "            \"state\": \"MSS7Nu\"," +
+            "            \"username\": \"marissa\"" +
+            "        }," +
+            "        \"clientId\": \"app\"," +
+            "        \"denied\": true," +
+            "        \"redirectUri\": \"http://localhost:8080/app/\"," +
+            "        \"resourceIds\": [" +
+            "            \"scim\"," +
+            "            \"openid\"," +
+            "            \"cloud_controller\"," +
+            "            \"password\"" +
+            "        ]," +
+            "        \"responseTypes\": [" +
+            "            \"code\"" +
+            "        ]," +
+            "        \"scope\": [" +
+            "            \"cloud_controller.read\"," +
+            "            \"cloud_controller.write\"," +
+            "            \"openid\"," +
+            "            \"password.write\"," +
+            "            \"scim.userids\"" +
+            "        ]," +
+            "        \"state\": \"MSS7Nu\"" +
+            "    }," +
+            "    \"client\": {" +
+            "        \"authorities\": [" +
+            "            \"uaa.resource\"" +
+            "        ]," +
+            "        \"authorized_grant_types\": [" +
+            "            \"authorization_code\"," +
+            "            \"client_credentials\"," +
+            "            \"implicit\"," +
+            "            \"password\"," +
+            "            \"refresh_token\"" +
+            "        ]," +
+            "        \"client_id\": \"app\"," +
+            "        \"resource_ids\": [" +
+            "            \"none\"" +
+            "        ]," +
+            "        \"scope\": [" +
+            "            \"cloud_controller.read\"," +
+            "            \"cloud_controller.write\"," +
+            "            \"openid\"," +
+            "            \"organizations.acme\"," +
+            "            \"password.write\"," +
+            "            \"scim.userids\"" +
+            "        ]" +
+            "    }," +
+            "    \"client_id\": \"app\"," +
+            "    \"denied_scopes\": [{" +
+            "            \"code\": \"scope.cloud_controller.read\"," +
+            "            \"text\": \"Access your 'cloud_controller' resources with scope 'read'\"" +
+            "        }]," +
+            "    \"message\": \"To confirm or deny access POST to the following locations with the parameters requested.\"," +
+            "    \"options\": {" +
+            "        \"confirm\": {" +
+            "            \"key\": \"user_oauth_approval\"," +
+            "            \"location\": \"http://localhost/uaa/oauth/authorize\"," +
+            "            \"path\": \"/uaa/oauth/authorize\"," +
+            "            \"value\": \"true\"" +
+            "        }," +
+            "        \"deny\": {" +
+            "            \"key\": \"user_oauth_approval\"," +
+            "            \"location\": \"http://localhost/uaa/oauth/authorize\"," +
+            "            \"path\": \"/uaa/oauth/authorize\"," +
+            "            \"value\": \"false\"" +
+            "        }" +
+            "    }," +
+            "    \"redirect_uri\": \"http://localhost:8080/app/\"," +
+            "    \"scopes\": [" +
+            "        {" +
+            "            \"code\": \"scope.password.write\"," +
+            "            \"text\": \"Access your 'password' resources with scope 'write'\"" +
+            "        }," +
+            "        {" +
+            "            \"code\": \"scope.cloud_controller.read\"," +
+            "            \"text\": \"Access your 'cloud_controller' resources with scope 'read'\"" +
+            "        }," +
+            "        {" +
+            "            \"code\": \"scope.cloud_controller.write\"," +
+            "            \"text\": \"Access your 'cloud_controller' resources with scope 'write'\"" +
+            "        }," +
+            "        {" +
+            "            \"code\": \"scope.scim.userids\"," +
+            "            \"text\": \"Access your 'scim' resources with scope 'userids'\"" +
+            "        }" +
+            "    ]," +
+            "    \"undecided_scopes\": [" +
+            "        {" +
+            "            \"code\": \"scope.cloud_controller.write\"," +
+            "            \"text\": \"Access your 'cloud_controller' resources with scope 'write'\"" +
+            "        }," +
+            "        {" +
+            "            \"code\": \"scope.scim.userids\"," +
+            "            \"text\": \"Access your 'scim' resources with scope 'userids'\"" +
+            "        }" +
+            "    ]" +
+            "}";
 }
