@@ -17,6 +17,7 @@ import static org.hamcrest.Matchers.not;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.TEXT_HTML;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.header;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
@@ -28,6 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.cloudfoundry.identity.uaa.authentication.login.Prompt;
 import org.junit.Test;
+import org.springframework.mock.env.MockEnvironment;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -40,7 +42,7 @@ public class RemoteUaaControllerMockMvcTests {
 
     @Test
     public void testLoginWithExplicitPrompts() throws Exception {
-        RemoteUaaController controller = new RemoteUaaController(new RestTemplate());
+        RemoteUaaController controller = new RemoteUaaController(new MockEnvironment(), new RestTemplate());
         Prompt first = new Prompt("how", "text", "How did I get here?");
         Prompt second = new Prompt("where", "password", "Where does that highway go to?");
         controller.setPrompts(Arrays.asList(first, second));
@@ -58,7 +60,7 @@ public class RemoteUaaControllerMockMvcTests {
     @Test
     public void testLoginWithRemoteUaaPrompts() throws Exception {
         RestTemplate restTemplate = new RestTemplate();
-        RemoteUaaController controller = new RemoteUaaController(restTemplate);
+        RemoteUaaController controller = new RemoteUaaController(new MockEnvironment(), restTemplate);
         controller.setUaaBaseUrl("https://uaa.example.com");
 
         MockMvc mockMvc = getMockMvc(controller);
@@ -91,7 +93,7 @@ public class RemoteUaaControllerMockMvcTests {
     @Test
     public void testLoginWithDefaultPrompts() throws Exception {
         RestTemplate restTemplate = new RestTemplate();
-        RemoteUaaController controller = new RemoteUaaController(restTemplate);
+        RemoteUaaController controller = new RemoteUaaController(new MockEnvironment(), restTemplate);
         controller.setUaaBaseUrl("https://uaa.example.com");
 
         MockMvc mockMvc = getMockMvc(controller);
@@ -107,6 +109,40 @@ public class RemoteUaaControllerMockMvcTests {
                 .andExpect(view().name("login"))
                 .andExpect(model().attribute("prompts", hasKey("username")))
                 .andExpect(model().attribute("prompts", hasKey("password")));
+    }
+
+    @Test
+    public void testPivotalSignupLink() throws Exception {
+        MockEnvironment environment = new MockEnvironment();
+        environment.setProperty("login.brand", "pivotal");
+
+        RemoteUaaController controller = new RemoteUaaController(environment, new RestTemplate());
+        Prompt first = new Prompt("how", "text", "How did I get here?");
+        Prompt second = new Prompt("where", "password", "Where does that highway go to?");
+        controller.setPrompts(Arrays.asList(first, second));
+
+        MockMvc mockMvc = getMockMvc(controller);
+
+        mockMvc.perform(get("/login").accept(TEXT_HTML))
+                .andExpect(status().isOk())
+                .andExpect(model().attribute("createAccountLink", "/accounts/new"));
+    }
+
+    @Test
+    public void testOssSignupLink() throws Exception {
+        MockEnvironment environment = new MockEnvironment();
+        environment.setProperty("links.signup", "http://www.example.com/signup");
+
+        RemoteUaaController controller = new RemoteUaaController(environment, new RestTemplate());
+        Prompt first = new Prompt("how", "text", "How did I get here?");
+        Prompt second = new Prompt("where", "password", "Where does that highway go to?");
+        controller.setPrompts(Arrays.asList(first, second));
+
+        MockMvc mockMvc = getMockMvc(controller);
+
+        mockMvc.perform(get("/login").accept(TEXT_HTML))
+                .andExpect(status().isOk())
+                .andExpect(model().attribute("createAccountLink", "http://www.example.com/signup"));
     }
 
     private MockMvc getMockMvc(RemoteUaaController controller) {

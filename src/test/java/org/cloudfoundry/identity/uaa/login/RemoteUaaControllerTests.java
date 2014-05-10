@@ -26,6 +26,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mock.env.MockEnvironment;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.util.MultiValueMap;
@@ -44,7 +45,7 @@ import java.util.Map;
  */
 public class RemoteUaaControllerTests {
 
-    private RemoteUaaController controller = new RemoteUaaController(new RestTemplate());
+    private RemoteUaaController controller = new RemoteUaaController(new MockEnvironment(), new RestTemplate());
 
     private MockHttpServletRequest request = new MockHttpServletRequest();
 

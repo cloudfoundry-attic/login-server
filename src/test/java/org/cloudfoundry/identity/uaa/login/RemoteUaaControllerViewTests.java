@@ -32,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -122,8 +123,8 @@ public class RemoteUaaControllerViewTests {
         }
 
         @Bean
-        RemoteUaaController remoteUaaController(RestTemplate restTemplate) {
-            RemoteUaaController remoteUaaController = new RemoteUaaController(new RestTemplate());
+        RemoteUaaController remoteUaaController(Environment environment, RestTemplate restTemplate) {
+            RemoteUaaController remoteUaaController = new RemoteUaaController(environment, new RestTemplate());
             Prompt first = new Prompt("how", "text", "How did I get here?");
             Prompt second = new Prompt("where", "password", "Where does that highway go to?");
             remoteUaaController.setPrompts(Arrays.asList(first, second));

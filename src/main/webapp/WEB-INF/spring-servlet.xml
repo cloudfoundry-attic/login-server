@@ -42,6 +42,7 @@
 
     <!-- TODO: Move the autologin related beans from the login server and saml login server to login common -->
     <bean id="abstractRemoteUaaController" abstract="true">
+        <constructor-arg ref="environment" />
         <constructor-arg>
             <bean class="org.springframework.web.client.RestTemplate" />
         </constructor-arg>

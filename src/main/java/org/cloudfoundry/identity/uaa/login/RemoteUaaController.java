@@ -26,6 +26,7 @@ import org.cloudfoundry.identity.uaa.client.SocialClientUserDetails;
 import org.cloudfoundry.identity.uaa.codestore.ExpiringCode;
 import org.cloudfoundry.identity.uaa.user.UaaAuthority;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -104,6 +105,8 @@ public class RemoteUaaController extends AbstractControllerInfo {
 
     private static final String USER_AGENT = "user-agent";
 
+    private final Environment environment;
+
     private RestOperations defaultTemplate = new RestTemplate();
 
     private RestOperations authorizationTemplate = new RestTemplate();
@@ -167,7 +170,7 @@ public class RemoteUaaController extends AbstractControllerInfo {
         }
     }
 
-    public RemoteUaaController(RestTemplate restTemplate) {
+    public RemoteUaaController(Environment environment, RestTemplate restTemplate) {
 
         // The default java.net client doesn't allow you to handle 4xx responses
         restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory() {
@@ -183,6 +186,7 @@ public class RemoteUaaController extends AbstractControllerInfo {
                 return statusCode.series() == HttpStatus.Series.SERVER_ERROR;
             }
         });
+        this.environment = environment;
         defaultTemplate = restTemplate;
         initProperties();
     }
@@ -194,6 +198,13 @@ public class RemoteUaaController extends AbstractControllerInfo {
         model.putAll(getLoginInfo(getUaaBaseUrl() + "/" + path, getRequestHeaders(headers)));
         model.put("links", getLinksInfo());
         if (principal == null) {
+            String createAccountLink;
+            if ("pivotal".equals(environment.getProperty("login.brand"))) {
+                createAccountLink = "/accounts/new";
+            } else {
+                createAccountLink = environment.getProperty("links.signup", "#");
+            }
+            model.put("createAccountLink", createAccountLink);
             return "login";
         }
         return "home";
