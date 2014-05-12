@@ -1,0 +1,28 @@
+/*doc
+---
+title: Dropdown
+name: dropdown
+category: Base CSS
+---
+
+Dropdowns are the basic bootstrap dropdowns. Whenever possible use the browser
+default dropdowns in the forms section. They are more naturally compatible with mobile.
+
+```haml_example
+.dropdown
+  %a#triggerId{"data-target" => "#", "data-toggle" => "dropdown", :href => "#", :role => "button"}
+    Dropdown
+    %span.caret
+  %ul.dropdown-menu{"aria-labelledby" => "triggerId", :role => "menu"}
+    %li
+      %a foo
+    %li
+      %a bar
+```
+
+*/
+.dropdown {
+  .caret {
+    border-top-color: initial; //use the text color for the caret color
+  }
+}

@@ -1,0 +1,42 @@
+.page-footer {
+  padding-top: 15px;
+  padding-bottom: 5px;
+  background-color: $footer-bg;
+  color: $type-inverse;
+  font-weight: 200;
+
+  .list-footer {
+    @extend .list-inline-divider;
+    float: left;
+
+
+    > li + li {
+      padding-left: 35px;
+      margin-left: 35px;
+      border-left-color: $footer-divider-color;
+    }
+
+    li:first-child {
+      padding-left: 0;
+    }
+
+    > li {
+      min-height: 25px;
+      line-height: 25px;
+
+    }
+    a {
+      display: inline-block;
+    }
+  }
+
+  .list-legal {
+    @extend .list-inline;
+
+    text-transform: uppercase;
+    > li + li {
+      padding-left: 15px;
+    }
+  }
+}
+

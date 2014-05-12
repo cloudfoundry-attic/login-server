@@ -15,14 +15,17 @@ rm -f ${BUILD_DIR}/uaa/.travis.yml
 rm -f ${BUILD_DIR}/uaa/pom.xml
 rm -f ${BUILD_DIR}/uaa/LICENSE
 
-rm -rf ${BUILD_DIR}/login/login-server
-rm -rf ${BUILD_DIR}/login/login-server-common
+rm -rf ${BUILD_DIR}/login/src
 rm -rf ${BUILD_DIR}/login/docs
-rm -rf ${BUILD_DIR}/login/doc-server
-rm -rf ${BUILD_DIR}/login/api-docs
 
 rm -f ${BUILD_DIR}/login/README.md
 rm -f ${BUILD_DIR}/login/NOTICE
+rm -f ${BUILD_DIR}/login/.apply_spring_profiles_to_login_yaml.sh
+rm -f ${BUILD_DIR}/login/.cobertura-instrument.sh
+rm -f ${BUILD_DIR}/login/.cobertura-report.sh
+rm -f ${BUILD_DIR}/login/.gitignore
+rm -f ${BUILD_DIR}/login/.gitreview
+rm -f ${BUILD_DIR}/login/cloudfoundry*.iml
 rm -f ${BUILD_DIR}/login/.run-script.sh
 rm -f ${BUILD_DIR}/login/.travis.yml
 rm -f ${BUILD_DIR}/login/pom.xml

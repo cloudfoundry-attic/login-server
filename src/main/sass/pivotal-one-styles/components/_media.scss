@@ -1,0 +1,42 @@
+/*doc
+---
+title: Media
+name: media
+category: Base CSS
+---
+
+The default media allow to float a media object (images, video, audio) to the left or right of a content block.
+
+```haml_example
+.media
+  %a.pull-left{:href => "#"}
+    %img.media-object{:alt => "...", :src => "http://placehold.it/64x64"}
+  .media-body
+    %h4.media-heading Media heading
+    %p
+      Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin commodo. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
+```
+
+Wrap the image in a fixed-size `.image-container` to make sure the image isn't
+larger than the container
+
+```haml_example
+.media
+  %a.pull-left{:href => "#"}
+    .image-container{style: "width: 100px; height: 50px;"}
+      %img.media-object{:alt => "...", :src => "http://placehold.it/64x64"}
+  .media-body
+    %h4.media-heading Media heading
+    %p
+      Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin commodo. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
+```
+*/
+.media {
+  .image-container {
+    .media-object {
+      margin: auto;
+      max-height: 100%;
+      max-width: 100%;
+    }
+  }
+}

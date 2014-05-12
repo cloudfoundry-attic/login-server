@@ -1,0 +1,258 @@
+/*doc
+---
+title: Backgrounds
+name: background
+category: Base CSS
+---
+
+Background color classes can be applied to any element.
+
+
+*/
+
+/*doc
+---
+title: Grays
+name: 3_gray
+parent: background
+category: Base CSS
+---
+
+<div class="row mvxl">
+  <div class="col-md-4">
+    <div class="chip">
+      <div class="chip-color bkg-default-1"></div>
+      <div class="chip-color-name">.bkg-default-1</div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="chip">
+      <div class="chip-color bkg-default-2"></div>
+      <div class="chip-color-name">.bkg-default-2</div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="chip">
+      <div class="chip-color bkg-default-3"></div>
+      <div class="chip-color-name">.bkg-default-3</div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="chip">
+      <div class="chip-color bkg-default-4"></div>
+      <div class="chip-color-name">.bkg-default-4</div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="chip">
+      <div class="chip-color bkg-default-5"></div>
+      <div class="chip-color-name">.bkg-default-5</div>
+    </div>
+  </div>
+</div>
+*/
+
+
+.bkg-default-1 {
+  background-color: $bkg-default-1-color;
+}
+.bkg-default-2 {
+  background-color: $bkg-default-2-color;
+}
+.bkg-default-3 {
+  background-color: $bkg-default-3-color;
+}
+.bkg-default-4 {
+  background-color: $bkg-default-4-color;
+}
+.bkg-default-5 {
+  background-color: $bkg-default-5-color;
+}
+
+/*doc
+---
+title: Primary
+name: 1_primary_colors
+parent: background
+category: Base CSS
+---
+<div class="row mvxl">
+  <div class="col-md-4">
+    <div class="chip">
+      <div class="chip-color bkg-primary-1"></div>
+      <div class="chip-color-name">.bkg-primary-1</div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="chip">
+      <div class="chip-color bkg-primary-2"></div>
+      <div class="chip-color-name">.bkg-primary-2</div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="chip">
+      <div class="chip-color bkg-primary-3"></div>
+      <div class="chip-color-name">.bkg-primary-3</div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="chip">
+      <div class="chip-color bkg-primary-4"></div>
+      <div class="chip-color-name">.bkg-primary-4</div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="chip">
+      <div class="chip-color bkg-primary-5"></div>
+      <div class="chip-color-name">.bkg-primary-5</div>
+    </div>
+  </div>
+</div>
+*/
+
+.bkg-primary-1 {
+  background-color: $bkg-primary-1-color;
+}
+.bkg-primary-2 {
+  background-color: $bkg-primary-2-color;
+}
+.bkg-primary-3 {
+  background-color: $bkg-primary-3-color;
+}
+.bkg-primary-4 {
+  background-color: $bkg-primary-4-color;
+}
+.bkg-primary-5 {
+  background-color: $bkg-primary-5-color;
+}
+
+/*doc
+---
+title: Steel
+name: 2_steel_colors
+parent: background
+category: Base CSS
+---
+<div class="row mvxl">
+  <div class="col-md-4">
+    <div class="chip">
+      <div class="chip-color bkg-steel-1"></div>
+      <div class="chip-color-name">.bkg-steel-1</div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="chip">
+      <div class="chip-color bkg-steel-2"></div>
+      <div class="chip-color-name">.bkg-steel-2</div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="chip">
+      <div class="chip-color bkg-steel-3"></div>
+      <div class="chip-color-name">.bkg-steel-3</div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="chip">
+      <div class="chip-color bkg-steel-4"></div>
+      <div class="chip-color-name">.bkg-steel-4</div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="chip">
+      <div class="chip-color bkg-steel-5"></div>
+      <div class="chip-color-name">.bkg-steel-5</div>
+    </div>
+  </div>
+</div>
+*/
+
+//FIXME: what to name this that isn't color specific?
+.bkg-steel-1 {
+  background-color: $bkg-steel-1-color;
+}
+.bkg-steel-2 {
+  background-color: $bkg-steel-2-color;
+}
+.bkg-steel-3 {
+  background-color: $bkg-steel-3-color;
+}
+.bkg-steel-4 {
+  background-color: $bkg-steel-4-color;
+}
+.bkg-steel-5 {
+  background-color: $bkg-steel-5-color;
+}
+
+/*doc
+---
+title: Images
+name: images
+parent: background
+category: Base CSS
+---
+
+
+<div class="row mvxl">
+  <div class="col-md-4">
+    <div class="chip">
+      <div class="chip-color bkg-highlight-1"></div>
+      <div class="chip-color-name">bkg-highlight-1</div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="chip">
+      <div class="chip-color bkg-highlight-2"></div>
+      <div class="chip-color-name">bkg-highlight-2</div>
+    </div>
+  </div>
+</div>
+
+*/
+
+.bkg-highlight-1 {
+  background-image: -webkit-gradient(
+      linear,
+      left bottom,
+      right top,
+      color-stop(1, rgb(99,173,167)),
+      color-stop(0, rgb(0, 119, 109))
+  );
+}
+
+.bkg-highlight-2 {
+  background: $bkg-default-5-color image-url('gray-cloud.png') no-repeat 50% 150px;
+}
+
+.bkg-highlight-3 {
+}
+
+
+/*doc
+---
+title: Overlay
+name: overlay
+parent: background
+category: Base CSS
+---
+
+The background overlay style is partially transparent.
+
+<div class="row">
+  <div class="col-md-4">
+    <div class="chip">
+      <div class="chip-color bkg-overlay"></div>
+      <div class="chip-color-name">bkg-overlay</div>
+    </div>
+  </div>
+</div>
+*/
+
+.bkg-overlay {
+  background-color: rgba(154, 202,198, .4);
+}
+
+
+
+
+

@@ -1,0 +1,195 @@
+---
+# Cloud Foundry 2012.02.03 Beta
+# Copyright (c) [2009-2012] VMware, Inc. All Rights Reserved.
+#
+# This product is licensed to you under the Apache License, Version 2.0 (the "License").
+# You may not use this product except in compliance with the License.
+#
+# This product includes a number of subcomponents with
+# separate copyright notices and license terms. Your use of these
+# subcomponents is subject to the terms and conditions of the
+# subcomponent's license, as noted in the LICENSE file.
+
+
+#links:
+#  home: https://console.run.pivotal.io
+#  network: https://network.gopivotal.com/login
+#  passwd: https://console.run.pivotal.io/password_resets/new
+#  signup: https://console.run.pivotal.io/register
+#  signup-network: https://network.gopivotal.com/users/new
+
+links:
+  home: https://console.10.244.0.34.xip.io
+  passwd: http://localhost:8080/login/forgot_password
+  signup: https://console.10.244.0.34.xip.io/register
+  signup-network: https://network.gopivotal.com/registrations/new
+
+
+login:
+  #the brand to use, oss or pivotal for JSP pages
+  brand: pivotal
+  #base URL that the login server can be reached at
+  url: http://localhost:8080/login
+  # The entity base url is the location of this application
+  # (The host and port of the application that will accept assertions) 
+  entityBaseURL: http://localhost:8080/login
+  # The entityID of this SP
+  entityID: cloudfoundry-saml-login-local
+  # The location and credentials of the certificate for this SP
+  # See README.md for details on how to create this.
+  serviceProviderKey: ! '-----BEGIN RSA PRIVATE KEY-----
+  
+    Proc-Type: 4,ENCRYPTED
+    
+    DEK-Info: DES-EDE3-CBC,231BD428AF94D4C8
+    
+    0Nmo90pX8byVS7ZlakMIoXdJSLlxqzi1pN0g1ye2U+9HgTLTLuMwWaPknZ/2NFtK
+    
+    rO72ss8uc7xBAoMkOvcMTZCg5P4JDlmuQ31IabzRyOQcAxCPZedgarRnwxT6GUim
+    
+    JtkzNPmAAgf1bfUTu/LNt2o01dW+qq+2qiwUxgUBM2xLBmadIWqqTOZbkFc9Xjvl
+    
+    /IEnJgp/c49sNh68EpXPlsGJfW7jAh90nlA13H1fpvTsSg2/6wKbRsxxNkpVg0Nq
+    
+    bQURQIO6htOLZBPMMpoPILp/KtKkd1zpaZJnbZGDo9AdwfAh9dUbEw8ukJwRg3Xl
+    
+    lsptHoMGsGdvgViWZhCB/pAHYLh31G8oVMA/qPB9PNJYIK2aQZdm7yiAdf+m8Jxb
+    
+    Do2xBH6XUeHkg2F0LWnC/FjaMRpLuliI9vvJVB7YCQKkMdgNVV0SCx39IiX0rEm5
+    
+    8vuuoAH3b7b+maWp5+ffriNIcEFSlcmTPIgqZBboIORBNXZnHTUG7nGIML+nlOK9
+    
+    zdvF2vAxchqOKroc6+SGFLNvNQd9S/nLH3vP+aX9iStL55G11+p2tL+bIGMWZj0h
+    
+    Z+qqQoogtngRFbjcVoKYerFXbKG6xXzXUc4O3EbvAKvEi0HJodYccP3L7wIer1aY
+    
+    VaMF2M05g5KedHosEfvvhU17xS9L4u2SRMZIQ3K8iLNEhZ6bOw6EnzTaKWeffrYr
+    
+    UOjfMEgswcHfpxx1iD5T4RTwxuKOgtFhd1QM4enXPsU6uRU5PGSiB/0t6jal6ClF
+    
+    PhtIrTwhx0vBR4rySx4raXdLClxxt5vLe826C3uwo/6HTdUsnDvIXA==
+    
+    -----END RSA PRIVATE KEY-----'
+  serviceProviderKeyPassword: password
+  serviceProviderCertificate: ! '-----BEGIN CERTIFICATE-----
+  
+    MIIBzzCCATgCCQDTMCX3wJYrVDANBgkqhkiG9w0BAQUFADAsMSowKAYDVQQDFCFz
+  
+    YW1sX2xvZ2luLE9VPXRlc3QsTz12bXdhcmUsTz1jb20wHhcNMTMwNzAyMjMzOTU4
+  
+    WhcNMTQwNzAyMjMzOTU4WjAsMSowKAYDVQQDFCFzYW1sX2xvZ2luLE9VPXRlc3Qs
+  
+    Tz12bXdhcmUsTz1jb20wgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBANYBRuep
+  
+    WaoNA7/RsOUVlmOzxbhtfW8AstGXjsWbAmmg8NSruRlNuMz1WdCeESM3zBqLSyp8
+  
+    Vf3j3ExzB2qquDbPXNA1k4EqgNya2E+6n3KsgVLCWQm4W46Pd7C6QswrR6JgUKaW
+  
+    6KI8BgyJQ9wjL/nR8uqZouJJyRSLuIaGXIuXAgMBAAEwDQYJKoZIhvcNAQEFBQAD
+  
+    gYEAXOojarkGv5nVZqTuY8BRM/TRt1oby3i0VRG70l0PcDlWft52aSvCd3t8ds2S
+  
+    h92cXLz8nvHEBaBTkxTLtf2/h5x2KQhXyHoU1UU+JjOegoF+LD6KdmaVk2l35Na5
+  
+    1V2AHsj+yDrJ9aKwt86jbBbcFkRphdkn5ivq71GCWRfcpZE=
+  
+    -----END CERTIFICATE-----'
+
+  # The entity alias of the IDP when vCenter SSO
+  idpEntityAlias: vshpere.local
+  # The entity alias of the IDP when Open AM
+  #idpEntityAlias: openam-local
+  
+  # URL of the IDP metadata
+  idpMetadataURL: https://win2012-sso2:7444/websso/SAML2/Metadata/vsphere.local
+  #if using file based, change the spring profile to 'fileMetadata'
+  #idpMetadataFile: /Users/johndoe/dev/login-server/src/main/resources/idp.xml
+  #if using OpenAM one can set the URL
+  #idpMetadataURL: http://openam.example.com:8181/openam/saml2/jsp/exportmetadata.jsp?entityid=http://openam.example.com:8181/openam
+  
+  
+  saml:
+    #openAM responds to emailAddress
+    #nameID: urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress
+    
+    #vCenter SSO responds to persistent
+    nameID: urn:oasis:names:tc:SAML:2.0:nameid-format:persistent
+    
+    assertionConsumerIndex: 1
+  
+  authorize:
+    url: http://localhost:8080/login/oauth/authorize
+
+uaa:
+  # The hostname of the UAA that this login server will connect to
+  url: http://localhost:8080/uaa
+  token:
+    url: http://localhost:8080/uaa/oauth/token
+  approvals:
+    url: http://localhost:8080/uaa/approvals
+  login:
+    url: http://localhost:8080/uaa/authenticate
+
+# The secret that this login server will use to authenticate to the uaa
+LOGIN_SECRET: loginsecret
+
+# Google Analytics
+#analytics:
+#  code: secret_code
+#  domain: example.com
+
+smtp:
+  host: localhost
+  port: 2525
+  user:
+  password:
+
+#spring_profiles: ldap
+#spring_profiles: saml
+#spring_profiles: keystone
+
+keystone:
+  authentication:
+#    url: http://localhost:35357/v2.0/tokens
+    url: http://localhost:5000/v3/auth/tokens
+
+#ldap:
+#  profile:
+#    file: ldap/ldap-simple-bind.xml
+#  base:
+#    url: 'ldaps://192.168.3.39:10636/'
+#    userDnPattern: 'cn={0},ou=Users,dc=test,dc=com;cn={0},ou=OtherUsers,dc=example,dc=com'
+#  ssl: 
+#    sslCertificate: ! '-----BEGIN CERTIFICATE-----
+#    MIIBfTCCAScCBgFDfaC2yzANBgkqhkiG9w0BAQUFADBCMQswCQYDVQQGEwJVUzEMMAoGA1UEChMD
+#    QVNGMRIwEAYDVQQLEwlEaXJlY3RvcnkxETAPBgNVBAMTCEFwYWNoZURTMB4XDTE0MDExMDE5Mjg0
+#    MVoXDTE1MDExMDE5Mjg0MVowTDELMAkGA1UEBhMCVVMxDDAKBgNVBAoTA0FTRjESMBAGA1UECxMJ
+#    RGlyZWN0b3J5MRswGQYDVQQDExJmaGFuaWstd29ya3N0YXRpb24wXDANBgkqhkiG9w0BAQEFAANL
+#    ADBIAkEAuA6Nmto6NFCCJ+CwsBnT2cvMxuYgf26iZ3ckIpLhs2V4ZJ4PFinR6JZUsVnRp0RbYoV5
+#    iW6F91XDTVtAMtDTJwIDAQABMA0GCSqGSIb3DQEBBQUAA0EATFGpEIprKYcnc+JuNcSQ8v2P2J7e
+#    lQ23NhTaljASF0g8AZ7SZEItU8JFYqf/KnNJ7FPwo4LbMbr7Zg6BRKBvnQ==
+#    -----END CERTIFICATE-----'
+#    sslCertificateAlias: ldaps
+    
+#ldap:
+#  profile:
+#    file:ldap/ldap-search-and-bind.xml
+#  base:  
+#    url: 'ldap://localhost:10389/'
+#    userDn: 'cn=admin,ou=Users,dc=test,dc=com'
+#    password: 'password'
+#    searchBase: '' 
+#    searchFilter: 'cn={0}'
+
+#ldap:
+#  profile:
+#    file:ldap/ldap-search-and-compare.xml
+#  base:  
+#    url: 'ldap://localhost:10389/'
+#    userDn: 'cn=admin,ou=Users,dc=test,dc=com'
+#    password: 'password'
+#    searchBase: '' 
+#    searchFilter: 'cn={0}'
+#    passwordAttributeName: userPassword
+#    passwordEncoder: org.cloudfoundry.identity.uaa.login.ldap.DynamicPasswordComparator
+#    localPasswordCompare: true

@@ -1,0 +1,65 @@
+/*doc
+---
+title: Alerts
+name: alert
+category: Base CSS
+---
+
+Alerts are used to display flash messages to the user.
+
+```haml_example
+.alert.alert-success
+  Success.
+```
+
+You can also make them dismissable:
+
+```haml_example
+.alert.alert-success.alert-dismissable
+  %button.close{data: {dismiss: "alert"}}
+    %i.fa.fa-times
+  Success
+.alert.alert-info.alert-dismissable
+  %button.close{data: {dismiss: "alert"}}
+    %i.fa.fa-times
+  Info
+.alert.alert-notice.alert-dismissable
+  %button.close{data: {dismiss: "alert"}}
+    %i.fa.fa-times
+  Notice - deprecated. Use `.alert-info`
+.alert.alert-warning.alert-dismissable
+  %button.close{data: {dismiss: "alert"}}
+    %i.fa.fa-times
+  Warn
+.alert.alert-danger.alert-dismissable
+  %button.close{data: {dismiss: "alert"}}
+    %i.fa.fa-times
+  Danger
+```
+
+*/
+
+.alert-dismissable {
+  $right-padding: $alert-padding * 2;
+  padding-right: $right-padding;
+
+  .close {
+    right: $alert-padding/2 - $right-padding;
+    top: -$alert-padding/2;
+    font-size: $alert-close-size;
+    color: $type-inverse;
+    opacity: 1.0;
+  }
+
+  &.alert-warning, &.alert-notice, &.alert-info {
+    .close {
+      color: $type-primary-4;
+    }
+  }
+}
+
+//TODO: deprecate-alert notice and use alert-info
+.alert-notice {
+  @extend .alert-info;
+}
+

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+    Cloud Foundry
+    Copyright (c) [2009-2014] Pivotal Software, Inc. All Rights Reserved.
+
+    This product is licensed to you under the Apache License, Version 2.0 (the "License").
+    You may not use this product except in compliance with the License.
+
+    This product includes a number of subcomponents with
+    separate copyright notices and license terms. Your use of these
+    subcomponents is subject to the terms and conditions of the
+    subcomponent's license, as noted in the LICENSE file.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:security="http://www.springframework.org/schema/security"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:oauth="http://www.springframework.org/schema/security/oauth2"
+    xmlns:util="http://www.springframework.org/schema/util" xmlns:cache="http://www.springframework.org/schema/cache"
+    xmlns:sec="http://www.springframework.org/schema/security"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+              http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.2.xsd
+              http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+              http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd
+              http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd
+              http://www.springframework.org/schema/security/oauth2 http://www.springframework.org/schema/security/spring-security-oauth2-1.0.xsd
+              http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache-4.0.xsd">
+
+    <security:authentication-manager id="ldapAuthenticationManager">
+        <sec:authentication-provider ref="ldapAuthProvider" />
+    </security:authentication-manager>
+
+    <bean id="remoteAuthenticationManager" class="org.cloudfoundry.identity.uaa.login.UsernamePasswordExtractingAuthenticationManager">
+        <constructor-arg ref="ldapAuthenticationManager" />
+    </bean>
+
+    <bean id="contextSource" class="org.springframework.security.ldap.DefaultSpringSecurityContextSource">
+        <constructor-arg value="${ldap.base.url:ldap://localhost:10389/}" />
+    </bean>
+
+    <bean id="ldapAuthProvider" class="org.springframework.security.ldap.authentication.LdapAuthenticationProvider">
+        <constructor-arg>
+            <bean class="org.springframework.security.ldap.authentication.BindAuthenticator">
+                <constructor-arg ref="contextSource" />
+                <property name="userDnPatterns">
+                    <bean class="org.springframework.util.StringUtils" factory-method="delimitedListToStringArray">
+                        <constructor-arg type="java.lang.String"
+                            value="${ldap.base.userDnPattern:cn={0},ou=Users,dc=test,dc=com}" />
+                        <constructor-arg type="java.lang.String" value="${ldap.base.userDnPatternDelimiter:;}" />
+                    </bean>
+                </property>
+            </bean>
+        </constructor-arg>
+        <constructor-arg>
+            <bean class="org.springframework.security.ldap.authentication.NullLdapAuthoritiesPopulator" />
+        </constructor-arg>
+        <property name="authoritiesMapper">
+            <bean class="org.springframework.security.core.authority.mapping.SimpleAuthorityMapper">
+                <property name="defaultAuthority" value="ROLE_USER" />
+            </bean>
+        </property>
+    </bean>
+
+</beans>              

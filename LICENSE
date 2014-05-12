@@ -1,5 +1,4 @@
-
-				Apache License
+            Apache License
            Version 2.0, January 2004
         http://www.apache.org/licenses/
 
@@ -204,10 +203,9 @@
 
 =======================================================================   
 
+cf-login-server:
 
-login-server:
-
-login-server: includes a number of subcomponents with separate copyright 
+cf-login-server: includes a number of subcomponents with separate copyright 
 notices and license terms.  The product that includes this file
 does not necessarily use all the open source subcomponents referred 
 to below. Your use of the source code for the these subcomponents 
@@ -216,46 +214,41 @@ is subject to the terms and conditions of the following licenses.
 
 SECTION 1: BSD-STYLE, MIT-STYLE, OR SIMILAR STYLE LICENSES
 
-   >>> aopalliance-1.0
+   >>> hsqldb-j5-2.2.4
    >>> mockito-all-1.8.5
 
 
 
 SECTION 2: Apache License, V2.0
 
-   >>> cloudfoundry-identity-common-1.4.0
-   >>> commons-codec-1.3
-   >>> commons-lang-2.5
+   >>> apache-ant-1.7.0
+   >>> com.springsource.bundlor.maven-1.0
    >>> httpclient-4.2.1
-   >>> httpcore-4.2.1
-   >>> jackson-core-asl-1.9.2
-   >>> jackson-mapper-asl-1.9.2
+   >>> jackson-mapper-als-1.9.8
    >>> log4j-1.2.14
-   >>> snakeyaml-1.9
+   >>> maven-antrun-plugin-1.0
+   >>> maven-release-plugin-2.3.2
+   >>> org.apache.maven.plugins.maven-antrun-plugin-1.6
+   >>> org.apache.maven.plugins.maven-compiler-plugin-2.3.2
+   >>> org.apache.maven.plugins.maven-eclipse-plugin-2.9
+   >>> org.apache.maven.plugins.maven-enforcer-plugin-1.1.1
+   >>> org.apache.maven.plugins.maven-source-plugin-2.1.2
+   >>> org.springframework.build.aws.maven-3.0.0.release
    >>> spring-aop-3.1.2.release
-   >>> spring-asm-3.1.2.release
    >>> spring-beans-3.1.2.release
    >>> spring-context-3.1.2.release
-   >>> spring-context-support-3.1.2.release
    >>> spring-core-3.1.2.release
    >>> spring-expression-3.1.2.release
-   >>> spring-ldap-core-1.3.1.release
-   >>> spring-security-config-3.1.3.release
-   >>> spring-security-core-3.1.3.release
-   >>> spring-security-ldap-3.1.3.release
-   >>> spring-security-oauth2-1.0.2.release
-   >>> spring-security-web-3.1.3.release
    >>> spring-test-3.1.2.release
-   >>> spring-tx-3.0.7.release
    >>> spring-web-3.1.2.release
    >>> spring-webmvc-3.1.2.release
+   >>> tomcat7-maven-plugin-2.0-beta-1
+   >>> vt-password-3.1.1
 
 
 
 SECTION 3: Common Development and Distribution License, V1.0
 
-   >>> jsp-api-2.1
-   >>> jstl-1.2
    >>> servlet-api-2.5
 
 
@@ -268,18 +261,28 @@ SECTION 4: Common Public License, V1.0
 
 SECTION 5: Eclipse Public License, V1.0
 
-   >>> aspectjrt-1.6.9
+   >>> lifecycle-mapping-1.0.0
+
+
+
+SECTION 6: GNU Lesser General Public License, V3.0
+
+   >>> git-commit-id-plugin-1.0
 
 
 
 APPENDIX. Standard License Files
 
- 
+   >>> Eclipse Public License, V1.0
+
    >>> Common Development and Distribution License, V1.0
 
    >>> Common Public License, V1.0
 
-   >>> Eclipse Public License, V1.0
+   >>> GNU Lesser General Public License, V3.0
+
+   >>> Common Development and Distribution License, V1.1
+
 
 
 
@@ -288,9 +291,36 @@ APPENDIX. Standard License Files
 BSD-STYLE, MIT-STYLE, OR SIMILAR STYLE LICENSES are applicable to the following component(s).
 
 
->>> aopalliance-1.0
+>>> hsqldb-j5-2.2.4
 
-LICENCE: all the source code provided by AOP Alliance is Public Domain.
+/ Copyright (c) 2001-2011, The HSQL Development Group
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+Redistributions of source code must retain the above copyright notice, this
+list of conditions and the following disclaimer.
+
+Redistributions in binary form must reproduce the above copyright notice,
+this list of conditions and the following disclaimer in the documentation
+and/or other materials provided with the distribution.
+
+Neither the name of the HSQL Development Group nor the names of its
+contributors may be used to endorse or promote products derived from this
+software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL HSQL DEVELOPMENT GROUP, HSQLDB.ORG,
+OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 >>> mockito-all-1.8.5
@@ -393,48 +423,43 @@ Originally developed by Leonardo Mesquita. Copyright notice added by Henrik Sthl
 Apache License, V2.0 is applicable to the following component(s).
 
 
->>> cloudfoundry-identity-common-1.4.0
+>>> apache-ant-1.7.0
 
-UAA 09012012
+This product includes software developed by
+   The Apache Software Foundation (http://www.apache.org/).
 
-Copyright (c) 2011-2012 VMware, Inc. All Rights Reserved. 
+   This product includes also software developed by :
+     - the W3C consortium (http://www.w3c.org) ,
+     - the SAX project (http://www.saxproject.org)
 
-This product is licensed to you under the Apache License, Version 2.0 (the "License").  
-You may not use this product except in compliance with the License.  
+   Please read the different LICENSE files present in the root directory of
+   this distribution.
 
-This product may include a number of subcomponents with separate copyright notices 
-and license terms. Your use of these subcomponents is subject to the terms and 
-conditions of the subcomponent's license, as noted in the LICENSE file.
+   The names "Ant" and  "Apache Software Foundation"  must not be used to
+   endorse  or promote  products derived  from this  software without prior
+   written permission. For written permission, please contact
+   apache@apache.org.
 
 
->>> commons-codec-1.3
+>>> com.springsource.bundlor.maven-1.0
 
-Copyright 2001-2004 The Apache Software Foundation.
-  
+Apache Wicket
+Copyright 2007 The Apache Software Foundation
+
+This product includes software developed at
+The Apache Software Foundation (http://www.apache.org/).
+
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
-  
+
 http://www.apache.org/licenses/LICENSE-2.0
-  
+
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-
-
->>> commons-lang-2.5
-
-Apache Commons Logging
-
-Copyright 2003-2007 The Apache Software Foundation
-
-
-
-This product includes software developed by
-
-The Apache Software Foundation (http://www.apache.org/).
 
 
 >>> httpclient-4.2.1
@@ -470,16 +495,327 @@ information on the Apache Software Foundation, please see
 <http://www.apache.org/>.
 
 
->>> httpcore-4.2.1
+>>> jackson-mapper-als-1.9.8
 
-Apache HttpComponents HttpCore
-Copyright 2005-2012 The Apache Software Foundation
+Copyright (c) 2007- Tatu Saloranta, tatu.saloranta@iki.fi
 
-This product includes software developed by
+ Licensed under the License specified in file LICENSE, included with
+ the source code and binary code bundles.
+ You may not use this file except in compliance with the License.
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+
+
+>>> log4j-1.2.14
+
+Apache log4j
+Copyright 2007 The Apache Software Foundation
+
+This product includes software developed at
 The Apache Software Foundation (http://www.apache.org/).
 
-This project contains annotations derived from JCIP-ANNOTATIONS
-Copyright (c) 2005 Brian Goetz and Tim Peierls. See http://www.jcip.net
+
+>>> maven-antrun-plugin-1.0
+
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+
+
+>>> maven-release-plugin-2.3.2
+
+License: Apache 2.0
+
+ADDITIONAL LICENSE INFORMATION:
+
+maven-release-plugin-2.3.2-sources(2).jar\META-INF\DEPENDENCIES
+
+Transitive dependencies of this project determined from the
+maven pom organized by organization.
+
+Maven Release Plugin
+
+
+From: 'an unknown organization'
+- Ganymed SSH2 for Java (http:www.ganymed.ethz.ch/ssh2/) ch.ethz.ganymed:ganymed-ssh2:jar:build210
+> BSD
+
+License: BSD style license  (http:www.ganymed.ethz.ch/ssh2/LICENSE.txt)
+- MKS Integrity - Java API (http:www.mks.com/customer-service) com.mks.api:mksapi-jar:jar:4.10.9049
+License: The Apache Software License, Version 2.0  (http:www.apache.org/licenses/LICENSE-2.0.txt)
+- CLI  commons-cli:commons-cli:jar:1.0
+
+- Codec  commons-codec:commons-codec:jar:1.2
+
+- commons-logging  commons-logging:commons-logging:jar:1.0
+
+- jdom  jdom:jdom:jar:1.0
+
+- Neko HTML (http:nekohtml.sourceforge.net/) nekohtml:nekohtml:jar:1.9.6.2
+License: The Apache Software License, Version 2.0  (http:www.apache.org/licenses/LICENSE-2.0.txt)
+- xercesMinimal  nekohtml:xercesMinimal:jar:1.9.6.2
+
+- Plexus Common Utilities (http:plexus.codehaus.org/plexus-utils) org.codehaus.plexus:plexus-utils:jar:3.0
+License: Apache Public License 2.0  (http:www.apache.org/licenses/LICENSE-2.0)
+- JDOM (http:www.jdom.org/) org.jdom:jdom:jar:1.1
+
+> CDDL 1.1
+
+[PLEASE NOTE: PIVOTAL SOFTWARE, INC. ELECTS TO USE AND DISTRIBUTE THIS COMPONENT UNDER THE TERMS OF THE CDDL 1.1.]
+
+SUN PUBLIC LICENSE
+
+Note: current releases of NetBeans are dual licensed under the CDDL and GPLv2 w/Classpath Exception license.
+
+- cvsclient (http:javacvs.netbeans.org/library/) org.netbeans.lib:cvsclient:jar:20060125
+
+License: Sun Public License  (http:www.netbeans.org/about/legal/spl.html)*****[Note: current releases of NetBeans are dual licensed under the CDDL and GPLv2 w/Classpath Exception license.]*****
+
+
+
+- Plexus Cipher: encryption/decryption Component (http:spice.sonatype.org/plexus-cipher) org.sonatype.plexus:plexus-cipher:jar:1.4
+
+License: Apache Public License 2.0  (http:www.apache.org/licenses/LICENSE-2.0)
+- Plexus Security Dispatcher Component (http:spice.sonatype.org/plexus-sec-dispatcher) org.sonatype.plexus:plexus-sec-dispatcher:jar:1.3
+
+License: Apache Public License 2.0  (http:www.apache.org/licenses/LICENSE-2.0)
+- regexp  regexp:regexp:jar:1.3
+
+
+From: 'Apache Software Foundation' (http:jakarta.apache.org/)
+- HttpClient (http:jakarta.apache.org/commons/httpclient/) commons-httpclient:commons-httpclient:jar:3.0
+License: Apache License  (http:www.apache.org/licenses/LICENSE-2.0)
+
+From: 'Codehaus' (http:www.codehaus.org)
+- jaxen (http:jaxen.codehaus.org/) jaxen:jaxen:jar:1.1-beta-8
+
+
+From: 'Codehaus' (http:www.codehaus.org/)
+- Default Plexus Container  org.codehaus.plexus:plexus-container-default:jar:1.0-alpha-9
+
+- Plexus Default Interactivity Handler  org.codehaus.plexus:plexus-interactivity-api:jar:1.0-alpha-6
+
+- Plexus Interpolation API (http:plexus.codehaus.org/plexus-components/plexus-interpolation) org.codehaus.plexus:plexus-interpolation:jar:1.14
+
+License: The Apache Software License, Version 2.0  (http:www.apache.org/licenses/LICENSE-2.0.txt)
+
+From: 'Dawid Kurzyniec' (http:www.mathcs.emory.edu/~dawidk/)
+- Backport of JSR 166 (http:backport-jsr166.sourceforge.net/) backport-util-concurrent:backport-util-concurrent:jar:3.1
+
+> Public Domain
+
+License: Public Domain  (http:creativecommons.org/licenses/publicdomain)
+
+From: 'jcraft' (http:www.jcraft.com/jsch)
+- JSch (http:www.jcraft.com/jsch/) com.jcraft:jsch:jar:0.1.38
+License: BSD  (http:www.jcraft.com/jsch/LICENSE.txt)
+
+> CPL 1.0
+
+From: 'JUnit' (http:www.junit.org)
+- JUnit (http:junit.org) junit:junit:jar:3.8.1
+
+License: Common Public License Version 1.0  (http:www.opensource.org/licenses/cpl1.0.txt)
+
+
+From: 'QOS.ch' (http:www.qos.ch)
+
+- JCL 1.1.1 implemented over SLF4J (http:www.slf4j.org) org.slf4j:jcl-over-slf4j:jar:1.5.6
+
+- SLF4J API Module (http:www.slf4j.org) org.slf4j:slf4j-api:jar:1.5.6
+
+- SLF4J JDK14 Binding (http:www.slf4j.org) org.slf4j:slf4j-jdk14:jar:1.5.6
+
+- SLF4J NOP Binding (http:www.slf4j.org) org.slf4j:slf4j-nop:jar:1.5.3
+
+
+From: 'The Apache Software Foundation' (http:www.apache.org/)
+- Commons Lang (http:commons.apache.org/lang/) commons-lang:commons-lang:jar:2.4
+License: The Apache Software License, Version 2.0  (http:www.apache.org/licenses/LICENSE-2.0.txt)
+- Jackrabbit JCR Commons (http:jackrabbit.apache.org/jackrabbit-jcr-commons/) org.apache.jackrabbit:jackrabbit-jcr-commons:bundle:1.5.0
+
+License: The Apache Software License, Version 2.0  (http:www.apache.org/licenses/LICENSE-2.0.txt)
+- Jackrabbit WebDAV Library (http:jackrabbit.apache.org/jackrabbit-webdav/) org.apache.jackrabbit:jackrabbit-webdav:jar:1.5.0
+
+License: The Apache Software License, Version 2.0  (http:www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Artifact (http:maven.apache.org/maven-artifact) org.apache.maven:maven-artifact:jar:2.2.1
+
+License: The Apache Software License, Version 2.0  (http:www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Artifact Manager (http:maven.apache.org/maven-artifact-manager) org.apache.maven:maven-artifact-manager:jar:2.2.1
+
+License: The Apache Software License, Version 2.0  (http:www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Core (http:maven.apache.org/maven-core) org.apache.maven:maven-core:jar:2.2.1
+
+License: The Apache Software License, Version 2.0  (http:www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Error Diagnostics (http:maven.apache.org/maven-error-diagnostics) org.apache.maven:maven-error-diagnostics:jar:2.2.1
+
+License: The Apache Software License, Version 2.0  (http:www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Model (http:maven.apache.org/maven-model) org.apache.maven:maven-model:jar:2.2.1
+
+License: The Apache Software License, Version 2.0  (http:www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Monitor (http:maven.apache.org/maven-monitor) org.apache.maven:maven-monitor:jar:2.2.1
+
+License: The Apache Software License, Version 2.0  (http:www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Plugin API (http:maven.apache.org/maven-plugin-api) org.apache.maven:maven-plugin-api:jar:2.2.1
+
+License: The Apache Software License, Version 2.0  (http:www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Plugin Descriptor Model (http:maven.apache.org/maven-plugin-descriptor) org.apache.maven:maven-plugin-descriptor:jar:2.2.1
+
+License: The Apache Software License, Version 2.0  (http:www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Plugin Parameter Documenter API (http:maven.apache.org/maven-plugin-parameter-documenter) org.apache.maven:maven-plugin-parameter-documenter:jar:2.2.1
+
+License: The Apache Software License, Version 2.0  (http:www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Plugin Registry Model (http:maven.apache.org/maven-plugin-registry) org.apache.maven:maven-plugin-registry:jar:2.2.1
+
+License: The Apache Software License, Version 2.0  (http:www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Profile Model (http:maven.apache.org/maven-profile) org.apache.maven:maven-profile:jar:2.2.1
+
+License: The Apache Software License, Version 2.0  (http:www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Project Builder (http:maven.apache.org/maven-project) org.apache.maven:maven-project:jar:2.2.1
+
+License: The Apache Software License, Version 2.0  (http:www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Repository Metadata Model (http:maven.apache.org/maven-repository-metadata) org.apache.maven:maven-repository-metadata:jar:2.2.1
+
+License: The Apache Software License, Version 2.0  (http:www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Local Settings Model (http:maven.apache.org/maven-settings) org.apache.maven:maven-settings:jar:2.2.1
+License: The Apache Software License, Version 2.0  (http:www.apache.org/licenses/LICENSE-2.0.txt)
+- Doxia :: Logging API (http:maven.apache.org/doxia/doxia/doxia-logging-api) org.apache.maven.doxia:doxia-logging-api:jar:1.1
+
+License: The Apache Software License, Version 2.0  (http:www.apache.org/licenses/LICENSE-2.0.txt)
+- Doxia :: Sink API (http:maven.apache.org/doxia/doxia/doxia-sink-api) org.apache.maven.doxia:doxia-sink-api:jar:1.1
+
+License: The Apache Software License, Version 2.0  (http:www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Release Manager (http:maven.apache.org/maven-release/maven-release-manager/) org.apache.maven.release:maven-release-manager:jar:2.3.2
+
+License: The Apache Software License, Version 2.0  (http:www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Reporting API (http:maven.apache.org/maven-reporting/maven-reporting-api) org.apache.maven.reporting:maven-reporting-api:jar:2.2.1
+
+License: The Apache Software License, Version 2.0  (http:www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven SCM API (http:maven.apache.org/scmmaven-scm-api) org.apache.maven.scm:maven-scm-api:jar:1.7
+
+License: The Apache Software License, Version 2.0  (http:www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven SCM Manager for Plexus (http:maven.apache.org/scmmaven-scm-managers/maven-scm-manager-plexus) org.apache.maven.scm:maven-scm-manager-plexus:jar:1.7
+
+License: The Apache Software License, Version 2.0  (http:www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven SCM AccuRev Provider (http:maven.apache.org/scmmaven-scm-providers/maven-scm-provider-accurev) org.apache.maven.scm:maven-scm-provider-accurev:jar:1.7
+
+License: The Apache Software License, Version 2.0  (http:www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven SCM Bazaar Provider (http:maven.apache.org/scmmaven-scm-providers/maven-scm-provider-bazaar) org.apache.maven.scm:maven-scm-provider-bazaar:jar:1.7
+
+License: The Apache Software License, Version 2.0  (http:www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven SCM Clearcase Provider (http:maven.apache.org/scmmaven-scm-providers/maven-scm-provider-clearcase) org.apache.maven.scm:maven-scm-provider-clearcase:jar:1.7
+
+License: The Apache Software License, Version 2.0  (http:www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven SCM CVS Provider - Common library (http:maven.apache.org/scmmaven-scm-providers/maven-scm-providers-cvs/maven-scm-provider-cvs-commons) org.apache.maven.scm:maven-scm-provider-cvs-commons:jar:1.7
+
+License: The Apache Software License, Version 2.0  (http:www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven SCM CVS Provider - CVS Executable Impl. (http:maven.apache.org/scmmaven-scm-providers/maven-scm-providers-cvs/maven-scm-provider-cvsexe) org.apache.maven.scm:maven-scm-provider-cvsexe:jar:1.7
+
+License: The Apache Software License, Version 2.0  (http:www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven SCM CVS Provider - CVS Java Impl. (http:maven.apache.org/scmmaven-scm-providers/maven-scm-providers-cvs/maven-scm-provider-cvsjava) org.apache.maven.scm:maven-scm-provider-cvsjava:jar:1.7
+
+License: The Apache Software License, Version 2.0  (http:www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven SCM Git Provider - Common library (http:maven.apache.org/scmmaven-scm-providers/maven-scm-providers-git/maven-scm-provider-git-commons) org.apache.maven.scm:maven-scm-provider-git-commons:jar:1.7
+
+License: The Apache Software License, Version 2.0  (http:www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven SCM Git Provider - Git Executable Impl. (http:maven.apache.org/scmmaven-scm-providers/maven-scm-providers-git/maven-scm-provider-gitexe) org.apache.maven.scm:maven-scm-provider-gitexe:jar:1.7
+
+License: The Apache Software License, Version 2.0  (http:www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven SCM Mercurial (Hg) Provider (http:maven.apache.org/scmmaven-scm-providers/maven-scm-provider-hg) org.apache.maven.scm:maven-scm-provider-hg:jar:1.7
+
+License: The Apache Software License, Version 2.0  (http:www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven SCM MKS Integrity Provider (http:maven.apache.org/scmmaven-scm-providers/maven-scm-provider-integrity) org.apache.maven.scm:maven-scm-provider-integrity:jar:1.7
+
+License: The Apache Software License, Version 2.0  (http:www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven SCM Jazz/Rational Team Concert Provider (http:maven.apache.org/scmmaven-scm-providers/maven-scm-provider-jazz) org.apache.maven.scm:maven-scm-provider-jazz:jar:1.7
+
+License: The Apache Software License, Version 2.0  (http:www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven SCM Perforce Provider (http:maven.apache.org/scmmaven-scm-providers/maven-scm-provider-perforce) org.apache.maven.scm:maven-scm-provider-perforce:jar:1.7
+
+License: The Apache Software License, Version 2.0  (http:www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven SCM Starteam Provider (http:maven.apache.org/scmmaven-scm-providers/maven-scm-provider-starteam) org.apache.maven.scm:maven-scm-provider-starteam:jar:1.7
+
+License: The Apache Software License, Version 2.0  (http:www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven SCM Subversion Provider - Common library (http:maven.apache.org/scmmaven-scm-providers/maven-scm-providers-svn/maven-scm-provider-svn-commons) org.apache.maven.scm:maven-scm-provider-svn-commons:jar:1.7
+
+License: The Apache Software License, Version 2.0  (http:www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven SCM Subversion Provider - SVN Executable Impl. (http:maven.apache.org/scmmaven-scm-providers/maven-scm-providers-svn/maven-scm-provider-svnexe) org.apache.maven.scm:maven-scm-provider-svnexe:jar:1.7
+
+License: The Apache Software License, Version 2.0  (http:www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven SCM Synergy Provider (http:maven.apache.org/scmmaven-scm-providers/maven-scm-provider-synergy) org.apache.maven.scm:maven-scm-provider-synergy:jar:1.7
+
+License: The Apache Software License, Version 2.0  (http:www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven SCM TFS Provider (http:labs.teamprise.com/maven) org.apache.maven.scm:maven-scm-provider-tfs:jar:1.7
+
+License: The Apache Software License, Version 2.0  (http:www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven SCM Visual Source Safe Provider (http:maven.apache.org/scmmaven-scm-providers/maven-scm-provider-vss) org.apache.maven.scm:maven-scm-provider-vss:jar:1.7
+
+License: The Apache Software License, Version 2.0  (http:www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven SCM Standard Providers (http:maven.apache.org/scmmaven-scm-providers/maven-scm-providers-standard) org.apache.maven.scm:maven-scm-providers-standard:pom:1.7
+
+License: The Apache Software License, Version 2.0  (http:www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Invoker (http:maven.apache.org/shared/maven-invoker/) org.apache.maven.shared:maven-invoker:jar:2.0.9
+License: The Apache Software License, Version 2.0  (http:www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Wagon File Provider (http:maven.apache.org/wagon/wagon-providers/wagon-file) org.apache.maven.wagon:wagon-file:jar:1.0-beta-6
+
+License: The Apache Software License, Version 2.0  (http:www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Wagon HTTP Provider (http:maven.apache.org/wagon/wagon-providers/wagon-http) org.apache.maven.wagon:wagon-http:jar:1.0-beta-6
+
+License: The Apache Software License, Version 2.0  (http:www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Wagon Lightweight HTTP Provider (http:maven.apache.org/wagon/wagon-providers/wagon-http-lightweight) org.apache.maven.wagon:wagon-http-lightweight:jar:1.0-beta-6
+
+License: The Apache Software License, Version 2.0  (http:www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Wagon HTTP Shared Library (http:maven.apache.org/wagon/wagon-providers/wagon-http-shared) org.apache.maven.wagon:wagon-http-shared:jar:1.0-beta-6
+
+License: The Apache Software License, Version 2.0  (http:www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Wagon API (http:maven.apache.org/wagon/wagon-provider-api) org.apache.maven.wagon:wagon-provider-api:jar:1.0-beta-6
+
+License: The Apache Software License, Version 2.0  (http:www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Wagon SSH Provider (http:maven.apache.org/wagon/wagon-providers/wagon-ssh) org.apache.maven.wagon:wagon-ssh:jar:1.0-beta-6
+
+License: The Apache Software License, Version 2.0  (http:www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Wagon SSH Common Library (http:maven.apache.org/wagon/wagon-providers/wagon-ssh-common) org.apache.maven.wagon:wagon-ssh-common:jar:1.0-beta-6
+
+License: The Apache Software License, Version 2.0  (http:www.apache.org/licenses/LICENSE-2.0.txt)f
+- Maven Wagon SSH External Provider (http:maven.apache.org/wagon/wagon-providers/wagon-ssh-external) org.apache.maven.wagon:wagon-ssh-external:jar:1.0-beta-6
+
+License: The Apache Software License, Version 2.0  (http:www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Wagon WebDav Provider (http:maven.apache.org/wagon/wagon-providers/wagon-webdav-jackrabbit) org.apache.maven.wagon:wagon-webdav-jackrabbit:jar:1.0-beta-6
+
+License: The Apache Software License, Version 2.0  (http:www.apache.org/licenses/LICENSE-2.0.txt)
+
+From: 'The Codehaus' (http:codehaus.org)
+- Groovy (http:groovy.codehaus.org/) org.codehaus.groovy:groovy-all:jar:1.7.6
+
+
+From: 'The Codehaus' (http:codehaus.org/)
+- classworlds (http:classworlds.codehaus.org/) classworlds:classworlds:jar:1.1
+
+
+>>> org.apache.maven.plugins.maven-antrun-plugin-1.6
+
+Maven AntRun Plugin
+Copyright 2002-2010 The Apache Software Foundation
+
+This product includes software developed at
+The Apache Software Foundation (http://www.apache.org/).
 
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -497,60 +833,536 @@ software distributed under the License is distributed on an
 KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
-====================================================================
 
-This software consists of voluntary contributions made by many
-individuals on behalf of the Apache Software Foundation.  For more
-information on the Apache Software Foundation, please see
-<http://www.apache.org/>.
+ADDITIONAL LICENSE INFORMATION:
 
+> THIRD PARTY DEPENDENCIES
 
->>> jackson-core-asl-1.9.2
+maven-antrun-plugin-1.6.jar\META-INF\ DEPENDENCIES
 
-his copy of Jackson JSON processor is licensed under the
-Apache (Software) License, version 2.0 ("the License").
-See the License for details about distribution rights, and the
-specific rights regarding derivate works.
+Transitive dependencies of this project determined from the
+maven pom organized by organization.
 
-You may obtain a copy of the License at:
+Maven AntRun Plugin
 
-http://www.apache.org/licenses/
+> Apache 2.0
 
-A copy is also included with both the the downloadable source code package
-and jar that contains class bytecodes, as file "ASL 2.0". In both cases,
-that file should be located next to this file: in source distribution
-the location should be "release-notes/asl"; and in jar "META-INF/"
+From: 'Apache Software Foundation' (http://www.apache.org/)
+- Maven Wagon API (http://maven.apache.org/wagon/wagon-provider-api) org.apache.maven.wagon:wagon-provider-api:jar:1.0-beta-2
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
 
+From: 'Apache Software Foundation'
+- org.apache.tools.ant (http://ant.apache.org/ant/) org.apache.ant:ant:jar:1.8.1
 
->>> jackson-mapper-asl-1.9.2
+- ant-launcher (http://ant.apache.org/ant-launcher/) org.apache.ant:ant-launcher:jar:1.8.1
 
-This copy of Jackson JSON processor is licensed under the
-Apache (Software) License, version 2.0 ("the License").
-See the License for details about distribution rights, and the
-specific rights regarding derivate works.
-
-You may obtain a copy of the License at:
-
-http://www.apache.org/licenses/
-
-A copy is also included with both the the downloadable source code package
-and jar that contains class bytecodes, as file "ASL 2.0". In both cases,
-that file should be located next to this file: in source distribution
-the location should be "release-notes/asl"; and in jar "META-INF/"
+- ant-nodeps (http://ant.apache.org/ant-nodeps/) org.apache.ant:ant-nodeps:jar:1.8.1
 
 
->>> log4j-1.2.14
+From: 'Codehaus' (http://www.codehaus.org/)
+- Default Plexus Container  org.codehaus.plexus:plexus-container-default:jar:1.0-alpha-9-stable-1
 
-Apache log4j
-Copyright 2007 The Apache Software Foundation
+- Plexus Interpolation API  org.codehaus.plexus:plexus-interpolation:jar:1.1
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+- Plexus Common Utilities (http://plexus.codehaus.org/plexus-utils) org.codehaus.plexus:plexus-utils:jar:2.0.5
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+> CPL 1.0
+
+From: 'JUnit' (http://www.junit.org)
+- JUnit (http://junit.org) junit:junit:jar:3.8.1
+License: Common Public License Version 1.0  (http://www.opensource.org/licenses/cpl1.0.txt)
+
+>Apache 2.0
+
+From: 'The Apache Software Foundation' (http://www.apache.org/)
+- Maven Artifact (http://maven.apache.org/maven-artifact) org.apache.maven:maven-artifact:jar:2.0.11
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Artifact Manager (http://maven.apache.org/maven-artifact-manager) org.apache.maven:maven-artifact-manager:jar:2.0.11
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Model (http://maven.apache.org/maven-model) org.apache.maven:maven-model:jar:2.0.11
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Plugin API (http://maven.apache.org/maven-plugin-api) org.apache.maven:maven-plugin-api:jar:2.0.11
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Plugin Registry Model (http://maven.apache.org/maven-plugin-registry) org.apache.maven:maven-plugin-registry:jar:2.0.11
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Profile Model (http://maven.apache.org/maven-profile) org.apache.maven:maven-profile:jar:2.0.11
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Project Builder (http://maven.apache.org/maven-project) org.apache.maven:maven-project:jar:2.0.11
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Repository Metadata Model (http://maven.apache.org/maven-repository-metadata) org.apache.maven:maven-repository-metadata:jar:2.0.11
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Local Settings Model (http://maven.apache.org/maven-settings) org.apache.maven:maven-settings:jar:2.0.11
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+> BSD Style
+
+From: 'The Codehaus' (http://codehaus.org/)
+- classworlds (http://classworlds.codehaus.org/) classworlds:classworlds:jar:1.1-alpha-2
+
+
+>>> org.apache.maven.plugins.maven-compiler-plugin-2.3.2
+
+Maven Compiler Plugin
+Copyright 2001-2010 The Apache Software Foundation
 
 This product includes software developed at
 The Apache Software Foundation (http://www.apache.org/).
 
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
 
->>> snakeyaml-1.9
+  http://www.apache.org/licenses/LICENSE-2.0
 
-Copyright (c) 2008-2011, http://www.snakeyaml.org
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+
+ADDITIONAL LICENSE INFORMATION:
+
+> THIRD PARTY DEPENDENCIES
+
+maven-source-plugin-2.3.2.jar\META-INF\ DEPENDENCIES
+
+Transitive dependencies of this project determined from the
+maven pom organized by organization.
+
+Maven Source Plugin
+
+> Apache 2.0
+
+From: 'Apache Software Foundation' (http://www.apache.org/)
+- Maven Wagon API (http://maven.apache.org/wagon/wagon-provider-api) org.apache.maven.wagon:wagon-provider-api:jar:1.0-beta-2
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+From: 'Codehaus' (http://www.codehaus.org/)
+- Plexus Archiver Component (http://plexus.codehaus.org/plexus-components/plexus-archiver) org.codehaus.plexus:plexus-archiver:jar:1.0
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+- Default Plexus Container  org.codehaus.plexus:plexus-container-default:jar:1.0-alpha-9-stable-1
+
+- Plexus Interpolation API (http://plexus.codehaus.org/plexus-components/plexus-interpolation) org.codehaus.plexus:plexus-interpolation:jar:1.13
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+- Plexus IO Components (http://plexus.codehaus.org/plexus-components/plexus-io) org.codehaus.plexus:plexus-io:jar:1.0
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+- Plexus Common Utilities (http://plexus.codehaus.org/plexus-utils) org.codehaus.plexus:plexus-utils:jar:2.0.5
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+From: 'The Apache Software Foundation' (http://www.apache.org/)
+- Maven Archiver (http://maven.apache.org/shared/maven-archiver) org.apache.maven:maven-archiver:jar:2.4.1
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Artifact (http://maven.apache.org/maven-artifact) org.apache.maven:maven-artifact:jar:2.0.9
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Artifact Manager (http://maven.apache.org/maven-artifact-manager) org.apache.maven:maven-artifact-manager:jar:2.0.9
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Model (http://maven.apache.org/maven-model) org.apache.maven:maven-model:jar:2.0.9
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Plugin API (http://maven.apache.org/maven-plugin-api) org.apache.maven:maven-plugin-api:jar:2.0.9
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Plugin Registry Model (http://maven.apache.org/maven-plugin-registry) org.apache.maven:maven-plugin-registry:jar:2.0.9
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Profile Model (http://maven.apache.org/maven-profile) org.apache.maven:maven-profile:jar:2.0.9
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Project Builder (http://maven.apache.org/maven-project) org.apache.maven:maven-project:jar:2.0.9
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Repository Metadata Model (http://maven.apache.org/maven-repository-metadata) org.apache.maven:maven-repository-metadata:jar:2.0.9
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Local Settings Model (http://maven.apache.org/maven-settings) org.apache.maven:maven-settings:jar:2.0.9
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+> BSD Style
+
+From: 'The Codehaus' (http://codehaus.org/)
+- classworlds (http://classworlds.codehaus.org/) classworlds:classworlds:jar:1.1-alpha-2
+
+
+>>> org.apache.maven.plugins.maven-eclipse-plugin-2.9
+
+Maven Eclipse Plugin
+Copyright 2002-2012 The Apache Software Foundation
+
+This product includes software developed at
+The Apache Software Foundation (http://www.apache.org/).
+
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+
+ADDITIONAL LICENSE INFORMATION:
+
+> THIRD PARTY DEPENDENCIES
+
+maven-eclipse-plugin-2.9.jar\META-INF\ DEPENDENCIES
+
+>EPL 1.0
+Maven Eclipse Plugin
+From: 'an unknown organization'
+- CLI  commons-cli:commons-cli:jar:1.0
+
+- jline  jline:jline:jar:0.9.1
+
+- Core Resource Management  org.eclipse.core:resources:jar:3.3.0-v20070604
+License: Eclipse Public License - v 1.0  (http://www.eclipse.org/org/documents/epl-v10.html)
+
+> Apache 2.0
+
+From: 'Apache Software Foundation' (http://www.apache.org/)
+- Maven Archiver (http://maven.apache.org/shared/maven-archiver/) org.apache.maven:maven-archiver:jar:2.2
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Wagon File Provider (http://maven.apache.org/wagon/wagon-providers/wagon-file) org.apache.maven.wagon:wagon-file:jar:1.0-beta-2
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Wagon Lightweight HTTP Provider (http://maven.apache.org/wagon/wagon-providers/wagon-http-lightweight) org.apache.maven.wagon:wagon-http-lightweight:jar:1.0-beta-2
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Wagon HTTP Shared Library (http://maven.apache.org/wagon/wagon-providers/wagon-http-shared) org.apache.maven.wagon:wagon-http-shared:jar:1.0-beta-2
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Wagon SSH Provider (http://maven.apache.org/wagon/wagon-providers/wagon-ssh) org.apache.maven.wagon:wagon-ssh:jar:1.0-beta-2
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Wagon SSH Common Library (http://maven.apache.org/wagon/wagon-providers/wagon-ssh-common) org.apache.maven.wagon:wagon-ssh-common:jar:1.0-beta-2
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Wagon SSH External Provider (http://maven.apache.org/wagon/wagon-providers/wagon-ssh-external) org.apache.maven.wagon:wagon-ssh-external:jar:1.0-beta-2
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+- XML Commons External Components XML APIs (http://xml.apache.org/commons/#external) xml-apis:xml-apis:jar:1.0.b2
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+From: 'aQute SARL' (http://www.aQute.biz)
+- BND Library (http://www.aQute.biz/Code/Bnd) biz.aQute:bndlib:jar:0.0.145
+License: This material is licensed under the Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0)
+
+From: 'Codehaus' (http://www.codehaus.org/)
+- Plexus Archiver Component  org.codehaus.plexus:plexus-archiver:jar:1.0-alpha-7
+
+- Default Plexus Container  org.codehaus.plexus:plexus-container-default:jar:1.0-alpha-9-stable-1
+
+- Plexus Default Interactivity Handler  org.codehaus.plexus:plexus-interactivity-api:jar:1.0-alpha-4
+
+- Plexus JLine Interactivity Handler  org.codehaus.plexus:plexus-interactivity-jline:jar:1.0-alpha-5
+
+- Plexus Resource Component (http://plexus.codehaus.org/plexus-components/plexus-resources) org.codehaus.plexus:plexus-resources:jar:1.0-alpha-7
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+- Plexus Common Utilities (http://plexus.codehaus.org/plexus-utils) org.codehaus.plexus:plexus-utils:jar:1.5.6
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+> BSD
+From: 'jcraft' (http://www.jcraft.com/jsch)
+- JSch (http://www.jcraft.com/jsch/) com.jcraft:jsch:jar:0.1.27
+License: BSD  (http://www.jcraft.com/jsch/LICENSE.txt)
+
+>MIT Style
+From: 'JTidy' (http://jtidy.sf.net)
+- JTidy (http://jtidy.sourceforge.net) jtidy:jtidy:jar:4aug2000r7-dev
+License: Java HTML Tidy License  (http://svn.sourceforge.net/viewvc/*checkout*/jtidy/trunk/jtidy/LICENSE.txt?revision=95)
+
+> Apache 2.0
+From: 'The Apache Software Foundation' (http://www.apache.org/)
+- Commons IO (http://commons.apache.org/io/) commons-io:commons-io:jar:1.4
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Artifact (http://maven.apache.org/maven-artifact) org.apache.maven:maven-artifact:jar:2.0.8
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Artifact Manager (http://maven.apache.org/maven-artifact-manager) org.apache.maven:maven-artifact-manager:jar:2.0.8
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Core (http://maven.apache.org/maven-core) org.apache.maven:maven-core:jar:2.0.8
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Error Diagnostics (http://maven.apache.org/maven-error-diagnostics) org.apache.maven:maven-error-diagnostics:jar:2.0.8
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Model (http://maven.apache.org/maven-model) org.apache.maven:maven-model:jar:2.0.8
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Monitor (http://maven.apache.org/maven-monitor) org.apache.maven:maven-monitor:jar:2.0.8
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Plugin API (http://maven.apache.org/maven-plugin-api) org.apache.maven:maven-plugin-api:jar:2.0.8
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Plugin Descriptor Model (http://maven.apache.org/maven-plugin-descriptor) org.apache.maven:maven-plugin-descriptor:jar:2.0.8
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Plugin Parameter Documenter API (http://maven.apache.org/maven-plugin-parameter-documenter) org.apache.maven:maven-plugin-parameter-documenter:jar:2.0.8
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Plugin Registry Model (http://maven.apache.org/maven-plugin-registry) org.apache.maven:maven-plugin-registry:jar:2.0.8
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Profile Model (http://maven.apache.org/maven-profile) org.apache.maven:maven-profile:jar:2.0.8
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Project Builder (http://maven.apache.org/maven-project) org.apache.maven:maven-project:jar:2.0.8
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Repository Metadata Model (http://maven.apache.org/maven-repository-metadata) org.apache.maven:maven-repository-metadata:jar:2.0.8
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Local Settings Model (http://maven.apache.org/maven-settings) org.apache.maven:maven-settings:jar:2.0.8
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+- Doxia :: Sink API (http://maven.apache.org/doxia/doxia/doxia-sink-api) org.apache.maven.doxia:doxia-sink-api:jar:1.0-alpha-9
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Reporting API (http://maven.apache.org/maven-reporting/maven-reporting-api) org.apache.maven.reporting:maven-reporting-api:jar:2.0.8
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven OSGi integration (http://maven.apache.org/shared/maven-osgi/) org.apache.maven.shared:maven-osgi:jar:0.2.0
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+- Apache Maven Wagon :: API (http://maven.apache.org/wagon/wagon-provider-api) org.apache.maven.wagon:wagon-provider-api:jar:2.1
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+> BSD Style
+From: 'The Codehaus' (http://codehaus.org/)
+- classworlds (http://classworlds.codehaus.org/) classworlds:classworlds:jar:1.1
+
+
+>>> org.apache.maven.plugins.maven-enforcer-plugin-1.1.1
+
+Maven Enforcer Plugin
+Copyright 2007-2012 The Apache Software Foundation
+
+This product includes software developed at
+The Apache Software Foundation (http://www.apache.org/).
+
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+
+
+
+ADDITIONAL LICENSE INFORMATION:
+
+> THIRD PARTY DEPENDENCIES
+maven-enforcer-plugin-1.1.1.jar\META-INF\ DEPENDENCIES
+
+Transitive dependencies of this project determined from the
+maven pom organized by organization.
+
+Maven Enforcer Plugin
+
+> Apache 2.0
+
+From: 'an unknown organization'
+  - CLI  commons-cli:commons-cli:jar:1.0
+
+> BSD Style
+  
+  - XML Im-/Exporter (http://xml-im-exporter.sourceforge.net) de.zeigermann.xml:xml-im-exporter:jar:1.1
+
+  - jdom  jdom:jdom:jar:1.0
+
+> Apache 2.0
+  - slide-webdavlib  slide:slide-webdavlib:jar:2.1
+
+> Apache 2.0
+
+From: 'Apache Software Foundation' (http://jakarta.apache.org/)
+  
+  - HttpClient (http://jakarta.apache.org/commons/httpclient/) commons-httpclient:commons-httpclient:jar:2.0.2
+
+
+From: 'Apache Software Foundation' (http://www.apache.org/)
+  - Maven Wagon File Provider (http://maven.apache.org/wagon/wagon-providers/wagon-file) org.apache.maven.wagon:wagon-file:jar:1.0-beta-2
+    License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+  - Maven Wagon Lightweight HTTP Provider (http://maven.apache.org/wagon/wagon-providers/wagon-http-lightweight) org.apache.maven.wagon:wagon-http-lightweight:jar:1.0-beta-2
+    License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+  - Maven Wagon HTTP Shared Library (http://maven.apache.org/wagon/wagon-providers/wagon-http-shared) org.apache.maven.wagon:wagon-http-shared:jar:1.0-beta-2
+    License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+  - Maven Wagon API (http://maven.apache.org/wagon/wagon-provider-api) org.apache.maven.wagon:wagon-provider-api:jar:1.0-beta-2
+    License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+  - Maven Wagon SSH Provider (http://maven.apache.org/wagon/wagon-providers/wagon-ssh) org.apache.maven.wagon:wagon-ssh:jar:1.0-beta-2
+    License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+  - Maven Wagon SSH Common Library (http://maven.apache.org/wagon/wagon-providers/wagon-ssh-common) org.apache.maven.wagon:wagon-ssh-common:jar:1.0-beta-2
+    License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+  - Maven Wagon SSH External Provider (http://maven.apache.org/wagon/wagon-providers/wagon-ssh-external) org.apache.maven.wagon:wagon-ssh-external:jar:1.0-beta-2
+    License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+  - Maven Wagon WebDav Provider (http://maven.apache.org/wagon/wagon-providers/wagon-webdav) org.apache.maven.wagon:wagon-webdav:jar:1.0-beta-2
+    License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+  - XML Commons External Components XML APIs (http://xml.apache.org/commons/#external) xml-apis:xml-apis:jar:1.0.b2
+    License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+From: 'Codehaus' (http://www.codehaus.org/)
+  - Default Plexus Container  org.codehaus.plexus:plexus-container-default:jar:1.0-alpha-9-stable-1
+
+  - Plexus I18N Component  org.codehaus.plexus:plexus-i18n:jar:1.0-beta-6
+
+  - Plexus Default Interactivity Handler  org.codehaus.plexus:plexus-interactivity-api:jar:1.0-alpha-4
+
+  - Plexus Common Utilities (http://plexus.codehaus.org/plexus-utils) org.codehaus.plexus:plexus-utils:jar:1.5.8
+    License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+> LGPL 3.0
+
+From: 'http://www.beanshell.org/'
+  - BeanShell  org.beanshell:bsh:jar:2.0b4
+    License: GNU LESSER GENERAL PUBLIC LICENSE  (http://www.gnu.org/licenses/lgpl.txt)
+
+> BSD Style
+
+From: 'jcraft' (http://www.jcraft.com/jsch)
+  - JSch (http://www.jcraft.com/jsch/) com.jcraft:jsch:jar:0.1.27
+    License: BSD  (http://www.jcraft.com/jsch/LICENSE.txt)
+
+> MIT Style
+
+From: 'JTidy' (http://jtidy.sf.net)
+  - JTidy (http://jtidy.sourceforge.net) jtidy:jtidy:jar:4aug2000r7-dev
+    License: Java HTML Tidy License  (http://svn.sourceforge.net/viewvc/*checkout*/jtidy/trunk/jtidy/LICENSE.txt?revision=95)
+
+From: 'The Apache Software Foundation' (http://jakarta.apache.org)
+  - Lang (http://jakarta.apache.org/commons/lang/) commons-lang:commons-lang:jar:2.3
+    License: The Apache Software License, Version 2.0  (/LICENSE.txt)
+  - Logging (http://jakarta.apache.org/commons/logging/) commons-logging:commons-logging:jar:1.0.4
+    License: The Apache Software License, Version 2.0  (/LICENSE.txt)
+
+From: 'The Apache Software Foundation' (http://www.apache.org/)
+  - Maven Artifact (http://maven.apache.org/maven-artifact) org.apache.maven:maven-artifact:jar:2.0.9
+    License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+  - Maven Artifact Manager (http://maven.apache.org/maven-artifact-manager) org.apache.maven:maven-artifact-manager:jar:2.0.9
+    License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+  - Maven Core (http://maven.apache.org/maven-core) org.apache.maven:maven-core:jar:2.0.9
+    License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+  - Maven Error Diagnostics (http://maven.apache.org/maven-error-diagnostics) org.apache.maven:maven-error-diagnostics:jar:2.0.9
+    License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+  - Maven Model (http://maven.apache.org/maven-model) org.apache.maven:maven-model:jar:2.0.9
+    License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+  - Maven Monitor (http://maven.apache.org/maven-monitor) org.apache.maven:maven-monitor:jar:2.0.9
+    License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+  - Maven Plugin API (http://maven.apache.org/maven-plugin-api) org.apache.maven:maven-plugin-api:jar:2.0.9
+    License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+  - Maven Plugin Descriptor Model (http://maven.apache.org/maven-plugin-descriptor) org.apache.maven:maven-plugin-descriptor:jar:2.0.9
+    License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+  - Maven Plugin Parameter Documenter API (http://maven.apache.org/maven-plugin-parameter-documenter) org.apache.maven:maven-plugin-parameter-documenter:jar:2.0.9
+    License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+  - Maven Plugin Registry Model (http://maven.apache.org/maven-plugin-registry) org.apache.maven:maven-plugin-registry:jar:2.0.9
+    License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+  - Maven Profile Model (http://maven.apache.org/maven-profile) org.apache.maven:maven-profile:jar:2.0.9
+    License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+  - Maven Project Builder (http://maven.apache.org/maven-project) org.apache.maven:maven-project:jar:2.0.9
+    License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+  - Maven Repository Metadata Model (http://maven.apache.org/maven-repository-metadata) org.apache.maven:maven-repository-metadata:jar:2.0.9
+    License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+  - Maven Local Settings Model (http://maven.apache.org/maven-settings) org.apache.maven:maven-settings:jar:2.0.9
+    License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+  - Doxia :: Sink API (http://maven.apache.org/doxia/doxia/doxia-sink-api) org.apache.maven.doxia:doxia-sink-api:jar:1.0-alpha-10
+    License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+  - Enforcer API (http://maven.apache.org/enforcer/enforcer-api) org.apache.maven.enforcer:enforcer-api:jar:1.1.1
+    License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+  - Enforcer Rules (http://maven.apache.org/enforcer/enforcer-rules) org.apache.maven.enforcer:enforcer-rules:jar:1.1.1
+    License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+  - Maven Reporting API (http://maven.apache.org/maven-reporting/maven-reporting-api) org.apache.maven.reporting:maven-reporting-api:jar:2.0.9
+    License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+  - Maven Common Artifact Filters (http://maven.apache.org/shared/maven-common-artifact-filters/) org.apache.maven.shared:maven-common-artifact-filters:jar:1.2
+    License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+  - Maven Dependency Tree (http://maven.apache.org/shared/maven-dependency-tree/) org.apache.maven.shared:maven-dependency-tree:jar:1.2
+    License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+> BSD Style
+
+From: 'The Codehaus' (http://codehaus.org/)
+  - classworlds (http://classworlds.codehaus.org/) classworlds:classworlds:jar:1.1
+
+
+>>> org.apache.maven.plugins.maven-source-plugin-2.1.2
+
+Maven Source Plugin
+Copyright 2002-2010 The Apache Software Foundation
+
+This product includes software developed at
+The Apache Software Foundation (http://www.apache.org/).
+
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+ http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+
+ADDITIONAL LICENSE INFORMATION:
+
+> THIRD PARTY DEPENDENCIES
+
+maven-source-plugin-2.1.2.jar\META-INF\ DEPENDENCIES
+
+Transitive dependencies of this project determined from the
+maven pom organized by organization.
+
+Maven Source Plugin
+
+> Apache 2.0
+
+From: 'Apache Software Foundation' (http://www.apache.org/)
+- Maven Wagon API (http://maven.apache.org/wagon/wagon-provider-api) org.apache.maven.wagon:wagon-provider-api:jar:1.0-beta-2
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+From: 'Codehaus' (http://www.codehaus.org/)
+- Plexus Archiver Component (http://plexus.codehaus.org/plexus-components/plexus-archiver) org.codehaus.plexus:plexus-archiver:jar:1.0
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+- Default Plexus Container  org.codehaus.plexus:plexus-container-default:jar:1.0-alpha-9-stable-1
+
+- Plexus Interpolation API (http://plexus.codehaus.org/plexus-components/plexus-interpolation) org.codehaus.plexus:plexus-interpolation:jar:1.13
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+- Plexus IO Components (http://plexus.codehaus.org/plexus-components/plexus-io) org.codehaus.plexus:plexus-io:jar:1.0
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+- Plexus Common Utilities (http://plexus.codehaus.org/plexus-utils) org.codehaus.plexus:plexus-utils:jar:2.0.5
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+From: 'The Apache Software Foundation' (http://www.apache.org/)
+- Maven Archiver (http://maven.apache.org/shared/maven-archiver) org.apache.maven:maven-archiver:jar:2.4.1
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Artifact (http://maven.apache.org/maven-artifact) org.apache.maven:maven-artifact:jar:2.0.9
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Artifact Manager (http://maven.apache.org/maven-artifact-manager) org.apache.maven:maven-artifact-manager:jar:2.0.9
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Model (http://maven.apache.org/maven-model) org.apache.maven:maven-model:jar:2.0.9
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Plugin API (http://maven.apache.org/maven-plugin-api) org.apache.maven:maven-plugin-api:jar:2.0.9
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Plugin Registry Model (http://maven.apache.org/maven-plugin-registry) org.apache.maven:maven-plugin-registry:jar:2.0.9
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Profile Model (http://maven.apache.org/maven-profile) org.apache.maven:maven-profile:jar:2.0.9
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Project Builder (http://maven.apache.org/maven-project) org.apache.maven:maven-project:jar:2.0.9
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Repository Metadata Model (http://maven.apache.org/maven-repository-metadata) org.apache.maven:maven-repository-metadata:jar:2.0.9
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+- Maven Local Settings Model (http://maven.apache.org/maven-settings) org.apache.maven:maven-settings:jar:2.0.9
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+> BSD Style
+
+From: 'The Codehaus' (http://codehaus.org/)
+- classworlds (http://classworlds.codehaus.org/) classworlds:classworlds:jar:1.1-alpha-2
+
+
+>>> org.springframework.build.aws.maven-3.0.0.release
+
+Copyright 2004-2007 the original author or authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -562,7 +1374,7 @@ Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
-limitations under the License.
+limitations under the License
 
 
 >>> spring-aop-3.1.2.release
@@ -580,11 +1392,6 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-
-
->>> spring-asm-3.1.2.release
-
-License : Apache 2.0
 
 
 >>> spring-beans-3.1.2.release
@@ -607,23 +1414,6 @@ limitations under the License.
 >>> spring-context-3.1.2.release
 
 Copyright 2002-2009 the original author or authors.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
-
->>> spring-context-support-3.1.2.release
-
-Copyright 2002-2006 the original author or authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -672,148 +1462,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 
->>> spring-ldap-core-1.3.1.release
-
-Copyright 2004, 2005, 2006 Acegi Technology Pty Limited
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
-
->>> spring-security-config-3.1.3.release
-
-Copyright 2002-2011 the original author or authors.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
-
->>> spring-security-core-3.1.3.release
-
-Copyright 2004, 2005, 2006 Acegi Technology Pty Limited
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
-ADDITIONAL LICENSE INFORMATION:
-
-> MIT
-
-spring-security-core-3.1.3.RELEASE-sources.jar\org\springframework\security\crypto\bcrypt\BCrypt.java
-
-Copyright (c) 2006 Damien Miller <djm@mindrot.org>
-
-Permission to use, copy, modify, and distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-
-
->>> spring-security-ldap-3.1.3.release
-
-Copyright 2004, 2005, 2006 Acegi Technology Pty Limited
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
-
->>> spring-security-oauth2-1.0.2.release
-
-Copyright 2010-2012 the original author or authors.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
-
->>> spring-security-web-3.1.3.release
-
-Copyright 2004, 2005, 2006 Acegi Technology Pty Limited
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
-
 >>> spring-test-3.1.2.release
 
 Copyright 2002-2011 the original author or authors.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
-
->>> spring-tx-3.0.7.release
-
-Copyright 2002-2006 the original author or authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -862,124 +1513,35 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 
---------------- SECTION 3: Common Development and Distribution License, V1.0 ----------
+>>> tomcat7-maven-plugin-2.0-beta-1
 
-Common Development and Distribution License, V1.0 is applicable to the following component(s).
-
-
->>> jsp-api-2.1
-
-The contents of this file are subject to the terms
- of the Common Development and Distribution License
- (the "License").  You may not use this file except
- in compliance with the License.
-
- You can obtain a copy of the license at
- glassfish/bootstrap/legal/CDDLv1.0.txt or
- https://glassfish.dev.java.net/public/CDDLv1.0.html.
- See the License for the specific language governing
- permissions and limitations under the License.
-
- When distributing Covered Code, include this CDDL
- HEADER in each file and include the License file at
- glassfish/bootstrap/legal/CDDLv1.0.txt.  If applicable,
- add the following below this CDDL HEADER, with the
- fields enclosed by brackets "[]" replaced with your
- own identifying information: Portions Copyright [yyyy]
- [name of copyright owner]
-
- Copyright 2005 Sun Microsystems, Inc. All rights reserved.
-
-
-ADDITIONAL LICENSE INFORMATION:
-
-
-> CDDL 1.0
-
-jsp-api-2.1-7.0.0pre1-sources.jar\javax\servlet\jsp\resources\web-jsptaglibrary_2_1.xsd
-
-[PLEASE NOTE: GOPIVOTAL, INC. ELECTS TO USE AND DISTRIBUTE THIS COMPONENT UNDER THE TERMS OF THE CDDL 1.0.  PLEASE SEE THE APPENDIX TO REVIEW THE FULL TEXT OF THE CDDL 1.0. THE ORIGINAL LICENSE TERMS ARE REPRODUCED BELOW ONLY AS A REFERENCE.]
-
-DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
-
- Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
-
- Portions Copyright Apache Software Foundation.
-
- The contents of this file are subject to the terms of either the GNU
- General Public License Version 2 only ("GPL") or the Common Development
- and Distribution License("CDDL") (collectively, the "License").  You
- may not use this file except in compliance with the License. You can obtain
- a copy of the License at https://glassfish.dev.java.net/public/CDDL+GPL.html
- or glassfish/bootstrap/legal/LICENSE.txt.  See the License for the specific
- language governing permissions and limitations under the License.
-
- When distributing the software, include this License Header Notice in each
- file and include the License file at glassfish/bootstrap/legal/LICENSE.txt.
- Sun designates this particular file as subject to the "Classpath" exception
- as provided by Sun in the GPL Version 2 section of the License file that
- accompanied this code.  If applicable, add the following below the License
- Header, with the fields enclosed by brackets [] replaced by your own
- identifying information: "Portions Copyrighted [year]
- [name of copyright owner]"
-
- Contributor(s):
-
- If you wish your version of this file to be governed by only the CDDL or
- only the GPL Version 2, indicate your decision by adding "[Contributor]
- elects to include this software in this distribution under the [CDDL or GPL
- Version 2] license."  If you don't indicate a single choice of license, a
- recipient has the option to distribute your version of this file under
- either the CDDL, the GPL Version 2 or to extend the choice of license to
- its licensees as provided above.  However, if you add GPL Version 2 code
- and therefore, elected the GPL Version 2 license, then the option applies
- only if the new code is made subject to such option by the copyright
- holder.
-
-
-> Apache 2.0
-
-sp-api-2.1-7.0.0pre1-sources.jar\javax\servlet\jsp\resources\jspxml_2_0.dtd
-
-Copyright 2004 The Apache Software Foundation
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+Apache License  Version 2.0
+Licensed to the Apache Software Foundation (ASF) under one or more
+contributor license agreements.  See the NOTICE file distributed with
+this work for additional information regarding copyright ownership.
+The ASF licenses this file to You under the Apache License, Version 2.0
+(the "License"); you may not use this file except in compliance with
+the License.  You may obtain a copy of the License at
 
 http://www.apache.org/licenses/LICENSE-2.0
 
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+
+>>> vt-password-3.1.1
+
+[PLEASE NOTE:  PIVOTAL SOFTWARE INC. ELECTS TO USE AND DISTRIBUTE THIS COMPONENT UNDER THE TERMS OF THE APACHE 2.0.  PLEASE SEE THE ORIGINAL LICENSE TERMS ARE REPRODUCED BELOW ONLY AS A REFERENCE.]
 
 
->>> jstl-1.2
+PASSWORD 3.1.1 README
 
-The contents of this file are subject to the terms
-of the Common Development and Distribution License
-(the "License").  You may not use this file except
-in compliance with the License.
+    This is the 3.1.1 release of the VT Password libraries.
+    It is dual licensed under both the LGPL and Apache 2.
+    If you have questions or comments about this library send e-mail to
+    vt-middleware-users@googlegroups.com.
 
-You can obtain a copy of the license at
-glassfish/bootstrap/legal/CDDLv1.0.txt or
-https://glassfish.dev.java.net/public/CDDLv1.0.html.
-See the License for the specific language governing
-permissions and limitations under the License.
 
-When distributing Covered Code, include this CDDL
-HEADER in each file and include the License file at
-glassfish/bootstrap/legal/CDDLv1.0.txt.  If applicable,
-add the following below this CDDL HEADER, with the
-fields enclosed by brackets "[]" replaced with your
-own identifying information: Portions Copyright [yyyy]
-[name of copyright owner]
+--------------- SECTION 3: Common Development and Distribution License, V1.0 ----------
 
-Copyright 2005 Sun Microsystems, Inc. All rights reserved.
-
-Portions Copyright Apache Software Foundation.
+Common Development and Distribution License, V1.0 is applicable to the following component(s).
 
 
 >>> servlet-api-2.5
@@ -1023,23 +1585,264 @@ LICENSE: CPL 1.0
 Eclipse Public License, V1.0 is applicable to the following component(s).
 
 
->>> aspectjrt-1.6.9
+>>> lifecycle-mapping-1.0.0
 
-Copyright (c) 1999-2001 Xerox Corporation, 2002 Palo Alto Research Center, Incorporated (PARC).
- 
-All rights reserved. 
+Copyright (c) 2008 Sonatype, Inc.
+All rights reserved. This program and the accompanying materials
+are made available under the terms of the Eclipse Public License v1.0
+which accompanies this distribution, and is available at
+http://www.eclipse.org/legal/epl-v10.html
 
-This program and the accompanying materials are made available  under the terms of the Eclipse Public License v1.0  which accompanies this distribution and is available at  http://www.eclipse.org/legal/epl-v10.html 
 
-Contributors: Xerox/PARC initial implementation
+--------------- SECTION 6: GNU Lesser General Public License, V3.0 ----------
+
+GNU Lesser General Public License, V3.0 is applicable to the following component(s).
+
+
+>>> git-commit-id-plugin-1.0
+
+LGPL 3.0
+
+ This file is part of git-commit-id-plugin by Konrad Malawski <konrad.malawski@java.pl>
+
+ git-commit-id-plugin is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Lesser General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
 
 =============== APPENDIX. Standard License Files ============== 
 
 
 
+--------------- SECTION 1: Eclipse Public License, V1.0 -----------
 
---------------- SECTION 1: Common Development and Distribution License, V1.0 -----------
+Eclipse Public License - v 1.0
+
+THE ACCOMPANYING PROGRAM IS PROVIDED UNDER THE TERMS OF THIS ECLIPSE
+PUBLIC LICENSE ("AGREEMENT"). ANY USE, REPRODUCTION OR DISTRIBUTION
+OF THE PROGRAM CONSTITUTES RECIPIENT'S ACCEPTANCE OF THIS AGREEMENT.
+1. DEFINITIONS
+
+"Contribution" means:
+
+    a) in the case of the initial Contributor, the initial code and
+    documentation distributed under this Agreement, and
+
+    b) in the case of each subsequent Contributor:
+
+        i) changes to the Program, and
+
+        ii) additions to the Program; where such changes and/or
+        additions to the Program originate from and are distributed
+        by that particular Contributor. A Contribution 'originates'
+        from a Contributor if it was added to the Program by such
+        Contributor itself or anyone acting on such Contributor's
+        behalf. Contributions do not include additions to the Program
+        which: (i) are separate modules of software distributed in
+        conjunction with the Program under their own license agreement,
+        and (ii) are not derivative works of the Program.
+
+"Contributor" means any person or entity that distributes the Program.
+
+"Licensed Patents" mean patent claims licensable by a Contributor which
+are necessarily infringed by the use or sale of its Contribution alone
+or when combined with the Program.
+
+"Program" means the Contributions distributed in accordance with this
+Agreement.
+
+"Recipient" means anyone who receives the Program under this Agreement,
+including all Contributors.
+
+2. GRANT OF RIGHTS
+
+    a) Subject to the terms of this Agreement, each Contributor hereby
+    grants Recipient a non-exclusive, worldwide, royalty-free copyright
+    license to reproduce, prepare derivative works of, publicly display,
+    publicly perform, distribute and sublicense the Contribution of such
+    Contributor, if any, and such derivative works, in source code and
+    object code form.
+
+    b) Subject to the terms of this Agreement, each Contributor hereby
+    grants Recipient a non-exclusive, worldwide, royalty-free patent
+    license under Licensed Patents to make, use, sell, offer to sell,
+    import and otherwise transfer the Contribution of such Contributor,
+    if any, in source code and object code form. This patent license
+    shall apply to the combination of the Contribution and the Program
+    if, at the time the Contribution is added by the Contributor, such
+    addition of the Contribution causes such combination to be covered
+    by the Licensed Patents. The patent license shall not apply to any
+    other combinations which include the Contribution. No hardware per
+    se is licensed hereunder.
+
+    c) Recipient understands that although each Contributor grants the
+    licenses to its Contributions set forth herein, no assurances are
+    provided by any Contributor that the Program does not infringe the
+    patent or other intellectual property rights of any other entity. Each
+    Contributor disclaims any liability to Recipient for claims brought by
+    any other entity based on infringement of intellectual property rights
+    or otherwise. As a condition to exercising the rights and licenses
+    granted hereunder, each Recipient hereby assumes sole responsibility
+    to secure any other intellectual property rights needed, if any. For
+    example, if a third party patent license is required to allow
+    Recipient to distribute the Program, it is Recipient's responsibility
+    to acquire that license before distributing the Program.
+
+    d) Each Contributor represents that to its knowledge it has sufficient
+    copyright rights in its Contribution, if any, to grant the copyright
+    license set forth in this Agreement.
+
+3. REQUIREMENTS
+
+A Contributor may choose to distribute the Program in object code form
+under its own license agreement, provided that:
+
+    a) it complies with the terms and conditions of this Agreement; and
+
+    b) its license agreement:
+
+        i) effectively disclaims on behalf of all Contributors all
+        warranties and conditions, express and implied, including
+        warranties or conditions of title and non-infringement, and
+        implied warranties or conditions of merchantability and fitness
+        for a particular purpose;
+
+        ii) effectively excludes on behalf of all Contributors all
+        liability for damages, including direct, indirect, special,
+        incidental and consequential damages, such as lost profits;
+
+        iii) states that any provisions which differ from this Agreement
+        are offered by that Contributor alone and not by any other
+        party; and
+
+        iv) states that source code for the Program is available from
+        such Contributor, and informs licensees how to obtain it in a
+        reasonable manner on or through a medium customarily used for
+        software exchange.
+
+When the Program is made available in source code form:
+
+    a) it must be made available under this Agreement; and
+
+    b) a copy of this Agreement must be included with each copy of
+    the Program.  Contributors may not remove or alter any copyright
+    notices contained within the Program.
+
+Each Contributor must identify itself as the originator of its
+Contribution, if any, in a manner that reasonably allows subsequent
+Recipients to identify the originator of the Contribution.
+
+4. COMMERCIAL DISTRIBUTION
+
+Commercial distributors of software may accept certain responsibilities
+with respect to end users, business partners and the like. While this
+license is intended to facilitate the commercial use of the Program, the
+Contributor who includes the Program in a commercial product offering
+should do so in a manner which does not create potential liability for
+other Contributors. Therefore, if a Contributor includes the Program in a
+commercial product offering, such Contributor ("Commercial Contributor")
+hereby agrees to defend and indemnify every other Contributor
+("Indemnified Contributor") against any losses, damages and costs
+(collectively "Losses") arising from claims, lawsuits and other legal
+actions brought by a third party against the Indemnified Contributor to
+the extent caused by the acts or omissions of such Commercial Contributor
+in connection with its distribution of the Program in a commercial
+product offering. The obligations in this section do not apply to any
+claims or Losses relating to any actual or alleged intellectual property
+infringement. In order to qualify, an Indemnified Contributor must: a)
+promptly notify the Commercial Contributor in writing of such claim,
+and b) allow the Commercial Contributor to control, and cooperate with
+the Commercial Contributor in, the defense and any related settlement
+negotiations. The Indemnified Contributor may participate in any such
+claim at its own expense.
+
+For example, a Contributor might include the Program in a commercial
+product offering, Product X. That Contributor is then a Commercial
+Contributor. If that Commercial Contributor then makes performance claims,
+or offers warranties related to Product X, those performance claims and
+warranties are such Commercial Contributor's responsibility alone. Under
+this section, the Commercial Contributor would have to defend claims
+against the other Contributors related to those performance claims and
+warranties, and if a court requires any other Contributor to pay any
+damages as a result, the Commercial Contributor must pay those damages.
+
+5. NO WARRANTY
+
+EXCEPT AS EXPRESSLY SET FORTH IN THIS AGREEMENT, THE PROGRAM IS PROVIDED
+ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, EITHER
+EXPRESS OR IMPLIED INCLUDING, WITHOUT LIMITATION, ANY WARRANTIES OR
+CONDITIONS OF TITLE, NON-INFRINGEMENT, MERCHANTABILITY OR FITNESS FOR A
+PARTICULAR PURPOSE. Each Recipient is solely responsible for determining
+the appropriateness of using and distributing the Program and assumes
+all risks associated with its exercise of rights under this Agreement
+, including but not limited to the risks and costs of program errors,
+compliance with applicable laws, damage to or loss of data, programs or
+equipment, and unavailability or interruption of operations.
+
+6. DISCLAIMER OF LIABILITY
+
+EXCEPT AS EXPRESSLY SET FORTH IN THIS AGREEMENT, NEITHER RECIPIENT NOR
+ANY CONTRIBUTORS SHALL HAVE ANY LIABILITY FOR ANY DIRECT, INDIRECT,
+INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING
+WITHOUT LIMITATION LOST PROFITS), HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OR DISTRIBUTION
+OF THE PROGRAM OR THE EXERCISE OF ANY RIGHTS GRANTED HEREUNDER, EVEN IF
+ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+
+7. GENERAL
+
+If any provision of this Agreement is invalid or unenforceable under
+applicable law, it shall not affect the validity or enforceability of
+the remainder of the terms of this Agreement, and without further action
+by the parties hereto, such provision shall be reformed to the minimum
+extent necessary to make such provision valid and enforceable.
+
+If Recipient institutes patent litigation against any entity (including
+a cross-claim or counterclaim in a lawsuit) alleging that the Program
+itself (excluding combinations of the Program with other software or
+hardware) infringes such Recipient's patent(s), then such Recipient's
+rights granted under Section 2(b) shall terminate as of the date such
+litigation is filed.
+
+All Recipient's rights under this Agreement shall terminate if it fails
+to comply with any of the material terms or conditions of this Agreement
+and does not cure such failure in a reasonable period of time after
+becoming aware of such noncompliance. If all Recipient's rights under
+this Agreement terminate, Recipient agrees to cease use and distribution
+of the Program as soon as reasonably practicable. However, Recipient's
+obligations under this Agreement and any licenses granted by Recipient
+relating to the Program shall continue and survive.
+
+Everyone is permitted to copy and distribute copies of this Agreement,
+but in order to avoid inconsistency the Agreement is copyrighted and may
+only be modified in the following manner. The Agreement Steward reserves
+the right to publish new versions (including revisions) of this Agreement
+from time to time. No one other than the Agreement Steward has the right
+to modify this Agreement. The Eclipse Foundation is the initial Agreement
+Steward. The Eclipse Foundation may assign the responsibility to serve
+as the Agreement Steward to a suitable separate entity. Each new version
+of the Agreement will be given a distinguishing version number. The
+Program (including Contributions) may always be distributed subject to
+the version of the Agreement under which it was received. In addition,
+after a new version of the Agreement is published, Contributor may elect
+to distribute the Program (including its Contributions) under the new
+version. Except as expressly stated in Sections 2(a) and 2(b) above,
+Recipient receives no rights or licenses to the intellectual property of
+any Contributor under this Agreement, whether expressly, by implication,
+estoppel or otherwise. All rights in the Program not expressly granted
+under this Agreement are reserved.
+
+This Agreement is governed by the laws of the State of New York and the
+intellectual property laws of the United States of America. No party to
+this Agreement will bring a legal action under this Agreement more than
+one year after the cause of action arose. Each party waives its rights
+to a jury trial in any resulting litigation.
+
+
+
+--------------- SECTION 2: Common Development and Distribution License, V1.0 -----------
 
 COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0
 
@@ -1372,7 +2175,7 @@ constitute any admission of liability.
 
 
 
---------------- SECTION 2: Common Public License, V1.0 -----------
+--------------- SECTION 3: Common Public License, V1.0 -----------
 
 Common Public License Version 1.0
 
@@ -1606,250 +2409,304 @@ to a jury trial in any resulting litigation.
 
 
 
---------------- SECTION 3: Eclipse Public License, V1.0 -----------
+--------------- SECTION 4: GNU Lesser General Public License, V3.0 -----------
 
-Eclipse Public License - v 1.0
+		   GNU LESSER GENERAL PUBLIC LICENSE
+                       Version 3, 29 June 2007
 
-THE ACCOMPANYING PROGRAM IS PROVIDED UNDER THE TERMS OF THIS ECLIPSE
-PUBLIC LICENSE ("AGREEMENT"). ANY USE, REPRODUCTION OR DISTRIBUTION
-OF THE PROGRAM CONSTITUTES RECIPIENT'S ACCEPTANCE OF THIS AGREEMENT.
-1. DEFINITIONS
-
-"Contribution" means:
-
-    a) in the case of the initial Contributor, the initial code and
-    documentation distributed under this Agreement, and
-
-    b) in the case of each subsequent Contributor:
-
-        i) changes to the Program, and
-
-        ii) additions to the Program; where such changes and/or
-        additions to the Program originate from and are distributed
-        by that particular Contributor. A Contribution 'originates'
-        from a Contributor if it was added to the Program by such
-        Contributor itself or anyone acting on such Contributor's
-        behalf. Contributions do not include additions to the Program
-        which: (i) are separate modules of software distributed in
-        conjunction with the Program under their own license agreement,
-        and (ii) are not derivative works of the Program.
-
-"Contributor" means any person or entity that distributes the Program.
-
-"Licensed Patents" mean patent claims licensable by a Contributor which
-are necessarily infringed by the use or sale of its Contribution alone
-or when combined with the Program.
-
-"Program" means the Contributions distributed in accordance with this
-Agreement.
-
-"Recipient" means anyone who receives the Program under this Agreement,
-including all Contributors.
-
-2. GRANT OF RIGHTS
-
-    a) Subject to the terms of this Agreement, each Contributor hereby
-    grants Recipient a non-exclusive, worldwide, royalty-free copyright
-    license to reproduce, prepare derivative works of, publicly display,
-    publicly perform, distribute and sublicense the Contribution of such
-    Contributor, if any, and such derivative works, in source code and
-    object code form.
-
-    b) Subject to the terms of this Agreement, each Contributor hereby
-    grants Recipient a non-exclusive, worldwide, royalty-free patent
-    license under Licensed Patents to make, use, sell, offer to sell,
-    import and otherwise transfer the Contribution of such Contributor,
-    if any, in source code and object code form. This patent license
-    shall apply to the combination of the Contribution and the Program
-    if, at the time the Contribution is added by the Contributor, such
-    addition of the Contribution causes such combination to be covered
-    by the Licensed Patents. The patent license shall not apply to any
-    other combinations which include the Contribution. No hardware per
-    se is licensed hereunder.
-
-    c) Recipient understands that although each Contributor grants the
-    licenses to its Contributions set forth herein, no assurances are
-    provided by any Contributor that the Program does not infringe the
-    patent or other intellectual property rights of any other entity. Each
-    Contributor disclaims any liability to Recipient for claims brought by
-    any other entity based on infringement of intellectual property rights
-    or otherwise. As a condition to exercising the rights and licenses
-    granted hereunder, each Recipient hereby assumes sole responsibility
-    to secure any other intellectual property rights needed, if any. For
-    example, if a third party patent license is required to allow
-    Recipient to distribute the Program, it is Recipient's responsibility
-    to acquire that license before distributing the Program.
-
-    d) Each Contributor represents that to its knowledge it has sufficient
-    copyright rights in its Contribution, if any, to grant the copyright
-    license set forth in this Agreement.
-
-3. REQUIREMENTS
-
-A Contributor may choose to distribute the Program in object code form
-under its own license agreement, provided that:
-
-    a) it complies with the terms and conditions of this Agreement; and
-
-    b) its license agreement:
-
-        i) effectively disclaims on behalf of all Contributors all
-        warranties and conditions, express and implied, including
-        warranties or conditions of title and non-infringement, and
-        implied warranties or conditions of merchantability and fitness
-        for a particular purpose;
-
-        ii) effectively excludes on behalf of all Contributors all
-        liability for damages, including direct, indirect, special,
-        incidental and consequential damages, such as lost profits;
-
-        iii) states that any provisions which differ from this Agreement
-        are offered by that Contributor alone and not by any other
-        party; and
-
-        iv) states that source code for the Program is available from
-        such Contributor, and informs licensees how to obtain it in a
-        reasonable manner on or through a medium customarily used for
-        software exchange.
-
-When the Program is made available in source code form:
-
-    a) it must be made available under this Agreement; and
-
-    b) a copy of this Agreement must be included with each copy of
-    the Program.  Contributors may not remove or alter any copyright
-    notices contained within the Program.
-
-Each Contributor must identify itself as the originator of its
-Contribution, if any, in a manner that reasonably allows subsequent
-Recipients to identify the originator of the Contribution.
-
-4. COMMERCIAL DISTRIBUTION
-
-Commercial distributors of software may accept certain responsibilities
-with respect to end users, business partners and the like. While this
-license is intended to facilitate the commercial use of the Program, the
-Contributor who includes the Program in a commercial product offering
-should do so in a manner which does not create potential liability for
-other Contributors. Therefore, if a Contributor includes the Program in a
-commercial product offering, such Contributor ("Commercial Contributor")
-hereby agrees to defend and indemnify every other Contributor
-("Indemnified Contributor") against any losses, damages and costs
-(collectively "Losses") arising from claims, lawsuits and other legal
-actions brought by a third party against the Indemnified Contributor to
-the extent caused by the acts or omissions of such Commercial Contributor
-in connection with its distribution of the Program in a commercial
-product offering. The obligations in this section do not apply to any
-claims or Losses relating to any actual or alleged intellectual property
-infringement. In order to qualify, an Indemnified Contributor must: a)
-promptly notify the Commercial Contributor in writing of such claim,
-and b) allow the Commercial Contributor to control, and cooperate with
-the Commercial Contributor in, the defense and any related settlement
-negotiations. The Indemnified Contributor may participate in any such
-claim at its own expense.
-
-For example, a Contributor might include the Program in a commercial
-product offering, Product X. That Contributor is then a Commercial
-Contributor. If that Commercial Contributor then makes performance claims,
-or offers warranties related to Product X, those performance claims and
-warranties are such Commercial Contributor's responsibility alone. Under
-this section, the Commercial Contributor would have to defend claims
-against the other Contributors related to those performance claims and
-warranties, and if a court requires any other Contributor to pay any
-damages as a result, the Commercial Contributor must pay those damages.
-
-5. NO WARRANTY
-
-EXCEPT AS EXPRESSLY SET FORTH IN THIS AGREEMENT, THE PROGRAM IS PROVIDED
-ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, EITHER
-EXPRESS OR IMPLIED INCLUDING, WITHOUT LIMITATION, ANY WARRANTIES OR
-CONDITIONS OF TITLE, NON-INFRINGEMENT, MERCHANTABILITY OR FITNESS FOR A
-PARTICULAR PURPOSE. Each Recipient is solely responsible for determining
-the appropriateness of using and distributing the Program and assumes
-all risks associated with its exercise of rights under this Agreement
-, including but not limited to the risks and costs of program errors,
-compliance with applicable laws, damage to or loss of data, programs or
-equipment, and unavailability or interruption of operations.
-
-6. DISCLAIMER OF LIABILITY
-
-EXCEPT AS EXPRESSLY SET FORTH IN THIS AGREEMENT, NEITHER RECIPIENT NOR
-ANY CONTRIBUTORS SHALL HAVE ANY LIABILITY FOR ANY DIRECT, INDIRECT,
-INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING
-WITHOUT LIMITATION LOST PROFITS), HOWEVER CAUSED AND ON ANY THEORY OF
-LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OR DISTRIBUTION
-OF THE PROGRAM OR THE EXERCISE OF ANY RIGHTS GRANTED HEREUNDER, EVEN IF
-ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
-
-7. GENERAL
-
-If any provision of this Agreement is invalid or unenforceable under
-applicable law, it shall not affect the validity or enforceability of
-the remainder of the terms of this Agreement, and without further action
-by the parties hereto, such provision shall be reformed to the minimum
-extent necessary to make such provision valid and enforceable.
-
-If Recipient institutes patent litigation against any entity (including
-a cross-claim or counterclaim in a lawsuit) alleging that the Program
-itself (excluding combinations of the Program with other software or
-hardware) infringes such Recipient's patent(s), then such Recipient's
-rights granted under Section 2(b) shall terminate as of the date such
-litigation is filed.
-
-All Recipient's rights under this Agreement shall terminate if it fails
-to comply with any of the material terms or conditions of this Agreement
-and does not cure such failure in a reasonable period of time after
-becoming aware of such noncompliance. If all Recipient's rights under
-this Agreement terminate, Recipient agrees to cease use and distribution
-of the Program as soon as reasonably practicable. However, Recipient's
-obligations under this Agreement and any licenses granted by Recipient
-relating to the Program shall continue and survive.
-
-Everyone is permitted to copy and distribute copies of this Agreement,
-but in order to avoid inconsistency the Agreement is copyrighted and may
-only be modified in the following manner. The Agreement Steward reserves
-the right to publish new versions (including revisions) of this Agreement
-from time to time. No one other than the Agreement Steward has the right
-to modify this Agreement. The Eclipse Foundation is the initial Agreement
-Steward. The Eclipse Foundation may assign the responsibility to serve
-as the Agreement Steward to a suitable separate entity. Each new version
-of the Agreement will be given a distinguishing version number. The
-Program (including Contributions) may always be distributed subject to
-the version of the Agreement under which it was received. In addition,
-after a new version of the Agreement is published, Contributor may elect
-to distribute the Program (including its Contributions) under the new
-version. Except as expressly stated in Sections 2(a) and 2(b) above,
-Recipient receives no rights or licenses to the intellectual property of
-any Contributor under this Agreement, whether expressly, by implication,
-estoppel or otherwise. All rights in the Program not expressly granted
-under this Agreement are reserved.
-
-This Agreement is governed by the laws of the State of New York and the
-intellectual property laws of the United States of America. No party to
-this Agreement will bring a legal action under this Agreement more than
-one year after the cause of action arose. Each party waives its rights
-to a jury trial in any resulting litigation.
+ Copyright (C) 2007 Free Software Foundation, Inc. <http://fsf.org/>
+ Everyone is permitted to copy and distribute verbatim copies
+ of this license document, but changing it is not allowed.
 
 
+  This version of the GNU Lesser General Public License incorporates
+the terms and conditions of version 3 of the GNU General Public
+License, supplemented by the additional permissions listed below.
 
-===========================================================================
+  0. Additional Definitions.
 
+  As used herein, "this License" refers to version 3 of the GNU Lesser
+General Public License, and the "GNU GPL" refers to version 3 of the GNU
+General Public License.
+
+  "The Library" refers to a covered work governed by this License,
+other than an Application or a Combined Work as defined below.
+
+  An "Application" is any work that makes use of an interface provided
+by the Library, but which is not otherwise based on the Library.
+Defining a subclass of a class defined by the Library is deemed a mode
+of using an interface provided by the Library.
+
+  A "Combined Work" is a work produced by combining or linking an
+Application with the Library.  The particular version of the Library
+with which the Combined Work was made is also called the "Linked
+Version".
+
+  The "Minimal Corresponding Source" for a Combined Work means the
+Corresponding Source for the Combined Work, excluding any source code
+for portions of the Combined Work that, considered in isolation, are
+based on the Application, and not on the Linked Version.
+
+  The "Corresponding Application Code" for a Combined Work means the
+object code and/or source code for the Application, including any data
+and utility programs needed for reproducing the Combined Work from the
+Application, but excluding the System Libraries of the Combined Work.
+
+  1. Exception to Section 3 of the GNU GPL.
+
+  You may convey a covered work under sections 3 and 4 of this License
+without being bound by section 3 of the GNU GPL.
+
+  2. Conveying Modified Versions.
+
+  If you modify a copy of the Library, and, in your modifications, a
+facility refers to a function or data to be supplied by an Application
+that uses the facility (other than as an argument passed when the
+facility is invoked), then you may convey a copy of the modified
+version:
+
+   a) under this License, provided that you make a good faith effort to
+   ensure that, in the event an Application does not supply the
+   function or data, the facility still operates, and performs
+   whatever part of its purpose remains meaningful, or
+
+   b) under the GNU GPL, with none of the additional permissions of
+   this License applicable to that copy.
+
+  3. Object Code Incorporating Material from Library Header Files.
+
+  The object code form of an Application may incorporate material from
+a header file that is part of the Library.  You may convey such object
+code under terms of your choice, provided that, if the incorporated
+material is not limited to numerical parameters, data structure
+layouts and accessors, or small macros, inline functions and templates
+(ten or fewer lines in length), you do both of the following:
+
+   a) Give prominent notice with each copy of the object code that the
+   Library is used in it and that the Library and its use are
+   covered by this License.
+
+   b) Accompany the object code with a copy of the GNU GPL and this license
+   document.
+
+  4. Combined Works.
+
+  You may convey a Combined Work under terms of your choice that,
+taken together, effectively do not restrict modification of the
+portions of the Library contained in the Combined Work and reverse
+engineering for debugging such modifications, if you also do each of
+the following:
+
+   a) Give prominent notice with each copy of the Combined Work that
+   the Library is used in it and that the Library and its use are
+   covered by this License.
+
+   b) Accompany the Combined Work with a copy of the GNU GPL and this license
+   document.
+
+   c) For a Combined Work that displays copyright notices during
+   execution, include the copyright notice for the Library among
+   these notices, as well as a reference directing the user to the
+   copies of the GNU GPL and this license document.
+
+   d) Do one of the following:
+
+       0) Convey the Minimal Corresponding Source under the terms of this
+       License, and the Corresponding Application Code in a form
+       suitable for, and under terms that permit, the user to
+       recombine or relink the Application with a modified version of
+       the Linked Version to produce a modified Combined Work, in the
+       manner specified by section 6 of the GNU GPL for conveying
+       Corresponding Source.
+
+       1) Use a suitable shared library mechanism for linking with the
+       Library.  A suitable mechanism is one that (a) uses at run time
+       a copy of the Library already present on the user's computer
+       system, and (b) will operate properly with a modified version
+       of the Library that is interface-compatible with the Linked
+       Version.
+
+   e) Provide Installation Information, but only if you would otherwise
+   be required to provide such information under section 6 of the
+   GNU GPL, and only to the extent that such information is
+   necessary to install and execute a modified version of the
+   Combined Work produced by recombining or relinking the
+   Application with a modified version of the Linked Version. (If
+   you use option 4d0, the Installation Information must accompany
+   the Minimal Corresponding Source and Corresponding Application
+   Code. If you use option 4d1, you must provide the Installation
+   Information in the manner specified by section 6 of the GNU GPL
+   for conveying Corresponding Source.)
+
+  5. Combined Libraries.
+
+  You may place library facilities that are a work based on the
+Library side by side in a single library together with other library
+facilities that are not Applications and are not covered by this
+License, and convey such a combined library under terms of your
+choice, if you do both of the following:
+
+   a) Accompany the combined library with a copy of the same work based
+   on the Library, uncombined with any other library facilities,
+   conveyed under the terms of this License.
+
+   b) Give prominent notice with the combined library that part of it
+   is a work based on the Library, and explaining where to find the
+   accompanying uncombined form of the same work.
+
+  6. Revised Versions of the GNU Lesser General Public License.
+
+  The Free Software Foundation may publish revised and/or new versions
+of the GNU Lesser General Public License from time to time. Such new
+versions will be similar in spirit to the present version, but may
+differ in detail to address new problems or concerns.
+
+  Each version is given a distinguishing version number. If the
+Library as you received it specifies that a certain numbered version
+of the GNU Lesser General Public License "or any later version"
+applies to it, you have the option of following the terms and
+conditions either of that published version or of any later version
+published by the Free Software Foundation. If the Library as you
+received it does not specify a version number of the GNU Lesser
+General Public License, you may choose any version of the GNU Lesser
+General Public License ever published by the Free Software Foundation.
+
+  If the Library as you received it specifies that a proxy can decide
+whether future versions of the GNU Lesser General Public License shall
+apply, that proxy's public statement of acceptance of any version is
+permanent authorization for you to choose that version for the
+Library.
+
+
+--------------- SECTION 5: Common Development and Distribution License, V1.1 -----------
+
+
+COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL)Version 1.1 
+
+1. Definitions. 
+
+1.1. "Contributor" means each individual or entity that creates or contributes to the creation of Modifications. 
+
+1.2. "Contributor Version" means the combination of the Original Software, prior Modifications used by a Contributor (if any), and the Modifications made by that particular Contributor. 
+
+1.3. "Covered SoftwareÆ" means (a) the Original Software, or (b) Modifications, or (c) the combination of files containing Original Software with files containing Modifications, in each case including portions thereof. 
+
+1.4. "Executable" means the Covered Software in any form other than Source Code. 
+
+1.5. "Initial Developer" means the individual or entity that first makes Original Software available under this License. 
+
+1.6. "Larger Work" means a work which combines Covered Software or portions thereof with code not governed by the terms of this License. 
+
+1.7. "License" means this document. 
+
+1.8. "Licensable" means having the right to grant, to the maximum extent possible, whether at the time of the initial grant or subsequently acquired, any and all of the rights conveyed herein. 
+
+1.9. "Modifications" means the Source Code and Executable form of any of the following: 
+A. Any file that results from an addition to, deletion from or modification of the contents of a file containing Original Software or previous Modifications; 
+B. Any new file that contains any part of the Original Software or previous Modification; or 
+C. Any new file that is contributed or otherwise made available under the terms of this License. 
+
+1.10. "Original Software" means the Source Code and Executable form of computer software code that is originally released under this License. 
+
+1.11. "Patent Claims" means any patent claim(s), now owned or hereafter acquired, including without limitation, method, process, and apparatus claims, in any patent Licensable by grantor. 
+
+1.12. "Source Code" means (a) the common form of computer software code in which modifications are made and (b) associated documentation included in or with such code. 
+
+1.13. "You" (or "Your") means an individual or a legal entity exercising rights under, and complying with all of the terms of, this License. For legal entities, "You" includes any entity which controls, is controlled by, or is under common control with You. For purposes of this definition, "control" means (a) the power, direct or indirect, to cause the direction or management of such entity, whether by contract or otherwise, or (b) ownership of more than fifty percent (50%) of the outstanding shares or beneficial ownership of such entity. 
+
+2. License Grants. 
+
+2.1. The Initial Developer Grant. 
+Conditioned upon Your compliance with Section 3.1 below and subject to third party intellectual property claims, the Initial Developer hereby grants You a world-wide, royalty-free, non-exclusive license: 
+(a) under intellectual property rights (other than patent or trademark) Licensable by Initial Developer, to use, reproduce, modify, display, perform, sublicense and distribute the Original Software (or portions thereof), with or without Modifications, and/or as part of a Larger Work; and 
+(b) under Patent Claims infringed by the making, using or selling of Original Software, to make, have made, use, practice, sell, and offer for sale, and/or otherwise dispose of the Original Software (or portions thereof). 
+(c) The licenses granted in Sections 2.1(a) and (b) are effective on the date Initial Developer first distributes or otherwise makes the Original Software available to a third party under the terms of this License. 
+(d) Notwithstanding Section 2.1(b) above, no patent license is granted: (1) for code that You delete from the Original Software, or (2) for infringements caused by: (i) the modification of the Original Software, or (ii) the combination of the Original Software with other software or devices. 
+
+2.2. Contributor Grant. 
+Conditioned upon Your compliance with Section 3.1 below and subject to third party intellectual property claims, each Contributor hereby grants You a world-wide, royalty-free, non-exclusive license: 
+(a) under intellectual property rights (other than patent or trademark) Licensable by Contributor to use, reproduce, modify, display, perform, sublicense and distribute the Modifications created by such Contributor (or portions thereof), either on an unmodified basis, with other Modifications, as Covered Software and/or as part of a Larger Work; and 
+(b) under Patent Claims infringed by the making, using, or selling of Modifications made by that Contributor either alone and/or in combination with its Contributor Version (or portions of such combination), to make, use, sell, offer for sale, have made, and/or otherwise dispose of: (1) Modifications made by that Contributor (or portions thereof); and (2) the combination of Modifications made by that Contributor with its Contributor Version (or portions of such combination). 
+(c) The licenses granted in Sections 2.2(a) and 2.2(b) are effective on the date Contributor first distributes or otherwise makes the Modifications available to a third party. 
+(d) Notwithstanding Section 2.2(b) above, no patent license is granted: (1) for any code that Contributor has deleted from the Contributor Version; (2) for infringements caused by: (i) third party modifications of Contributor Version, or (ii) the combination of Modifications made by that Contributor with other software (except as part of the Contributor Version) or other devices; or (3) under Patent Claims infringed by Covered Software in the absence of Modifications made by that Contributor. 
+
+3. Distribution Obligations. 
+
+3.1. Availability of Source Code. 
+Any Covered Software that You distribute or otherwise make available in Executable form must also be made available in Source Code form and that Source Code form must be distributed only under the terms of this License. You must include a copy of this License with every copy of the Source Code form of the Covered Software You distribute or otherwise make available. You must inform recipients of any such Covered Software in Executable form as to how they can obtain such Covered Software in Source Code form in a reasonable manner on or through a medium customarily used for software exchange. 
+
+3.2. Modifications. 
+The Modifications that You create or to which You contribute are governed by the terms of this License. You represent that You believe Your Modifications are Your original creation(s) and/or You have sufficient rights to grant the rights conveyed by this License. 
+
+3.3. Required Notices. 
+You must include a notice in each of Your Modifications that identifies You as the Contributor of the Modification. You may not remove or alter any copyright, patent or trademark notices contained within the Covered Software, or any notices of licensing or any descriptive text giving attribution to any Contributor or the Initial Developer. 
+
+3.4. Application of Additional Terms. 
+You may not offer or impose any terms on any Covered Software in Source Code form that alters or restricts the applicable version of this License or the recipients' rights hereunder. You may choose to offer, and to charge a fee for, warranty, support, indemnity or liability obligations to one or more recipients of Covered Software. However, you may do so only on Your own behalf, and not on behalf of the Initial Developer or any Contributor. You must make it absolutely clear that any such warranty, support, indemnity or liability obligation is offered by You alone, and You hereby agree to indemnify the Initial Developer and every Contributor for any liability incurred by the Initial Developer or such Contributor as a result of warranty, support, indemnity or liability terms You offer. 
+
+3.5. Distribution of Executable Versions. 
+You may distribute the Executable form of the Covered Software under the terms of this License or under the terms of a license of Your choice, which may contain terms different from this License, provided that You are in compliance with the terms of this License and that the license for the Executable form does not attempt to limit or alter the recipient's rights in the Source Code form from the rights set forth in this License. If You distribute the Covered Software in Executable form under a different license, You must make it absolutely clear that any terms which differ from this License are offered by You alone, not by the Initial Developer or Contributor. You hereby agree to indemnify the Initial Developer and every Contributor for any liability incurred by the Initial Developer or such Contributor as a result of any such terms You offer. 
+
+3.6. Larger Works. 
+You may create a Larger Work by combining Covered Software with other code not governed by the terms of this License and distribute the Larger Work as a single product. In such a case, You must make sure the requirements of this License are fulfilled for the Covered Software. 
+
+4. Versions of the License. 
+
+4.1. New Versions. 
+Oracle is the initial license steward and may publish revised and/or new versions of this License from time to time. Each version will be given a distinguishing version number. Except as provided in Section 4.3, no one other than the license steward has the right to modify this License. 
+
+4.2. Effect of New Versions. 
+You may always continue to use, distribute or otherwise make the Covered Software available under the terms of the version of the License under which You originally received the Covered Software. If the Initial Developer includes a notice in the Original Software prohibiting it from being distributed or otherwise made available under any subsequent version of the License, You must distribute and make the Covered Software available under the terms of the version of the License under which You originally received the Covered Software. Otherwise, You may also choose to use, distribute or otherwise make the Covered Software available under the terms of any subsequent version of the License published by the license steward. 
+
+4.3. Modified Versions. 
+When You are an Initial Developer and You want to create a new license for Your Original Software, You may create and use a modified version of this License if You: (a) rename the license and remove any references to the name of the license steward (except to note that the license differs from this License); and (b) otherwise make it clear that the license contains terms which differ from this License. 
+
+5. DISCLAIMER OF WARRANTY. 
+COVERED SOFTWARE IS PROVIDED UNDER THIS LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, WITHOUT LIMITATION, WARRANTIES THAT THE COVERED SOFTWARE IS FREE OF DEFECTS, MERCHANTABLE, FIT FOR A PARTICULAR PURPOSE OR NON-INFRINGING. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE COVERED SOFTWARE IS WITH YOU. SHOULD ANY COVERED SOFTWARE PROVE DEFECTIVE IN ANY RESPECT, YOU (NOT THE INITIAL DEVELOPER OR ANY OTHER CONTRIBUTOR) ASSUME THE COST OF ANY NECESSARY SERVICING, REPAIR OR CORRECTION. THIS DISCLAIMER OF WARRANTY CONSTITUTES AN ESSENTIAL PART OF THIS LICENSE. NO USE OF ANY COVERED SOFTWARE IS AUTHORIZED HEREUNDER EXCEPT UNDER THIS DISCLAIMER. 
+
+6. TERMINATION. 
+
+6.1. This License and the rights granted hereunder will terminate automatically if You fail to comply with terms herein and fail to cure such breach within 30 days of becoming aware of the breach. Provisions which, by their nature, must remain in effect beyond the termination of this License shall survive. 
+
+6.2. If You assert a patent infringement claim (excluding declaratory judgment actions) against Initial Developer or a Contributor (the Initial Developer or Contributor against whom You assert such claim is referred to as "Participant") alleging that the Participant Software (meaning the Contributor Version where the Participant is a Contributor or the Original Software where the Participant is the Initial Developer) directly or indirectly infringes any patent, then any and all rights granted directly or indirectly to You by such Participant, the Initial Developer (if the Initial Developer is not the Participant) and all Contributors under Sections 2.1 and/or 2.2 of this License shall, upon 60 days notice from Participant terminate prospectively and automatically at the expiration of such 60 day notice period, unless if within such 60 day period You withdraw Your claim with respect to the Participant Software against such Participant either unilaterally or pursuant to a written agreement with Participant. 
+
+6.3. If You assert a patent infringement claim against Participant alleging that the Participant Software directly or indirectly infringes any patent where such claim is resolved (such as by license or settlement) prior to the initiation of patent infringement litigation, then the reasonable value of the licenses granted by such Participant under Sections 2.1 or 2.2 shall be taken into account in determining the amount or value of any payment or license. 
+
+6.4. In the event of termination under Sections 6.1 or 6.2 above, all end user licenses that have been validly granted by You or any distributor hereunder prior to termination (excluding licenses granted to You by any distributor) shall survive termination. 
+
+7. LIMITATION OF LIABILITY. 
+UNDER NO CIRCUMSTANCES AND UNDER NO LEGAL THEORY, WHETHER TORT (INCLUDING NEGLIGENCE), CONTRACT, OR OTHERWISE, SHALL YOU, THE INITIAL DEVELOPER, ANY OTHER CONTRIBUTOR, OR ANY DISTRIBUTOR OF COVERED SOFTWARE, OR ANY SUPPLIER OF ANY OF SUCH PARTIES, BE LIABLE TO ANY PERSON FOR ANY INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES OF ANY CHARACTER INCLUDING, WITHOUT LIMITATION, DAMAGES FOR LOSS OF GOODWILL, WORK STOPPAGE, COMPUTER FAILURE OR MALFUNCTION, OR ANY AND ALL OTHER COMMERCIAL DAMAGES OR LOSSES, EVEN IF SUCH PARTY SHALL HAVE BEEN INFORMED OF THE POSSIBILITY OF SUCH DAMAGES. THIS LIMITATION OF LIABILITY SHALL NOT APPLY TO LIABILITY FOR DEATH OR PERSONAL INJURY RESULTING FROM SUCH PARTY'S NEGLIGENCE TO THE EXTENT APPLICABLE LAW PROHIBITS SUCH LIMITATION. SOME JURISDICTIONS DO NOT ALLOW THE EXCLUSION OR LIMITATION OF INCIDENTAL OR CONSEQUENTIAL DAMAGES, SO THIS EXCLUSION AND LIMITATION MAY NOT APPLY TO YOU. 
+
+8. U.S. GOVERNMENT END USERS. 
+The Covered Software is a "commercial item," as that term is defined in 48 C.F.R. 2.101 (Oct. 1995), consisting of "commercial computer software" (as that term is defined at 48 C.F.R. sec. 252.227-7014(a)(1)) and "commercial computer software documentation" as such terms are used in 48 C.F.R. 12.212 (Sept. 1995). Consistent with 48 C.F.R. 12.212 and 48 C.F.R. 227.7202-1 through 227.7202-4 (June 1995), all U.S. Government End Users acquire Covered Software with only those rights set forth herein. This U.S. Government Rights clause is in lieu of, and supersedes, any other FAR, DFAR, or other clause or provision that addresses Government rights in computer software under this License. 
+
+9. MISCELLANEOUS. 
+This License represents the complete agreement concerning subject matter hereof. If any provision of this License is held to be unenforceable, such provision shall be reformed only to the extent necessary to make it enforceable. This License shall be governed by the law of the jurisdiction specified in a notice contained within the Original Software (except to the extent applicable law, if any, provides otherwise), excluding such jurisdiction's conflict-of-law provisions. Any litigation relating to this License shall be subject to the jurisdiction of the courts located in the jurisdiction and venue specified in a notice contained within the Original Software, with the losing party responsible for costs, including, without limitation, court costs and reasonable attorneys' fees and expenses. The application of the United Nations Convention on Contracts for the International Sale of Goods is expressly excluded. Any law or regulation which provides that the language of a contract shall be construed against the drafter shall not apply to this License. You agree that You alone are responsible for compliance with the United States export administration regulations (and the export control laws and regulation of any other countries) when You use, distribute or otherwise make available any Covered Software. 
+
+10. RESPONSIBILITY FOR CLAIMS. 
+As between Initial Developer and the Contributors, each party is responsible for claims and damages arising, directly or indirectly, out of its utilization of rights under this License and You agree to work with Initial Developer and Contributors to distribute such responsibility on an equitable basis. Nothing herein is intended or shall be deemed to constitute any admission of liability. 
+
+NOTICE PURSUANT TO SECTION 9 OF THE COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) 
+The code released under the CDDL shall be governed by the laws of the State of California (excluding conflict-of-law provisions). Any litigation relating to this License shall be subject to the jurisdiction of the Federal Courts of the Northern District of California and the state courts of the State of California, with venue lying in Santa Clara County, California.
+
+
+================================================
+ 
 To the extent any open source components are licensed under the
 GPL and/or LGPL, or other similar licenses that require the
 source code and/or modifications to source code to be made
 available (as would be noted above), you may obtain a copy of
 the source code corresponding to the binaries for such open
 source components and modifications thereto, if any, (the
-"Source Files"), by downloading the Source Files from VMware's website at
-http://www.vmware.com/download/open_source.html, or by sending a request, 
-with your name and address to: GoPivotal, Inc., 1900 S. Norfolk Street #125, 
-San Mateo, CA 94403, Attention: General Counsel. All such requests should 
-clearly specify: OPEN SOURCE FILES REQUEST,
-Attention General Counsel. GoPivotal shall mail a copy of the
+"Source Files"), by downloading the Source Files from Pivotal's website at
+http://www.gopivotal.com/open-source, or by sending a request, with your name and address to: 
+Pivotal Software, Inc., 1900 S. Norfolk Street #125, San Mateo, CA 94403, Attention: 
+General Counsel.All such requests should clearly specify: OPEN SOURCE FILES REQUEST,
+Attention General Counsel. Pivotal shall mail a copy of the
 Source Files to you on a CD or equivalent physical medium. This
 offer to obtain a copy of the Source Files is valid for three
-years from the date you acquired this Software product. Alternatively, 
-the Source Files may accompany the GoPivotal product.
+years from the date you acquired this Software product.
+Alternatively, the Source Files may accompany the Pivotal product.
 
-[CFLOGINSERVER81513SS081913]
+[CFLOGINSERVER11152013VN122013]
+

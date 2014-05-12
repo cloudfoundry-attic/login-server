@@ -30,7 +30,7 @@
 
 - Start up the login server, uaa and sample apps
   - `export MAVEN_OPTS="-Xmx768m -XX:MaxPermSize=256m"`
-  - `cd login-server/saml-login-server; mvn tomcat:run -P integration`
+  - `cd login-server; mvn tomcat:run -P integration`
 
 - Create an OpenAM Hosted Identity provider and a circle of trust
 

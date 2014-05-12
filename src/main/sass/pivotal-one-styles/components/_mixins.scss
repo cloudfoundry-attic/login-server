@@ -1,0 +1,72 @@
+/* Button Mixins */
+
+@mixin button-skin($color, $background, $background-hover) {
+  color: $color;
+  background-color: $background;
+  border: none;
+  &:hover,
+  &:focus,
+  &:active,
+  &.active {
+    color: $color;
+    background-color: $background-hover;
+  }
+  .open & { &.dropdown-toggle {
+    color: $color;
+    background-color: $background-hover;
+  } }
+  &:active,
+  &.active {
+    background-image: none;
+  }
+  .open & { &.dropdown-toggle {
+    background-image: none;
+  } }
+  &.disabled,
+  &[disabled],
+  fieldset[disabled] & {
+    &,
+    &:hover,
+    &:focus,
+    &:active,
+    &.active {
+      background-color: $btn-disabled-bg;
+      color: $btn-disabled-color;
+    }
+  }
+}
+
+@mixin button-skin-alternate($color, $background, $border) {
+  color: $color;
+  background-color: $background;
+
+  &:hover,
+  &:focus,
+  &:active,
+  &.active {
+    color: $color;
+    background-color: darken($background, 9%);
+  }
+  .open & { &.dropdown-toggle {
+    color: $color;
+    background-color: darken($background, 8%);
+  } }
+  &:active,
+  &.active {
+    background-image: none;
+  }
+  .open & { &.dropdown-toggle {
+    background-image: none;
+  } }
+  &.disabled,
+  &[disabled],
+  fieldset[disabled] & {
+    &,
+    &:hover,
+    &:focus,
+    &:active,
+    &.active {
+      background-color: $background;
+    }
+  }
+}
