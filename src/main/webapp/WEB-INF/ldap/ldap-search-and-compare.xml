@@ -54,7 +54,6 @@
                 <property name="passwordEncoder">
                     <bean id="ldapPasswordEncoder"
                         class="${ldap.base.passwordEncoder:org.cloudfoundry.identity.uaa.login.ldap.DynamicPasswordComparator}">
-                        <property name="forceLowerCasePrefix" value="true" />
                     </bean>
                 </property>
                 <property name="localCompare" value="${ldap.base.localPasswordCompare:true}" />
