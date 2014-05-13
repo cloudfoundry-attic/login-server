@@ -112,7 +112,6 @@
     </developers>
 
     <properties>
-        <identity.version>1.6.5-SNAPSHOT</identity.version>
         <spring.version>4.0.3.RELEASE</spring.version>
         <spring.security.version>3.2.3.RELEASE</spring.security.version>
         <groupId>${project.groupId}</groupId>
@@ -196,19 +195,6 @@
             </plugins>
         </pluginManagement>
         <plugins>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>versions-maven-plugin</artifactId>
-                <version>${versions-maven-plugin.version}</version>
-                <configuration>
-                    <properties>
-                        <property>
-                          <name>identity.version</name>
-                          <version>[${newIdentityVersion}]</version>
-                        </property>
-                    </properties>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -452,7 +438,7 @@
                                 <webapp>
                                     <groupId>org.cloudfoundry.identity</groupId>
                                     <artifactId>cloudfoundry-identity-uaa</artifactId>
-                                    <version>${identity.version}</version>
+                                    <version>${project.parent.version}</version>
                                     <type>war</type>
                                     <contextPath>uaa</contextPath>
                                     <asWebapp>true</asWebapp>
@@ -460,7 +446,7 @@
                                 <webapp>
                                     <groupId>org.cloudfoundry.identity</groupId>
                                     <artifactId>cloudfoundry-identity-api</artifactId>
-                                    <version>${identity.version}</version>
+                                    <version>${project.parent.version}</version>
                                     <type>war</type>
                                     <contextPath>api</contextPath>
                                     <asWebapp>true</asWebapp>
@@ -468,7 +454,7 @@
                                 <webapp>
                                     <groupId>org.cloudfoundry.identity</groupId>
                                     <artifactId>cloudfoundry-identity-app</artifactId>
-                                    <version>${identity.version}</version>
+                                    <version>${project.parent.version}</version>
                                     <type>war</type>
                                     <contextPath>app</contextPath>
                                     <asWebapp>true</asWebapp>
@@ -495,7 +481,7 @@
         <dependency>
             <groupId>org.cloudfoundry.identity</groupId>
             <artifactId>cloudfoundry-identity-common</artifactId>
-            <version>${identity.version}</version>
+            <version>${project.parent.version}</version>
             <exclusions>
                 <exclusion>
                     <artifactId>spring-tx</artifactId>
@@ -511,7 +497,7 @@
         <dependency>
             <groupId>org.cloudfoundry.identity</groupId>
             <artifactId>cloudfoundry-identity-scim</artifactId>
-            <version>${identity.version}</version>
+            <version>${project.parent.version}</version>
         </dependency>
 
         <dependency>
