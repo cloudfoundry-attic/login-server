@@ -12,13 +12,14 @@
  *******************************************************************************/
 package org.cloudfoundry.identity.uaa.login;
 
+import static org.junit.Assume.assumeFalse;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 import org.cloudfoundry.identity.uaa.login.test.DefaultTestConfig;
 import org.cloudfoundry.identity.uaa.login.test.DefaultTestConfigContextLoader;
-import org.junit.Assume;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,6 +34,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.util.Arrays;
+import java.util.List;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
@@ -49,7 +51,10 @@ public class ResetPasswordControllerIntegrationTests {
 
     @Before
     public void setUp() throws Exception {
-        Assume.assumeFalse("Reset password functionality is disabled by the saml profile", Arrays.asList(webApplicationContext.getEnvironment().getActiveProfiles()).contains("saml"));
+        List<String> profiles = Arrays.asList(webApplicationContext.getEnvironment().getActiveProfiles());
+        assumeFalse("Reset password functionality is disabled by the saml profile", profiles.contains("saml"));
+        assumeFalse("Reset password functionality is disabled by the ldap profile", profiles.contains("ldap"));
+        assumeFalse("Reset password functionality is disabled by the keystone profile", profiles.contains("keystone"));
 
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
                 .addFilter(springSecurityFilterChain)
