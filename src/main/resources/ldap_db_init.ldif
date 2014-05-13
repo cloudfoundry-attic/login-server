@@ -27,6 +27,7 @@ olcAccess: to attrs=userPassword
   by self write
   by anonymous auth
   by dn.base="cn=admin,dc=test,dc=com" write
+  by dn.base="cn=admin,ou=Users,dc=test,dc=com" read
   by * none
 # Allow users to change their own record
 # Allow anyone to read directory
