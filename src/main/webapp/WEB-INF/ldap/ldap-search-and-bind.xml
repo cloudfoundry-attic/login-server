@@ -29,10 +29,6 @@
         <sec:authentication-provider ref="ldapAuthProvider" />
     </security:authentication-manager>
 
-    <bean id="remoteAuthenticationManager" class="org.cloudfoundry.identity.uaa.login.UsernamePasswordExtractingAuthenticationManager">
-        <constructor-arg ref="ldapAuthenticationManager" />
-    </bean>
-
     <bean id="contextSource" class="org.springframework.security.ldap.DefaultSpringSecurityContextSource">
         <constructor-arg value="${ldap.base.url:ldap://localhost:10389/dc=test,dc=com}" />
         <property name="userDn" value="${ldap.base.userDn:cn=admin,ou=Users,dc=test,dc=com}" />
