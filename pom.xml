@@ -114,17 +114,10 @@
     <properties>
         <spring.version>4.0.3.RELEASE</spring.version>
         <spring.security.version>3.2.3.RELEASE</spring.security.version>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>login</artifactId>
-        <version>${project.version}</version>
-        <packaging>war</packaging>
-        <generatePom>true</generatePom>
-
         <spring.security.saml.version>1.0.0.RC3-SNAPSHOT</spring.security.saml.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <login.path>/login</login.path>
         <file>target/${project.artifactId}-${project.version}.war</file>
         <m2eclipse.wtp.contextRoot>/login</m2eclipse.wtp.contextRoot>
     </properties>
@@ -207,7 +200,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-eclipse-plugin</artifactId>
-                <version>${maven-eclipse-plugin.version}</version>
+                <version>2.9</version>
                 <configuration>
                     <additionalProjectnatures>
                         <projectnature>org.springframework.ide.eclipse.core.springnature</projectnature>
@@ -365,7 +358,7 @@
                     <useTestClasspath>false</useTestClasspath>
                     <jarScanAllDirectories>false</jarScanAllDirectories>
                     <addWarDependenciesInClassloader>true</addWarDependenciesInClassloader>
-                    <path>${login.path}</path>
+                    <path>/login</path>
                     <systemProperties>
                         <CLOUD_FOUNDRY_CONFIG_PATH>${CLOUD_FOUNDRY_CONFIG_PATH}</CLOUD_FOUNDRY_CONFIG_PATH>
                         <UAA_PROFILE>local</UAA_PROFILE>
