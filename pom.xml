@@ -19,12 +19,12 @@
     <parent>
         <groupId>org.cloudfoundry.identity</groupId>
         <artifactId>cloudfoundry-identity-parent</artifactId>
-        <version>1.6.4</version>
+        <version>1.6.5</version>
     </parent>
 
     <groupId>com.cloudfoundry.identity</groupId>
     <artifactId>cloudfoundry-login-server</artifactId>
-    <version>1.6.2</version>
+    <version>1.6.3</version>
     <packaging>war</packaging>
     <name>Cloud Foundry Login Server</name>
     <description>Login/LDAP/SAML2 Service provider for Cloud Foundry</description>
@@ -112,20 +112,12 @@
     </developers>
 
     <properties>
-        <identity.version>1.6.4</identity.version>
         <spring.version>4.0.3.RELEASE</spring.version>
         <spring.security.version>3.2.3.RELEASE</spring.security.version>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>login</artifactId>
-        <version>${project.version}</version>
-        <packaging>war</packaging>
-        <generatePom>true</generatePom>
-
         <spring.security.saml.version>1.0.0.RC3-SNAPSHOT</spring.security.saml.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <login.path>/login</login.path>
         <file>target/${project.artifactId}-${project.version}.war</file>
         <m2eclipse.wtp.contextRoot>/login</m2eclipse.wtp.contextRoot>
     </properties>
@@ -197,19 +189,6 @@
         </pluginManagement>
         <plugins>
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>versions-maven-plugin</artifactId>
-                <version>${versions-maven-plugin.version}</version>
-                <configuration>
-                    <properties>
-                        <property>
-                          <name>identity.version</name>
-                          <version>[${newIdentityVersion}]</version>
-                        </property>
-                    </properties>
-                </configuration>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${maven-compiler-plugin.version}</version>
@@ -221,7 +200,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-eclipse-plugin</artifactId>
-                <version>${maven-eclipse-plugin.version}</version>
+                <version>2.9</version>
                 <configuration>
                     <additionalProjectnatures>
                         <projectnature>org.springframework.ide.eclipse.core.springnature</projectnature>
@@ -379,7 +358,7 @@
                     <useTestClasspath>false</useTestClasspath>
                     <jarScanAllDirectories>false</jarScanAllDirectories>
                     <addWarDependenciesInClassloader>true</addWarDependenciesInClassloader>
-                    <path>${login.path}</path>
+                    <path>/login</path>
                     <systemProperties>
                         <CLOUD_FOUNDRY_CONFIG_PATH>${CLOUD_FOUNDRY_CONFIG_PATH}</CLOUD_FOUNDRY_CONFIG_PATH>
                         <UAA_PROFILE>local</UAA_PROFILE>
@@ -452,7 +431,7 @@
                                 <webapp>
                                     <groupId>org.cloudfoundry.identity</groupId>
                                     <artifactId>cloudfoundry-identity-uaa</artifactId>
-                                    <version>${identity.version}</version>
+                                    <version>${project.parent.version}</version>
                                     <type>war</type>
                                     <contextPath>uaa</contextPath>
                                     <asWebapp>true</asWebapp>
@@ -460,7 +439,7 @@
                                 <webapp>
                                     <groupId>org.cloudfoundry.identity</groupId>
                                     <artifactId>cloudfoundry-identity-api</artifactId>
-                                    <version>${identity.version}</version>
+                                    <version>${project.parent.version}</version>
                                     <type>war</type>
                                     <contextPath>api</contextPath>
                                     <asWebapp>true</asWebapp>
@@ -468,7 +447,7 @@
                                 <webapp>
                                     <groupId>org.cloudfoundry.identity</groupId>
                                     <artifactId>cloudfoundry-identity-app</artifactId>
-                                    <version>${identity.version}</version>
+                                    <version>${project.parent.version}</version>
                                     <type>war</type>
                                     <contextPath>app</contextPath>
                                     <asWebapp>true</asWebapp>
@@ -495,7 +474,7 @@
         <dependency>
             <groupId>org.cloudfoundry.identity</groupId>
             <artifactId>cloudfoundry-identity-common</artifactId>
-            <version>${identity.version}</version>
+            <version>${project.parent.version}</version>
             <exclusions>
                 <exclusion>
                     <artifactId>spring-tx</artifactId>
@@ -511,7 +490,7 @@
         <dependency>
             <groupId>org.cloudfoundry.identity</groupId>
             <artifactId>cloudfoundry-identity-scim</artifactId>
-            <version>${identity.version}</version>
+            <version>${project.parent.version}</version>
         </dependency>
 
         <dependency>

@@ -21,16 +21,17 @@ olcDbIndex: uid pres,eq
 olcDbIndex: cn,sn,mail pres,eq,approx,sub
 olcDbIndex: objectClass eq
 # Allow users to change their own password
-# Allow anonymous to authenciate against the password
-# Allow admin to change anyone's password
+# Allow anonymous to authenticate against the password
+# Allow admin to change any password
 olcAccess: to attrs=userPassword
   by self write
   by anonymous auth
-  by dn.base="cn=admin,dc=home,dc=local" write
+  by dn.base="cn=admin,dc=test,dc=com" write
+  by dn.base="cn=admin,ou=Users,dc=test,dc=com" read
   by * none
 # Allow users to change their own record
 # Allow anyone to read directory
 olcAccess: to *
   by self write
-  by dn.base="cn=admin,dc=home,dc=local" write
+  by dn.base="cn=admin,dc=test,dc=com" write
   by * read

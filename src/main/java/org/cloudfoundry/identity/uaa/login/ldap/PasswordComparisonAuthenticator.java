@@ -23,6 +23,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.ldap.NameNotFoundException;
 import org.springframework.ldap.core.DirContextOperations;
 import org.springframework.ldap.core.support.BaseLdapPathContextSource;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.encoding.LdapShaPasswordEncoder;
 import org.springframework.security.authentication.encoding.PasswordEncoder;
@@ -101,6 +102,9 @@ public class PasswordComparisonAuthenticator extends AbstractLdapAuthenticator {
         try {
             Attributes attributes = user.getAttributes();
             Attribute attr = attributes.get(getPasswordAttributeName());
+            if (attr.size()==0) {
+                throw new AuthenticationCredentialsNotFoundException("Missing "+getPasswordAttributeName()+" attribute.");
+            }
             for (int i = 0; (attr != null) && (!match) && (i < attr.size()); i++) {
                 Object valObject = attr.get(i);
                 if (valObject != null && valObject instanceof byte[]) {
