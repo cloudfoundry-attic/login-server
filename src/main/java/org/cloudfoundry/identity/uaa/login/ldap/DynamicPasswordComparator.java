@@ -31,14 +31,12 @@ public class DynamicPasswordComparator implements org.springframework.security.a
 
     @Override
     public String encodePassword(String rawPass, Object salt) {
-        // TODO Auto-generated method stub
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public boolean isPasswordValid(String encPass, String rawPass, Object salt) {
-        // TODO Auto-generated method stub
-        return false;
+        throw new UnsupportedOperationException();
     }
 
     public static void main(String[] args) throws Exception {
