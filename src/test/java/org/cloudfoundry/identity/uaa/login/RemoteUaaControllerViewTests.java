@@ -24,6 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.cloudfoundry.identity.uaa.authentication.login.Prompt;
 import org.cloudfoundry.identity.uaa.login.test.ThymeleafConfig;
+import org.cloudfoundry.identity.uaa.test.UaaTestAccounts;
 import org.cloudfoundry.identity.uaa.user.UaaAuthority;
 import org.junit.Before;
 import org.junit.Test;
@@ -64,6 +65,8 @@ public class RemoteUaaControllerViewTests {
 
     private MockMvc mockMvc;
     private MockRestServiceServer mockRestServiceServer;
+    
+    private UaaTestAccounts testAccounts = UaaTestAccounts.standard(null);
 
     @Before
     public void setUp() throws Exception {
@@ -79,7 +82,7 @@ public class RemoteUaaControllerViewTests {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(UAA_JSON, MediaType.APPLICATION_JSON));
 
-        UsernamePasswordAuthenticationToken principal = new UsernamePasswordAuthenticationToken("marissa", null, Arrays.asList(UaaAuthority.fromAuthorities("uaa.user")));
+        UsernamePasswordAuthenticationToken principal = new UsernamePasswordAuthenticationToken(testAccounts.getUserName(), null, Arrays.asList(UaaAuthority.fromAuthorities("uaa.user")));
 
         MockHttpServletRequestBuilder get = get("/oauth/authorize")
                 .param("response_type", "code")

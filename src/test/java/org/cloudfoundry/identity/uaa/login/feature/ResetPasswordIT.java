@@ -41,7 +41,7 @@ import java.util.regex.Pattern;
 
 @RunWith(LoginServerClassRunner.class)
 @ContextConfiguration(classes = DefaultIntegrationTestConfig.class)
-@UnlessProfileActive(values = {"saml", "ldap"})
+@UnlessProfileActive(values = {"saml", "ldap", "keystone"})
 public class ResetPasswordIT {
 
     @Autowired @Rule

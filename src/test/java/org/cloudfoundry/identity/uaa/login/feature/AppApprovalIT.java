@@ -14,6 +14,7 @@ package org.cloudfoundry.identity.uaa.login.feature;
 
 import org.cloudfoundry.identity.uaa.login.test.DefaultIntegrationTestConfig;
 import org.cloudfoundry.identity.uaa.login.test.IntegrationTestRule;
+import org.cloudfoundry.identity.uaa.test.UaaTestAccounts;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -41,6 +42,8 @@ public class AppApprovalIT {
 
     @Value("${integration.test.app_url}")
     String appUrl;
+    
+    private UaaTestAccounts testAccounts = UaaTestAccounts.standard(null);
 
     @Test
     public void testApprovingAnApp() throws Exception {
@@ -50,8 +53,8 @@ public class AppApprovalIT {
         webDriver.get(appUrl);
 
         // Sign in to login server
-        webDriver.findElement(By.name("username")).sendKeys("marissa");
-        webDriver.findElement(By.name("password")).sendKeys("koala");
+        webDriver.findElement(By.name("username")).sendKeys(testAccounts.getUserName());
+        webDriver.findElement(By.name("password")).sendKeys(testAccounts.getPassword());
         webDriver.findElement(By.xpath("//input[@value='Sign in']")).click();
 
         // Authorize the app for some scopes

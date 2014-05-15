@@ -12,6 +12,8 @@
  *******************************************************************************/
 package org.cloudfoundry.identity.uaa.login.test;
 
+import org.cloudfoundry.identity.uaa.test.UaaTestAccounts;
+import org.cloudfoundry.identity.uaa.test.UrlHelper;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -21,6 +23,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.env.Environment;
+import org.springframework.security.oauth2.client.test.TestAccounts;
 import org.springframework.web.client.RestTemplate;
 
 import com.dumbster.smtp.SimpleSmtpServer;
@@ -67,5 +70,11 @@ public class DefaultIntegrationTestConfig {
                                  @Value("${integration.test.uaa_url}") String baseUrl,
                                  @Value("${integration.test.uaa_url}") String uaaUrl) {
         return new TestClient(restTemplate, baseUrl, uaaUrl);
+    }
+    
+    @Bean
+    public TestAccounts testAccounts(@Value("${integration.test.uaa_url}") String uaaUrl) {
+        //TODO - actually USE the URL?
+        return UaaTestAccounts.standard(null);
     }
 }

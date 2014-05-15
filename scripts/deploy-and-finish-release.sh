@@ -4,7 +4,7 @@ cd `dirname $0`/..
 
 if [ "$#" -ne 3 ]; then
     echo "Usage: $(basename $0) login_server_release_version login_server_next_dev_version uaa_next_dev_version"
-    exit
+    exit 1
 fi
 
 echo Deploying and finishing Login Server release $1

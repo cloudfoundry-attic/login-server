@@ -7,12 +7,18 @@ env:
   matrix:
     - SPRING_PROFILES=default,coverage
     - SPRING_PROFILES=default,saml,coverage
+    - SPRING_PROFILES=default,ldap,coverage
+    - SPRING_PROFILES=default,keystone,coverage
 before_install:
   - git pull --unshallow
+  - if [ "$SPRING_PROFILES" = "default,ldap,coverage" ]; then ./scripts/ldap/install-ldap.sh; fi
+  - if [ "$SPRING_PROFILES" = "default,keystone,coverage" ]; then ./scripts/keystone/install-keystone.sh; fi
   - wget -O tomcat.tar.gz http://archive.apache.org/dist/tomcat/tomcat-7/v7.0.52/bin/apache-tomcat-7.0.52.tar.gz
   - unset GEM_PATH # for compatibility with the maven-sass-plugin
 install:
   - $TRAVIS_BUILD_DIR/.apply_spring_profiles_to_login_yaml.sh $SPRING_PROFILES
+  - if [ "$SPRING_PROFILES" = "default,ldap,coverage" ]; then ./scripts/ldap/configure-manifest.sh; fi
+  - if [ "$SPRING_PROFILES" = "default,keystone,coverage" ]; then ./scripts/keystone/configure-manifest.sh; fi
   - cat src/main/resources/login.yml
   - mvn test-compile -P coverage --quiet
   - mkdir -p target/tomcat
@@ -32,7 +38,8 @@ before_script:
   - export CI_LOGGING_CONFIG=$TRAVIS_BUILD_DIR/src/test/resources/log4j_ci.properties
 script:
   - ./.run-script.sh start
-  - mvn -Dspring.profiles.active=${SPRING_PROFILES} -Dlogging.config=file://$CI_LOGGING_CONFIG -Dlog4j.configuration=$CI_LOGGING_CONFIG verify -DforceIntegrationTests -DfailIfNoTests=false -Dtest="org.cloudfoundry.identity.uaa.login.feature.*" -P coverage
+  - if [ "$SPRING_PROFILES" = "default,ldap,coverage" ]; then mvn -Duaa.test.username=marissa2 -Duaa.test.password=ldap -Dspring.profiles.active=${SPRING_PROFILES} -Dlogging.config=file://$CI_LOGGING_CONFIG -Dlog4j.configuration=$CI_LOGGING_CONFIG verify -DforceIntegrationTests -DfailIfNoTests=false -Dtest="org.cloudfoundry.identity.uaa.login.feature.*" -P coverage; fi 
+  - if [ "$SPRING_PROFILES" != "default,ldap,coverage" ]; then mvn -Dspring.profiles.active=${SPRING_PROFILES} -Dlogging.config=file://$CI_LOGGING_CONFIG -Dlog4j.configuration=$CI_LOGGING_CONFIG verify -DforceIntegrationTests -DfailIfNoTests=false -Dtest="org.cloudfoundry.identity.uaa.login.feature.*" -P coverage; fi 
   - curl -v -X POST http://localhost:8080/login/healthz/coverage/flush
   - ./.run-script.sh stop
   - mvn -Dspring.profiles.active=${SPRING_PROFILES} -Dlogging.config=file://$CI_LOGGING_CONFIG -Dlog4j.configuration=$CI_LOGGING_CONFIG test -P coverage

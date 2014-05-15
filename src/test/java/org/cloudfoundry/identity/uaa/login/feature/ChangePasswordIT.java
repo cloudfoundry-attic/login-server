@@ -38,7 +38,7 @@ import java.security.SecureRandom;
 
 @RunWith(LoginServerClassRunner.class)
 @ContextConfiguration(classes = DefaultIntegrationTestConfig.class)
-@UnlessProfileActive(values = {"saml", "ldap"})
+@UnlessProfileActive(values = {"saml", "ldap", "keystone"})
 public class ChangePasswordIT {
 
     @Autowired @Rule
