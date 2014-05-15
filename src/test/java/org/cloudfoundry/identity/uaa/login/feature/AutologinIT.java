@@ -15,6 +15,7 @@ package org.cloudfoundry.identity.uaa.login.feature;
 import org.cloudfoundry.identity.uaa.login.test.DefaultIntegrationTestConfig;
 import org.cloudfoundry.identity.uaa.login.test.IntegrationTestRule;
 import org.cloudfoundry.identity.uaa.login.test.TestClient;
+import org.cloudfoundry.identity.uaa.test.UaaTestAccounts;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -61,6 +62,8 @@ public class AutologinIT {
 
     @Autowired
     TestClient testClient;
+    
+    private UaaTestAccounts testAccounts = UaaTestAccounts.standard(null);
 
     @Test
     public void testAutologinFlow() throws Exception {
@@ -69,8 +72,8 @@ public class AutologinIT {
         HttpHeaders headers = getAppBasicAuthHttpHeaders();
 
         Map<String, String> requestBody = new HashMap<>();
-        requestBody.put("username", "marissa");
-        requestBody.put("password", "koala");
+        requestBody.put("username", testAccounts.getUserName());
+        requestBody.put("password", testAccounts.getPassword());
 
         ResponseEntity<Map> autologinResponseEntity = restOperations.exchange(baseUrl + "/autologin",
                 HttpMethod.POST,
@@ -91,7 +94,7 @@ public class AutologinIT {
 
         webDriver.get(baseUrl);
 
-        Assert.assertEquals("marissa", webDriver.findElement(By.cssSelector(".header .nav")).getText());
+        Assert.assertEquals(testAccounts.getUserName(), webDriver.findElement(By.cssSelector(".header .nav")).getText());
     }
 
     @Test
@@ -100,8 +103,8 @@ public class AutologinIT {
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
         MultiValueMap<String, String> requestBody = new LinkedMultiValueMap<>();
-        requestBody.add("username", "marissa");
-        requestBody.add("password", "koala");
+        requestBody.add("username", testAccounts.getUserName());
+        requestBody.add("password", testAccounts.getPassword());
 
         ResponseEntity<Map> autologinResponseEntity = restOperations.exchange(baseUrl + "/autologin",
                 HttpMethod.POST,
@@ -117,7 +120,7 @@ public class AutologinIT {
         HttpHeaders headers = getAppBasicAuthHttpHeaders();
 
         Map<String, String> requestBody = new HashMap<>();
-        requestBody.put("username", "marissa");
+        requestBody.put("username", testAccounts.getUserName());
 
         try {
             restOperations.exchange(baseUrl + "/autologin",
@@ -132,8 +135,8 @@ public class AutologinIT {
     @Test
     public void testClientAuthorization() throws Exception {
         Map<String, String> requestBody = new HashMap<>();
-        requestBody.put("username", "marissa");
-        requestBody.put("password", "koala");
+        requestBody.put("username", testAccounts.getUserName());
+        requestBody.put("password", testAccounts.getPassword());
 
         try {
             restOperations.exchange(baseUrl + "/autologin",
@@ -152,8 +155,8 @@ public class AutologinIT {
         HttpHeaders headers = getAppBasicAuthHttpHeaders();
 
         Map<String, String> requestBody = new HashMap<>();
-        requestBody.put("username", "marissa");
-        requestBody.put("password", "koala");
+        requestBody.put("username", testAccounts.getUserName());
+        requestBody.put("password", testAccounts.getPassword());
 
         ResponseEntity<Map> autologinResponseEntity = restOperations.exchange(baseUrl + "/autologin",
                 HttpMethod.POST,

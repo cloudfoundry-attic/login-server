@@ -39,6 +39,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.jwt.Jwt;
 import org.springframework.security.jwt.JwtHelper;
+import org.springframework.security.oauth2.client.test.TestAccounts;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.LinkedMultiValueMap;
@@ -56,6 +57,9 @@ import java.util.Map;
 @ContextConfiguration(classes = DefaultIntegrationTestConfig.class)
 public class ImplicitGrantIT {
 
+    @Autowired
+    TestAccounts testAccounts;
+    
     @Autowired @Rule
     public IntegrationTestRule integrationTestRule;
 
@@ -84,8 +88,8 @@ public class ImplicitGrantIT {
         postBody.add("redirect_uri", "https://uaa.cloudfoundry.com/redirect/vmc");
         postBody.add("response_type", "token");
         postBody.add("source", "credentials");
-        postBody.add("username", "marissa");
-        postBody.add("password", "koala");
+        postBody.add("username", testAccounts.getUserName());
+        postBody.add("password", testAccounts.getPassword());
 
         ResponseEntity<Void> responseEntity = restOperations.exchange(baseUrl + "/oauth/authorize",
                 HttpMethod.POST,
@@ -121,7 +125,7 @@ public class ImplicitGrantIT {
         Assert.assertThat((String) claims.get("jti"), is(params.getFirst("jti")));
         Assert.assertThat((String) claims.get("client_id"), is("vmc"));
         Assert.assertThat((String) claims.get("cid"), is("vmc"));
-        Assert.assertThat((String) claims.get("user_name"), is("marissa"));
+        Assert.assertThat((String) claims.get("user_name"), is(testAccounts.getUserName()));
 
         Assert.assertThat(((List<String>) claims.get("scope")), containsInAnyOrder(scopes));
 
@@ -139,8 +143,8 @@ public class ImplicitGrantIT {
         postBody.add("redirect_uri", "https://uaa.cloudfoundry.com/redirect/vmc");
         postBody.add("response_type", "token");
         postBody.add("source", "credentials");
-        postBody.add("username", "marissa");
-        postBody.add("password", "koala");
+        postBody.add("username", testAccounts.getUserName());
+        postBody.add("password", testAccounts.getPassword());
         postBody.add("scope", "read");
 
         ResponseEntity<Void> responseEntity = restOperations.exchange(baseUrl + "/oauth/authorize",

@@ -23,6 +23,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.oauth2.client.test.TestAccounts;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -38,14 +39,17 @@ public class LoginIT {
 
     @Value("${integration.test.base_url}")
     String baseUrl;
+    
+    @Autowired
+    TestAccounts testAccounts;
 
     @Test
     public void testLoggingIn() throws Exception {
         webDriver.get(baseUrl + "/login");
         Assert.assertEquals("Pivotal", webDriver.getTitle());
 
-        webDriver.findElement(By.name("username")).sendKeys("marissa");
-        webDriver.findElement(By.name("password")).sendKeys("koala");
+        webDriver.findElement(By.name("username")).sendKeys(testAccounts.getUserName());
+        webDriver.findElement(By.name("password")).sendKeys(testAccounts.getPassword());
         webDriver.findElement(By.xpath("//input[@value='Sign in']")).click();
 
         Assert.assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), Matchers.containsString("Where to?"));

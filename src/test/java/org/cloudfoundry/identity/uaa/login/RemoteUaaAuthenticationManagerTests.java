@@ -25,6 +25,7 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.cloudfoundry.identity.uaa.test.UaaTestAccounts;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.HttpEntity;
@@ -47,6 +48,8 @@ public class RemoteUaaAuthenticationManagerTests {
     private RestOperations restTemplate = mock(RestOperations.class);
 
     private HttpHeaders responseHeaders = new HttpHeaders();
+    
+    private UaaTestAccounts testAccounts = UaaTestAccounts.standard(null);
 
     @Before
     public void start() {
@@ -57,16 +60,16 @@ public class RemoteUaaAuthenticationManagerTests {
     public void testAuthenticate() throws Exception {
         responseHeaders.setLocation(new URI("https://uaa.cloudfoundry.com/"));
         Map<String, String> response = new HashMap<String, String>();
-        response.put("username", "marissa");
+        response.put("username", testAccounts.getUserName());
         @SuppressWarnings("rawtypes")
         ResponseEntity<Map> expectedResponse = new ResponseEntity<Map>(response, responseHeaders, HttpStatus.OK);
         when(
                         restTemplate.exchange(endsWith("/authenticate"), eq(HttpMethod.POST), any(HttpEntity.class),
                                         eq(Map.class)))
                         .thenReturn(expectedResponse);
-        Authentication result = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken("marissa",
+        Authentication result = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(testAccounts.getUserName(),
                         "foo"));
-        assertEquals("marissa", result.getName());
+        assertEquals(testAccounts.getUserName(), result.getName());
         assertTrue(result.isAuthenticated());
     }
 
