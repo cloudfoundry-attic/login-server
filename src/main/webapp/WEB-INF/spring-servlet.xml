@@ -343,6 +343,8 @@
 
     <bean id="buildInfo" class="org.cloudfoundry.identity.uaa.login.BuildInfo" />
 
+    <bean id="tileInfo" class="org.cloudfoundry.identity.uaa.login.TileInfo" />
+
     <bean id="accountsController" class="org.cloudfoundry.identity.uaa.login.AccountsController" />
 
     <beans profile="!ldap">

@@ -8,7 +8,7 @@
 <body>
     <div class="island" layout:fragment="page-content" th:if="${brand} == 'pivotal'">
         <h1>Create an Account</h1>
-        <ul class="pivotal-links">
+        <ul class="tiles">
             <li><a href="https://network.gopivotal.com/registrations/new" th:href="${@links.get('registerNetwork')}" id="network-link">Pivotal Network</a></li>
             <li><a href="https://www.cloudfoundry.com/signup" th:href="${@links.get('register')}" id="web-services-link">Pivotal Web Services</a></li>
         </ul>

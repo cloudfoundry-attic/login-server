@@ -10,16 +10,21 @@
 # subcomponents is subject to the terms and conditions of the
 # subcomponent's license, as noted in the LICENSE file.
 
-
-#links:
-#  home: https://console.run.pivotal.io
-#  network: https://network.gopivotal.com/login
-#  passwd: https://console.run.pivotal.io/password_resets/new
-#  signup: https://console.run.pivotal.io/register
-#  signup-network: https://network.gopivotal.com/users/new
+tiles:
+  - name: Pivotal Network
+    link: https://network.gopivotal.com/login
+    image: /resources/pivotal/images/network-logo-gray.png
+    image-hover: /resources/pivotal/images/network-logo-teal.png
+  - name: Pivotal Web Services
+    link: https://console.10.244.0.34.xip.io
+    image: /resources/pivotal/images/pws-logo-gray.png
+    image-hover: /resources/pivotal/images/pws-logo-teal.png
+  - name: Pivotal Partners
+    link: https://partners.gopivotal.com/login
+    image: /resources/pivotal/images/partners-logo-gray.png
+    image-hover: /resources/pivotal/images/partners-logo-teal.png
 
 links:
-  home: https://console.10.244.0.34.xip.io
   passwd: http://localhost:8080/login/forgot_password
   signup: https://console.10.244.0.34.xip.io/register
   signup-network: https://network.gopivotal.com/registrations/new

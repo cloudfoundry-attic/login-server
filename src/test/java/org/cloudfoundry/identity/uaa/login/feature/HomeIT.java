@@ -12,11 +12,13 @@
  *******************************************************************************/
 package org.cloudfoundry.identity.uaa.login.feature;
 
+import static org.junit.Assert.assertEquals;
+
 import org.cloudfoundry.identity.uaa.login.test.DefaultIntegrationTestConfig;
 import org.cloudfoundry.identity.uaa.login.test.IntegrationTestRule;
-import org.cloudfoundry.identity.uaa.test.UaaTestAccounts;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,6 +30,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.client.test.TestAccounts;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.util.List;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = DefaultIntegrationTestConfig.class)
@@ -44,8 +48,10 @@ public class HomeIT {
     @Value("${integration.test.base_url}")
     String baseUrl;
 
-    @Test
-    public void theHeaderDropdown() throws Exception {
+    private HomePagePerspective asOnHomePage;
+
+    @Before
+    public void setUp() {
         webDriver.get(baseUrl + "/logout.do");
 
         webDriver.get(baseUrl + "/login");
@@ -53,7 +59,11 @@ public class HomeIT {
         webDriver.findElement(By.name("password")).sendKeys(testAccounts.getPassword());
         webDriver.findElement(By.xpath("//input[@value='Sign in']")).click();
 
-        HomePagePerspective asOnHomePage = new HomePagePerspective(webDriver, testAccounts.getUserName());
+        asOnHomePage = new HomePagePerspective(webDriver, testAccounts.getUserName());
+    }
+
+    @Test
+    public void theHeaderDropdown() throws Exception {
         Assert.assertNotNull(asOnHomePage.getUsernameElement());
         Assert.assertFalse(asOnHomePage.getAccountSettingsElement().isDisplayed());
         Assert.assertFalse(asOnHomePage.getSignOutElement().isDisplayed());
@@ -68,6 +78,20 @@ public class HomeIT {
         Assert.assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), Matchers.containsString("Account Settings"));
     }
 
+    @Test
+    public void tiles() throws Exception {
+        List<WebElement> tiles = asOnHomePage.getTiles();
+        assertEquals(3, tiles.size());
+
+        assertEquals("Pivotal Network", tiles.get(0).getText());
+        assertEquals("https://network.gopivotal.com/login", tiles.get(0).getAttribute("href"));
+        assertEquals("url(http://localhost:8080/login/resources/pivotal/images/network-logo-gray.png)", tiles.get(0).getCssValue("background-image"));
+
+        assertEquals("Pivotal Web Services", tiles.get(1).getText());
+
+        assertEquals("Pivotal Partners", tiles.get(2).getText());
+    }
+
     static class HomePagePerspective {
         private final WebDriver webDriver;
         private final String username;
@@ -75,6 +99,10 @@ public class HomeIT {
         public HomePagePerspective(WebDriver webDriver, String username) {
             this.webDriver = webDriver;
             this.username = username;
+        }
+
+        public List<WebElement> getTiles() {
+            return webDriver.findElements(By.cssSelector(".tiles li a"));
         }
 
         public WebElement getUsernameElement() {
