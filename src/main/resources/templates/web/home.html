@@ -10,7 +10,7 @@
     <div class="header" layout:fragment="page-header">
         <th:block layout:include="nav :: nav"></th:block>
     </div>
-    <div class="island" layout:fragment="page-content" th:if="${brand} == 'pivotal'">
+    <div class="island" layout:fragment="page-content">
         <h1>Where to?</h1>
         <ul class="tiles">
             <li th:each="tile,status : ${tiles}">
