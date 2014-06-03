@@ -60,14 +60,12 @@ public class CreateAccountIT {
         webDriver.findElement(By.xpath("//*[text()='Create account']")).click();
 
         List<WebElement> tiles = webDriver.findElements(By.cssSelector(".tiles li a"));
-        assertEquals(3, tiles.size());
+        assertEquals(2, tiles.size());
 
         assertEquals("Pivotal Network", tiles.get(0).getText());
         assertEquals("https://network.gopivotal.com/registrations/new", tiles.get(0).getAttribute("href"));
         assertEquals("url(http://localhost:8080/login/resources/pivotal/images/network-logo-gray.png)", tiles.get(0).getCssValue("background-image"));
 
         assertEquals("Pivotal Web Services", tiles.get(1).getText());
-
-        assertEquals("Pivotal Partners", tiles.get(2).getText());
     }
 }

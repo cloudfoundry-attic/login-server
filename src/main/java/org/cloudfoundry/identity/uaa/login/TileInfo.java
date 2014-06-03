@@ -14,15 +14,37 @@ package org.cloudfoundry.identity.uaa.login;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 
 public class TileInfo {
 
-    @Autowired
-    Environment environment;
+    private ArrayList<LinkedHashMap<String,String>> tiles;
 
-    public ArrayList getTiles() {
-        return environment.getProperty("tiles", ArrayList.class);
+    @Autowired
+    public TileInfo(Environment environment) {
+        tiles = (ArrayList<LinkedHashMap<String,String>>) environment.getProperty("tiles", ArrayList.class);
+    }
+
+    public ArrayList<LinkedHashMap<String,String>> getLoginTiles() {
+        ArrayList<LinkedHashMap<String,String>> loginTiles = new ArrayList<>();
+        for (LinkedHashMap<String,String> tile : tiles) {
+            if (!StringUtils.isEmpty(tile.get("login-link"))) {
+                loginTiles.add(tile);
+            }
+        }
+        return loginTiles;
+    }
+
+    public ArrayList<LinkedHashMap<String,String>> getSignupTiles() {
+        ArrayList<LinkedHashMap<String,String>> signupTiles = new ArrayList<>();
+        for (LinkedHashMap<String,String> tile : tiles) {
+            if (!StringUtils.isEmpty(tile.get("signup-link"))) {
+                signupTiles.add(tile);
+            }
+        }
+        return signupTiles;
     }
 }

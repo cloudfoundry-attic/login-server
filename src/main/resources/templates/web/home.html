@@ -14,7 +14,7 @@
         <h1>Where to?</h1>
         <ul class="tiles">
             <li th:each="tile,status : ${tiles}">
-                <a href="http://network.gopivotal.com" th:href="${tile.get('link')}" th:text="${tile.get('name')}" th:class="'tile-' + ${status.count}">Pivotal Network</a>
+                <a href="http://network.gopivotal.com" th:href="${tile.get('login-link')}" th:text="${tile.get('name')}" th:class="'tile-' + ${status.count}">Pivotal Network</a>
             </li>
         </ul>
         <div th:each="tile : ${tiles}" class="image-preload" th:style="'background-image: url(' + @{${tile.get('image-hover')}} + ')'"></div>

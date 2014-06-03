@@ -27,7 +27,7 @@ public class AccountsController {
 
     @RequestMapping(value = "/new", method = RequestMethod.GET)
     public String newAccount(Model model) {
-        model.addAttribute("tiles", tileInfo.getTiles());
+        model.addAttribute("tiles", tileInfo.getSignupTiles());
         return "accounts/new";
     }
 }

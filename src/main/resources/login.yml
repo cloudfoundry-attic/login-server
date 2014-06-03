@@ -12,18 +12,17 @@
 
 tiles:
   - name: Pivotal Network
-    link: https://network.gopivotal.com/login
+    login-link: https://network.gopivotal.com/login
     signup-link: https://network.gopivotal.com/registrations/new
     image: /resources/pivotal/images/network-logo-gray.png
     image-hover: /resources/pivotal/images/network-logo-teal.png
   - name: Pivotal Web Services
-    link: https://console.10.244.0.34.xip.io
+    login-link: https://console.10.244.0.34.xip.io
     signup-link: https://console.10.244.0.34.xip.io/register
     image: /resources/pivotal/images/pws-logo-gray.png
     image-hover: /resources/pivotal/images/pws-logo-teal.png
   - name: Pivotal Partners
-    link: https://partners.gopivotal.com/login
-    signup-link: https://partners.gopivotal.com/signup
+    login-link: https://partners.gopivotal.com/login
     image: /resources/pivotal/images/partners-logo-gray.png
     image-hover: /resources/pivotal/images/partners-logo-teal.png
 

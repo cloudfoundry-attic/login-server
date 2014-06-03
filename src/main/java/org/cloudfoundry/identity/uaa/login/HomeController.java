@@ -33,7 +33,7 @@ public class HomeController extends AbstractControllerInfo {
     @RequestMapping(value = { "/", "/home" })
     public String home(Model model, Principal principal) {
         model.addAttribute("principal", principal);
-        model.addAttribute("tiles", tileInfo.getTiles());
+        model.addAttribute("tiles", tileInfo.getLoginTiles());
         populateBuildAndLinkInfo(model);
         return "home";
     }
