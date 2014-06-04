@@ -25,7 +25,8 @@ public class TileInfo {
 
     @Autowired
     public TileInfo(Environment environment) {
-        tiles = (ArrayList<LinkedHashMap<String,String>>) environment.getProperty("tiles", ArrayList.class);
+        tiles = (ArrayList<LinkedHashMap<String,String>>)
+                    environment.getProperty("tiles", ArrayList.class, new ArrayList<LinkedHashMap<String,String>>());
     }
 
     public ArrayList<LinkedHashMap<String,String>> getLoginTiles() {
