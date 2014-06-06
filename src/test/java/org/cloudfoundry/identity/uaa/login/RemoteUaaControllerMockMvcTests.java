@@ -112,11 +112,8 @@ public class RemoteUaaControllerMockMvcTests {
     }
 
     @Test
-    public void testPivotalSignupLink() throws Exception {
-        MockEnvironment environment = new MockEnvironment();
-        environment.setProperty("login.brand", "pivotal");
-
-        RemoteUaaController controller = new RemoteUaaController(environment, new RestTemplate());
+    public void testDefaultSignupLink() throws Exception {
+        RemoteUaaController controller = new RemoteUaaController(new MockEnvironment(), new RestTemplate());
         Prompt first = new Prompt("how", "text", "How did I get here?");
         Prompt second = new Prompt("where", "password", "Where does that highway go to?");
         controller.setPrompts(Arrays.asList(first, second));
@@ -129,7 +126,7 @@ public class RemoteUaaControllerMockMvcTests {
     }
 
     @Test
-    public void testOssSignupLink() throws Exception {
+    public void testCustomSignupLink() throws Exception {
         MockEnvironment environment = new MockEnvironment();
         environment.setProperty("links.signup", "http://www.example.com/signup");
 
