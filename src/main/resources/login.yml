@@ -28,7 +28,6 @@ tiles:
 
 links:
   passwd: http://localhost:8080/login/forgot_password
-  signup: https://console.10.244.0.34.xip.io/register
   signup-network: https://network.gopivotal.com/registrations/new
 
 

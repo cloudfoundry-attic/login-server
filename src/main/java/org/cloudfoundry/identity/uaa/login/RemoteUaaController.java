@@ -198,13 +198,7 @@ public class RemoteUaaController extends AbstractControllerInfo {
         model.putAll(getLoginInfo(getUaaBaseUrl() + "/" + path, getRequestHeaders(headers)));
         model.put("links", getLinksInfo());
         if (principal == null) {
-            String createAccountLink;
-            if ("pivotal".equals(environment.getProperty("login.brand"))) {
-                createAccountLink = "/accounts/new";
-            } else {
-                createAccountLink = environment.getProperty("links.signup", "#");
-            }
-            model.put("createAccountLink", createAccountLink);
+            model.put("createAccountLink", environment.getProperty("links.signup", "/accounts/new"));
             return "login";
         }
         return "home";
