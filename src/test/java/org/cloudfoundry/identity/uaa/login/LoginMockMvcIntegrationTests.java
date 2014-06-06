@@ -66,7 +66,7 @@ public class LoginMockMvcIntegrationTests {
                         .andExpect(status().isOk())
                         .andExpect(view().name("login"))
                         .andExpect(model().attribute("links", hasEntry("passwd", "http://localhost:8080/login/forgot_password")))
-                        .andExpect(model().attribute("links", hasEntry("register", "https://console.10.244.0.34.xip.io/register")))
+                        .andExpect(model().attribute("links", hasEntry("register", "/accounts/new")))
                         .andExpect(model().attributeExists("prompts"));
     }
 
