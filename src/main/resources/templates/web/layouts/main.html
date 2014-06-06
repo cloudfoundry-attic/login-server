@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" dir="ltr" lang="en" th:with="brand=${@environment.getProperty('login.brand')}">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" dir="ltr" lang="en" th:with="assetBaseUrl=${@environment.getProperty('assetBaseUrl','/resources/oss')}">
 <head>
-    <title th:inline="text">[[${brand == 'pivotal' ? 'Pivotal' : 'Cloud Foundry'}]]</title>
-    <link href='/resources/pivotal/images/favicon.ico' th:href="@{'/resources/'+${brand}+'/images/favicon.ico'}" rel='shortcut icon' />
+    <title th:inline="text">[[${@environment.getProperty('login.brand') == 'pivotal' ? 'Pivotal' : 'Cloud Foundry'}]]</title>
+    <link href='/resources/pivotal/images/favicon.ico' th:href="@{${assetBaseUrl}+'/images/favicon.ico'}" rel='shortcut icon' />
     <meta charset='utf-8' />
     <meta name='author' content='Pivotal Software, Inc' />
     <meta name='copyright' content='Copyright 2014 Pivotal Software, Inc. All Rights Reserved.' />
@@ -10,9 +10,9 @@
     <meta name='Description' content=""/>
     <meta name='keywords' content=""/>
     <link href="/vendor/font-awesome/css/font-awesome.min.css" th:href="@{/vendor/font-awesome/css/font-awesome.min.css}" rel="stylesheet"/>
-    <link href="/resources/pivotal/stylesheets/application.css" th:href="@{'/resources/'+${brand}+'/stylesheets/application.css'}" rel="stylesheet"/>
+    <link href="/resources/pivotal/stylesheets/application.css" th:href="@{${assetBaseUrl}+'/stylesheets/application.css'}" rel="stylesheet"/>
 </head>
-<body th:style="|background: #f8f8f8 url(@{'/resources/'+${brand}+'/images/logo.png'}) no-repeat 50% ${brand == 'oss' ? 40 : 0}px;|">
+<body th:style="|background: #f8f8f8 url(@{${assetBaseUrl}+'/images/logo.png'}) no-repeat 50% 0;|">
 <div class="content">
     <div layout:fragment="page-header"></div>
     <div layout:fragment="page-content"></div>

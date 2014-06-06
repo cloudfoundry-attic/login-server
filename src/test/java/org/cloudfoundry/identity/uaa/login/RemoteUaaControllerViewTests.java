@@ -33,16 +33,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.mock.env.MockEnvironment;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.WebApplicationContext;
@@ -55,6 +57,7 @@ import java.util.Arrays;
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
 @ContextConfiguration(classes = RemoteUaaControllerViewTests.ContextConfiguration.class)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class RemoteUaaControllerViewTests {
 
     @Autowired
@@ -62,6 +65,9 @@ public class RemoteUaaControllerViewTests {
 
     @Autowired
     RestTemplate restTemplate;
+
+    @Autowired
+    MockEnvironment environment;
 
     private MockMvc mockMvc;
     private MockRestServiceServer mockRestServiceServer;
@@ -74,6 +80,24 @@ public class RemoteUaaControllerViewTests {
                 .build();
 
         mockRestServiceServer = MockRestServiceServer.createServer(restTemplate);
+    }
+
+    @Test
+    public void testDefaultBranding() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/login"))
+                .andExpect(xpath("//head/link[@rel='shortcut icon']/@href").string("/resources/oss/images/favicon.ico"))
+                .andExpect(xpath("//head/link[@href='/resources/oss/stylesheets/application.css']").exists())
+                .andExpect(xpath("//body[contains(@style,'/resources/oss/images/logo.png')]").exists());
+    }
+
+    @Test
+    public void testExternalizedBranding() throws Exception {
+        environment.setProperty("assetBaseUrl", "//cdn.example.com/pivotal");
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/login"))
+                .andExpect(xpath("//head/link[@rel='shortcut icon']/@href").string("//cdn.example.com/pivotal/images/favicon.ico"))
+                .andExpect(xpath("//head/link[@href='//cdn.example.com/pivotal/stylesheets/application.css']").exists())
+                .andExpect(xpath("//body[contains(@style,'//cdn.example.com/pivotal/images/logo.png')]").exists());
     }
 
     @Test
@@ -121,12 +145,17 @@ public class RemoteUaaControllerViewTests {
         }
 
         @Bean
-        RestTemplate restTemplate () {
+        RestTemplate restTemplate() {
             return new RestTemplate();
         }
 
         @Bean
-        RemoteUaaController remoteUaaController(Environment environment, RestTemplate restTemplate) {
+        MockEnvironment environment() {
+            return new MockEnvironment();
+        }
+
+        @Bean
+        RemoteUaaController remoteUaaController(MockEnvironment environment, RestTemplate restTemplate) {
             RemoteUaaController remoteUaaController = new RemoteUaaController(environment, new RestTemplate());
             Prompt first = new Prompt("how", "text", "How did I get here?");
             Prompt second = new Prompt("where", "password", "Where does that highway go to?");

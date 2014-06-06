@@ -10,6 +10,9 @@
 # subcomponents is subject to the terms and conditions of the
 # subcomponent's license, as noted in the LICENSE file.
 
+# customize static asset source
+assetBaseUrl: /resources/pivotal
+
 tiles:
   - name: Pivotal Network
     login-link: https://network.gopivotal.com/login
@@ -30,9 +33,8 @@ links:
   passwd: http://localhost:8080/login/forgot_password
   signup-network: https://network.gopivotal.com/registrations/new
 
-
 login:
-  #the brand to use, oss or pivotal for JSP pages
+  #the brand to use
   brand: pivotal
   #base URL that the login server can be reached at
   url: http://localhost:8080/login
