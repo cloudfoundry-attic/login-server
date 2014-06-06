@@ -6,7 +6,7 @@
     <style th:each="tile,status : ${tiles}" th:text="'.tile-' + ${status.count} + ' {background-image: url(' + @{${tile.get('image')}} + ')} .tile-' + ${status.count} + ':hover {background-image: url(' + @{${tile.get('image-hover')}} + ')}'"></style>
 </head>
 <body>
-    <div class="island" layout:fragment="page-content" th:if="${brand} == 'pivotal'">
+    <div class="island" layout:fragment="page-content">
         <h1>Create an Account</h1>
         <ul class="tiles">
             <li th:each="tile,status : ${tiles}">
