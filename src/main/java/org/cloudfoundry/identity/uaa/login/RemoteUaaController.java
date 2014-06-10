@@ -74,7 +74,7 @@ import java.util.Map;
 /**
  * Controller that manages OAuth authorization via a remote UAA service. Use
  * this in conjunction with the authentication
- * mechanism of your choice (LDAP, Google OpenID etc.) to serve OAuth2 tokens to
+ * mechanism of your choice (Google OpenID etc.) to serve OAuth2 tokens to
  * clients registered in the remote
  * server.
  * 

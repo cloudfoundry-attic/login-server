@@ -347,7 +347,7 @@
 
     <bean id="accountsController" class="org.cloudfoundry.identity.uaa.login.AccountsController" />
 
-    <beans profile="!ldap">
+
         <beans profile="!saml">
         <beans profile="!keystone">
             <bean id="resetPasswordService" class="org.cloudfoundry.identity.uaa.login.EmailResetPasswordService">
@@ -380,7 +380,6 @@
             </bean>
         </beans>
         </beans>
-    </beans>
 
     <beans profile="fileMetadata">
         <bean id="metadataProviderList" class="java.util.ArrayList">
@@ -639,25 +638,6 @@
         </bean>
     </beans>
 
-
-    <beans profile="ldap">
-        <bean id="uaaController" class="org.cloudfoundry.identity.uaa.login.RemoteUaaController" parent="abstractRemoteUaaController" />
-        <import resource="${ldap.profile.file:ldap/ldap-simple-bind.xml}" />
-        <bean id="uaaAuthenticationManager" class="org.cloudfoundry.identity.uaa.login.RemoteUaaAuthenticationManager">
-            <property name="loginUrl" value="${uaa.login.url:http://localhost:8080/uaa/authenticate}" />
-        </bean>
-        <bean id="remoteAuthenticationManager" class="org.cloudfoundry.identity.uaa.login.ChainedAuthenticationManager">
-            <constructor-arg ref="uaaAuthenticationManager" index="0"/>
-            <constructor-arg ref="ldapAuthenticationManager" index="1"/>
-        </bean>
-    </beans>
-
-    <beans profile="keystone">
-        <bean id="uaaController" class="org.cloudfoundry.identity.uaa.login.RemoteUaaController" parent="abstractRemoteUaaController" />
-        <bean id="remoteAuthenticationManager" class="org.cloudfoundry.identity.uaa.keystone.KeystoneAuthenticationManager">
-            <property name="loginUrl" value="${keystone.authentication.url:http://localhost:35357/v2.0/tokens}"/>
-        </bean>
-    </beans>
 
     <beans profile="coverage">
         <bean id="coverageController" class="org.cloudfoundry.identity.uaa.coverage.CoverageController" />
