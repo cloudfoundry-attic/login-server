@@ -56,10 +56,10 @@ public class UaaApprovalsServiceTest {
         mockUaaServer.expect(requestTo("http://uaa.example.com/uaa/approvals"))
                 .andExpect(method(GET))
                 .andExpect(header("Accept", containsString(APPLICATION_JSON_VALUE)))
-                .andRespond(withSuccess("[{\"userName\":\"marissa\", \"clientId\":\"app\", \"scope\":\"scim.userids\", \"status\":\"APPROVED\", \"expiresAt\":\"2014-05-17T15:17:52.310Z\", \"lastUpdatedAt\":\"2014-04-17T15:17:52.317Z\"}," +
-                        "{\"userName\":\"marissa\", \"clientId\":\"app\", \"scope\":\"cloud_controller.read\", \"status\":\"APPROVED\", \"expiresAt\":\"2014-05-17T15:17:52.310Z\", \"lastUpdatedAt\":\"2014-04-17T15:17:52.311Z\"}," +
-                        "{\"userName\":\"marissa\", \"clientId\":\"app\", \"scope\":\"cloud_controller.write\", \"status\":\"APPROVED\", \"expiresAt\":\"2014-05-17T15:17:52.310Z\", \"lastUpdatedAt\":\"2014-04-17T15:17:52.313Z\"}," +
-                        "{\"userName\":\"marissa\", \"clientId\":\"app\", \"scope\":\"password.write\", \"status\":\"DENIED\", \"expiresAt\":\"2014-05-17T15:17:52.310Z\", \"lastUpdatedAt\":\"2014-04-17T15:17:52.316Z\"}]", APPLICATION_JSON));
+                .andRespond(withSuccess("[{\"userId\":\"abc-def-ghi\", \"clientId\":\"app\", \"scope\":\"scim.userids\", \"status\":\"APPROVED\", \"expiresAt\":\"2014-05-17T15:17:52.310Z\", \"lastUpdatedAt\":\"2014-04-17T15:17:52.317Z\"}," +
+                        "{\"userId\":\"abc-def-ghi\", \"clientId\":\"app\", \"scope\":\"cloud_controller.read\", \"status\":\"APPROVED\", \"expiresAt\":\"2014-05-17T15:17:52.310Z\", \"lastUpdatedAt\":\"2014-04-17T15:17:52.311Z\"}," +
+                        "{\"userId\":\"abc-def-ghi\", \"clientId\":\"app\", \"scope\":\"cloud_controller.write\", \"status\":\"APPROVED\", \"expiresAt\":\"2014-05-17T15:17:52.310Z\", \"lastUpdatedAt\":\"2014-04-17T15:17:52.313Z\"}," +
+                        "{\"userId\":\"abc-def-ghi\", \"clientId\":\"app\", \"scope\":\"password.write\", \"status\":\"DENIED\", \"expiresAt\":\"2014-05-17T15:17:52.310Z\", \"lastUpdatedAt\":\"2014-04-17T15:17:52.316Z\"}]", APPLICATION_JSON));
 
         Map<String, List<UaaApprovalsService.DescribedApproval>> approvalsByClientId = approvalsService.getCurrentApprovalsByClientId();
         Assert.assertThat(approvalsByClientId, hasKey("app"));
@@ -68,7 +68,7 @@ public class UaaApprovalsServiceTest {
         Assert.assertEquals(4, describedApprovals.size());
 
         UaaApprovalsService.DescribedApproval cloudControllerReadApproval = describedApprovals.get(0);
-        Assert.assertEquals(testAccounts.getUserName(), cloudControllerReadApproval.getUserName());
+        Assert.assertEquals("abc-def-ghi", cloudControllerReadApproval.getUserId());
         Assert.assertEquals("app", cloudControllerReadApproval.getClientId());
         Assert.assertEquals("cloud_controller.read", cloudControllerReadApproval.getScope());
         Assert.assertEquals(Approval.ApprovalStatus.APPROVED, cloudControllerReadApproval.getStatus());

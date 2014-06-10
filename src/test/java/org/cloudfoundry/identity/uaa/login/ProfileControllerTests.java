@@ -83,14 +83,14 @@ public class ProfileControllerTests {
         Map<String, List<UaaApprovalsService.DescribedApproval>> approvalsByClientId = new HashMap<String, List<UaaApprovalsService.DescribedApproval>>();
 
         UaaApprovalsService.DescribedApproval readApproval = new UaaApprovalsService.DescribedApproval();
-        readApproval.setUserId("user");
+        readApproval.setUserId("userId");
         readApproval.setClientId("app");
         readApproval.setScope("thing.read");
         readApproval.setStatus(APPROVED);
         readApproval.setDescription("Read your thing resources");
 
         UaaApprovalsService.DescribedApproval writeApproval = new UaaApprovalsService.DescribedApproval();
-        writeApproval.setUserId("user");
+        writeApproval.setUserId("userId");
         writeApproval.setClientId("app");
         writeApproval.setScope("thing.write");
         writeApproval.setStatus(APPROVED);
@@ -148,13 +148,13 @@ public class ProfileControllerTests {
         Mockito.verify(approvalsService).updateApprovals(captor.capture());
 
         UaaApprovalsService.DescribedApproval readApproval = captor.getValue().get(0);
-        Assert.assertEquals("user", readApproval.getUserName());
+        Assert.assertEquals("userId", readApproval.getUserId());
         Assert.assertEquals("app", readApproval.getClientId());
         Assert.assertEquals("thing.read", readApproval.getScope());
         Assert.assertEquals(APPROVED, readApproval.getStatus());
 
         UaaApprovalsService.DescribedApproval writeApproval = captor.getValue().get(1);
-        Assert.assertEquals("user", writeApproval.getUserName());
+        Assert.assertEquals("userId", writeApproval.getUserId());
         Assert.assertEquals("app", writeApproval.getClientId());
         Assert.assertEquals("thing.write", writeApproval.getScope());
         Assert.assertEquals(DENIED, writeApproval.getStatus());
