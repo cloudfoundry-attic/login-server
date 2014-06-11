@@ -50,13 +50,10 @@
         <property name="uaaBaseUrl" value="${uaa.url:http://localhost:8080/uaa}" />
         <property name="authorizationTemplate" ref="authorizationTemplate" />
         <property name="links" ref="links" />
-        <property name="addNew" value="true" />
         <property name="codeExpirationMillis" value="300000" />
     </bean>
 
-    <bean id="uaaController" class="org.cloudfoundry.identity.uaa.login.RemoteUaaController" parent="abstractRemoteUaaController">
-        <property name="addNew" value="false" />
-    </bean>
+    <bean id="uaaController" class="org.cloudfoundry.identity.uaa.login.RemoteUaaController" parent="abstractRemoteUaaController"/>
 
     <!-- Pattern:/autologin -->
     <http pattern="/autologin" create-session="stateless" entry-point-ref="basicAuthenticationEntryPoint"
@@ -224,6 +221,8 @@
                 <value>password</value>
                 <value>passcode</value>
                 <value>credentials</value>
+                <value>origin</value>
+                <value>user_id</value>
             </list>
         </property>
     </bean>

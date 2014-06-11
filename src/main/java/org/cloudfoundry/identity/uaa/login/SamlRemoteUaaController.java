@@ -32,6 +32,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.cloudfoundry.identity.uaa.authentication.Origin;
+import org.cloudfoundry.identity.uaa.authentication.UaaAuthenticationDetails;
 import org.cloudfoundry.identity.uaa.client.SocialClientUserDetails;
 import org.cloudfoundry.identity.uaa.codestore.ExpiringCode;
 import org.codehaus.jackson.JsonGenerationException;
@@ -61,6 +63,8 @@ import org.springframework.web.client.RestTemplate;
 public class SamlRemoteUaaController extends RemoteUaaController {
 
     private static final Log logger = LogFactory.getLog(SamlRemoteUaaController.class);
+
+    public static final String SAML_ORIGIN = "login-saml";
 
     private final ObjectMapper mapper = new ObjectMapper();
 
@@ -96,7 +100,11 @@ public class SamlRemoteUaaController extends RemoteUaaController {
 
     @Override
     protected Map<String, String> getLoginCredentials(Principal principal) {
-        Map<String, String> login = new LinkedHashMap<String, String>();
+        Map<String, String> login = super.getLoginCredentials(principal);
+        if (!login.containsKey(Origin.ORIGIN)) {
+            appendField(login, Origin.ORIGIN, SAML_ORIGIN);
+            appendField(login, UaaAuthenticationDetails.ADD_NEW, "true");
+        }
         Collection<? extends GrantedAuthority> authorities = null;
 
         if (principal instanceof ExpiringUsernameAuthenticationToken) {
@@ -106,9 +114,6 @@ public class SamlRemoteUaaController extends RemoteUaaController {
 
             authorities = ((SamlUserDetails) (((ExpiringUsernameAuthenticationToken) principal).getPrincipal()))
                             .getAuthorities();
-        }
-        else {
-            appendField(login, "username", principal.getName());
         }
 
         if (principal instanceof Authentication) {
@@ -153,8 +158,7 @@ public class SamlRemoteUaaController extends RemoteUaaController {
         // Request has a password. Owner password grant with a UAA password
         if (null != request.getParameter("password")) {
             return passthru(request, entity, model, false);
-        }
-        else {
+        } else {
             //
             MultiValueMap<String, String> requestHeadersForClientInfo = new LinkedMaskingMultiValueMap<String, String>(
                             AUTHORIZATION);
@@ -172,13 +176,10 @@ public class SamlRemoteUaaController extends RemoteUaaController {
                 map.setAll(parameters);
                 if (principal != null) {
                     map.set("source", "login");
-                    map.set("add_new", String.valueOf(isAddNew()));
                     map.set("client_id", getClientId(clientInfoResponse.getBody()));
                     map.setAll(getLoginCredentials(principal));
-                    map.remove("credentials"); // legacy vmc might break
-                                               // otherwise
-                }
-                else {
+                    map.remove("credentials"); // legacy vmc might break otherwise
+                } else {
                     throw new BadCredentialsException("No principal found in authorize endpoint");
                 }
 

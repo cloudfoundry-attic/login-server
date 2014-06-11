@@ -21,6 +21,9 @@ import org.apache.http.client.params.ClientPNames;
 import org.apache.http.client.params.CookiePolicy;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.cloudfoundry.identity.uaa.authentication.AuthzAuthenticationRequest;
+import org.cloudfoundry.identity.uaa.authentication.Origin;
+import org.cloudfoundry.identity.uaa.authentication.UaaAuthenticationDetails;
+import org.cloudfoundry.identity.uaa.authentication.UaaPrincipal;
 import org.cloudfoundry.identity.uaa.authentication.login.Prompt;
 import org.cloudfoundry.identity.uaa.client.SocialClientUserDetails;
 import org.cloudfoundry.identity.uaa.codestore.ExpiringCode;
@@ -113,8 +116,6 @@ public class RemoteUaaController extends AbstractControllerInfo {
 
     private List<Prompt> prompts;
 
-    private boolean addNew = false;
-
     private long codeExpirationMillis = 5 * 60 * 1000;
 
     private AuthenticationManager remoteAuthenticationManager;
@@ -144,14 +145,6 @@ public class RemoteUaaController extends AbstractControllerInfo {
      */
     public void setPrompts(List<Prompt> prompts) {
         this.prompts = prompts;
-    }
-
-    public boolean isAddNew() {
-        return addNew;
-    }
-
-    public void setAddNew(boolean addNew) {
-        this.addNew = addNew;
     }
 
     /**
@@ -259,7 +252,6 @@ public class RemoteUaaController extends AbstractControllerInfo {
 
         if (principal != null) {
             map.set("source", "login");
-            map.set("add_new", String.valueOf(isAddNew()));
             map.setAll(getLoginCredentials(principal));
             map.remove("credentials"); // legacy vmc might break otherwise
             map.remove("password"); // request for token will not use password
@@ -342,7 +334,8 @@ public class RemoteUaaController extends AbstractControllerInfo {
         body.add("client_id", basic[0]);
         body.add("client_secret", basic[1]);
         body.add("source", "login");
-        body.add("add_new", String.valueOf(isAddNew()));
+        Map<String,String> creds = getLoginCredentials(principal);
+        body.setAll(creds);
         HttpEntity entity = new HttpEntity(body, headers);
         return passthru(request, entity, model, true);
     }
@@ -497,13 +490,23 @@ public class RemoteUaaController extends AbstractControllerInfo {
     protected Map<String, String> getLoginCredentials(Principal principal) {
         Map<String, String> login = new LinkedHashMap<String, String>();
         appendField(login, "username", principal.getName());
-        if (principal instanceof Authentication) {
+        if (principal instanceof UaaPrincipal) {
+            appendField(login, "user_id", ((UaaPrincipal)principal).getId());
+            appendField(login, Origin.ORIGIN, ((UaaPrincipal)principal).getOrigin());
+            appendField(login, UaaAuthenticationDetails.ADD_NEW, "false");
+        } else if (principal instanceof Authentication) {
             Object details = ((Authentication) principal).getPrincipal();
-            if (details instanceof SocialClientUserDetails) {
+            if (details instanceof UaaPrincipal) {
+                appendField(login, "user_id", ((UaaPrincipal)details).getId());
+                appendField(login, Origin.ORIGIN, ((UaaPrincipal)details).getOrigin());
+                appendField(login, UaaAuthenticationDetails.ADD_NEW, "false");
+            } else if (details instanceof SocialClientUserDetails) {
                 SocialClientUserDetails user = (SocialClientUserDetails) details;
                 appendField(login, "name", user.getName());
                 appendField(login, "external_id", user.getExternalId());
                 appendField(login, "email", user.getEmail());
+                appendField(login, Origin.ORIGIN, user.getSource());
+                appendField(login, UaaAuthenticationDetails.ADD_NEW, "true");
             }
         }
         return login;
