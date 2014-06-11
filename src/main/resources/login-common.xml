@@ -94,7 +94,9 @@
 				<value>username</value>
 				<value>password</value>
 				<value>credentials</value>
-			</list>
+                <value>user_id</value>
+                <value>origin</value>
+            </list>
 		</property>
 	</bean>
 	
@@ -163,6 +165,7 @@
 
     <bean id="remoteAuthenticationManager" class="org.cloudfoundry.identity.uaa.login.RemoteUaaAuthenticationManager" >
         <property name="loginUrl" value="${uaa.login.url:http://localhost:8080/uaa/authenticate}" />
+        <property name="restTemplate" ref="authorizationTemplate"/>
 	</bean>
 
 </beans>

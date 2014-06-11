@@ -105,6 +105,7 @@ public class ChangePasswordIT {
     }
 
     private void signOut() {
+        System.out.println("integrationTestRule = " + userName);
         webDriver.findElement(By.xpath("//*[text()='"+userName+"']")).click();
         webDriver.findElement(By.linkText("Sign Out")).click();
     }
