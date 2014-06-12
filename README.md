@@ -20,7 +20,6 @@ directories with a common parent):
 
     $ (cd uaa; mvn clean install)
     $ cd login-server
-    $ unset GEM_PATH (see https://www.pivotaltracker.com/story/show/70172968)
     $ mvn clean install
     $ mvn tomcat7:run -P integration
 
@@ -39,14 +38,6 @@ There are two documents that can help you configure the login server in your env
 [Login Server Configuration in deployment manifest](docs/Login-Server-Configuration.md)
 
 [OpenAM Configuration](docs/OpenAM-Configuration.md)
-
-## Stylesheets
-
-The Login Server uses [SASS](http://sass-lang.com/) to preprocess CSS stylesheets.
-These get compiled in the generate-resources phase of the Maven build.
-To watch the SCSS files and auto-recompile them during development, use:
-
-    $ mvn sass:watch
 
 ## The Login Application
 

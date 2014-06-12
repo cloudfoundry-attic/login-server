@@ -273,24 +273,6 @@
                 <version>${maven-war-plugin.version}</version>
             </plugin>
             <plugin>
-                <groupId>org.jasig.maven</groupId>
-                <artifactId>sass-maven-plugin</artifactId>
-                <version>${sass-maven-plugin.version}</version>
-                <configuration>
-                    <sassSourceDirectory>src/main/sass/login-server</sassSourceDirectory>
-                    <destination>src/main/webapp/resources</destination>
-                    <useCompass>true</useCompass>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>update-stylesheets</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <version>${maven-failsafe-plugin.version}</version>

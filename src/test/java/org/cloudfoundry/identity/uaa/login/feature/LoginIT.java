@@ -60,7 +60,7 @@ public class LoginIT {
         webDriver.get(baseUrl + "/login");
 
         String regex = "Version: \\S+, Commit: \\w{7}, Timestamp: \\S+, UAA: http://localhost:8080/uaa";
-        Assert.assertTrue(webDriver.findElement(By.className("footer")).getAttribute("title").matches(regex));
+        Assert.assertTrue(webDriver.findElement(By.cssSelector(".footer .copyright")).getAttribute("title").matches(regex));
     }
 
     @Test

@@ -10,7 +10,6 @@ env:
 before_install:
   - git pull --unshallow
   - wget -O tomcat.tar.gz http://archive.apache.org/dist/tomcat/tomcat-7/v7.0.52/bin/apache-tomcat-7.0.52.tar.gz
-  - unset GEM_PATH # for compatibility with the maven-sass-plugin
 install:
   - $TRAVIS_BUILD_DIR/.apply_spring_profiles_to_login_yaml.sh $SPRING_PROFILES
   - cat src/main/resources/login.yml
