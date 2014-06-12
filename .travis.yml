@@ -7,23 +7,27 @@ env:
   matrix:
     - SPRING_PROFILES=default,coverage
     - SPRING_PROFILES=default,saml,coverage
+cache:
+  apt: true
+  directories:
+  - $HOME/.m2/repository
 before_install:
   - git pull --unshallow
   - wget -O tomcat.tar.gz http://archive.apache.org/dist/tomcat/tomcat-7/v7.0.52/bin/apache-tomcat-7.0.52.tar.gz
 install:
   - $TRAVIS_BUILD_DIR/.apply_spring_profiles_to_login_yaml.sh $SPRING_PROFILES
   - cat src/main/resources/login.yml
-  - mvn test-compile -P coverage --quiet
+  - mvn -U test-compile -P coverage --quiet
   - mkdir -p target/tomcat
   - tar zxf tomcat.tar.gz -C target/tomcat --strip-components 1
   - export WEBAPPS_DIR=$TRAVIS_BUILD_DIR/target/tomcat/webapps
   - rm -rf $WEBAPPS_DIR/*
   - export IDENTITY_VERSION=`mvn help:evaluate -Dexpression=project.parent.version | grep -v "\[" | tail -n 1`
-  - mvn dependency:copy -Dartifact=org.cloudfoundry.identity:cloudfoundry-identity-uaa:$IDENTITY_VERSION:war -DoutputDirectory=$WEBAPPS_DIR --quiet
+  - mvn -U dependency:copy -Dartifact=org.cloudfoundry.identity:cloudfoundry-identity-uaa:$IDENTITY_VERSION:war -DoutputDirectory=$WEBAPPS_DIR --quiet
   - mv $WEBAPPS_DIR/cloudfoundry-identity-uaa-*.war $WEBAPPS_DIR/uaa.war
-  - mvn dependency:copy -Dartifact=org.cloudfoundry.identity:cloudfoundry-identity-app:$IDENTITY_VERSION:war -DoutputDirectory=$WEBAPPS_DIR --quiet
+  - mvn -U dependency:copy -Dartifact=org.cloudfoundry.identity:cloudfoundry-identity-app:$IDENTITY_VERSION:war -DoutputDirectory=$WEBAPPS_DIR --quiet
   - mv $WEBAPPS_DIR/cloudfoundry-identity-app-*.war $WEBAPPS_DIR/app.war
-  - mvn dependency:copy -Dartifact=org.cloudfoundry.identity:cloudfoundry-identity-api:$IDENTITY_VERSION:war -DoutputDirectory=$WEBAPPS_DIR --quiet
+  - mvn -U dependency:copy -Dartifact=org.cloudfoundry.identity:cloudfoundry-identity-api:$IDENTITY_VERSION:war -DoutputDirectory=$WEBAPPS_DIR --quiet
   - mv $WEBAPPS_DIR/cloudfoundry-identity-api-*.war $WEBAPPS_DIR/api.war
 before_script:
   - $TRAVIS_BUILD_DIR/.cobertura-instrument.sh
