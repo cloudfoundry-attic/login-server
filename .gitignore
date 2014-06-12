@@ -6,7 +6,6 @@ target/
 */src/main/java/META-INF/
 */src/main/webapp/META-INF/
 */src/main/*/WEB-INF/lib/
-/src/main/webapp/resources/**/*.css
 src/main/resources/profiles/dev/
 out/
 .access_token
