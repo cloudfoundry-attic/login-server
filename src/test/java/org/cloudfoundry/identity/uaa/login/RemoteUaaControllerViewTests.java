@@ -87,7 +87,7 @@ public class RemoteUaaControllerViewTests {
         mockMvc.perform(MockMvcRequestBuilders.get("/login"))
                 .andExpect(xpath("//head/link[@rel='shortcut icon']/@href").string("/resources/oss/images/favicon.ico"))
                 .andExpect(xpath("//head/link[@href='/resources/oss/stylesheets/application.css']").exists())
-                .andExpect(xpath("//body[contains(@style,'/resources/oss/images/logo.png')]").exists());
+                .andExpect(xpath("//div[@class='header' and contains(@style,'/resources/oss/images/logo.png')]").exists());
     }
 
     @Test
@@ -97,7 +97,7 @@ public class RemoteUaaControllerViewTests {
         mockMvc.perform(MockMvcRequestBuilders.get("/login"))
                 .andExpect(xpath("//head/link[@rel='shortcut icon']/@href").string("//cdn.example.com/pivotal/images/favicon.ico"))
                 .andExpect(xpath("//head/link[@href='//cdn.example.com/pivotal/stylesheets/application.css']").exists())
-                .andExpect(xpath("//body[contains(@style,'//cdn.example.com/pivotal/images/logo.png')]").exists());
+                .andExpect(xpath("//div[@class='header' and contains(@style,'//cdn.example.com/pivotal/images/logo.png')]").exists());
     }
 
     @Test
