@@ -130,7 +130,6 @@
 	<util:map id="links">
         <entry key="passwd" value="${links.passwd:}" />
         <entry key="register" value="${links.signup:/accounts/new}" />
-        <entry key="registerNetwork" value="${links.signup-network:https://network.gopivotal.com/registrations/new}" />
 	</util:map>
 
 	<bean id="homeController" class="org.cloudfoundry.identity.uaa.login.HomeController">

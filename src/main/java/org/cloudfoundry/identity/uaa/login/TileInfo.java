@@ -18,6 +18,8 @@ import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 public class TileInfo {
 
@@ -25,13 +27,12 @@ public class TileInfo {
 
     @Autowired
     public TileInfo(Environment environment) {
-        tiles = (ArrayList<LinkedHashMap<String,String>>)
-                    environment.getProperty("tiles", ArrayList.class, new ArrayList<LinkedHashMap<String,String>>());
+        tiles = environment.getProperty("tiles", ArrayList.class, new ArrayList<LinkedHashMap<String,String>>());
     }
 
-    public ArrayList<LinkedHashMap<String,String>> getLoginTiles() {
-        ArrayList<LinkedHashMap<String,String>> loginTiles = new ArrayList<>();
-        for (LinkedHashMap<String,String> tile : tiles) {
+    public List<Map<String,String>> getLoginTiles() {
+        List<Map<String,String>> loginTiles = new ArrayList<>();
+        for (Map<String,String> tile : tiles) {
             if (!StringUtils.isEmpty(tile.get("login-link"))) {
                 loginTiles.add(tile);
             }
@@ -39,9 +40,9 @@ public class TileInfo {
         return loginTiles;
     }
 
-    public ArrayList<LinkedHashMap<String,String>> getSignupTiles() {
-        ArrayList<LinkedHashMap<String,String>> signupTiles = new ArrayList<>();
-        for (LinkedHashMap<String,String> tile : tiles) {
+    public List<Map<String,String>> getSignupTiles() {
+        List<Map<String,String>> signupTiles = new ArrayList<>();
+        for (Map<String,String> tile : tiles) {
             if (!StringUtils.isEmpty(tile.get("signup-link"))) {
                 signupTiles.add(tile);
             }

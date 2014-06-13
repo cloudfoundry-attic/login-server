@@ -29,7 +29,6 @@ import org.openqa.selenium.WebDriver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.HtmlUtils;
 
@@ -81,7 +80,7 @@ public class ResetPasswordIT {
     @Test
     public void resettingAPassword() throws Exception {
         webDriver.get(baseUrl + "/login");
-        Assert.assertEquals("Pivotal", webDriver.getTitle());
+        Assert.assertEquals("Cloud Foundry", webDriver.getTitle());
 
         webDriver.findElement(By.linkText("Reset password")).click();
 

@@ -9,6 +9,8 @@ import org.springframework.mock.env.MockPropertySource;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -40,10 +42,10 @@ public class TileInfoTest {
         environment.setProperty("tiles", tiles);
         tileInfo = new TileInfo(environment);
 
-        ArrayList<LinkedHashMap<String,String>> loginTiles = tileInfo.getLoginTiles();
+        List<Map<String, String>> loginTiles = tileInfo.getLoginTiles();
 
         assertEquals(3, loginTiles.size());
-        for (LinkedHashMap<String,String> loginTile : loginTiles) {
+        for (Map<String, String> loginTile : loginTiles) {
             assertFalse(StringUtils.isEmpty(loginTile.get("login-link")));
         }
     }
@@ -52,7 +54,7 @@ public class TileInfoTest {
     public void testLoginNoTiles() throws Exception {
         tileInfo = new TileInfo(environment);
 
-        ArrayList<LinkedHashMap<String,String>> loginTiles = tileInfo.getLoginTiles();
+        List<Map<String, String>> loginTiles = tileInfo.getLoginTiles();
 
         assertEquals(0, loginTiles.size());
     }
@@ -62,10 +64,10 @@ public class TileInfoTest {
         environment.setProperty("tiles", tiles);
         tileInfo = new TileInfo(environment);
 
-        ArrayList<LinkedHashMap<String,String>> signupTiles = tileInfo.getSignupTiles();
+        List<Map<String, String>> signupTiles = tileInfo.getSignupTiles();
 
         assertEquals(2, signupTiles.size());
-        for (LinkedHashMap<String,String> loginTile : signupTiles) {
+        for (Map<String, String> loginTile : signupTiles) {
             assertFalse(StringUtils.isEmpty(loginTile.get("signup-link")));
         }
     }
@@ -74,7 +76,7 @@ public class TileInfoTest {
     public void testSignupNoTiles() throws Exception {
         tileInfo = new TileInfo(environment);
 
-        ArrayList<LinkedHashMap<String,String>> signupTiles = tileInfo.getSignupTiles();
+        List<Map<String, String>> signupTiles = tileInfo.getSignupTiles();
 
         assertEquals(0, signupTiles.size());
     }

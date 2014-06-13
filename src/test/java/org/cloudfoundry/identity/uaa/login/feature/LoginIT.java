@@ -46,7 +46,7 @@ public class LoginIT {
     @Test
     public void testLoggingIn() throws Exception {
         webDriver.get(baseUrl + "/login");
-        Assert.assertEquals("Pivotal", webDriver.getTitle());
+        Assert.assertEquals("Cloud Foundry", webDriver.getTitle());
 
         webDriver.findElement(By.name("username")).sendKeys(testAccounts.getUserName());
         webDriver.findElement(By.name("password")).sendKeys(testAccounts.getPassword());
@@ -61,15 +61,5 @@ public class LoginIT {
 
         String regex = "Version: \\S+, Commit: \\w{7}, Timestamp: \\S+, UAA: http://localhost:8080/uaa";
         Assert.assertTrue(webDriver.findElement(By.cssSelector(".footer .copyright")).getAttribute("title").matches(regex));
-    }
-
-    @Test
-    public void testSignupPage() throws Exception {
-        webDriver.get(baseUrl + "/login");
-
-        webDriver.findElement(By.linkText("Create account")).click();
-
-        Assert.assertEquals("https://network.gopivotal.com/registrations/new", webDriver.findElement(By.linkText("Pivotal Network")).getAttribute("href"));
-        Assert.assertEquals("https://console.10.244.0.34.xip.io/register", webDriver.findElement(By.linkText("Pivotal Web Services")).getAttribute("href"));
     }
 }

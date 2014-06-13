@@ -10,32 +10,33 @@
 # subcomponents is subject to the terms and conditions of the
 # subcomponent's license, as noted in the LICENSE file.
 
-# customize static asset source
-assetBaseUrl: /resources/pivotal
+# customize static asset source, provides control over visual branding
+# (defaults to /resources/oss)
+#assetBaseUrl: /resources/pivotal
 
-tiles:
-  - name: Pivotal Network
-    login-link: https://network.gopivotal.com/login
-    signup-link: https://network.gopivotal.com/registrations/new
-    image: /resources/pivotal/images/network-logo-gray.png
-    image-hover: /resources/pivotal/images/network-logo-teal.png
-  - name: Pivotal Web Services
-    login-link: https://console.10.244.0.34.xip.io
-    signup-link: https://console.10.244.0.34.xip.io/register
-    image: /resources/pivotal/images/pws-logo-gray.png
-    image-hover: /resources/pivotal/images/pws-logo-teal.png
-  - name: Pivotal Partners
-    login-link: https://partners.gopivotal.com/login
-    image: /resources/pivotal/images/partners-logo-gray.png
-    image-hover: /resources/pivotal/images/partners-logo-teal.png
+#tiles:
+#  - name: Pivotal Network
+#    login-link: https://network.gopivotal.com/login
+#    signup-link: https://network.gopivotal.com/registrations/new
+#    image: /resources/pivotal/images/network-logo-gray.png
+#    image-hover: /resources/pivotal/images/network-logo-teal.png
+#  - name: Pivotal Web Services
+#    login-link: https://console.10.244.0.34.xip.io
+#    signup-link: https://console.10.244.0.34.xip.io/register
+#    image: /resources/pivotal/images/pws-logo-gray.png
+#    image-hover: /resources/pivotal/images/pws-logo-teal.png
+#  - name: Pivotal Partners
+#    login-link: https://partners.gopivotal.com/login
+#    image: /resources/pivotal/images/partners-logo-gray.png
+#    image-hover: /resources/pivotal/images/partners-logo-teal.png
 
 links:
   passwd: http://localhost:8080/login/forgot_password
-  signup-network: https://network.gopivotal.com/registrations/new
 
 login:
-  #the brand to use
-  brand: pivotal
+  # the brand to use for password reset emails and page titles
+  # (defaults to oss)
+  #brand: pivotal
   #base URL that the login server can be reached at
   url: http://localhost:8080/login
   # The entity base url is the location of this application

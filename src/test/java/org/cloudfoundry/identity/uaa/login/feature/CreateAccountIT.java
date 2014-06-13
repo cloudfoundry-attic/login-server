@@ -14,7 +14,6 @@ package org.cloudfoundry.identity.uaa.login.feature;
 
 import org.cloudfoundry.identity.uaa.login.test.DefaultIntegrationTestConfig;
 import org.cloudfoundry.identity.uaa.login.test.IntegrationTestRule;
-import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -22,16 +21,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.client.test.TestAccounts;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = DefaultIntegrationTestConfig.class)
@@ -55,17 +49,10 @@ public class CreateAccountIT {
     }
 
     @Test
-    public void tiles() throws Exception {
+    public void testMessage() throws Exception {
         webDriver.get(baseUrl + "/");
         webDriver.findElement(By.xpath("//*[text()='Create account']")).click();
 
-        List<WebElement> tiles = webDriver.findElements(By.cssSelector(".tiles li a"));
-        assertEquals(2, tiles.size());
-
-        assertEquals("Pivotal Network", tiles.get(0).getText());
-        assertEquals("https://network.gopivotal.com/registrations/new", tiles.get(0).getAttribute("href"));
-        assertEquals("url(http://localhost:8080/login/resources/pivotal/images/network-logo-gray.png)", tiles.get(0).getCssValue("background-image"));
-
-        assertEquals("Pivotal Web Services", tiles.get(1).getText());
+        Assert.assertEquals("Create an Account", webDriver.findElement(By.tagName("h1")).getText());
     }
 }
