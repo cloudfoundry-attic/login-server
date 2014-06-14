@@ -12,9 +12,11 @@
  *******************************************************************************/
 package org.cloudfoundry.identity.uaa.login;
 
+import org.cloudfoundry.identity.uaa.authentication.Origin;
+import org.cloudfoundry.identity.uaa.authentication.UaaPrincipal;
 import org.cloudfoundry.identity.uaa.oauth.approval.Approval;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,7 +24,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -33,12 +34,10 @@ import java.util.Map;
 @Controller
 public class ProfileController {
 
-    private final Environment environment;
     private final ApprovalsService approvalsService;
 
     @Autowired
-    public ProfileController(Environment environment, ApprovalsService approvalsService) {
-        this.environment = environment;
+    public ProfileController(ApprovalsService approvalsService) {
         this.approvalsService = approvalsService;
     }
 
@@ -46,10 +45,10 @@ public class ProfileController {
      * Display the current user's approvals
      */
     @RequestMapping(value = "/profile", method = RequestMethod.GET)
-    public String get(Model model) {
+    public String get(Authentication authentication, Model model) {
         Map<String, List<UaaApprovalsService.DescribedApproval>> approvals = approvalsService.getCurrentApprovalsByClientId();
         model.addAttribute("approvals", approvals);
-        model.addAttribute("showChangePasswordLink", showChangePasswordLink());
+        model.addAttribute("showChangePasswordLink", showChangePasswordLink(authentication));
         return "approvals";
     }
 
@@ -88,8 +87,11 @@ public class ProfileController {
         return "redirect:profile";
     }
 
-    private boolean showChangePasswordLink() {
-        List<String> activeProfiles = Arrays.asList(environment.getActiveProfiles());
-        return !activeProfiles.contains("saml") && !activeProfiles.contains("ldap");
+    private boolean showChangePasswordLink(Authentication authentication) {
+        if (authentication.getPrincipal() instanceof UaaPrincipal) {
+            UaaPrincipal principal = (UaaPrincipal) authentication.getPrincipal();
+            return Origin.UAA.equals(principal.getOrigin());
+        }
+        return false;
     }
 }

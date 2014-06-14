@@ -16,9 +16,7 @@ import static org.hamcrest.Matchers.containsString;
 
 import org.cloudfoundry.identity.uaa.login.test.DefaultIntegrationTestConfig;
 import org.cloudfoundry.identity.uaa.login.test.IntegrationTestRule;
-import org.cloudfoundry.identity.uaa.login.test.LoginServerClassRunner;
 import org.cloudfoundry.identity.uaa.login.test.TestClient;
-import org.cloudfoundry.identity.uaa.login.test.UnlessProfileActive;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -36,9 +34,8 @@ import org.springframework.web.client.RestTemplate;
 import com.dumbster.smtp.SimpleSmtpServer;
 import java.security.SecureRandom;
 
-@RunWith(LoginServerClassRunner.class)
+@RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = DefaultIntegrationTestConfig.class)
-@UnlessProfileActive(values = {"saml", "ldap", "keystone"})
 public class ChangePasswordIT {
 
     @Autowired @Rule
@@ -105,7 +102,6 @@ public class ChangePasswordIT {
     }
 
     private void signOut() {
-        System.out.println("integrationTestRule = " + userName);
         webDriver.findElement(By.xpath("//*[text()='"+userName+"']")).click();
         webDriver.findElement(By.linkText("Sign Out")).click();
     }

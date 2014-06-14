@@ -346,8 +346,16 @@
 
     <bean id="accountsController" class="org.cloudfoundry.identity.uaa.login.AccountsController" />
 
+    <bean id="changePasswordService" class="org.cloudfoundry.identity.uaa.login.UaaChangePasswordService">
+        <constructor-arg ref="authorizationTemplate"/>
+        <constructor-arg value="${uaa.url:http://localhost:8080/uaa}"/>
+    </bean>
 
-        <beans profile="!saml">
+    <bean id="changePasswordController" class="org.cloudfoundry.identity.uaa.login.ChangePasswordController">
+        <constructor-arg ref="changePasswordService"/>
+    </bean>
+
+    <beans profile="!saml">
         <beans profile="!keystone">
             <bean id="resetPasswordService" class="org.cloudfoundry.identity.uaa.login.EmailResetPasswordService">
                 <constructor-arg ref="mailTemplateEngine" />
@@ -365,20 +373,11 @@
                 <constructor-arg value="${login.url:http://localhost:8080/login}"/>
             </bean>
 
-            <bean id="changePasswordService" class="org.cloudfoundry.identity.uaa.login.UaaChangePasswordService">
-                <constructor-arg ref="authorizationTemplate"/>
-                <constructor-arg value="${uaa.url:http://localhost:8080/uaa}"/>
-            </bean>
-
             <bean id="resetPasswordController" class="org.cloudfoundry.identity.uaa.login.ResetPasswordController">
                 <constructor-arg ref="resetPasswordService"/>
             </bean>
-
-            <bean id="changePasswordController" class="org.cloudfoundry.identity.uaa.login.ChangePasswordController">
-                <constructor-arg ref="changePasswordService"/>
-            </bean>
         </beans>
-        </beans>
+    </beans>
 
     <beans profile="fileMetadata">
         <bean id="metadataProviderList" class="java.util.ArrayList">

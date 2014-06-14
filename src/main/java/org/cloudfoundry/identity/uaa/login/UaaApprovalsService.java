@@ -43,14 +43,14 @@ public class UaaApprovalsService implements ApprovalsService {
 
     @Override
     public Map<String, List<DescribedApproval>> getCurrentApprovalsByClientId() {
-        Map<String, List<DescribedApproval>> result = new HashMap<String, List<DescribedApproval>>();
+        Map<String, List<DescribedApproval>> result = new HashMap<>();
         ResponseEntity<Set<DescribedApproval>> approvalsResponse = restTemplate.exchange(approvalsUrl, HttpMethod.GET, null, new ParameterizedTypeReference<Set<DescribedApproval>>() {});
         Set<DescribedApproval> approvals = approvalsResponse.getBody();
 
         for (DescribedApproval approval : approvals) {
             List<DescribedApproval> clientApprovals = result.get(approval.getClientId());
             if (clientApprovals == null) {
-                clientApprovals = new ArrayList<DescribedApproval>();
+                clientApprovals = new ArrayList<>();
                 result.put(approval.getClientId(), clientApprovals);
             }
 
