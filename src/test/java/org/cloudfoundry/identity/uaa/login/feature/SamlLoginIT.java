@@ -43,7 +43,7 @@ public class SamlLoginIT {
     @Test
     public void testSamlVariations() throws Exception {
         webDriver.get(baseUrl + "/login");
-        Assert.assertEquals("Pivotal", webDriver.getTitle());
+        Assert.assertEquals("Cloud Foundry", webDriver.getTitle());
 
         webDriver.findElement(By.name("username"));
         webDriver.findElement(By.name("password"));
