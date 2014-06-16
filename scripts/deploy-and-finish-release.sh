@@ -34,6 +34,6 @@ echo
 echo releases/$1 back merged into develop
 echo
 echo UAA version bumped to $3 on develop
-echo Login Server version bumbed to $2 on develop
+echo Login Server version bumped to $2 on develop
 echo
 echo Check the dev versions, ammend if necessary, and push the changes
