@@ -4,7 +4,7 @@ cd `dirname $0`/..
 
 if [ "$#" -ne 2 ]; then
     echo "Usage: $(basename $0) login_server_release_version uaa_release_version"
-    exit
+    exit 1
 fi
 
 echo Creating Login Server release $1 with UAA version $2

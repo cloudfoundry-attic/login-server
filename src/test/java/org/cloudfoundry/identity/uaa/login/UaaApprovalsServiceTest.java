@@ -26,6 +26,7 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 import org.cloudfoundry.identity.uaa.oauth.approval.Approval;
+import org.cloudfoundry.identity.uaa.test.UaaTestAccounts;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,6 +41,7 @@ public class UaaApprovalsServiceTest {
 
     private MockRestServiceServer mockUaaServer;
     private UaaApprovalsService approvalsService;
+    private UaaTestAccounts testAccounts = UaaTestAccounts.standard(null);
 
     @Before
     public void setUp() throws Exception {
@@ -54,10 +56,10 @@ public class UaaApprovalsServiceTest {
         mockUaaServer.expect(requestTo("http://uaa.example.com/uaa/approvals"))
                 .andExpect(method(GET))
                 .andExpect(header("Accept", containsString(APPLICATION_JSON_VALUE)))
-                .andRespond(withSuccess("[{\"userName\":\"marissa\", \"clientId\":\"app\", \"scope\":\"scim.userids\", \"status\":\"APPROVED\", \"expiresAt\":\"2014-05-17T15:17:52.310Z\", \"lastUpdatedAt\":\"2014-04-17T15:17:52.317Z\"}," +
-                        "{\"userName\":\"marissa\", \"clientId\":\"app\", \"scope\":\"cloud_controller.read\", \"status\":\"APPROVED\", \"expiresAt\":\"2014-05-17T15:17:52.310Z\", \"lastUpdatedAt\":\"2014-04-17T15:17:52.311Z\"}," +
-                        "{\"userName\":\"marissa\", \"clientId\":\"app\", \"scope\":\"cloud_controller.write\", \"status\":\"APPROVED\", \"expiresAt\":\"2014-05-17T15:17:52.310Z\", \"lastUpdatedAt\":\"2014-04-17T15:17:52.313Z\"}," +
-                        "{\"userName\":\"marissa\", \"clientId\":\"app\", \"scope\":\"password.write\", \"status\":\"DENIED\", \"expiresAt\":\"2014-05-17T15:17:52.310Z\", \"lastUpdatedAt\":\"2014-04-17T15:17:52.316Z\"}]", APPLICATION_JSON));
+                .andRespond(withSuccess("[{\"userId\":\"abc-def-ghi\", \"clientId\":\"app\", \"scope\":\"scim.userids\", \"status\":\"APPROVED\", \"expiresAt\":\"2014-05-17T15:17:52.310Z\", \"lastUpdatedAt\":\"2014-04-17T15:17:52.317Z\"}," +
+                        "{\"userId\":\"abc-def-ghi\", \"clientId\":\"app\", \"scope\":\"cloud_controller.read\", \"status\":\"APPROVED\", \"expiresAt\":\"2014-05-17T15:17:52.310Z\", \"lastUpdatedAt\":\"2014-04-17T15:17:52.311Z\"}," +
+                        "{\"userId\":\"abc-def-ghi\", \"clientId\":\"app\", \"scope\":\"cloud_controller.write\", \"status\":\"APPROVED\", \"expiresAt\":\"2014-05-17T15:17:52.310Z\", \"lastUpdatedAt\":\"2014-04-17T15:17:52.313Z\"}," +
+                        "{\"userId\":\"abc-def-ghi\", \"clientId\":\"app\", \"scope\":\"password.write\", \"status\":\"DENIED\", \"expiresAt\":\"2014-05-17T15:17:52.310Z\", \"lastUpdatedAt\":\"2014-04-17T15:17:52.316Z\"}]", APPLICATION_JSON));
 
         Map<String, List<UaaApprovalsService.DescribedApproval>> approvalsByClientId = approvalsService.getCurrentApprovalsByClientId();
         Assert.assertThat(approvalsByClientId, hasKey("app"));
@@ -66,7 +68,7 @@ public class UaaApprovalsServiceTest {
         Assert.assertEquals(4, describedApprovals.size());
 
         UaaApprovalsService.DescribedApproval cloudControllerReadApproval = describedApprovals.get(0);
-        Assert.assertEquals("marissa", cloudControllerReadApproval.getUserName());
+        Assert.assertEquals("abc-def-ghi", cloudControllerReadApproval.getUserId());
         Assert.assertEquals("app", cloudControllerReadApproval.getClientId());
         Assert.assertEquals("cloud_controller.read", cloudControllerReadApproval.getScope());
         Assert.assertEquals(Approval.ApprovalStatus.APPROVED, cloudControllerReadApproval.getStatus());
@@ -85,7 +87,7 @@ public class UaaApprovalsServiceTest {
                 .andExpect(method(PUT))
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$[0].clientId").value("app"))
-                .andExpect(jsonPath("$[0].userName").value("marissa"))
+                .andExpect(jsonPath("$[0].userName").value(testAccounts.getUserName()))
                 .andExpect(jsonPath("$[0].scope").value("thing.write"))
                 .andExpect(jsonPath("$[0].status").value("APPROVED"))
                 .andRespond(withSuccess());
@@ -93,7 +95,7 @@ public class UaaApprovalsServiceTest {
         List<UaaApprovalsService.DescribedApproval> approvals = new ArrayList<UaaApprovalsService.DescribedApproval>();
         UaaApprovalsService.DescribedApproval approval = new UaaApprovalsService.DescribedApproval();
         approval.setClientId("app");
-        approval.setUserId("marissa");
+        approval.setUserId(testAccounts.getUserName());
         approval.setScope("thing.write");
         approval.setStatus(Approval.ApprovalStatus.APPROVED);
         approval.setDescription("Write to your thing resources");

@@ -28,6 +28,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import org.cloudfoundry.identity.uaa.authentication.Origin;
+import org.cloudfoundry.identity.uaa.authentication.UaaPrincipal;
 import org.cloudfoundry.identity.uaa.login.test.ThymeleafConfig;
 import org.junit.Assert;
 import org.junit.Before;
@@ -39,7 +41,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.mock.env.MockEnvironment;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -69,9 +71,6 @@ public class ProfileControllerTests {
     WebApplicationContext webApplicationContext;
 
     @Autowired
-    MockEnvironment environment;
-
-    @Autowired
     ApprovalsService approvalsService;
 
     private MockMvc mockMvc;
@@ -83,14 +82,14 @@ public class ProfileControllerTests {
         Map<String, List<UaaApprovalsService.DescribedApproval>> approvalsByClientId = new HashMap<String, List<UaaApprovalsService.DescribedApproval>>();
 
         UaaApprovalsService.DescribedApproval readApproval = new UaaApprovalsService.DescribedApproval();
-        readApproval.setUserId("user");
+        readApproval.setUserId("userId");
         readApproval.setClientId("app");
         readApproval.setScope("thing.read");
         readApproval.setStatus(APPROVED);
         readApproval.setDescription("Read your thing resources");
 
         UaaApprovalsService.DescribedApproval writeApproval = new UaaApprovalsService.DescribedApproval();
-        writeApproval.setUserId("user");
+        writeApproval.setUserId("userId");
         writeApproval.setClientId("app");
         writeApproval.setScope("thing.write");
         writeApproval.setStatus(APPROVED);
@@ -103,8 +102,12 @@ public class ProfileControllerTests {
 
     @Test
     public void testGetProfile() throws Exception {
-        mockMvc.perform(get("/profile"))
+        UaaPrincipal uaaPrincipal = new UaaPrincipal("fake-user-id", "username", "email@example.com", Origin.UAA, null);
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(uaaPrincipal, null);
+
+        mockMvc.perform(get("/profile").principal(authentication))
                 .andExpect(status().isOk())
+                .andExpect(model().attribute("showChangePasswordLink", true))
                 .andExpect(model().attribute("approvals", hasKey("app")))
                 .andExpect(model().attribute("approvals", hasValue(hasSize(2))))
                 .andExpect(content().contentTypeCompatibleWith(TEXT_HTML))
@@ -117,7 +120,10 @@ public class ProfileControllerTests {
         Map<String, List<UaaApprovalsService.DescribedApproval>> approvalsByClientId = new HashMap<String, List<UaaApprovalsService.DescribedApproval>>();
         Mockito.when(approvalsService.getCurrentApprovalsByClientId()).thenReturn(approvalsByClientId);
 
-        mockMvc.perform(get("/profile"))
+        UaaPrincipal uaaPrincipal = new UaaPrincipal("fake-user-id", "username", "email@example.com", Origin.UAA, null);
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(uaaPrincipal, null);
+
+        mockMvc.perform(get("/profile").principal(authentication))
                 .andExpect(status().isOk())
                 .andExpect(model().attributeExists("approvals"))
                 .andExpect(content().contentTypeCompatibleWith(TEXT_HTML))
@@ -125,11 +131,13 @@ public class ProfileControllerTests {
     }
 
     @Test
-    public void testPasswordLinkHiddenWhenSamlIsActive() throws Exception {
-        environment.setActiveProfiles("saml");
-        
-        mockMvc.perform(get("/profile"))
+    public void testPasswordLinkHiddenWhenUsersOriginIsNotUaa() throws Exception {
+        UaaPrincipal uaaPrincipal = new UaaPrincipal("fake-user-id", "username", "email@example.com", Origin.LDAP, "dnEntryForLdapUser");
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(uaaPrincipal, null);
+
+        mockMvc.perform(get("/profile").principal(authentication))
                 .andExpect(status().isOk())
+                .andExpect(model().attribute("showChangePasswordLink", false))
                 .andExpect(content().string(not(containsString("Change Password"))));
     }
 
@@ -148,13 +156,13 @@ public class ProfileControllerTests {
         Mockito.verify(approvalsService).updateApprovals(captor.capture());
 
         UaaApprovalsService.DescribedApproval readApproval = captor.getValue().get(0);
-        Assert.assertEquals("user", readApproval.getUserName());
+        Assert.assertEquals("userId", readApproval.getUserId());
         Assert.assertEquals("app", readApproval.getClientId());
         Assert.assertEquals("thing.read", readApproval.getScope());
         Assert.assertEquals(APPROVED, readApproval.getStatus());
 
         UaaApprovalsService.DescribedApproval writeApproval = captor.getValue().get(1);
-        Assert.assertEquals("user", writeApproval.getUserName());
+        Assert.assertEquals("userId", writeApproval.getUserId());
         Assert.assertEquals("app", writeApproval.getClientId());
         Assert.assertEquals("thing.write", writeApproval.getScope());
         Assert.assertEquals(DENIED, writeApproval.getStatus());
@@ -190,18 +198,13 @@ public class ProfileControllerTests {
         }
 
         @Bean
-        MockEnvironment environment() {
-            return new MockEnvironment();
-        }
-
-        @Bean
         ApprovalsService approvalsService() {
             return Mockito.mock(ApprovalsService.class);
         }
 
         @Bean
-        ProfileController profileController(MockEnvironment environment, ApprovalsService approvalsService) {
-            return new ProfileController(environment, approvalsService);
+        ProfileController profileController(ApprovalsService approvalsService) {
+            return new ProfileController(approvalsService);
         }
     }
 }

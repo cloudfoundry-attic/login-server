@@ -12,59 +12,11 @@
  *******************************************************************************/
 package org.cloudfoundry.identity.uaa.login.test;
 
-import org.cloudfoundry.identity.uaa.config.YamlServletProfileInitializer;
-import org.springframework.context.ApplicationContext;
-import org.springframework.mock.web.MockServletConfig;
-import org.springframework.mock.web.MockServletContext;
-import org.springframework.test.context.ContextConfigurationAttributes;
-import org.springframework.test.context.MergedContextConfiguration;
-import org.springframework.test.context.SmartContextLoader;
-import org.springframework.test.context.web.WebMergedContextConfiguration;
-import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
+import org.cloudfoundry.identity.uaa.test.IntegrationTestContextLoader;
 
-public class DefaultTestConfigContextLoader implements SmartContextLoader {
+public class DefaultTestConfigContextLoader extends IntegrationTestContextLoader {
 
-    @Override
-    public void processContextConfiguration(ContextConfigurationAttributes configAttributes) {
-
-    }
-
-    @Override
-    public ApplicationContext loadContext(MergedContextConfiguration mergedConfig) throws Exception {
-        if (!(mergedConfig instanceof WebMergedContextConfiguration)) {
-            throw new IllegalArgumentException(String.format(
-                    "Cannot load WebApplicationContext from non-web merged context configuration %s. "
-                            + "Consider annotating your test class with @WebAppConfiguration.", mergedConfig));
-        }
-
-        AnnotationConfigWebApplicationContext context = new AnnotationConfigWebApplicationContext();
-
-        ApplicationContext parent = mergedConfig.getParentApplicationContext();
-        if (parent != null) {
-            context.setParent(parent);
-        }
-        context.getEnvironment().setActiveProfiles(mergedConfig.getActiveProfiles());
-        MockServletContext servletContext = new MockServletContext();
-        MockServletConfig servletConfig = new MockServletConfig(servletContext);
-        servletConfig.addInitParameter("environmentConfigDefaults", "login.yml");
-        context.setServletContext(servletContext);
-        context.setServletConfig(servletConfig);
-        context.setConfigLocations(mergedConfig.getLocations());
-        context.register(mergedConfig.getClasses());
-        new YamlServletProfileInitializer().initialize(context);
-        context.refresh();
-        context.registerShutdownHook();
-        return context;
-    }
-
-    @Override
-    public String[] processLocations(Class<?> clazz, String... locations) {
-        return locations;
-    }
-
-    @Override
-    public final ApplicationContext loadContext(String... locations) throws Exception {
-        throw new UnsupportedOperationException(
-                getClass().getSimpleName() + " does not support the loadContext(String... locations) method");
+    protected String environmentConfigDefaults() {
+        return "login.yml";
     }
 }

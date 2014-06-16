@@ -1,8 +1,8 @@
 ## The Cloud Foundry SAML Login Server
 
 The saml_login server supports two additional features on top of what you get from the regular [login-server] [1]. 
-It adds LDAP authentication support, as well authentication using an external SAML source. We have tested our authentication with 
-Apache Directory Server, OpenLDAP, [OpenAM] [2] and the vCenter SSO appliance. 
+It adds authentication using an external SAML source. We have tested our authentication with 
+[OpenAM] [2] and the vCenter SSO appliance. 
 
   [1]: https://github.com/cloudfoundry/login-server/tree/master "login-server"
   [2]: https://github.com/cloudfoundry/login-server/tree/master/OpenAM-README.md "OpenAM Installation Instructions"
@@ -11,8 +11,7 @@ Apache Directory Server, OpenLDAP, [OpenAM] [2] and the vCenter SSO appliance.
 ###Configuring cf-release for a saml_login deployment
 
 The saml_login deploys the same way as the login-server, with additional configuration parameters.
-Enabling ldap or saml is done using the `spring_profiles` configuration parameter. LDAP and SAML can be used together, as two different profiles active 
-at the same time.
+Enabling saml is done using the `spring_profiles` configuration parameter. 
 
 - Open your infrastructure manifest - for example cf-release/templates/cf-infrastructure-warden.yml
   
@@ -41,8 +40,6 @@ at the same time.
 - Open your cf-properties.yml manifest to configure saml_login properties
   
   Please note the spring_profiles setting
-  - spring_profiles: ldap,saml (uses both ldap and saml with an external SAML provider)
-  - spring_profiles: ldap  (uses only ldap)
   - spring_profiles: saml (uses only  saml with an external SAML provider)
 
   <pre>
@@ -57,8 +54,8 @@ at the same time.
         passwd: (( "https://console." domain "/password_resets/new" ))
         signup: (( "https://console." domain "/register" ))
     
-      #if you wish to use ldap or saml
-      spring_profiles: ldap,saml
+      #if you wish to use saml
+      spring_profiles: saml
       
       #saml authentication information, only required if 'saml' is part of spring_profiles
       entityid: cloudfoundry-saml-login-server
@@ -99,16 +96,6 @@ at the same time.
         -----END CERTIFICATE-----
       nameidFormat: "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent"
   
-      ldap:
-        profile_type: simple-bind # options are simple-bind, search-and-bind, search-and-compare
-        url: "ldap://192.168.3.39:10389/" #required
-        userDNPattern: 'cn={0},ou=Users,dc=test,dc=com;cn={0},ou=OtherUsers,dc=example,dc=com' # required for simple-bind
-        userDN: cn=admin,ou=Users,dc=test,dc=com # required for search-and-bind and search-and-compare
-        userPassword: password # required for search-and-bind and search-and-compare
-        searchFilter: cn={0} # required for search-and-bind and search-and-compare
-        passwordAttributeName: userPassword # required for search-and-compare
-        passwordEncoder: org.cloudfoundry.identity.uaa.login.ldap.DynamicPasswordComparator # required for search-and-compare
-        localPasswordCompare: true # required for search-and-compare
   </pre>  
   
   

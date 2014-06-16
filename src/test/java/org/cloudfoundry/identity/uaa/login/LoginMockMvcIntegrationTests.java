@@ -65,17 +65,8 @@ public class LoginMockMvcIntegrationTests {
         mockMvc.perform(get("/login"))
                         .andExpect(status().isOk())
                         .andExpect(view().name("login"))
-                        .andExpect(model().attribute("links", hasEntry("home", "https://console.10.244.0.34.xip.io")))
-                        .andExpect(model().attribute("links",
-                                        hasEntry("passwd", "http://localhost:8080/login/forgot_password")))
-                        .andExpect(model().attribute("links",
-                                        hasEntry("register", "https://console.10.244.0.34.xip.io/register")))
-                        .andExpect(model().attribute("links",
-                                        hasEntry("network", "https://network.gopivotal.com/login")))
-                        .andExpect(model().attribute("links",
-                                hasEntry("registerNetwork", "https://network.gopivotal.com/registrations/new")))
-                        .andExpect(model().attribute("links", hasEntry("uaa", "http://localhost:8080/uaa")))
-                        .andExpect(model().attribute("links", hasEntry("login", "http://localhost:8080/login")))
+                        .andExpect(model().attribute("links", hasEntry("passwd", "http://localhost:8080/login/forgot_password")))
+                        .andExpect(model().attribute("links", hasEntry("register", "/accounts/new")))
                         .andExpect(model().attributeExists("prompts"));
     }
 

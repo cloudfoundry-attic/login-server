@@ -13,10 +13,9 @@
 package org.cloudfoundry.identity.uaa.login.feature;
 
 import org.cloudfoundry.identity.uaa.login.test.DefaultIntegrationTestConfig;
-import org.cloudfoundry.identity.uaa.login.test.IfProfileActive;
 import org.cloudfoundry.identity.uaa.login.test.IntegrationTestRule;
-import org.cloudfoundry.identity.uaa.login.test.LoginServerClassRunner;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,13 +23,17 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.oauth2.client.test.TestAccounts;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-@RunWith(LoginServerClassRunner.class)
+@RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = DefaultIntegrationTestConfig.class)
-@IfProfileActive("saml")
-public class SamlLoginIT {
+public class CreateAccountIT {
 
+    @Autowired
+    TestAccounts testAccounts;
+    
     @Autowired @Rule
     public IntegrationTestRule integrationTestRule;
 
@@ -40,15 +43,16 @@ public class SamlLoginIT {
     @Value("${integration.test.base_url}")
     String baseUrl;
 
-    @Test
-    public void testSamlVariations() throws Exception {
-        webDriver.get(baseUrl + "/login");
-        Assert.assertEquals("Cloud Foundry", webDriver.getTitle());
+    @Before
+    public void setUp() {
+        webDriver.get(baseUrl + "/logout.do");
+    }
 
-        webDriver.findElement(By.name("username"));
-        webDriver.findElement(By.name("password"));
-        webDriver.findElement(By.xpath("//a[text()='Use your corporate credentials']"));
-        webDriver.findElement(By.xpath("//input[@value='Sign in']"));
-        Assert.assertEquals(3, webDriver.findElements(By.xpath("//input")).size());
+    @Test
+    public void testMessage() throws Exception {
+        webDriver.get(baseUrl + "/");
+        webDriver.findElement(By.xpath("//*[text()='Create account']")).click();
+
+        Assert.assertEquals("Create an Account", webDriver.findElement(By.tagName("h1")).getText());
     }
 }

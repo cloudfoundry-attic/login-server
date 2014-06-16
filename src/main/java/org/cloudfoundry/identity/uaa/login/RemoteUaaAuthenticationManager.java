@@ -18,6 +18,8 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.cloudfoundry.identity.uaa.authentication.Origin;
+import org.cloudfoundry.identity.uaa.authentication.UaaPrincipal;
 import org.cloudfoundry.identity.uaa.user.UaaAuthority;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -32,6 +34,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.util.MultiValueMap;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.DefaultResponseErrorHandler;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
@@ -105,9 +108,10 @@ public class RemoteUaaAuthenticationManager implements AuthenticationManager {
                         new HttpEntity<Object>(getParameters(username, password), headers), Map.class);
 
         if (response.getStatusCode() == HttpStatus.OK || response.getStatusCode() == HttpStatus.CREATED) {
-            if (evaluateResponse(authentication,response)) {
+            Authentication auth = evaluateResponse(authentication, response);
+            if (auth!=null) {
                 logger.info("Successful authentication request for " + authentication.getName());
-                return new UsernamePasswordAuthenticationToken(username, null, UaaAuthority.USER_AUTHORITIES);
+                return auth;
             }
         } else if (response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
             logger.info("Failed authentication request");
@@ -121,12 +125,20 @@ public class RemoteUaaAuthenticationManager implements AuthenticationManager {
         throw new RuntimeException("Could not authenticate with remote server");
     }
     
-    protected boolean evaluateResponse(Authentication authentication, ResponseEntity<Map> response) {
+    protected Authentication evaluateResponse(Authentication authentication, ResponseEntity<Map> response) {
         String userFromUaa = (String) response.getBody().get("username");
-        if (userFromUaa.equals(authentication.getPrincipal().toString())) {
-            return true;
+        String userId = (String)response.getBody().get("user_id");
+        String origin = (String)response.getBody().get(Origin.ORIGIN);
+        if (userFromUaa.equalsIgnoreCase(authentication.getPrincipal().toString())) {
+            if (StringUtils.hasText(userId) && StringUtils.hasText(origin)) {
+                UaaPrincipal principal = new UaaPrincipal(userId, userFromUaa, null, origin, null);
+                return new UsernamePasswordAuthenticationToken(principal, null, UaaAuthority.USER_AUTHORITIES);
+            } else {
+                return new UsernamePasswordAuthenticationToken(userFromUaa, null, UaaAuthority.USER_AUTHORITIES);
+            }
         } else {
-            return false;
+            logger.debug("Authentication username mismatch:"+userFromUaa);
+            return null;
         }
     }
 

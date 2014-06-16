@@ -23,6 +23,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.oauth2.client.test.TestAccounts;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -38,14 +39,17 @@ public class LoginIT {
 
     @Value("${integration.test.base_url}")
     String baseUrl;
+    
+    @Autowired
+    TestAccounts testAccounts;
 
     @Test
     public void testLoggingIn() throws Exception {
         webDriver.get(baseUrl + "/login");
-        Assert.assertEquals("Pivotal", webDriver.getTitle());
+        Assert.assertEquals("Cloud Foundry", webDriver.getTitle());
 
-        webDriver.findElement(By.name("username")).sendKeys("marissa");
-        webDriver.findElement(By.name("password")).sendKeys("koala");
+        webDriver.findElement(By.name("username")).sendKeys(testAccounts.getUserName());
+        webDriver.findElement(By.name("password")).sendKeys(testAccounts.getPassword());
         webDriver.findElement(By.xpath("//input[@value='Sign in']")).click();
 
         Assert.assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), Matchers.containsString("Where to?"));
@@ -56,16 +60,6 @@ public class LoginIT {
         webDriver.get(baseUrl + "/login");
 
         String regex = "Version: \\S+, Commit: \\w{7}, Timestamp: \\S+, UAA: http://localhost:8080/uaa";
-        Assert.assertTrue(webDriver.findElement(By.className("footer")).getAttribute("title").matches(regex));
-    }
-
-    @Test
-    public void testSignupPage() throws Exception {
-        webDriver.get(baseUrl + "/login");
-
-        webDriver.findElement(By.linkText("Create account")).click();
-
-        Assert.assertEquals("https://network.gopivotal.com/registrations/new", webDriver.findElement(By.linkText("Pivotal Network")).getAttribute("href"));
-        Assert.assertEquals("https://console.10.244.0.34.xip.io/register", webDriver.findElement(By.linkText("Pivotal Web Services")).getAttribute("href"));
+        Assert.assertTrue(webDriver.findElement(By.cssSelector(".footer .copyright")).getAttribute("title").matches(regex));
     }
 }

@@ -3,17 +3,17 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorator="layouts/main">
 <head>
-    <th:block layout:include="pivotal_links :: style"></th:block>
+    <style th:each="tile,status : ${tiles}" th:text="'.tile-' + ${status.count} + ' {background-image: url(' + @{${tile.get('image')}} + ')} .tile-' + ${status.count} + ':hover {background-image: url(' + @{${tile.get('image-hover')}} + ')}'"></style>
 </head>
 <body>
-    <div class="island" layout:fragment="page-content" th:if="${brand} == 'pivotal'">
+    <div class="island" layout:fragment="page-content">
         <h1>Create an Account</h1>
-        <ul class="pivotal-links">
-            <li><a href="https://network.gopivotal.com/registrations/new" th:href="${@links.get('registerNetwork')}" id="network-link">Pivotal Network</a></li>
-            <li><a href="https://www.cloudfoundry.com/signup" th:href="${@links.get('register')}" id="web-services-link">Pivotal Web Services</a></li>
+        <ul class="tiles">
+            <li th:each="tile,status : ${tiles}">
+                <a href="https://network.gopivotal.com/registrations/new" th:href="${tile.get('signup-link')}" th:text="${tile.get('name')}" th:class="'tile-' + ${status.count}">Pivotal Network</a>
+            </li>
         </ul>
-        <div id="network-link-preload" class="image-preload"></div>
-        <div id="web-services-link-preload" class="image-preload"></div>
+        <div th:each="tile : ${tiles}" class="image-preload" th:style="'background-image: url(' + @{${tile.get('image-hover')}} + ')'"></div>
     </div>
 </body>
 </html>

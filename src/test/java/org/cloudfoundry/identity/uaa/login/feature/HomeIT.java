@@ -16,6 +16,7 @@ import org.cloudfoundry.identity.uaa.login.test.DefaultIntegrationTestConfig;
 import org.cloudfoundry.identity.uaa.login.test.IntegrationTestRule;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,13 +25,16 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.oauth2.client.test.TestAccounts;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = DefaultIntegrationTestConfig.class)
 public class HomeIT {
-
+    @Autowired
+    TestAccounts testAccounts;
+    
     @Autowired @Rule
     public IntegrationTestRule integrationTestRule;
 
@@ -40,16 +44,27 @@ public class HomeIT {
     @Value("${integration.test.base_url}")
     String baseUrl;
 
-    @Test
-    public void theHeaderDropdown() throws Exception {
+    private HomePagePerspective asOnHomePage;
+
+    @Before
+    public void setUp() {
         webDriver.get(baseUrl + "/logout.do");
 
         webDriver.get(baseUrl + "/login");
-        webDriver.findElement(By.name("username")).sendKeys("marissa");
-        webDriver.findElement(By.name("password")).sendKeys("koala");
+        webDriver.findElement(By.name("username")).sendKeys(testAccounts.getUserName());
+        webDriver.findElement(By.name("password")).sendKeys(testAccounts.getPassword());
         webDriver.findElement(By.xpath("//input[@value='Sign in']")).click();
 
-        HomePagePerspective asOnHomePage = new HomePagePerspective(webDriver, "marissa");
+        asOnHomePage = new HomePagePerspective(webDriver, testAccounts.getUserName());
+    }
+
+    @Test
+    public void testMessage() throws Exception {
+        Assert.assertEquals("Where to?", webDriver.findElement(By.tagName("h1")).getText());
+    }
+
+    @Test
+    public void theHeaderDropdown() throws Exception {
         Assert.assertNotNull(asOnHomePage.getUsernameElement());
         Assert.assertFalse(asOnHomePage.getAccountSettingsElement().isDisplayed());
         Assert.assertFalse(asOnHomePage.getSignOutElement().isDisplayed());

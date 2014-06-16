@@ -12,10 +12,6 @@
  *******************************************************************************/
 package org.cloudfoundry.identity.uaa.login;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
-
 import org.cloudfoundry.identity.uaa.config.YamlPropertiesFactoryBean;
 import org.junit.After;
 import org.junit.Before;
@@ -25,10 +21,12 @@ import org.springframework.context.support.GenericXmlApplicationContext;
 import org.springframework.core.env.PropertiesPropertySource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
-import org.springframework.security.ldap.authentication.LdapAuthenticationProvider;
 import org.springframework.security.saml.log.SAMLDefaultLogger;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.ViewResolver;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 /**
  * @author Dave Syer
@@ -59,20 +57,9 @@ public class BootstrapTests {
     }
 
     @Test
-    public void testLdapProfile() throws Exception {
-        context = getServletContext("ldap", "./src/test/resources/test/config/login.yml", "file:./src/main/webapp/WEB-INF/spring-servlet.xml");
-        assertNotNull(context.getBean("viewResolver", ViewResolver.class));
-        assertNotNull(context.getBean("ldapAuthProvider", LdapAuthenticationProvider.class));
-        try {
-            context.getBean("resetPasswordController", ResetPasswordController.class);
-            fail("Bean resetPasswordController found in ldap profile.");
-        } catch (NoSuchBeanDefinitionException e) {
-        }
-    }
-
-    @Test
     public void testSamlProfile() throws Exception {
-        context = getServletContext("saml", "./src/main/resources/login.yml", "file:./src/main/webapp/WEB-INF/spring-servlet.xml");
+        System.setProperty("idpMetadataFile", "./src/test/resources/test.saml.metadata");
+        context = getServletContext("saml,fileMetadata", "./src/main/resources/login.yml", "file:./src/main/webapp/WEB-INF/spring-servlet.xml");
         assertNotNull(context.getBean("viewResolver", ViewResolver.class));
         assertNotNull(context.getBean("samlLogger", SAMLDefaultLogger.class));
         try {

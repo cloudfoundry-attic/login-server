@@ -10,24 +10,33 @@
 # subcomponents is subject to the terms and conditions of the
 # subcomponent's license, as noted in the LICENSE file.
 
+# customize static asset source, provides control over visual branding
+# (defaults to /resources/oss)
+#assetBaseUrl: /resources/pivotal
 
-#links:
-#  home: https://console.run.pivotal.io
-#  network: https://network.gopivotal.com/login
-#  passwd: https://console.run.pivotal.io/password_resets/new
-#  signup: https://console.run.pivotal.io/register
-#  signup-network: https://network.gopivotal.com/users/new
+#tiles:
+#  - name: Pivotal Network
+#    login-link: https://network.gopivotal.com/login
+#    signup-link: https://network.gopivotal.com/registrations/new
+#    image: /resources/pivotal/images/network-logo-gray.png
+#    image-hover: /resources/pivotal/images/network-logo-teal.png
+#  - name: Pivotal Web Services
+#    login-link: https://console.10.244.0.34.xip.io
+#    signup-link: https://console.10.244.0.34.xip.io/register
+#    image: /resources/pivotal/images/pws-logo-gray.png
+#    image-hover: /resources/pivotal/images/pws-logo-teal.png
+#  - name: Pivotal Partners
+#    login-link: https://partners.gopivotal.com/login
+#    image: /resources/pivotal/images/partners-logo-gray.png
+#    image-hover: /resources/pivotal/images/partners-logo-teal.png
 
 links:
-  home: https://console.10.244.0.34.xip.io
   passwd: http://localhost:8080/login/forgot_password
-  signup: https://console.10.244.0.34.xip.io/register
-  signup-network: https://network.gopivotal.com/registrations/new
-
 
 login:
-  #the brand to use, oss or pivotal for JSP pages
-  brand: pivotal
+  # the brand to use for password reset emails and page titles
+  # (defaults to oss)
+  #brand: pivotal
   #base URL that the login server can be reached at
   url: http://localhost:8080/login
   # The entity base url is the location of this application
@@ -144,52 +153,4 @@ smtp:
   user:
   password:
 
-#spring_profiles: ldap
 #spring_profiles: saml
-#spring_profiles: keystone
-
-keystone:
-  authentication:
-#    url: http://localhost:35357/v2.0/tokens
-    url: http://localhost:5000/v3/auth/tokens
-
-#ldap:
-#  profile:
-#    file: ldap/ldap-simple-bind.xml
-#  base:
-#    url: 'ldaps://192.168.3.39:10636/'
-#    userDnPattern: 'cn={0},ou=Users,dc=test,dc=com;cn={0},ou=OtherUsers,dc=example,dc=com'
-#  ssl: 
-#    sslCertificate: ! '-----BEGIN CERTIFICATE-----
-#    MIIBfTCCAScCBgFDfaC2yzANBgkqhkiG9w0BAQUFADBCMQswCQYDVQQGEwJVUzEMMAoGA1UEChMD
-#    QVNGMRIwEAYDVQQLEwlEaXJlY3RvcnkxETAPBgNVBAMTCEFwYWNoZURTMB4XDTE0MDExMDE5Mjg0
-#    MVoXDTE1MDExMDE5Mjg0MVowTDELMAkGA1UEBhMCVVMxDDAKBgNVBAoTA0FTRjESMBAGA1UECxMJ
-#    RGlyZWN0b3J5MRswGQYDVQQDExJmaGFuaWstd29ya3N0YXRpb24wXDANBgkqhkiG9w0BAQEFAANL
-#    ADBIAkEAuA6Nmto6NFCCJ+CwsBnT2cvMxuYgf26iZ3ckIpLhs2V4ZJ4PFinR6JZUsVnRp0RbYoV5
-#    iW6F91XDTVtAMtDTJwIDAQABMA0GCSqGSIb3DQEBBQUAA0EATFGpEIprKYcnc+JuNcSQ8v2P2J7e
-#    lQ23NhTaljASF0g8AZ7SZEItU8JFYqf/KnNJ7FPwo4LbMbr7Zg6BRKBvnQ==
-#    -----END CERTIFICATE-----'
-#    sslCertificateAlias: ldaps
-    
-#ldap:
-#  profile:
-#    file:ldap/ldap-search-and-bind.xml
-#  base:  
-#    url: 'ldap://localhost:10389/'
-#    userDn: 'cn=admin,ou=Users,dc=test,dc=com'
-#    password: 'password'
-#    searchBase: '' 
-#    searchFilter: 'cn={0}'
-
-#ldap:
-#  profile:
-#    file:ldap/ldap-search-and-compare.xml
-#  base:  
-#    url: 'ldap://localhost:10389/'
-#    userDn: 'cn=admin,ou=Users,dc=test,dc=com'
-#    password: 'password'
-#    searchBase: '' 
-#    searchFilter: 'cn={0}'
-#    passwordAttributeName: userPassword
-#    passwordEncoder: org.cloudfoundry.identity.uaa.login.ldap.DynamicPasswordComparator
-#    localPasswordCompare: true

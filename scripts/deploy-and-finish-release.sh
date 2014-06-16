@@ -4,7 +4,7 @@ cd `dirname $0`/..
 
 if [ "$#" -ne 3 ]; then
     echo "Usage: $(basename $0) login_server_release_version login_server_next_dev_version uaa_next_dev_version"
-    exit
+    exit 1
 fi
 
 echo Deploying and finishing Login Server release $1
@@ -17,8 +17,7 @@ mvn deploy -DskipTests=true
 git checkout master
 git merge releases/$1 --no-ff
 git tag -a $1 -m "$1 release of the Login Server"
-git push origin master
-git push origin --tags
+git push origin master --tags
 git co develop
 git merge releases/$1 --no-ff
 git branch -d releases/$1

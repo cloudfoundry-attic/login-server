@@ -50,13 +50,10 @@
         <property name="uaaBaseUrl" value="${uaa.url:http://localhost:8080/uaa}" />
         <property name="authorizationTemplate" ref="authorizationTemplate" />
         <property name="links" ref="links" />
-        <property name="addNew" value="true" />
         <property name="codeExpirationMillis" value="300000" />
     </bean>
 
-    <bean id="uaaController" class="org.cloudfoundry.identity.uaa.login.RemoteUaaController" parent="abstractRemoteUaaController">
-        <property name="addNew" value="false" />
-    </bean>
+    <bean id="uaaController" class="org.cloudfoundry.identity.uaa.login.RemoteUaaController" parent="abstractRemoteUaaController"/>
 
     <!-- Pattern:/autologin -->
     <http pattern="/autologin" create-session="stateless" entry-point-ref="basicAuthenticationEntryPoint"
@@ -224,6 +221,8 @@
                 <value>password</value>
                 <value>passcode</value>
                 <value>credentials</value>
+                <value>origin</value>
+                <value>user_id</value>
             </list>
         </property>
     </bean>
@@ -343,10 +342,20 @@
 
     <bean id="buildInfo" class="org.cloudfoundry.identity.uaa.login.BuildInfo" />
 
+    <bean id="tileInfo" class="org.cloudfoundry.identity.uaa.login.TileInfo" />
+
     <bean id="accountsController" class="org.cloudfoundry.identity.uaa.login.AccountsController" />
 
-    <beans profile="!ldap">
-        <beans profile="!saml">
+    <bean id="changePasswordService" class="org.cloudfoundry.identity.uaa.login.UaaChangePasswordService">
+        <constructor-arg ref="authorizationTemplate"/>
+        <constructor-arg value="${uaa.url:http://localhost:8080/uaa}"/>
+    </bean>
+
+    <bean id="changePasswordController" class="org.cloudfoundry.identity.uaa.login.ChangePasswordController">
+        <constructor-arg ref="changePasswordService"/>
+    </bean>
+
+    <beans profile="!saml">
         <beans profile="!keystone">
             <bean id="resetPasswordService" class="org.cloudfoundry.identity.uaa.login.EmailResetPasswordService">
                 <constructor-arg ref="mailTemplateEngine" />
@@ -364,19 +373,9 @@
                 <constructor-arg value="${login.url:http://localhost:8080/login}"/>
             </bean>
 
-            <bean id="changePasswordService" class="org.cloudfoundry.identity.uaa.login.UaaChangePasswordService">
-                <constructor-arg ref="authorizationTemplate"/>
-                <constructor-arg value="${uaa.url:http://localhost:8080/uaa}"/>
-            </bean>
-
             <bean id="resetPasswordController" class="org.cloudfoundry.identity.uaa.login.ResetPasswordController">
                 <constructor-arg ref="resetPasswordService"/>
             </bean>
-
-            <bean id="changePasswordController" class="org.cloudfoundry.identity.uaa.login.ChangePasswordController">
-                <constructor-arg ref="changePasswordService"/>
-            </bean>
-        </beans>
         </beans>
     </beans>
 
@@ -637,25 +636,6 @@
         </bean>
     </beans>
 
-
-    <beans profile="ldap">
-        <bean id="uaaController" class="org.cloudfoundry.identity.uaa.login.RemoteUaaController" parent="abstractRemoteUaaController" />
-        <import resource="${ldap.profile.file:ldap/ldap-simple-bind.xml}" />
-        <bean id="uaaAuthenticationManager" class="org.cloudfoundry.identity.uaa.login.RemoteUaaAuthenticationManager">
-            <property name="loginUrl" value="${uaa.login.url:http://localhost:8080/uaa/authenticate}" />
-        </bean>
-        <bean id="remoteAuthenticationManager" class="org.cloudfoundry.identity.uaa.login.ChainedAuthenticationManager">
-            <constructor-arg ref="uaaAuthenticationManager" index="0"/>
-            <constructor-arg ref="ldapAuthenticationManager" index="1"/>
-        </bean>
-    </beans>
-
-    <beans profile="keystone">
-        <bean id="uaaController" class="org.cloudfoundry.identity.uaa.login.RemoteUaaController" parent="abstractRemoteUaaController" />
-        <bean id="remoteAuthenticationManager" class="org.cloudfoundry.identity.uaa.keystone.KeystoneAuthenticationManager">
-            <property name="loginUrl" value="${keystone.authentication.url:http://localhost:35357/v2.0/tokens}"/>
-        </bean>
-    </beans>
 
     <beans profile="coverage">
         <bean id="coverageController" class="org.cloudfoundry.identity.uaa.coverage.CoverageController" />
