@@ -1,8 +1,8 @@
 package org.cloudfoundry.identity.uaa.login;
 
 import org.cloudfoundry.identity.uaa.login.test.ThymeleafConfig;
-import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -80,5 +80,20 @@ public class EmailAccountCreationServiceTests {
                 eq("Pivotal account activation request"),
                 contains("<a href=\"http://localhost/login/accounts/new?code=the_secret_code&amp;email=user%40example.com\">Activate your account</a>")
         );
+    }
+
+    @Test
+    public void testCompleteActivation() throws Exception {
+        mockUaaServer.expect(requestTo("http://uaa.example.com/uaa/create_account"))
+                .andExpect(method(POST))
+                .andExpect(jsonPath("$.code").value("expiring_code"))
+                .andExpect(jsonPath("$.password").value("secret"))
+                .andRespond(withSuccess("userman", APPLICATION_JSON));
+
+        String username = emailAccountCreationService.completeActivation("expiring_code", "secret");
+
+        mockUaaServer.verify();
+
+        Assert.assertEquals("userman", username);
     }
 }

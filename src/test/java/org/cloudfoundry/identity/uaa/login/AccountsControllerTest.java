@@ -64,18 +64,17 @@ public class AccountsControllerTest {
     }
 
     @Test
-    @Ignore
     public void testCreateAccount() throws Exception {
-        MockHttpServletRequestBuilder post = post("/accounts/new")
-                .param("code", "expired_code")
+        Mockito.when(accountCreationService.completeActivation("expiring_code", "secret")).thenReturn("username");
+
+        MockHttpServletRequestBuilder post = post("/accounts")
+                .param("code", "expiring_code")
                 .param("password", "secret")
                 .param("password_confirmation", "secret");
 
         mockMvc.perform(post)
-                .andExpect(status().isCreated())
-                .andExpect(redirectedUrl("/"));
-
-        //TODO: assert account creation api calls sent to uaa
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("home"));
     }
 
     @Test

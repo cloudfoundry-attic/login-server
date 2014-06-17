@@ -52,6 +52,11 @@ public class EmailAccountCreationService implements AccountCreationService {
         }
     }
 
+    @Override
+    public String completeActivation(String code, String password) {
+        return uaaTemplate.postForObject(uaaBaseUrl + "/create_account", new Account(code, password), String.class);
+    }
+
     private String getSubjectText() {
         return brand.equals("pivotal") ? "Pivotal account activation request" : "Account activation request";
     }
@@ -65,5 +70,23 @@ public class EmailAccountCreationService implements AccountCreationService {
         ctx.setVariable("email", email);
         ctx.setVariable("accountsUrl", accountsUrl);
         return templateEngine.process("activate", ctx);
+    }
+
+    private static class Account {
+        private final String code;
+        private final String password;
+
+        public Account(String code, String password) {
+            this.code = code;
+            this.password = password;
+        }
+
+        public String getPassword() {
+            return password;
+        }
+
+        public String getCode() {
+            return code;
+        }
     }
 }

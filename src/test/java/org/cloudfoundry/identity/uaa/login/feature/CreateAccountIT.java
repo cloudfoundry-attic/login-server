@@ -31,6 +31,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.security.SecureRandom;
+import java.util.Iterator;
 
 import static org.hamcrest.Matchers.containsString;
 
@@ -70,11 +71,15 @@ public class CreateAccountIT {
 
         Assert.assertEquals("Create Account", webDriver.findElement(By.tagName("h1")).getText());
 
+        int receivedEmailSize = simpleSmtpServer.getReceivedEmailSize();
+
         webDriver.findElement(By.name("email")).sendKeys(userEmail);
         webDriver.findElement(By.xpath("//input[@value='Send activation email']")).click();
 
-        Assert.assertEquals(1, simpleSmtpServer.getReceivedEmailSize());
-        SmtpMessage message = (SmtpMessage) simpleSmtpServer.getReceivedEmail().next();
+        Assert.assertEquals(receivedEmailSize + 1, simpleSmtpServer.getReceivedEmailSize());
+        Iterator receivedEmail = simpleSmtpServer.getReceivedEmail();
+        SmtpMessage message = (SmtpMessage) receivedEmail.next();
+        receivedEmail.remove();
         Assert.assertEquals(userEmail, message.getHeaderValue("To"));
         Assert.assertThat(message.getBody(), containsString("Activate your account"));
 

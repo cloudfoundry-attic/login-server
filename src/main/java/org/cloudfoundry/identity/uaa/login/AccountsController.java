@@ -35,6 +35,12 @@ public class AccountsController {
         return "redirect:email_sent?code=activation";
     }
 
+    @RequestMapping(method = POST, params = {"code", "password"})
+    public String createAccount(@RequestParam("code") String code, @RequestParam("password") String password) {
+        accountCreationService.completeActivation(code, password);
+        return "redirect:home";
+    }
+
     @RequestMapping(value = "/new", method = GET)
     public String activationEmail() {
         return "accounts/new_activation_email";
