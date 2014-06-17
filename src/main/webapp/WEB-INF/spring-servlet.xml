@@ -362,6 +362,8 @@
         <constructor-arg index="2" value="${login.brand:oss}"/>
     </bean>
 
+    <bean id="emailSentController" class="org.cloudfoundry.identity.uaa.login.EmailSentController" />
+
     <bean id="accountCreationService" class="org.cloudfoundry.identity.uaa.login.EmailAccountCreationService">
         <constructor-arg index="0" ref="mailTemplateEngine"/>
         <constructor-arg index="1" ref="emailService"/>
