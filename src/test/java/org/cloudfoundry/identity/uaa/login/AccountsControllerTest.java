@@ -14,15 +14,17 @@ package org.cloudfoundry.identity.uaa.login;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.flash;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
@@ -42,7 +44,7 @@ public class AccountsControllerTest {
     public void testNewAccountPage() throws Exception {
         mockMvc.perform(get("/accounts/new"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("accounts/new"));
+                .andExpect(view().name("accounts/new_activation_email"));
     }
 
     @Test
@@ -52,6 +54,44 @@ public class AccountsControllerTest {
                 .andExpect(redirectedUrl("email_sent?code=activation"));
 
         Mockito.verify(accountCreationService).beginActivation("user1@example.com");
+    }
+
+    @Test
+    public void testNewAccountPageWithActivationCode() throws Exception {
+        mockMvc.perform(get("/accounts/new").param("code", "expiring_code").param("email", "user@example.com"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("accounts/new"));
+    }
+
+    @Test
+    @Ignore
+    public void testCreateAccount() throws Exception {
+        MockHttpServletRequestBuilder post = post("/accounts/new")
+                .param("code", "expired_code")
+                .param("password", "secret")
+                .param("password_confirmation", "secret");
+
+        mockMvc.perform(post)
+                .andExpect(status().isCreated())
+                .andExpect(redirectedUrl("/"));
+
+        //TODO: assert account creation api calls sent to uaa
+    }
+
+    @Test
+    @Ignore
+    public void testCreateAccountWithExpiredActivationCode() throws Exception {
+        //TODO: simulate expired code on uaa
+
+        MockHttpServletRequestBuilder post = post("/accounts/new")
+                .param("code", "expired_code")
+                .param("password", "secret")
+                .param("password_confirmation", "secret");
+
+        mockMvc.perform(post)
+                .andExpect(status().isBadRequest())
+                .andExpect(flash().attribute("message_code", "code_expired"))
+                .andExpect(view().name("accounts/new"));
     }
 
     private MockMvc getStandaloneMockMvc(AccountsController controller) {

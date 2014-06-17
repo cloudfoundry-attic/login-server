@@ -78,7 +78,7 @@ public class EmailAccountCreationServiceTests {
         Mockito.verify(emailService).sendMimeMessage(
                 eq("user@example.com"),
                 eq("Pivotal account activation request"),
-                contains("<a href=\"http://localhost/login/accounts?code=the_secret_code&amp;email=user%40example.com\">Activate your account</a>")
+                contains("<a href=\"http://localhost/login/accounts/new?code=the_secret_code&amp;email=user%40example.com\">Activate your account</a>")
         );
     }
 }

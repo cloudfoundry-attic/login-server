@@ -29,13 +29,18 @@ public class AccountsController {
         this.accountCreationService = accountCreationService;
     }
 
-    @RequestMapping(method = POST)
+    @RequestMapping(method = POST, params = "email")
     public String sendActivationEmail(@RequestParam("email") String email) {
         accountCreationService.beginActivation(email);
         return "redirect:email_sent?code=activation";
     }
 
     @RequestMapping(value = "/new", method = GET)
+    public String activationEmail() {
+        return "accounts/new_activation_email";
+    }
+
+    @RequestMapping(value = "/new", method = GET, params = {"code", "email"})
     public String newAccount() {
         return "accounts/new";
     }

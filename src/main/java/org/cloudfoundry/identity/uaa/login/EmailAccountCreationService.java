@@ -57,7 +57,7 @@ public class EmailAccountCreationService implements AccountCreationService {
     }
 
     private String getEmailHtml(String code, String email) {
-        String accountsUrl = ServletUriComponentsBuilder.fromCurrentContextPath().path("/accounts").build().toUriString();
+        String accountsUrl = ServletUriComponentsBuilder.fromCurrentContextPath().path("/accounts/new").build().toUriString();
 
         final Context ctx = new Context();
         ctx.setVariable("servicePhrase", brand.equals("pivotal") ? "a Pivotal" : "an");

@@ -4,13 +4,16 @@
 </head>
 <body>
 <div class="island" layout:fragment="page-content">
-    <h1>Create Account</h1>
+    <h1>Activate Your Account</h1>
     <div class="island-content">
+        <div th:text="|Email: ${param.email[0]}|" class="email-display">Email: user@example.com</div>
         <form th:action="@{/accounts}" method="post" novalidate="novalidate">
-            <input name="email" type="email" placeholder="Email" autofocus="autofocus" class="form-control"/>
-            <input type="submit" value="Send activation email" class="create-account-button"/>
+            <input type="hidden" name="code" th:value="${param.code[0]}"/>
+            <div th:if="${message_code}" th:text="#{'account_activation.' + ${message_code}}" class="error-message"></div>
+            <input name="password" type="password" placeholder="Password" autocomplete="off" class="form-control"/>
+            <input name="password_confirmation" type="password" placeholder="Confirm" autocomplete="off" class="form-control"/>
+            <input type="submit" value="Activate" class="island-button"/>
         </form>
-        <a href="/login" th:href="@{/login}" class="link-lowlight">Back to Sign In</a>
     </div>
 </div>
 </body>
