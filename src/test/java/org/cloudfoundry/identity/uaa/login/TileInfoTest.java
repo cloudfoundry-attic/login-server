@@ -25,11 +25,9 @@ public class TileInfoTest {
     public void setUp() throws Exception {
         LinkedHashMap<String,String> tile1 = new LinkedHashMap<>();
         tile1.put("login-link", "http://example.com/login");
-        tile1.put("signup-link", "http://example.com/signup");
 
         LinkedHashMap<String,String> tile2 = new LinkedHashMap<>();
         tile2.put("login-link", "http://example.com/login");
-        tile2.put("signup-link", "http://example.com/signup");
 
         LinkedHashMap<String,String> tile3 = new LinkedHashMap<>();
         tile3.put("login-link", "http://example.com/login");
@@ -57,28 +55,6 @@ public class TileInfoTest {
         List<Map<String, String>> loginTiles = tileInfo.getLoginTiles();
 
         assertEquals(0, loginTiles.size());
-    }
-
-    @Test
-    public void testSignupTiles() throws Exception {
-        environment.setProperty("tiles", tiles);
-        tileInfo = new TileInfo(environment);
-
-        List<Map<String, String>> signupTiles = tileInfo.getSignupTiles();
-
-        assertEquals(2, signupTiles.size());
-        for (Map<String, String> loginTile : signupTiles) {
-            assertFalse(StringUtils.isEmpty(loginTile.get("signup-link")));
-        }
-    }
-
-    @Test
-    public void testSignupNoTiles() throws Exception {
-        tileInfo = new TileInfo(environment);
-
-        List<Map<String, String>> signupTiles = tileInfo.getSignupTiles();
-
-        assertEquals(0, signupTiles.size());
     }
 
     /**

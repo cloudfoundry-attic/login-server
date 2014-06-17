@@ -13,21 +13,28 @@
 package org.cloudfoundry.identity.uaa.login;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 public class AccountsControllerTest {
 
     private MockMvc mockMvc;
+    private AccountCreationService accountCreationService;
 
     @Before
     public void setUp() throws Exception {
+        accountCreationService = Mockito.mock(AccountCreationService.class);
+
         mockMvc = getStandaloneMockMvc(new AccountsController());
     }
 
@@ -36,6 +43,15 @@ public class AccountsControllerTest {
         mockMvc.perform(get("/accounts/new"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("accounts/new"));
+    }
+
+    @Test
+    public void testSendActivationEmail() throws Exception {
+        mockMvc.perform(post("/accounts").param("email", "user1@example.com"))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("email_sent?code=activation"));
+
+        Mockito.verify(accountCreationService).beginActivation("user1@example.com");
     }
 
     private MockMvc getStandaloneMockMvc(AccountsController controller) {

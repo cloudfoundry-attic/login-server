@@ -13,6 +13,7 @@
 package org.cloudfoundry.identity.uaa.login;
 
 import static org.hamcrest.Matchers.containsString;
+import static org.mockito.Matchers.*;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
@@ -27,12 +28,17 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Matchers;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.thymeleaf.spring4.SpringTemplateEngine;
 
@@ -46,20 +52,18 @@ public class EmailResetPasswordServiceTests {
 
     private EmailResetPasswordService emailResetPasswordService;
     private MockRestServiceServer mockUaaServer;
-    private UriComponentsBuilder uriComponentsBuilder;
-    private FakeJavaMailSender mailSender;
 
     @Autowired
     @Qualifier("mailTemplateEngine")
     SpringTemplateEngine templateEngine;
+    private EmailService emailService;
 
     @Before
     public void setUp() throws Exception {
         RestTemplate uaaTemplate = new RestTemplate();
         mockUaaServer = MockRestServiceServer.createServer(uaaTemplate);
-        uriComponentsBuilder = UriComponentsBuilder.fromUriString("http://login.example.com/login");
-        mailSender = new FakeJavaMailSender();
-        emailResetPasswordService = new EmailResetPasswordService(templateEngine, uaaTemplate, "http://uaa.example.com/uaa", mailSender, "pivotal", "http://login.example.com/login");
+        emailService = Mockito.mock(EmailService.class);
+        emailResetPasswordService = new EmailResetPasswordService(templateEngine, uaaTemplate, "http://uaa.example.com/uaa", emailService, "pivotal");
     }
 
     @Test
@@ -68,17 +72,20 @@ public class EmailResetPasswordServiceTests {
                 .andExpect(method(POST))
                 .andRespond(withSuccess("the_secret_code", APPLICATION_JSON));
 
-        emailResetPasswordService.forgotPassword(uriComponentsBuilder, "user@example.com");
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setProtocol("http");
+        request.setContextPath("/login");
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
+
+        emailResetPasswordService.forgotPassword("user@example.com");
 
         mockUaaServer.verify();
 
-        Assert.assertEquals(1, mailSender.getSentMessages().size());
-
-        FakeJavaMailSender.MimeMessageWrapper messageWrapper = mailSender.getSentMessages().get(0);
-        Assert.assertEquals(Arrays.asList(new InternetAddress("user@example.com")), messageWrapper.getRecipients(Message.RecipientType.TO));
-        Assert.assertEquals(Arrays.asList(new InternetAddress("admin@login.example.com")), messageWrapper.getFrom());
-        Assert.assertEquals("Pivotal", ((InternetAddress)messageWrapper.getFrom().get(0)).getPersonal());
-        Assert.assertThat(messageWrapper.getContentString(), containsString("<a href=\"http://login.example.com/login/reset_password?code=the_secret_code&amp;email=user%40example.com\">Reset your password</a>"));
+        Mockito.verify(emailService).sendMimeMessage(
+                eq("user@example.com"),
+                eq("Pivotal account password reset request"),
+                contains("<a href=\"http://localhost/login/reset_password?code=the_secret_code&amp;email=user%40example.com\">Reset your password</a>")
+        );
     }
 
     @Test
@@ -87,11 +94,11 @@ public class EmailResetPasswordServiceTests {
                 .andExpect(method(POST))
                 .andRespond(withBadRequest());
 
-        emailResetPasswordService.forgotPassword(uriComponentsBuilder, "user@example.com");
+        emailResetPasswordService.forgotPassword("user@example.com");
 
         mockUaaServer.verify();
 
-        Assert.assertEquals(0, mailSender.getSentMessages().size());
+        Mockito.verifyZeroInteractions(emailService);
     }
 
     @Test

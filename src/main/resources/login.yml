@@ -17,12 +17,10 @@
 #tiles:
 #  - name: Pivotal Network
 #    login-link: https://network.gopivotal.com/login
-#    signup-link: https://network.gopivotal.com/registrations/new
 #    image: /resources/pivotal/images/network-logo-gray.png
 #    image-hover: /resources/pivotal/images/network-logo-teal.png
 #  - name: Pivotal Web Services
 #    login-link: https://console.10.244.0.34.xip.io
-#    signup-link: https://console.10.244.0.34.xip.io/register
 #    image: /resources/pivotal/images/pws-logo-gray.png
 #    image-hover: /resources/pivotal/images/pws-logo-teal.png
 #  - name: Pivotal Partners

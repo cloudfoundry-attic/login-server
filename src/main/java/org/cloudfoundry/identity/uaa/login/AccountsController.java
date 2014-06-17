@@ -12,22 +12,23 @@
  *******************************************************************************/
 package org.cloudfoundry.identity.uaa.login;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
+import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 @Controller
 @RequestMapping("/accounts")
 public class AccountsController {
 
-    @Autowired
-    private TileInfo tileInfo;
+    @RequestMapping(method = POST)
+    public String sendActivationEmail() {
+        return "redirect:email_sent?code=activation";
+    }
 
-    @RequestMapping(value = "/new", method = RequestMethod.GET)
-    public String newAccount(Model model) {
-        model.addAttribute("tiles", tileInfo.getSignupTiles());
+    @RequestMapping(value = "/new", method = GET)
+    public String newAccount() {
         return "accounts/new";
     }
 }
