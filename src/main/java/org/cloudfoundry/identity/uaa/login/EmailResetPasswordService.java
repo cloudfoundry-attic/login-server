@@ -31,16 +31,16 @@ public class EmailResetPasswordService implements ResetPasswordService {
     private final Log logger = LogFactory.getLog(getClass());
 
     private final TemplateEngine templateEngine;
+    private final EmailService emailService;
     private final RestTemplate uaaTemplate;
     private final String uaaBaseUrl;
-    private final EmailService emailService;
     private final String brand;
 
-    public EmailResetPasswordService(TemplateEngine templateEngine, RestTemplate uaaTemplate, String uaaBaseUrl, EmailService emailService, String brand) {
+    public EmailResetPasswordService(TemplateEngine templateEngine, EmailService emailService, RestTemplate uaaTemplate, String uaaBaseUrl, String brand) {
         this.templateEngine = templateEngine;
+        this.emailService = emailService;
         this.uaaTemplate = uaaTemplate;
         this.uaaBaseUrl = uaaBaseUrl;
-        this.emailService = emailService;
         this.brand = brand;
     }
 

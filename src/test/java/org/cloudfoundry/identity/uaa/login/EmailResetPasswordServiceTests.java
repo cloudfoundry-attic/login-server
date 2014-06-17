@@ -12,23 +12,11 @@
  *******************************************************************************/
 package org.cloudfoundry.identity.uaa.login;
 
-import static org.hamcrest.Matchers.containsString;
-import static org.mockito.Matchers.*;
-import static org.springframework.http.HttpMethod.POST;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withBadRequest;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
-
-import org.cloudfoundry.identity.uaa.login.test.FakeJavaMailSender;
 import org.cloudfoundry.identity.uaa.login.test.ThymeleafConfig;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -39,12 +27,17 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-import org.springframework.web.util.UriComponentsBuilder;
 import org.thymeleaf.spring4.SpringTemplateEngine;
 
-import java.util.Arrays;
-import javax.mail.Message;
-import javax.mail.internet.InternetAddress;
+import static org.mockito.Matchers.contains;
+import static org.mockito.Matchers.eq;
+import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withBadRequest;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = ThymeleafConfig.class)
@@ -52,18 +45,18 @@ public class EmailResetPasswordServiceTests {
 
     private EmailResetPasswordService emailResetPasswordService;
     private MockRestServiceServer mockUaaServer;
+    private EmailService emailService;
 
     @Autowired
     @Qualifier("mailTemplateEngine")
     SpringTemplateEngine templateEngine;
-    private EmailService emailService;
 
     @Before
     public void setUp() throws Exception {
         RestTemplate uaaTemplate = new RestTemplate();
         mockUaaServer = MockRestServiceServer.createServer(uaaTemplate);
         emailService = Mockito.mock(EmailService.class);
-        emailResetPasswordService = new EmailResetPasswordService(templateEngine, uaaTemplate, "http://uaa.example.com/uaa", emailService, "pivotal");
+        emailResetPasswordService = new EmailResetPasswordService(templateEngine, emailService, uaaTemplate, "http://uaa.example.com/uaa", "pivotal");
     }
 
     @Test

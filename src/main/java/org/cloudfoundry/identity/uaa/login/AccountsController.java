@@ -14,6 +14,7 @@ package org.cloudfoundry.identity.uaa.login;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
@@ -22,8 +23,15 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 @RequestMapping("/accounts")
 public class AccountsController {
 
+    private final AccountCreationService accountCreationService;
+
+    public AccountsController(AccountCreationService accountCreationService) {
+        this.accountCreationService = accountCreationService;
+    }
+
     @RequestMapping(method = POST)
-    public String sendActivationEmail() {
+    public String sendActivationEmail(@RequestParam("email") String email) {
+        accountCreationService.beginActivation(email);
         return "redirect:email_sent?code=activation";
     }
 

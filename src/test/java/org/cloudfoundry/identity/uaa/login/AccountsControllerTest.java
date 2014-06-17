@@ -35,7 +35,7 @@ public class AccountsControllerTest {
     public void setUp() throws Exception {
         accountCreationService = Mockito.mock(AccountCreationService.class);
 
-        mockMvc = getStandaloneMockMvc(new AccountsController());
+        mockMvc = getStandaloneMockMvc(new AccountsController(accountCreationService));
     }
 
     @Test
