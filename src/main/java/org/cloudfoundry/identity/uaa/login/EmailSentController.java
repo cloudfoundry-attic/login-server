@@ -12,27 +12,16 @@
  *******************************************************************************/
 package org.cloudfoundry.identity.uaa.login;
 
-import org.springframework.util.StringUtils;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
-public class ChangePasswordValidation {
-    private final String password;
-    private final String passwordConfirmation;
+@Controller
+public class EmailSentController {
 
-    public ChangePasswordValidation(String password, String passwordConfirmation) {
-        this.password = password;
-        this.passwordConfirmation = passwordConfirmation;
-    }
-
-    public boolean valid() {
-        return StringUtils.hasText(password) && StringUtils.hasText(passwordConfirmation) && password.equals(passwordConfirmation);
-    }
-
-    @Deprecated
-    public String getMessage() {
-        return "Passwords must match and not be empty";
-    }
-
-    public String getMessageCode() {
-        return "form_error";
+    @RequestMapping(value = "/email_sent", method = RequestMethod.GET)
+    public String emailSentPage(@ModelAttribute("code") String code) {
+        return "email_sent";
     }
 }

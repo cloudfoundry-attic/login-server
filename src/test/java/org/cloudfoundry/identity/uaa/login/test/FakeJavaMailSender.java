@@ -37,7 +37,7 @@ public class FakeJavaMailSender implements JavaMailSender {
 
     public FakeJavaMailSender() {
         session = Session.getInstance(new Properties());
-        sentMessages = new ArrayList<MimeMessageWrapper>();
+        sentMessages = new ArrayList<>();
     }
 
     @Override

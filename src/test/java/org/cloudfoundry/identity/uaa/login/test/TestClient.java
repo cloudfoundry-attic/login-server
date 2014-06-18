@@ -22,8 +22,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.HtmlUtils;
 
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class TestClient {
 
@@ -99,5 +102,14 @@ public class TestClient {
         HttpEntity<String> requestEntity = new HttpEntity<String>(json, headers);
         ResponseEntity<Void> exchange = restTemplate.exchange(url, HttpMethod.POST, requestEntity, Void.class);
         Assert.assertEquals(HttpStatus.CREATED, exchange.getStatusCode());
+    }
+
+
+    public String extractLink(String messageBody) {
+        Pattern linkPattern = Pattern.compile("<a href=\"(.*?)\">.*?</a>");
+        Matcher matcher = linkPattern.matcher(messageBody);
+        matcher.find();
+        String encodedLink = matcher.group(1);
+        return HtmlUtils.htmlUnescape(encodedLink);
     }
 }

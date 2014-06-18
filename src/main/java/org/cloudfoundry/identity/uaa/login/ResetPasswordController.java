@@ -18,10 +18,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Arrays;
 import javax.servlet.http.HttpServletResponse;
@@ -41,14 +40,9 @@ public class ResetPasswordController {
     }
 
     @RequestMapping(value = "/forgot_password.do", method = RequestMethod.POST)
-    public String forgotPassword(@ModelAttribute("email") String email) {
-        resetPasswordService.forgotPassword(ServletUriComponentsBuilder.fromCurrentContextPath(), email);
-        return "redirect:email_sent";
-    }
-
-    @RequestMapping(value = "/email_sent", method = RequestMethod.GET)
-    public String emailSentPage() {
-        return "email_sent";
+    public String forgotPassword(@RequestParam("email") String email) {
+        resetPasswordService.forgotPassword(email);
+        return "redirect:email_sent?code=reset_password";
     }
 
     @RequestMapping(value = "/reset_password", method = RequestMethod.GET)
@@ -58,9 +52,9 @@ public class ResetPasswordController {
 
     @RequestMapping(value = "/reset_password.do", method = RequestMethod.POST)
     public String resetPassword(Model model,
-                                @ModelAttribute("code") String code,
-                                @ModelAttribute("password") String password,
-                                @ModelAttribute("password_confirmation") String passwordConfirmation,
+                                @RequestParam("code") String code,
+                                @RequestParam("password") String password,
+                                @RequestParam("password_confirmation") String passwordConfirmation,
                                 HttpServletResponse response) {
 
         ChangePasswordValidation validation = new ChangePasswordValidation(password, passwordConfirmation);
@@ -74,7 +68,6 @@ public class ResetPasswordController {
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username, null, Arrays.asList(UaaAuthority.UAA_USER));
         SecurityContextHolder.getContext().setAuthentication(token);
 
-        model.asMap().clear();
         return "redirect:home";
     }
 }

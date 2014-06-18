@@ -30,13 +30,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.HtmlUtils;
 
 import com.dumbster.smtp.SimpleSmtpServer;
 import com.dumbster.smtp.SmtpMessage;
 import java.security.SecureRandom;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Iterator;
 
 @RunWith(LoginServerClassRunner.class)
 @ContextConfiguration(classes = DefaultIntegrationTestConfig.class)
@@ -84,17 +82,23 @@ public class ResetPasswordIT {
 
         webDriver.findElement(By.linkText("Reset password")).click();
 
+        Assert.assertEquals("Reset Password", webDriver.findElement(By.tagName("h1")).getText());
+
+        int receivedEmailSize = simpleSmtpServer.getReceivedEmailSize();
+
         webDriver.findElement(By.name("email")).sendKeys(userEmail);
         webDriver.findElement(By.xpath("//input[@value='Send reset password link']")).click();
 
-        Assert.assertEquals(1, simpleSmtpServer.getReceivedEmailSize());
-        SmtpMessage message = (SmtpMessage) simpleSmtpServer.getReceivedEmail().next();
+        Assert.assertEquals(receivedEmailSize + 1, simpleSmtpServer.getReceivedEmailSize());
+        Iterator receivedEmail = simpleSmtpServer.getReceivedEmail();
+        SmtpMessage message = (SmtpMessage) receivedEmail.next();
+        receivedEmail.remove();
         Assert.assertEquals(userEmail, message.getHeaderValue("To"));
         Assert.assertThat(message.getBody(), containsString("Reset your password"));
 
         Assert.assertEquals("Check your email for a reset password link.", webDriver.findElement(By.cssSelector(".instructions-sent")).getText());
 
-        String link = extractLink(message.getBody());
+        String link = testClient.extractLink(message.getBody());
         webDriver.get(link);
 
         webDriver.findElement(By.name("password")).sendKeys("newsecret");
@@ -112,13 +116,5 @@ public class ResetPasswordIT {
         webDriver.findElement(By.xpath("//input[@value='Sign in']")).click();
 
         Assert.assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), containsString("Where to?"));
-    }
-
-    private String extractLink(String messageBody) {
-        Pattern linkPattern = Pattern.compile("<a href=\"(.*?)\">.*?</a>");
-        Matcher matcher = linkPattern.matcher(messageBody);
-        matcher.find();
-        String encodedLink = matcher.group(1);
-        return HtmlUtils.htmlUnescape(encodedLink);
     }
 }

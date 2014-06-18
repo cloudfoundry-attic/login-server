@@ -1,19 +1,19 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorator="layouts/main">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layouts/main">
 <head>
-    <style th:each="tile,status : ${tiles}" th:text="'.tile-' + ${status.count} + ' {background-image: url(' + @{${tile.get('image')}} + ')} .tile-' + ${status.count} + ':hover {background-image: url(' + @{${tile.get('image-hover')}} + ')}'"></style>
 </head>
 <body>
-    <div class="island" layout:fragment="page-content">
-        <h1>Create an Account</h1>
-        <ul class="tiles">
-            <li th:each="tile,status : ${tiles}">
-                <a href="https://network.gopivotal.com/registrations/new" th:href="${tile.get('signup-link')}" th:text="${tile.get('name')}" th:class="'tile-' + ${status.count}">Pivotal Network</a>
-            </li>
-        </ul>
-        <div th:each="tile : ${tiles}" class="image-preload" th:style="'background-image: url(' + @{${tile.get('image-hover')}} + ')'"></div>
+<div class="island" layout:fragment="page-content">
+    <h1>Activate Your Account</h1>
+    <div class="island-content">
+        <div th:text="|Email: ${param.email[0]}|" class="email-display">Email: user@example.com</div>
+        <form th:action="@{/accounts(email=${param.email[0]},code=${param.code[0]})}" method="post" novalidate="novalidate">
+            <div th:if="${message_code}" th:text="#{'account_activation.' + ${message_code}}" class="error-message"></div>
+            <input name="password" type="password" placeholder="Password" autocomplete="off" class="form-control"/>
+            <input name="password_confirmation" type="password" placeholder="Confirm" autocomplete="off" class="form-control"/>
+            <input type="submit" value="Activate" class="island-button"/>
+        </form>
     </div>
+</div>
 </body>
 </html>

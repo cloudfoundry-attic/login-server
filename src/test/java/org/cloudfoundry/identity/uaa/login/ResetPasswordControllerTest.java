@@ -12,10 +12,12 @@
  *******************************************************************************/
 package org.cloudfoundry.identity.uaa.login;
 
+import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.flash;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -27,7 +29,6 @@ import org.mockito.Mockito;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 public class ResetPasswordControllerTest {
@@ -62,9 +63,9 @@ public class ResetPasswordControllerTest {
                 .param("email", "user@example.com");
         mockMvc.perform(post)
                 .andExpect(status().isFound())
-                .andExpect(flash().attributeExists("success"));
+                .andExpect(redirectedUrl("email_sent?code=reset_password"));
 
-        Mockito.verify(resetPasswordService).forgotPassword(ServletUriComponentsBuilder.fromCurrentContextPath(), "user@example.com");
+        Mockito.verify(resetPasswordService).forgotPassword(eq("user@example.com"));
     }
 
     @Test
@@ -97,6 +98,7 @@ public class ResetPasswordControllerTest {
     public void testResetPasswordFormValidationFailure() throws Exception {
         MockHttpServletRequestBuilder post = post("/reset_password.do")
                 .contentType(APPLICATION_FORM_URLENCODED)
+                .param("code", "123456")
                 .param("password", "pass")
                 .param("password_confirmation", "word");
         mockMvc.perform(post)

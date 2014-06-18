@@ -40,6 +40,10 @@
     <security:http pattern="/email_sent" security="none" />
     <security:http pattern="/accounts/new" security="none" />
 
+    <bean id="uaaUrl" class="java.lang.String">
+        <constructor-arg value="${uaa.url:http://localhost:8080/uaa}"/>
+    </bean>
+
     <!-- TODO: Move the autologin related beans from the login server and saml login server to login common -->
     <bean id="abstractRemoteUaaController" abstract="true">
         <constructor-arg ref="environment" />
@@ -47,7 +51,7 @@
             <bean class="org.springframework.web.client.RestTemplate" />
         </constructor-arg>
         <property name="remoteAuthenticationManager" ref="remoteAuthenticationManager" />
-        <property name="uaaBaseUrl" value="${uaa.url:http://localhost:8080/uaa}" />
+        <property name="uaaBaseUrl" ref="uaaUrl" />
         <property name="authorizationTemplate" ref="authorizationTemplate" />
         <property name="links" ref="links" />
         <property name="codeExpirationMillis" value="300000" />
@@ -96,6 +100,12 @@
     <security:http pattern="/reset_password.do" disable-url-rewriting="true"
                    entry-point-ref="loginEntryPoint">
         <security:intercept-url pattern="/reset_password.do" access="IS_AUTHENTICATED_ANONYMOUSLY" />
+        <security:anonymous enabled="true" />
+    </security:http>
+
+    <security:http pattern="/accounts" disable-url-rewriting="true"
+                   entry-point-ref="loginEntryPoint">
+        <security:intercept-url pattern="/accounts" access="IS_AUTHENTICATED_ANONYMOUSLY" />
         <security:anonymous enabled="true" />
     </security:http>
 
@@ -214,7 +224,7 @@
     <bean id="passcodeAuthenticationFilter" class="org.cloudfoundry.identity.uaa.login.PasscodeAuthenticationFilter">
         <constructor-arg name="authenticationManager" ref="remoteAuthenticationManager" />
         <property name="authorizationTemplate" ref="authorizationTemplate" />
-        <property name="uaaBaseUrl" value="${uaa.url:http://localhost:8080/uaa}" />
+        <property name="uaaBaseUrl" ref="uaaUrl" />
         <property name="parameterNames">
             <list>
                 <value>username</value>
@@ -260,7 +270,7 @@
     </bean>
 
     <bean id="autologinAuthenticationManager" class="org.cloudfoundry.identity.uaa.login.AutologinAuthenticationManager">
-        <property name="uaaBaseUrl" value="${uaa.url:http://localhost:8080/uaa}" />
+        <property name="uaaBaseUrl" ref="uaaUrl" />
         <property name="authorizationTemplate" ref="authorizationTemplate" />
     </bean>
 
@@ -296,6 +306,7 @@
         <property name="prefix" value="classpath:/templates/web/" />
         <property name="suffix" value=".html"/>
         <property name="templateMode" value="HTML5"/>
+        <property name="cacheable" value="false" />
     </bean>
 
     <bean id="mailTemplateResolver" class="org.thymeleaf.templateresolver.TemplateResolver">
@@ -344,11 +355,36 @@
 
     <bean id="tileInfo" class="org.cloudfoundry.identity.uaa.login.TileInfo" />
 
-    <bean id="accountsController" class="org.cloudfoundry.identity.uaa.login.AccountsController" />
+    <bean id="emailService" class="org.cloudfoundry.identity.uaa.login.EmailService">
+        <constructor-arg index="0">
+            <bean class="org.springframework.mail.javamail.JavaMailSenderImpl">
+                <property name="host" value="${smtp.host:localhost}"/>
+                <property name="port" value="${smtp.port:25}"/>
+                <property name="username" value="${smtp.user:}"/>
+                <property name="password" value="${smtp.password:}"/>
+            </bean>
+        </constructor-arg>
+        <constructor-arg index="1" value="${login.url:http://localhost:8080/login}"/>
+        <constructor-arg index="2" value="${login.brand:oss}"/>
+    </bean>
+
+    <bean id="emailSentController" class="org.cloudfoundry.identity.uaa.login.EmailSentController" />
+
+    <bean id="accountCreationService" class="org.cloudfoundry.identity.uaa.login.EmailAccountCreationService">
+        <constructor-arg index="0" ref="mailTemplateEngine"/>
+        <constructor-arg index="1" ref="emailService"/>
+        <constructor-arg index="2" ref="authorizationTemplate"/>
+        <constructor-arg index="3" ref="uaaUrl"/>
+        <constructor-arg index="4" value="${login.brand:oss}"/>
+    </bean>
+
+    <bean id="accountsController" class="org.cloudfoundry.identity.uaa.login.AccountsController" >
+        <constructor-arg index="0" ref="accountCreationService"/>
+    </bean>
 
     <bean id="changePasswordService" class="org.cloudfoundry.identity.uaa.login.UaaChangePasswordService">
         <constructor-arg ref="authorizationTemplate"/>
-        <constructor-arg value="${uaa.url:http://localhost:8080/uaa}"/>
+        <constructor-arg ref="uaaUrl"/>
     </bean>
 
     <bean id="changePasswordController" class="org.cloudfoundry.identity.uaa.login.ChangePasswordController">
@@ -358,19 +394,11 @@
     <beans profile="!saml">
         <beans profile="!keystone">
             <bean id="resetPasswordService" class="org.cloudfoundry.identity.uaa.login.EmailResetPasswordService">
-                <constructor-arg ref="mailTemplateEngine" />
-                <constructor-arg ref="authorizationTemplate"/>
-                <constructor-arg value="${uaa.url:http://localhost:8080/uaa}"/>
-                <constructor-arg>
-                    <bean class="org.springframework.mail.javamail.JavaMailSenderImpl">
-                        <property name="host" value="${smtp.host:localhost}"/>
-                        <property name="port" value="${smtp.port:25}"/>
-                        <property name="username" value="${smtp.user:}"/>
-                        <property name="password" value="${smtp.password:}"/>
-                    </bean>
-                </constructor-arg>
-                <constructor-arg value="${login.brand:oss}"/>
-                <constructor-arg value="${login.url:http://localhost:8080/login}"/>
+                <constructor-arg index="0" ref="mailTemplateEngine" />
+                <constructor-arg index="1" ref="emailService"/>
+                <constructor-arg index="2" ref="authorizationTemplate"/>
+                <constructor-arg index="3" ref="uaaUrl"/>
+                <constructor-arg index="4" value="${login.brand:oss}"/>
             </bean>
 
             <bean id="resetPasswordController" class="org.cloudfoundry.identity.uaa.login.ResetPasswordController">
