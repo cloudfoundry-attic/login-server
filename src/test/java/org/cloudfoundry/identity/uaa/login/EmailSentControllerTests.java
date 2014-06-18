@@ -66,7 +66,7 @@ public class EmailSentControllerTests {
         }
 
         @Bean
-        public ResourceBundleMessageSource messageSource() {
+        ResourceBundleMessageSource messageSource() {
             ResourceBundleMessageSource resourceBundleMessageSource = new ResourceBundleMessageSource();
             resourceBundleMessageSource.setBasename("messages");
             return resourceBundleMessageSource;

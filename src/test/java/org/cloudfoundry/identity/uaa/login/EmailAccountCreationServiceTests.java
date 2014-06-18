@@ -13,6 +13,7 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.client.MockRestServiceServer;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -23,10 +24,14 @@ import java.sql.Timestamp;
 import static org.mockito.Matchers.contains;
 import static org.mockito.Matchers.eq;
 import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withBadRequest;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -88,12 +93,45 @@ public class EmailAccountCreationServiceTests {
                 .andExpect(method(POST))
                 .andExpect(jsonPath("$.code").value("expiring_code"))
                 .andExpect(jsonPath("$.password").value("secret"))
-                .andRespond(withSuccess("userman", APPLICATION_JSON));
+                .andRespond(withSuccess("user@example.com", APPLICATION_JSON));    // *
+        // * uaa actually returns a created status, but MockRestServiceServer doesn't support the created code with a response body
 
         String username = emailAccountCreationService.completeActivation("expiring_code", "secret");
 
         mockUaaServer.verify();
 
-        Assert.assertEquals("userman", username);
+        Assert.assertEquals("user@example.com", username);
+    }
+
+    @Test
+    public void testCompleteActivationWithExpiredCode() throws Exception {
+        mockUaaServer.expect(requestTo("http://uaa.example.com/uaa/create_account"))
+                .andExpect(method(POST))
+                .andExpect(jsonPath("$.code").value("expiring_code"))
+                .andExpect(jsonPath("$.password").value("secret"))
+                .andRespond(withBadRequest());
+
+        try {
+            emailAccountCreationService.completeActivation("expiring_code", "secret");
+            Assert.fail();
+        } catch (HttpClientErrorException e) {
+            Assert.assertThat(e.getStatusCode(), Matchers.equalTo(BAD_REQUEST));
+        }
+    }
+
+    @Test
+    public void testCompleteActivationWithExistingUser() throws Exception {
+        mockUaaServer.expect(requestTo("http://uaa.example.com/uaa/create_account"))
+                .andExpect(method(POST))
+                .andExpect(jsonPath("$.code").value("expiring_code"))
+                .andExpect(jsonPath("$.password").value("secret"))
+                .andRespond(withStatus(CONFLICT));
+
+        try {
+            emailAccountCreationService.completeActivation("expiring_code", "secret");
+            Assert.fail();
+        } catch (HttpClientErrorException e) {
+            Assert.assertThat(e.getStatusCode(), Matchers.equalTo(CONFLICT));
+        }
     }
 }

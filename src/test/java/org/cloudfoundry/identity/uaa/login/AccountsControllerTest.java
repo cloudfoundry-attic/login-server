@@ -12,32 +12,57 @@
  *******************************************************************************/
 package org.cloudfoundry.identity.uaa.login;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.flash;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
-
+import org.cloudfoundry.identity.uaa.login.test.ThymeleafConfig;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+import org.springframework.context.support.ResourceBundleMessageSource;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.servlet.view.InternalResourceViewResolver;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.CONFLICT;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.xpath;
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@WebAppConfiguration
+@ContextConfiguration(classes = AccountsControllerTest.ContextConfiguration.class)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class AccountsControllerTest {
 
+    @Autowired
+    WebApplicationContext webApplicationContext;
+
+    @Autowired
+    AccountCreationService accountCreationService;
+
     private MockMvc mockMvc;
-    private AccountCreationService accountCreationService;
 
     @Before
     public void setUp() throws Exception {
-        accountCreationService = Mockito.mock(AccountCreationService.class);
-
-        mockMvc = getStandaloneMockMvc(new AccountsController(accountCreationService));
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
+                .build();
     }
 
     @Test
@@ -68,38 +93,100 @@ public class AccountsControllerTest {
         Mockito.when(accountCreationService.completeActivation("expiring_code", "secret")).thenReturn("username");
 
         MockHttpServletRequestBuilder post = post("/accounts")
+                .param("email", "user@example.com")
                 .param("code", "expiring_code")
                 .param("password", "secret")
                 .param("password_confirmation", "secret");
 
         mockMvc.perform(post)
                 .andExpect(status().isFound())
+                .andExpect(model().attributeDoesNotExist("message_code"))
                 .andExpect(redirectedUrl("home"));
     }
 
     @Test
-    @Ignore
-    public void testCreateAccountWithExpiredActivationCode() throws Exception {
-        //TODO: simulate expired code on uaa
+    public void testCreateAccountWithFormValidationFailure() throws Exception {
+        MockHttpServletRequestBuilder post = post("/accounts")
+                .param("email", "user@example.com")
+                .param("code", "expiring_code")
+                .param("password", "secret")
+                .param("password_confirmation", "not_secret");
 
-        MockHttpServletRequestBuilder post = post("/accounts/new")
+        mockMvc.perform(post)
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(model().attribute("message_code", "form_error"))
+                .andExpect(view().name("accounts/new"))
+                .andExpect(xpath("//*[@class='error-message']").string("Passwords must match and not be empty."));
+
+        Mockito.verifyZeroInteractions(accountCreationService);
+    }
+
+    @Test
+    public void testCreateAccountWithExpiredActivationCode() throws Exception {
+        Mockito.when(accountCreationService.completeActivation("expired_code", "secret"))
+                .thenThrow(new HttpClientErrorException(BAD_REQUEST));
+
+        MockHttpServletRequestBuilder post = post("/accounts")
+                .param("email", "user@example.com")
                 .param("code", "expired_code")
                 .param("password", "secret")
                 .param("password_confirmation", "secret");
 
         mockMvc.perform(post)
-                .andExpect(status().isBadRequest())
-                .andExpect(flash().attribute("message_code", "code_expired"))
-                .andExpect(view().name("accounts/new"));
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(model().attribute("message_code", "code_expired"))
+                .andExpect(view().name("accounts/new"))
+                .andExpect(xpath("//*[@class='error-message']").string("Your activation code has expired. Please request another."));
     }
 
-    private MockMvc getStandaloneMockMvc(AccountsController controller) {
-        InternalResourceViewResolver viewResolver = new InternalResourceViewResolver();
-        viewResolver.setPrefix("/WEB-INF/jsp/pivotal");
-        viewResolver.setSuffix(".jsp");
-        return MockMvcBuilders
-                .standaloneSetup(controller)
-                .setViewResolvers(viewResolver)
-                .build();
+    @Test
+    public void testCreateAccountWithExistingUser() throws Exception {
+        Mockito.when(accountCreationService.completeActivation("expiring_code", "secret"))
+                .thenThrow(new HttpClientErrorException(CONFLICT));
+
+        MockHttpServletRequestBuilder post = post("/accounts")
+                .param("email", "user@example.com")
+                .param("code", "expiring_code")
+                .param("password", "secret")
+                .param("password_confirmation", "secret");
+
+        mockMvc.perform(post)
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(model().attribute("message_code", "email_already_taken"))
+                .andExpect(view().name("accounts/new"))
+                .andExpect(xpath("//*[@class='error-message']").string("You have already signed up. Please use the forgot password link from the login page."));
+    }
+
+    @Configuration
+    @EnableWebMvc
+    @Import(ThymeleafConfig.class)
+    static class ContextConfiguration extends WebMvcConfigurerAdapter {
+
+        @Override
+        public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
+            configurer.enable();
+        }
+
+        @Bean
+        BuildInfo buildInfo() {
+            return new BuildInfo();
+        }
+
+        @Bean
+        public ResourceBundleMessageSource messageSource() {
+            ResourceBundleMessageSource resourceBundleMessageSource = new ResourceBundleMessageSource();
+            resourceBundleMessageSource.setBasename("messages");
+            return resourceBundleMessageSource;
+        }
+
+        @Bean
+        AccountCreationService accountCreationService() {
+            return Mockito.mock(AccountCreationService.class);
+        }
+
+        @Bean
+        AccountsController accountsController(AccountCreationService accountCreationService) {
+            return new AccountsController(accountCreationService);
+        }
     }
 }

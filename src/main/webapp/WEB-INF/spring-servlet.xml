@@ -38,7 +38,7 @@
     <security:http pattern="/forgot_password*" security="none" />
     <security:http pattern="/reset_password" security="none" />
     <security:http pattern="/email_sent" security="none" />
-    <security:http pattern="/accounts/**" security="none" />
+    <security:http pattern="/accounts/new" security="none" />
 
     <bean id="uaaUrl" class="java.lang.String">
         <constructor-arg value="${uaa.url:http://localhost:8080/uaa}"/>
@@ -100,6 +100,12 @@
     <security:http pattern="/reset_password.do" disable-url-rewriting="true"
                    entry-point-ref="loginEntryPoint">
         <security:intercept-url pattern="/reset_password.do" access="IS_AUTHENTICATED_ANONYMOUSLY" />
+        <security:anonymous enabled="true" />
+    </security:http>
+
+    <security:http pattern="/accounts" disable-url-rewriting="true"
+                   entry-point-ref="loginEntryPoint">
+        <security:intercept-url pattern="/accounts" access="IS_AUTHENTICATED_ANONYMOUSLY" />
         <security:anonymous enabled="true" />
     </security:http>
 
