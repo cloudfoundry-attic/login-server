@@ -253,7 +253,7 @@ public class RemoteUaaController extends AbstractControllerInfo {
         if (principal != null) {
             map.set("source", "login");
             map.setAll(getLoginCredentials(principal));
-            map.remove("credentials"); // legacy vmc might break otherwise
+            map.remove("credentials"); // legacy cf might break otherwise
             map.remove("password"); // request for token will not use password
         }
         else {

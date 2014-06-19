@@ -75,7 +75,7 @@
         <custom-filter ref="autologinAuthenticationFilter" position="FORM_LOGIN_FILTER" />
     </http>
 
-    <!-- Version of the /authorize endpoint for stateless clients such as VMC -->
+    <!-- Version of the /authorize endpoint for stateless clients such as cf -->
     <!-- Pattern: /oauth/authorize parameters:{response_type=token,credentials={} -->
     <http name="statelessAuthzEndpointSecurity" request-matcher-ref="oauthAuthorizeRequestMatcher" create-session="stateless"
         entry-point-ref="oauthAuthenticationEntryPoint" authentication-manager-ref="remoteAuthenticationManager"

@@ -178,7 +178,7 @@ public class SamlRemoteUaaController extends RemoteUaaController {
                     map.set("source", "login");
                     map.set("client_id", getClientId(clientInfoResponse.getBody()));
                     map.setAll(getLoginCredentials(principal));
-                    map.remove("credentials"); // legacy vmc might break otherwise
+                    map.remove("credentials"); // legacy cf might break otherwise
                 } else {
                     throw new BadCredentialsException("No principal found in authorize endpoint");
                 }
