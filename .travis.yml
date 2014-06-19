@@ -4,6 +4,7 @@ env:
     - CATALINA_PID=/tmp/tomcat.pid
     - CATALINA_OUT=/tmp/tomcat.log
     - CATALINA_OPTS="-XX:MaxPermSize=256M -DUAA_PROFILE=local"
+  secure: "QSurpsJrLI2gu1NzPtN09FlL8IUpyX6mIeP3r5PTB0WkAWe6MT5VUyxThKrZ2NtDeV0qTSN+yyvnyTBf5kJGSnXuB5XMJzYgHVY1YnXbuLEK0pvwQGBl9kqKomG/hDDBgIyH5LWk0Z41Zz1fIKlBlSlbsz/97CwfcPo+bnttBLA="
   matrix:
     - SPRING_PROFILES=default,coverage
     - SPRING_PROFILES=default,saml,coverage
@@ -42,8 +43,30 @@ script:
 after_success:
   - $TRAVIS_BUILD_DIR/.cobertura-report.sh
   - mvn coveralls:cobertura
+  - python scripts/travis/travis_after_all.py
+  - export $(cat .to_export_back)
+  - |
+      if [ "$BUILD_LEADER" = "YES" ]; then
+        if [ "$BUILD_AGGREGATE_STATUS" = "others_succeeded" ]; then
+          echo "All Succeded!"
+          if [ "$TRAVIS_BRANCH" = "develop" ]; then
+            $TRAVIS_BUILD_DIR/scripts/travis/auto-bump-uaa.sh
+          fi
+        else
+          echo "Some Failed"
+        fi
+      fi
 after_failure:
+  - python scripts/travis/travis_after_all.py
+  - export $(cat .to_export_back)
+  - |
+      if [ "$BUILD_LEADER" = "YES" ]; then
+        if [ "$BUILD_AGGREGATE_STATUS" = "others_failed" ]; then
+          echo "All Failed"
+        else
+          echo "Some Failed"
+        fi
+      fi
   - cat $CATALINA_OUT
 after_script:
-  - rm -rf tomcat
-  - rm -f tomcat.tar.gz
+  - echo leader=$BUILD_LEADER status=$BUILD_AGGREGATE_STATUS
