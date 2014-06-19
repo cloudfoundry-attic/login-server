@@ -2,7 +2,11 @@
 
 cd `dirname $0`/../..
 
+git config --global user.email "cf-identity-eng@pivotallabs.com"
+git config --global user.name "CF Identity Travis bot"
+
 set -x
+
 
 cd uaa
 git checkout `git tag -l 'travis-success-*' | sort -n | tail -n 1`
