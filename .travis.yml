@@ -9,6 +9,8 @@ env:
     - SPRING_PROFILES=default,saml,coverage
 cache:
   apt: true
+  directories:
+  - $HOME/.m2/repository
 before_install:
   - git pull --unshallow
   - wget -O tomcat.tar.gz http://archive.apache.org/dist/tomcat/tomcat-7/v7.0.52/bin/apache-tomcat-7.0.52.tar.gz
@@ -24,12 +26,9 @@ install:
   - export WEBAPPS_DIR=$TRAVIS_BUILD_DIR/target/tomcat/webapps
   - rm -rf $WEBAPPS_DIR/*
   - export IDENTITY_VERSION=`mvn help:evaluate -Dexpression=project.parent.version | grep -v "\[" | tail -n 1`
-  - mvn dependency:copy -Dartifact=org.cloudfoundry.identity:cloudfoundry-identity-uaa:$IDENTITY_VERSION:war -DoutputDirectory=$WEBAPPS_DIR
-  - mv $WEBAPPS_DIR/cloudfoundry-identity-uaa-*.war $WEBAPPS_DIR/uaa.war
-  - mvn dependency:copy -Dartifact=org.cloudfoundry.identity:cloudfoundry-identity-app:$IDENTITY_VERSION:war -DoutputDirectory=$WEBAPPS_DIR
-  - mv $WEBAPPS_DIR/cloudfoundry-identity-app-*.war $WEBAPPS_DIR/app.war
-  - mvn dependency:copy -Dartifact=org.cloudfoundry.identity:cloudfoundry-identity-api:$IDENTITY_VERSION:war -DoutputDirectory=$WEBAPPS_DIR
-  - mv $WEBAPPS_DIR/cloudfoundry-identity-api-*.war $WEBAPPS_DIR/api.war
+  - mv $TRAVIS_BUILD_DIR/uaa/uaa/target/cloudfoundry-identity-uaa-*.war $WEBAPPS_DIR/uaa.war
+  - mv $TRAVIS_BUILD_DIR/uaa/samples/app/target/cloudfoundry-identity-app-*.war $WEBAPPS_DIR/app.war
+  - mv $TRAVIS_BUILD_DIR/uaa/samples/api/target/cloudfoundry-identity-api-*.war $WEBAPPS_DIR/api.war
 before_script:
   - $TRAVIS_BUILD_DIR/.cobertura-instrument.sh
   - mvn -Dwar.exploded.dir=$WEBAPPS_DIR/login war:exploded -P coverage
