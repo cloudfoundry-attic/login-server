@@ -4,9 +4,9 @@ cd `dirname $0`/../..
 
 git config --global user.email "cf-identity-eng@pivotallabs.com"
 git config --global user.name "CF Login Server Travis bot"
+git config --global credential.username "$GH_TOKEN"
 
 set -x
-
 
 cd uaa
 git checkout `git tag -l 'travis-success-*' | sort -n | tail -n 1`
@@ -16,4 +16,8 @@ echo `git commit -m "Auto-updating UAA to latest develop version"`
 
 set +x
 
-git push https://cf-identity-eng:$GH_TOKEN@github.com/cloudfoundry/login-server.git develop > /dev/null 2>&1
+expect -c '
+spawn git push origin develop
+expect {
+":" { send "\n" }
+}' > /dev/null 2>&1
