@@ -16,4 +16,4 @@ echo `git commit -m "Auto-updating UAA to latest develop version"`
 
 set +x
 
-git push https://cf-identity-eng:$GH_TOKEN@github.com/cloudfoundry/login-server.git develop
+git push https://cf-identity-eng:$GH_TOKEN@github.com/cloudfoundry/login-server.git develop > /dev/null 2>&1
