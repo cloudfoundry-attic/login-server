@@ -3,7 +3,7 @@
 cd `dirname $0`/../..
 
 git config --global user.email "cf-identity-eng@pivotallabs.com"
-git config --global user.name "CF Identity Travis bot"
+git config --global user.name "CF Login Server Travis bot"
 
 set -x
 
