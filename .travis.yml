@@ -4,7 +4,7 @@ env:
     - CATALINA_PID=/tmp/tomcat.pid
     - CATALINA_OUT=/tmp/tomcat.log
     - CATALINA_OPTS="-XX:MaxPermSize=256M -DUAA_PROFILE=local"
-    - secure: "VA1HorscBIGor+Io9PvnXKRBinJXQ9FsHpe8QoT57Gkb3TaOmURn2irFgKY1QtgAOMsY3GpqpWZ1U5ycNIa9kVq/waWKdqGi4WFqQn3WBCbfjDm5WKiFT4yxcbxBI5vNuXAZ9VdSY7P3kVJiB73MMO3PwbPXXfzR6NPMrzXl4/s="
+    - secure: "J5DYxGOG/3MjrzoEJLla/GVq2Z5Nx2oCbYEDNRbAnIIol0Dj5JK1++mXpED3+4fJKkNQBhqMZn1t6P0s/OIng0pUpg9QB7tKAMdJ+N7FKRAM5Ko8g+XhWXWAmxbob3uy2qPIEGWDczskTBmwZus/Zv3N59qwNUGq3HRiCR5BR3g="
   matrix:
     - SPRING_PROFILES=default,coverage
     - SPRING_PROFILES=default,saml,coverage
