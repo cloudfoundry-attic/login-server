@@ -20,4 +20,4 @@ expect -c '
 spawn git push origin develop
 expect {
 ":" { send "\n" }
-}' > /dev/null 2>&1
+}' | grep -v $GH_TOKEN
