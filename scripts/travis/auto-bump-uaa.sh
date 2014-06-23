@@ -17,7 +17,7 @@ echo `git commit -m "Auto-updating UAA to latest develop version"`
 set +x
 
 expect -c '
-spawn git push origin develop
+spawn git push https://github.com/cloudfoundry/login-server.git develop
 expect {
 ":" { send "\n" }
 }' | grep -v $GH_TOKEN
