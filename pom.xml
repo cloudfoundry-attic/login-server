@@ -19,7 +19,7 @@
     <groupId>org.cloudfoundry.identity</groupId>
     <artifactId>cloudfoundry-login-server</artifactId>
     <version>1.7.1-SNAPSHOT</version>
-    <packaging>war</packaging>
+    <packaging>pom</packaging>
     <name>Cloud Foundry Login Server</name>
     <description>Login/SAML2 Service provider for Cloud Foundry</description>
 
@@ -467,28 +467,6 @@
     </profiles>
 
     <dependencies>
-        <!--<dependency>-->
-            <!--<groupId>${project.parent.groupId}</groupId>-->
-            <!--<artifactId>cloudfoundry-identity-common</artifactId>-->
-            <!--<version>${project.parent.version}</version>-->
-            <!--<exclusions>-->
-                <!--<exclusion>-->
-                    <!--<artifactId>spring-tx</artifactId>-->
-                    <!--<groupId>org.springframework</groupId>-->
-                <!--</exclusion>-->
-                <!--<exclusion>-->
-                    <!--<artifactId>spring-jdbc</artifactId>-->
-                    <!--<groupId>org.springframework</groupId>-->
-                <!--</exclusion>-->
-            <!--</exclusions>-->
-        <!--</dependency>-->
-
-        <!--<dependency>-->
-            <!--<groupId>org.cloudfoundry.identity</groupId>-->
-            <!--<artifactId>cloudfoundry-identity-scim</artifactId>-->
-            <!--<version>${project.parent.version}</version>-->
-        <!--</dependency>-->
-
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>
@@ -757,14 +735,6 @@
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-jwt</artifactId>
             <version>1.0.1.RELEASE</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>${project.parent.groupId}</groupId>
-            <artifactId>cloudfoundry-identity-common</artifactId>
-            <version>${project.parent.version}</version>
-            <type>test-jar</type>
             <scope>test</scope>
         </dependency>
     </dependencies>
