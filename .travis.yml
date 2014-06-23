@@ -9,6 +9,7 @@ env:
     - SPRING_PROFILES=default,coverage
     - SPRING_PROFILES=default,saml,coverage
 before_install:
+  - sudo apt-get -qy install expect
   - git pull --unshallow
   - wget -O tomcat.tar.gz http://archive.apache.org/dist/tomcat/tomcat-7/v7.0.52/bin/apache-tomcat-7.0.52.tar.gz
 install:
