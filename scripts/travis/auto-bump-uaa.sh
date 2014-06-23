@@ -20,4 +20,4 @@ expect -c '
 spawn git push https://github.com/cloudfoundry/login-server.git develop
 expect {
 ":" { send "\n" }
-}' | grep -v $GH_TOKEN
+}' 2>&1 | grep -v $GH_TOKEN
