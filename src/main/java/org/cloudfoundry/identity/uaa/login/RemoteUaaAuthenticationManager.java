@@ -77,6 +77,9 @@ public class RemoteUaaAuthenticationManager implements AuthenticationManager {
      */
     public void setRestTemplate(RestOperations restTemplate) {
         this.restTemplate = restTemplate;
+        if (restTemplate instanceof RestTemplate) {
+            initRestTemplateErrorHandler((RestTemplate)restTemplate);
+        }
     }
     
     public RestOperations getRestTemplate() {
@@ -84,8 +87,11 @@ public class RemoteUaaAuthenticationManager implements AuthenticationManager {
     }
 
     public RemoteUaaAuthenticationManager() {
-        RestTemplate restTemplate = new RestTemplate();
+        setRestTemplate(new RestTemplate());
         // The default java.net client doesn't allow you to handle 4xx responses
+    }
+
+    private void initRestTemplateErrorHandler(RestTemplate restTemplate) {
         restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
         restTemplate.setErrorHandler(new DefaultResponseErrorHandler() {
             @Override
@@ -93,7 +99,6 @@ public class RemoteUaaAuthenticationManager implements AuthenticationManager {
                 return statusCode.series() == HttpStatus.Series.SERVER_ERROR;
             }
         });
-        this.restTemplate = restTemplate;
     }
 
     @Override
