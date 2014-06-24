@@ -20,6 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.cloudfoundry.identity.uaa.authentication.AuthzAuthenticationRequest;
 import org.cloudfoundry.identity.uaa.authentication.UaaAuthenticationDetails;
+import org.cloudfoundry.identity.uaa.authentication.UaaPrincipal;
 import org.cloudfoundry.identity.uaa.client.SocialClientUserDetails;
 import org.cloudfoundry.identity.uaa.codestore.ExpiringCode;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -110,7 +111,19 @@ public class AutologinAuthenticationManager implements AuthenticationManager {
         }
 
         // ensure that we stored clientId
-        String clientId = (String) user.getDetails();
+        String clientId = null;
+        String origin = null;
+        String userId = null;
+        Object principal = user.getUsername();
+        if (user.getDetails() instanceof String) {
+            clientId = (String) user.getDetails();
+        } else if (user.getDetails() instanceof Map) {
+            Map<String,String> map = (Map<String,String>)user.getDetails();
+            clientId = map.get("client_id");
+            origin = map.get("origin");
+            userId = map.get("user_id");
+            principal = new UaaPrincipal(userId,user.getUsername(),null,origin,null);
+        }
         if (clientId == null) {
             throw new BadCredentialsException("Cannot redeem provided code for user, client id missing");
         }
@@ -125,8 +138,7 @@ public class AutologinAuthenticationManager implements AuthenticationManager {
             throw new BadCredentialsException("Cannot redeem provided code for user, client mismatch");
         }
 
-        UsernamePasswordAuthenticationToken result = new UsernamePasswordAuthenticationToken(user.getUsername(), null,
-                        user.getAuthorities());
+        UsernamePasswordAuthenticationToken result = new UsernamePasswordAuthenticationToken(principal, null, user.getAuthorities());
         result.setDetails(authentication.getDetails());
         return result;
 
