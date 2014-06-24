@@ -393,12 +393,13 @@ public class RemoteUaaController extends AbstractControllerInfo {
         if (username == null) {
             throw new BadCredentialsException("No username in request");
         }
+        Authentication remoteAuthentication = null;
         if (remoteAuthenticationManager != null) {
             String password = request.getPassword();
             if (!StringUtils.hasText(password)) {
                 throw new BadCredentialsException("No password in request");
             }
-            remoteAuthenticationManager.authenticate(new AuthzAuthenticationRequest(username, password, null));
+            remoteAuthentication = remoteAuthenticationManager.authenticate(new AuthzAuthenticationRequest(username, password, null));
         }
 
         String base64Credentials = auth.substring("Basic".length()).trim();
@@ -411,7 +412,16 @@ public class RemoteUaaController extends AbstractControllerInfo {
         String clientId = values[0];
         logger.debug("Autologin authentication request for user:" + username + "; client:" + clientId);
         SocialClientUserDetails user = new SocialClientUserDetails(username, UaaAuthority.USER_AUTHORITIES);
-        user.setDetails(clientId);
+        Map<String,String> details = new HashMap<>();
+        details.put("client_id", clientId);
+        user.setDetails(details);
+        if (remoteAuthentication!=null && remoteAuthentication.getPrincipal() instanceof UaaPrincipal) {
+            UaaPrincipal p = (UaaPrincipal)remoteAuthentication.getPrincipal();
+            if (p!=null) {
+                details.put("origin", p.getOrigin());
+                details.put("user_id",p.getId());
+            }
+        }
 
         ResponseEntity<ExpiringCode> response = doGenerateCode(user);
         return new AutologinResponse(response.getBody().getCode());
