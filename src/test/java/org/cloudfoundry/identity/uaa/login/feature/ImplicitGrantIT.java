@@ -84,8 +84,8 @@ public class ImplicitGrantIT {
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
 
         LinkedMultiValueMap<String, String> postBody = new LinkedMultiValueMap<>();
-        postBody.add("client_id", "vmc");
-        postBody.add("redirect_uri", "https://uaa.cloudfoundry.com/redirect/vmc");
+        postBody.add("client_id", "cf");
+        postBody.add("redirect_uri", "https://uaa.cloudfoundry.com/redirect/cf");
         postBody.add("response_type", "token");
         postBody.add("source", "credentials");
         postBody.add("username", testAccounts.getUserName());
@@ -100,7 +100,7 @@ public class ImplicitGrantIT {
 
         UriComponents locationComponents = UriComponentsBuilder.fromUri(responseEntity.getHeaders().getLocation()).build();
         Assert.assertEquals("uaa.cloudfoundry.com", locationComponents.getHost());
-        Assert.assertEquals("/redirect/vmc", locationComponents.getPath());
+        Assert.assertEquals("/redirect/cf", locationComponents.getPath());
 
         MultiValueMap<String, String> params = parseFragmentParams(locationComponents);
 
@@ -123,8 +123,8 @@ public class ImplicitGrantIT {
         });
 
         Assert.assertThat((String) claims.get("jti"), is(params.getFirst("jti")));
-        Assert.assertThat((String) claims.get("client_id"), is("vmc"));
-        Assert.assertThat((String) claims.get("cid"), is("vmc"));
+        Assert.assertThat((String) claims.get("client_id"), is("cf"));
+        Assert.assertThat((String) claims.get("cid"), is("cf"));
         Assert.assertThat((String) claims.get("user_name"), is(testAccounts.getUserName()));
 
         Assert.assertThat(((List<String>) claims.get("scope")), containsInAnyOrder(scopes));
@@ -139,8 +139,8 @@ public class ImplicitGrantIT {
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
 
         LinkedMultiValueMap<String, String> postBody = new LinkedMultiValueMap<>();
-        postBody.add("client_id", "vmc");
-        postBody.add("redirect_uri", "https://uaa.cloudfoundry.com/redirect/vmc");
+        postBody.add("client_id", "cf");
+        postBody.add("redirect_uri", "https://uaa.cloudfoundry.com/redirect/cf");
         postBody.add("response_type", "token");
         postBody.add("source", "credentials");
         postBody.add("username", testAccounts.getUserName());
@@ -158,7 +158,7 @@ public class ImplicitGrantIT {
 
         UriComponents locationComponents = UriComponentsBuilder.fromUri(responseEntity.getHeaders().getLocation()).build();
         Assert.assertEquals("uaa.cloudfoundry.com", locationComponents.getHost());
-        Assert.assertEquals("/redirect/vmc", locationComponents.getPath());
+        Assert.assertEquals("/redirect/cf", locationComponents.getPath());
 
         MultiValueMap<String, String> params = parseFragmentParams(locationComponents);
 

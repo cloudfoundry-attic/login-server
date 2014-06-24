@@ -16,7 +16,6 @@ import org.cloudfoundry.identity.uaa.login.test.DefaultIntegrationTestConfig;
 import org.cloudfoundry.identity.uaa.login.test.IntegrationTestRule;
 import org.cloudfoundry.identity.uaa.login.test.TestClient;
 import org.cloudfoundry.identity.uaa.test.UaaTestAccounts;
-import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,16 +29,23 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestOperations;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = DefaultIntegrationTestConfig.class)
@@ -94,7 +100,109 @@ public class AutologinIT {
 
         webDriver.get(baseUrl);
 
-        Assert.assertEquals(testAccounts.getUserName(), webDriver.findElement(By.cssSelector(".header .nav")).getText());
+        assertEquals(testAccounts.getUserName(), webDriver.findElement(By.cssSelector(".header .nav")).getText());
+    }
+
+    @Test
+    public void testSimpleAutologinFlow() throws Exception {
+        HttpHeaders headers = getAppBasicAuthHttpHeaders();
+
+        LinkedMultiValueMap<String, String> requestBody = new LinkedMultiValueMap<>();
+        requestBody.add("username", testAccounts.getUserName());
+        requestBody.add("password", testAccounts.getPassword());
+
+        //generate an autologin code with our credentials
+        ResponseEntity<Map> autologinResponseEntity = restOperations.exchange(baseUrl + "/autologin",
+            HttpMethod.POST,
+            new HttpEntity<>(requestBody, headers),
+            Map.class);
+        String autologinCode = (String) autologinResponseEntity.getBody().get("code");
+
+        //start the authorization flow - this will issue a login event
+        //by using the autologin code
+        String authorizeUrl = UriComponentsBuilder.fromHttpUrl(baseUrl)
+            .path("/oauth/authorize")
+            .queryParam("redirect_uri", appUrl)
+            .queryParam("response_type", "code")
+            .queryParam("client_id", "app")
+            .queryParam("code", autologinCode)
+            .build().toUriString();
+
+        //rest template that does NOT follow redirects
+        RestTemplate template = new RestTemplate(new HttpClientFactory());
+        headers.remove("Authorization");
+        ResponseEntity<Map> authorizeResponse = template.exchange(authorizeUrl,
+            HttpMethod.GET,
+            new HttpEntity<>(new HashMap<String,String>(),headers),
+            Map.class);
+
+
+        //we are now logged in. retrieve the JSESSIONID
+        List<String> cookies = authorizeResponse.getHeaders().get("Set-Cookie");
+        assertEquals(1, cookies.size());
+        headers = getAppBasicAuthHttpHeaders();
+        headers.add("Cookie", cookies.get(0));
+
+        //if we receive a 200, then we must approve our scopes
+        if (HttpStatus.OK == authorizeResponse.getStatusCode()) {
+            authorizeUrl = UriComponentsBuilder.fromHttpUrl(baseUrl)
+                .path("/oauth/authorize")
+                .queryParam("user_oauth_approval", "true")
+                .build().toUriString();
+            authorizeResponse = template.exchange(authorizeUrl,
+                HttpMethod.POST,
+                new HttpEntity<>(new HashMap<String,String>(),headers),
+                Map.class);
+        }
+
+        //approval is complete, we receive a token code back
+        assertEquals(HttpStatus.FOUND, authorizeResponse.getStatusCode());
+        List<String> location = authorizeResponse.getHeaders().get("Location");
+        assertEquals(1, location.size());
+        String newCode = location.get(0).substring(location.get(0).indexOf("code=") + 5);
+
+        //request a token using our code
+        String tokenUrl = UriComponentsBuilder.fromHttpUrl(baseUrl)
+            .path("/oauth/token")
+            .queryParam("response_type", "token")
+            .queryParam("grant_type", "authorization_code")
+            .queryParam("code", newCode)
+            .queryParam("redirect_uri", appUrl)
+            .build().toUriString();
+
+        ResponseEntity<Map> tokenResponse = template.exchange(
+            tokenUrl,
+            HttpMethod.POST,
+            new HttpEntity<>(new HashMap<String, String>(), headers),
+            Map.class);
+        assertEquals(HttpStatus.OK, tokenResponse.getStatusCode());
+
+        //here we must reset our state. we do that by following the logout flow.
+        headers.clear();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        ResponseEntity<Void> loginResponse = restOperations.exchange(baseUrl + "/login.do",
+            HttpMethod.POST,
+            new HttpEntity<>(requestBody, headers),
+            Void.class);
+        cookies = loginResponse.getHeaders().get("Set-Cookie");
+        assertEquals(1, cookies.size());
+        headers.clear();
+        headers.add("Cookie", cookies.get(0));
+        restOperations.exchange(baseUrl + "/profile",
+            HttpMethod.GET,
+            new HttpEntity<>(null, headers),Void.class);
+
+        String revokeApprovalsUrl = UriComponentsBuilder.fromHttpUrl(baseUrl)
+            .path("/profile")
+            .build().toUriString();
+        requestBody.clear();
+        requestBody.add("clientId","app");
+        requestBody.add("delete","");
+        ResponseEntity<Void> revokeResponse = template.exchange(revokeApprovalsUrl,
+            HttpMethod.POST,
+            new HttpEntity<>(requestBody, headers),
+            Void.class);
+        assertEquals(HttpStatus.FOUND, revokeResponse.getStatusCode());
     }
 
     @Test
@@ -112,7 +220,7 @@ public class AutologinIT {
                 Map.class);
 
         String autologinCode = (String) autologinResponseEntity.getBody().get("code");
-        Assert.assertEquals(6, autologinCode.length());
+        assertEquals(6, autologinCode.length());
     }
 
     @Test
@@ -128,7 +236,7 @@ public class AutologinIT {
                     new HttpEntity<>(requestBody, headers),
                     Map.class);
         } catch (HttpClientErrorException e) {
-            Assert.assertEquals(HttpStatus.UNAUTHORIZED, e.getStatusCode());
+            assertEquals(HttpStatus.UNAUTHORIZED, e.getStatusCode());
         }
     }
 
@@ -144,7 +252,7 @@ public class AutologinIT {
                     new HttpEntity<>(requestBody),
                     Map.class);
         } catch (HttpClientErrorException e) {
-            Assert.assertEquals(HttpStatus.UNAUTHORIZED, e.getStatusCode());
+            assertEquals(HttpStatus.UNAUTHORIZED, e.getStatusCode());
         }
     }
 
@@ -176,7 +284,7 @@ public class AutologinIT {
         try {
             restOperations.exchange(authorizeUrl, HttpMethod.GET, null, Void.class);
         } catch (HttpClientErrorException e) {
-            Assert.assertEquals(HttpStatus.UNAUTHORIZED, e.getStatusCode());
+            assertEquals(HttpStatus.UNAUTHORIZED, e.getStatusCode());
         }
     }
 
@@ -184,5 +292,12 @@ public class AutologinIT {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", testClient.getBasicAuthHeaderValue("app", "appclientsecret"));
         return headers;
+    }
+
+    private static class HttpClientFactory extends SimpleClientHttpRequestFactory {
+        protected void prepareConnection(HttpURLConnection connection, String httpMethod) throws IOException {
+            super.prepareConnection(connection, httpMethod);
+            connection.setInstanceFollowRedirects(false);
+        }
     }
 }
