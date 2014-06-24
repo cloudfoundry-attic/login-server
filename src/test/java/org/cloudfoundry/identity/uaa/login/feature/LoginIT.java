@@ -23,9 +23,15 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.client.test.TestAccounts;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.web.client.RestTemplate;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = DefaultIntegrationTestConfig.class)
@@ -53,6 +59,32 @@ public class LoginIT {
         webDriver.findElement(By.xpath("//input[@value='Sign in']")).click();
 
         Assert.assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), Matchers.containsString("Where to?"));
+    }
+
+    @Test
+    public void testLoggingInFailure() throws Exception {
+        webDriver.get(baseUrl + "/login");
+        Assert.assertEquals("Cloud Foundry", webDriver.getTitle());
+
+        webDriver.findElement(By.name("username")).sendKeys(testAccounts.getUserName());
+        webDriver.findElement(By.name("password")).sendKeys("invalidpassword");
+        webDriver.findElement(By.xpath("//input[@value='Sign in']")).click();
+
+        Assert.assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), Matchers.containsString("Welcome!"));
+    }
+
+    @Test
+    public void testFailedLogin() throws Exception {
+        RestTemplate template = new RestTemplate();
+        LinkedMultiValueMap<String,String> body = new LinkedMultiValueMap<>();
+        body.add("username", testAccounts.getUserName());
+        body.add("password", "invalidpassword");
+        ResponseEntity<Void> loginResponse = template.exchange(baseUrl + "/login.do",
+            HttpMethod.POST,
+            new HttpEntity<>(body, null),
+            Void.class);
+        Assert.assertEquals(HttpStatus.FOUND, loginResponse.getStatusCode());
+
     }
 
     @Test
