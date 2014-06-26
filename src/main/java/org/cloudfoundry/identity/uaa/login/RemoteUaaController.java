@@ -287,7 +287,12 @@ public class RemoteUaaController extends AbstractControllerInfo {
             model.putAll(body);
             model.put("links", getLinksInfo());
             if (!body.containsKey("options")) {
-                throw new OAuth2Exception("No options returned from UAA for user approval");
+                String errorMsg = "No options returned from UAA for user approval";
+                if (body.containsKey("error")) {
+                    throw OAuth2Exception.create((String)body.get("error"), (String)(body.containsKey("error_description")?body.get("error_description"):errorMsg));
+                } else {
+                    throw new OAuth2Exception(errorMsg);
+                }
             }
             logger.info("Approval required in /oauth/authorize for: " + principal.getName());
             return new ModelAndView("access_confirmation", model);
