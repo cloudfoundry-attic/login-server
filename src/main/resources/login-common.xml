@@ -138,6 +138,7 @@
 	</bean>
 
 	<oauth:rest-template id="authorizationTemplate" resource="uaa" />
+    <oauth:rest-template id="remoteAuthManagerAuthorizationTemplate" resource="uaa" />
 
 	<bean id="healthzEndpoint" class="org.cloudfoundry.identity.uaa.web.HealthzEndpoint" />
 
@@ -164,7 +165,7 @@
 
     <bean id="remoteAuthenticationManager" class="org.cloudfoundry.identity.uaa.login.RemoteUaaAuthenticationManager" >
         <property name="loginUrl" value="${uaa.login.url:http://localhost:8080/uaa/authenticate}" />
-        <property name="restTemplate" ref="authorizationTemplate"/>
+        <property name="restTemplate" ref="remoteAuthManagerAuthorizationTemplate"/>
 	</bean>
 
 </beans>
