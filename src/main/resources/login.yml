@@ -29,9 +29,15 @@
 #    image-hover: /resources/pivotal/images/partners-logo-teal.png
 
 links:
+  # Custom external create account link
+  #signup: http://some-oauth-client.example.com/signup
   passwd: http://localhost:8080/login/forgot_password
 
 login:
+  # Enable create account on the Login Server (enabled by default)
+  # - links.signup will still be used if present
+  #signupsEnabled: false
+
   # the brand to use for password reset emails and page titles
   # (defaults to oss)
   #brand: pivotal
