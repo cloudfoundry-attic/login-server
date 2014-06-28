@@ -292,7 +292,8 @@
 
     <bean id="openIdUserDetailsService" class="org.cloudfoundry.identity.uaa.openid2.OpenIdUserDetailsService" />
 
-
+    <context:annotation-config />
+    <bean id="loginServerConfig" class="org.cloudfoundry.identity.uaa.login.LoginServerConfig" />
 
     <mvc:resources mapping="/resources/**" location="/resources/" />
     <mvc:annotation-driven />
@@ -375,10 +376,6 @@
         <constructor-arg index="2" ref="authorizationTemplate"/>
         <constructor-arg index="3" ref="uaaUrl"/>
         <constructor-arg index="4" value="${login.brand:oss}"/>
-    </bean>
-
-    <bean id="accountsController" class="org.cloudfoundry.identity.uaa.login.AccountsController" >
-        <constructor-arg index="0" ref="accountCreationService"/>
     </bean>
 
     <bean id="changePasswordService" class="org.cloudfoundry.identity.uaa.login.UaaChangePasswordService">
