@@ -306,7 +306,6 @@
         <property name="prefix" value="classpath:/templates/web/" />
         <property name="suffix" value=".html"/>
         <property name="templateMode" value="HTML5"/>
-        <property name="cacheable" value="false" />
     </bean>
 
     <bean id="mailTemplateResolver" class="org.thymeleaf.templateresolver.TemplateResolver">
