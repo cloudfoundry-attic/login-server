@@ -12,6 +12,8 @@
  *******************************************************************************/
 package org.cloudfoundry.identity.uaa.login;
 
+import org.cloudfoundry.identity.uaa.authentication.Origin;
+import org.cloudfoundry.identity.uaa.authentication.UaaPrincipal;
 import org.cloudfoundry.identity.uaa.user.UaaAuthority;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,8 +25,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.HttpClientErrorException;
 
 import javax.servlet.http.HttpServletResponse;
-
-import java.util.Arrays;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
@@ -59,9 +59,9 @@ public class AccountsController {
             return "accounts/new";
         }
 
-        String username;
+        AccountCreationService.Account account;
         try {
-            username = accountCreationService.completeActivation(code, password);
+            account = accountCreationService.completeActivation(code, password);
         } catch (HttpClientErrorException e) {
             if (e.getStatusCode().equals(HttpStatus.CONFLICT)) {
                 model.addAttribute("message_code", "email_already_taken");
@@ -72,7 +72,8 @@ public class AccountsController {
             return "accounts/new";
         }
 
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username, null, Arrays.asList(UaaAuthority.UAA_USER));
+        UaaPrincipal uaaPrincipal = new UaaPrincipal(account.getUserId(), account.getUsername(), account.getUsername(), Origin.UAA, null);
+        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(uaaPrincipal, null, UaaAuthority.USER_AUTHORITIES);
         SecurityContextHolder.getContext().setAuthentication(token);
 
         return "redirect:home";

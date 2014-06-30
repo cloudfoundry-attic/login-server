@@ -89,18 +89,20 @@ public class EmailAccountCreationServiceTests {
 
     @Test
     public void testCompleteActivation() throws Exception {
+        String responseJson = "{\"user_id\":\"newly-created-user-id\",\"username\":\"user@example.com\"}";
         mockUaaServer.expect(requestTo("http://uaa.example.com/uaa/create_account"))
                 .andExpect(method(POST))
                 .andExpect(jsonPath("$.code").value("expiring_code"))
                 .andExpect(jsonPath("$.password").value("secret"))
-                .andRespond(withSuccess("user@example.com", APPLICATION_JSON));    // *
+                .andRespond(withSuccess(responseJson, APPLICATION_JSON));    // *
         // * uaa actually returns a created status, but MockRestServiceServer doesn't support the created code with a response body
 
-        String username = emailAccountCreationService.completeActivation("expiring_code", "secret");
+        AccountCreationService.Account account = emailAccountCreationService.completeActivation("expiring_code", "secret");
 
         mockUaaServer.verify();
 
-        Assert.assertEquals("user@example.com", username);
+        Assert.assertEquals("user@example.com", account.getUsername());
+        Assert.assertEquals("newly-created-user-id", account.getUserId());
     }
 
     @Test

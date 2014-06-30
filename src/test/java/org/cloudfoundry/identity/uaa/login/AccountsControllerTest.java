@@ -28,6 +28,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.context.WebApplicationContext;
@@ -90,7 +91,8 @@ public class AccountsControllerTest {
 
     @Test
     public void testCreateAccount() throws Exception {
-        Mockito.when(accountCreationService.completeActivation("expiring_code", "secret")).thenReturn("username");
+        Mockito.when(accountCreationService.completeActivation("expiring_code", "secret"))
+            .thenReturn(new AccountCreationService.Account("newly-created-user-id", "username"));
 
         MockHttpServletRequestBuilder post = post("/accounts")
                 .param("email", "user@example.com")

@@ -12,11 +12,14 @@
  *******************************************************************************/
 package org.cloudfoundry.identity.uaa.login.test;
 
+import org.cloudfoundry.identity.uaa.login.LoginServerConfig;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.ImportResource;
 
 @Configuration
 @ImportResource("file:./src/main/webapp/WEB-INF/spring-servlet.xml")
+@Import(LoginServerConfig.class)
 public class DefaultTestConfig {
     // empty java config allows autowired fields in tests without alterations to spring-servlet.xml
 }

@@ -12,6 +12,8 @@ import org.thymeleaf.spring4.SpringTemplateEngine;
 import javax.mail.MessagingException;
 import java.io.UnsupportedEncodingException;
 import java.sql.Timestamp;
+import java.util.HashMap;
+import java.util.Map;
 
 public class EmailAccountCreationService implements AccountCreationService {
 
@@ -53,8 +55,11 @@ public class EmailAccountCreationService implements AccountCreationService {
     }
 
     @Override
-    public String completeActivation(String code, String password) {
-        return uaaTemplate.postForObject(uaaBaseUrl + "/create_account", new Account(code, password), String.class);
+    public AccountCreationService.Account completeActivation(String code, String password) {
+        Map<String, String> accountCreationRequest = new HashMap<>();
+        accountCreationRequest.put("code", code);
+        accountCreationRequest.put("password", password);
+        return uaaTemplate.postForObject(uaaBaseUrl + "/create_account", accountCreationRequest, AccountCreationService.Account.class);
     }
 
     private String getSubjectText() {
@@ -70,23 +75,5 @@ public class EmailAccountCreationService implements AccountCreationService {
         ctx.setVariable("email", email);
         ctx.setVariable("accountsUrl", accountsUrl);
         return templateEngine.process("activate", ctx);
-    }
-
-    private static class Account {
-        private final String code;
-        private final String password;
-
-        public Account(String code, String password) {
-            this.code = code;
-            this.password = password;
-        }
-
-        public String getPassword() {
-            return password;
-        }
-
-        public String getCode() {
-            return code;
-        }
     }
 }
