@@ -1,4 +1,5 @@
 rootProject.name = 'cloudfoundry-login-server'
+include ':cloudfoundry-identity-parent'
 include ':cloudfoundry-identity-parent:cloudfoundry-identity-common'
 include ':cloudfoundry-identity-parent:cloudfoundry-identity-scim'
 include ':cloudfoundry-identity-parent:cloudfoundry-identity-uaa'
@@ -6,6 +7,7 @@ include ':cloudfoundry-identity-parent:cloudfoundry-identity-samples:cloudfoundr
 include ':cloudfoundry-identity-parent:cloudfoundry-identity-samples:cloudfoundry-identity-app'
 include ':cloudfoundry-identity-parent:cloudfoundry-identity-samples'
 
+project(':cloudfoundry-identity-parent').projectDir = "$rootDir/uaa" as File
 project(':cloudfoundry-identity-parent:cloudfoundry-identity-common').projectDir = "$rootDir/uaa/common" as File
 project(':cloudfoundry-identity-parent:cloudfoundry-identity-scim').projectDir = "$rootDir/uaa/scim" as File
 project(':cloudfoundry-identity-parent:cloudfoundry-identity-uaa').projectDir = "$rootDir/uaa/uaa" as File
