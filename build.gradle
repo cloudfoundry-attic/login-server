@@ -109,11 +109,77 @@ dependencies {
   providedCompile(group: 'javax.servlet', name: 'jsp-api', version:'2.0')
 */}
 
-task buildInfo {
-  def cmd = "git show -s --format=\"git.commit.id.abbrev=%h%ngit.commit.time=%ai\""
-  def proc = cmd.execute()
-  // TODO: Generate git.properties
+configurations {
+  coberturaJar
 }
+
+dependencies {
+  coberturaJar("net.sourceforge.cobertura:cobertura:2.0.3") {
+    exclude(group: "org.mortbay.jetty")
+  }
+}
+
+apply plugin: 'cobertura'
+
+cobertura {
+  coverageFormats = ['xml', 'html']
+  coverageMergeDatafiles = [
+    new File("build/cobertura/cobertura.ser"),
+    new File(System.properties['java.io.tmpdir'] + 'cargo/conf/cobertura.ser')
+  ]
+}
+
+apply plugin: 'flyway'
+
+flyway {
+  switch (databaseType()) {
+    case 'mysql':
+      driver = 'org.mariadb.jdbc.Driver'
+      url = 'jdbc:mysql://localhost:3306/uaa'
+      user = 'root'
+      password = 'changeme'
+      schemas = ['uaa']
+      break
+    case 'postgresql':
+      driver = 'org.postgresql.Driver'
+      url = 'jdbc:postgresql:uaa'
+      user = 'root'
+      password = 'changeme'
+      break
+  }
+}
+
+task prepareDatabase {
+  dependsOn { databaseType().equals('hsqldb') ? null : flywayClean }
+  finalizedBy { rootProject.tasks.findByName('cargoStartLocal') }
+}
+
+task flushCoverageData(type: Exec) {
+  commandLine "curl", "-s", "-v", "-X", "POST", "http://localhost:8080/uaa/healthz/coverage/flush"
+
+  finalizedBy { rootProject.tasks.findByName('cargoStopLocal') }
+  onlyIf { runningWithCoverage() }
+}
+
+apply from: 'uaa/uaa/build_properties.gradle'
+
+task integrationTest(type: Test) {
+  dependsOn prepareDatabase
+
+  finalizedBy flushCoverageData
+
+  filter {
+    includeTestsMatching "*IT"
+  }
+}
+
+task instrumentedWar(type: War, dependsOn: instrument) {
+  destinationDir = file("$buildDir/instrumented_libs")
+  classpath = war.classpath.minus(files('/classes')).plus(files('/instrumented_classes'))
+  onlyIf { runningWithCoverage() }
+}
+
+assemble.dependsOn instrumentedWar
 
 apply plugin: 'cargo'
 
@@ -175,16 +241,6 @@ project.gradle.taskGraph.whenReady { TaskExecutionGraph graph ->
       }
     }
   }
-}
-
-apply plugin: 'cobertura'
-
-cobertura {
-  coverageFormats = ['xml', 'html']
-  coverageMergeDatafiles = [
-    new File("build/cobertura/cobertura.ser"),
-    new File(System.properties['java.io.tmpdir'] + 'cargo/conf/cobertura.ser')
-  ]
 }
 
 apply plugin: 'coveralls'
