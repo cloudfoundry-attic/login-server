@@ -12,8 +12,14 @@
  *******************************************************************************/
 package org.cloudfoundry.identity.uaa.login;
 
-import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.any;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.Mockito;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.servlet.view.InternalResourceViewResolver;
+
 import static org.mockito.Matchers.eq;
 import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -22,14 +28,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mockito;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 public class ResetPasswordControllerTest {
     private MockMvc mockMvc;
@@ -70,11 +68,9 @@ public class ResetPasswordControllerTest {
 
     @Test
     public void testResetPasswordPage() throws Exception {
-        mockMvc.perform(get("/reset_password").param("code", "secret_code"))
+        mockMvc.perform(get("/reset_password").param("email", "user@example.com").param("code", "secret_code"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("reset_password"))
-                .andExpect(model().attributeDoesNotExist("message"))
-                .andExpect(model().attribute("code", "secret_code"));
+                .andExpect(view().name("reset_password"));
     }
 
     @Test
