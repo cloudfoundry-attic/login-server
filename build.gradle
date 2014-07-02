@@ -199,6 +199,10 @@ cargo {
   port = 8080
   
   local {
+    systemProperties {
+      property 'UAA_PROFILE', 'local'
+    }
+
     installer {
       installUrl = 'http://archive.apache.org/dist/tomcat/tomcat-7/v7.0.52/bin/apache-tomcat-7.0.52.tar.gz'
       downloadDir = file("$buildDir/download")
