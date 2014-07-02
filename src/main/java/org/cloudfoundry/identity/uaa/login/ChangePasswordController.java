@@ -56,7 +56,7 @@ public class ChangePasswordController {
         }
 
         SecurityContext securityContext = SecurityContextHolder.getContext();
-        String username = (String) securityContext.getAuthentication().getName();
+        String username = securityContext.getAuthentication().getName();
 
         try {
             changePasswordService.changePassword(username, currentPassword, newPassword);
