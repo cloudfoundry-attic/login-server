@@ -84,6 +84,7 @@ dependencies {
   }
 }
 
+apply plugin: 'cargo'
 apply plugin: 'cobertura'
 
 cobertura {
@@ -120,8 +121,6 @@ task instrumentedWar(type: War, dependsOn: instrument) {
 }
 
 assemble.dependsOn instrumentedWar
-
-apply plugin: 'cargo'
 
 Task[] cargoDependencies = [
   assemble,
