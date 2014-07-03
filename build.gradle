@@ -74,6 +74,8 @@ dependencies {
   testCompile group: 'dumbster', name: 'dumbster', version:'1.6'
 }
 
+apply from: 'uaa/artifactory.gradle'
+
 configurations {
   coberturaJar
 }
