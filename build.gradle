@@ -221,7 +221,7 @@ def runningWithCoverage() {
 }
 
 def databaseType() {
-  List activeProfiles = (System.getenv('TESTENV') ?: '').split(',')
+  List activeProfiles = (System.getenv('SPRING_PROFILES') ?: '').split(',')
   if (activeProfiles.contains('mysql')) {
     'mysql'
   } else if (activeProfiles.contains('postgresql')) {

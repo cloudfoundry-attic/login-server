@@ -17,9 +17,9 @@ install:
   - $TRAVIS_BUILD_DIR/.apply_spring_profiles_to_login_yaml.sh $SPRING_PROFILES
   - cat src/main/resources/login.yml
 script:
-  - ./gradlew cobertura
+  - ./gradlew :cobertura
 after_success:
-  - ./gradlew coveralls
+  - ./gradlew :coveralls
   - python scripts/travis/travis_after_all.py
   - export $(cat .to_export_back)
   - |
