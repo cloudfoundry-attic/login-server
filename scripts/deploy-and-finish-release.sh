@@ -21,8 +21,6 @@ git push origin master --tags
 git co develop
 git merge releases/$1 --no-ff -m "Merge branch 'releases/$1' into develop"
 git branch -d releases/$1
-cd uaa && git co develop
-cd `dirname $0`/..
 ./scripts/set-version.sh $2
 git commit -am "Bump next developer version"
 
@@ -35,7 +33,6 @@ echo releases/$1 merged into master, tagged and pushed
 echo
 echo releases/$1 back merged into develop
 echo
-echo UAA version bumped to head of develop
 echo Login Server version bumped to $2 on develop
 echo
 echo Check the dev versions, ammend if necessary, and push the changes
