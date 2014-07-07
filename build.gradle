@@ -80,7 +80,6 @@ dependencies {
 apply plugin: 'artifactory'
 
 artifactory {
-  contextUrl = "http://repo.spring.io"
   publish {
     contextUrl = "http://repo.spring.io"
     repository {
