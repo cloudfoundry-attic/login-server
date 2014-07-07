@@ -15,6 +15,10 @@ buildscript {
   }
 }
 
+ext {
+  integrationCoverageFile = file("$buildDir/integration.ser")
+}
+
 allprojects {
   /* http://issues.gradle.org/browse/GRADLE-2470 */
   apply plugin: 'java'
@@ -106,7 +110,7 @@ cobertura {
   coverageFormats = ['xml', 'html']
   coverageMergeDatafiles = [
     new File("build/cobertura/cobertura.ser"),
-    new File(System.properties['java.io.tmpdir'], 'cargo/conf/cobertura.ser')
+    integrationCoverageFile
   ]
 }
 
@@ -119,8 +123,14 @@ task flushCoverageData(type: Exec) {
 
 apply from: 'uaa/uaa/build_properties.gradle'
 
+task resetCoverage(type: Delete) {
+  delete integrationCoverageFile
+
+  onlyIf { runningWithCoverage() }
+}
+
 task integrationTest(type: Test) {
-  dependsOn cargoStartLocal
+  dependsOn cargoStartLocal, resetCoverage
 
   systemProperty "spring.profiles.active", System.getenv('TESTENV') ?: 'default'
 
@@ -157,6 +167,7 @@ cargo {
   local {
     systemProperties {
       property 'UAA_PROFILE', 'local'
+      property 'net.sourceforge.cobertura.datafile', integrationCoverageFile
     }
 
     installer {
