@@ -122,6 +122,8 @@ apply from: 'uaa/uaa/build_properties.gradle'
 task integrationTest(type: Test) {
   dependsOn cargoStartLocal
 
+  systemProperty "spring.profiles.active", System.getenv('TESTENV') ?: 'default'
+
   finalizedBy flushCoverageData
 
   filter {
