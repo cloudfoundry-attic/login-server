@@ -12,18 +12,19 @@
  *******************************************************************************/
 package org.cloudfoundry.identity.uaa.login;
 
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpMethod.PUT;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
-
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
+
+import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.HttpStatus.FOUND;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 public class UaaChangePasswordServiceTest {
     private MockRestServiceServer mockUaaServer;
@@ -38,14 +39,12 @@ public class UaaChangePasswordServiceTest {
 
     @Test
     public void testChangePassword() throws Exception {
-        mockUaaServer.expect(requestTo("http://uaa.example.com/uaa/Users?filter=userName%20eq%20'the%20user%20name'&attributes=id"))
-                .andExpect(method(GET))
-                .andRespond(withSuccess("123", APPLICATION_JSON));
-
-        mockUaaServer.expect(requestTo("http://uaa.example.com/uaa/Users/123/password"))
-                .andExpect(method(PUT))
-//                .andExpect(jsonPath("$."))
-                .andRespond(withSuccess("derp derp", APPLICATION_JSON));
+        mockUaaServer.expect(requestTo("http://uaa.example.com/uaa/password_change"))
+                .andExpect(method(POST))
+                .andExpect(jsonPath("$.username").value("the user name"))
+                .andExpect(jsonPath("$.current_password").value("current password"))
+                .andExpect(jsonPath("$.new_password").value("new password"))
+                .andRespond(withSuccess("the user name", APPLICATION_JSON));
 
         subject.changePassword("the user name", "current password", "new password");
 

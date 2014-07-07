@@ -1,0 +1,220 @@
+buildscript {
+  repositories {
+    mavenCentral()
+    jcenter()
+    maven {
+      url 'http://repo.spring.io/plugins-release'
+    }
+  }
+
+  dependencies {
+    classpath group: 'org.gradle.api.plugins', name: 'gradle-cargo-plugin', version: '1.5'
+    classpath group: 'org.jfrog.buildinfo', name: 'build-info-extractor-gradle', version: '2.2.4'
+    classpath group: 'net.saliman', name: 'gradle-cobertura-plugin', version: '2.2.2'
+    classpath group: 'org.kt3k.gradle.plugin', name: 'coveralls-gradle-plugin', version: '0.4.1'
+  }
+}
+
+ext {
+  integrationCoverageFile = file("$buildDir/integration.ser")
+}
+
+allprojects {
+  /* http://issues.gradle.org/browse/GRADLE-2470 */
+  apply plugin: 'java'
+  sourceCompatibility = 1.7
+  targetCompatibility = 1.7
+}
+
+apply from: 'uaa/shared_versions.gradle'
+
+apply plugin: 'maven'
+group = 'org.cloudfoundry.identity'
+
+apply plugin: 'war'
+description = 'Cloud Foundry Login Server'
+
+task packageSources(type: Jar) {
+  classifier = 'sources'
+  from sourceSets.main.allSource
+
+}
+artifacts.archives packageSources
+repositories {
+  maven { url "http://maven.springframework.org/release" }
+  maven { url "http://maven.springframework.org/milestone" }
+  maven { url "http://maven.springframework.org/snapshot" }
+  maven { url "http://objectstyle.org/maven2/" }
+  maven { url "http://repo.springsource.org/ext-release-local" }
+  maven { url "http://repo.maven.apache.org/maven2" }
+}
+
+dependencies {
+  Project identityCommon = project(':cloudfoundry-identity-parent:cloudfoundry-identity-common')
+
+  compile(identityCommon) {
+    exclude(module: 'jna')
+  }
+  compile group: 'org.springframework', name: 'spring-context-support', version:springVersion
+  compile group: 'org.springframework.security', name: 'spring-security-openid', version:springSecurityVersion
+  compile(group: 'org.springframework.security.extensions', name: 'spring-security-saml2-core', version:'1.0.0.RC3-SNAPSHOT') {
+    exclude(module: 'bcprov-jdk15')
+  }
+  compile group: 'org.thymeleaf', name: 'thymeleaf-spring4', version:'2.1.2.RELEASE'
+  compile group: 'nz.net.ultraq.thymeleaf', name: 'thymeleaf-layout-dialect', version:'1.2.3'
+  compile group: 'org.thymeleaf.extras', name: 'thymeleaf-extras-springsecurity3', version:'2.1.1.RELEASE'
+  compile group: 'javax.mail', name: 'mail', version:'1.4.7'
+  runtime group: 'org.springframework.security', name: 'spring-security-config', version:springSecurityVersion
+  testCompile identityCommon.sourceSets.test.output
+  testCompile group: 'org.springframework', name: 'spring-test', version:springVersion
+  testCompile group: 'junit', name: 'junit', version:'4.11'
+  testCompile group: 'org.hamcrest', name: 'hamcrest-all', version:'1.3'
+  testCompile group: 'org.mockito', name: 'mockito-all', version:'1.8.5'
+  testCompile group: 'com.jayway.jsonpath', name: 'json-path', version:'0.9.1'
+  testCompile group: 'com.jayway.jsonpath', name: 'json-path-assert', version:'0.9.1'
+  testCompile group: 'org.seleniumhq.selenium', name: 'selenium-java', version:'2.42.2'
+  testCompile group: 'com.github.detro.ghostdriver', name: 'phantomjsdriver', version:'1.1.0'
+  testCompile group: 'dumbster', name: 'dumbster', version:'1.6'
+}
+
+apply plugin: 'artifactory'
+
+artifactory {
+  contextUrl = "http://repo.spring.io"
+  publish {
+    contextUrl = "http://repo.spring.io"
+    repository {
+      repoKey = version.endsWith('-SNAPSHOT') ? 'libs-snapshot-local' : 'libs-release-local'
+      username = project.hasProperty('artifactory_user') ? "${artifactory_user}" : ""
+      password = project.hasProperty('artifactory_password') ? "${artifactory_password}" : ""
+      maven = true
+    }
+  }
+}
+
+configurations {
+  coberturaJar
+}
+
+dependencies {
+  coberturaJar("net.sourceforge.cobertura:cobertura:2.0.3") {
+    exclude(group: "org.mortbay.jetty")
+  }
+}
+
+apply plugin: 'cargo'
+apply plugin: 'cobertura'
+
+cobertura {
+  coverageFormats = ['xml', 'html']
+  coverageMergeDatafiles = [
+    new File("build/cobertura/cobertura.ser"),
+    integrationCoverageFile
+  ]
+}
+
+task flushCoverageData(type: Exec) {
+  commandLine "curl", "-s", "-v", "-X", "POST", "http://localhost:8080/uaa/healthz/coverage/flush"
+
+  finalizedBy { rootProject.tasks.findByName('cargoStopLocal') }
+  onlyIf { runningWithCoverage() }
+}
+
+apply from: 'uaa/uaa/build_properties.gradle'
+
+task resetCoverage(type: Delete) {
+  delete integrationCoverageFile
+
+  onlyIf { runningWithCoverage() }
+}
+
+task integrationTest(type: Test) {
+  dependsOn cargoStartLocal, resetCoverage
+
+  systemProperty "spring.profiles.active", System.getenv('TESTENV') ?: 'default'
+
+  finalizedBy flushCoverageData
+
+  filter {
+    includeTestsMatching "*IT"
+  }
+}
+
+task instrumentedWar(type: War, dependsOn: instrument) {
+  destinationDir = file("$buildDir/instrumented_libs")
+  classpath = files('build/instrumented_classes').plus(war.classpath.minus(files(sourceSets.main.output.classesDir)))
+  onlyIf { runningWithCoverage() }
+}
+
+assemble.dependsOn instrumentedWar
+
+Task[] cargoDependencies = [
+  assemble,
+  project(':cloudfoundry-identity-parent:cloudfoundry-identity-uaa').assemble,
+  project(':cloudfoundry-identity-parent:cloudfoundry-identity-samples:cloudfoundry-identity-app').assemble,
+  project(':cloudfoundry-identity-parent:cloudfoundry-identity-samples:cloudfoundry-identity-api').assemble
+]
+cargoStartLocal.dependsOn cargoDependencies
+cargoRunLocal.dependsOn cargoDependencies
+
+task run(dependsOn: cargoRunLocal)
+
+cargo {
+  containerId = 'tomcat7x'
+  port = 8080
+  
+  local {
+    systemProperties {
+      property 'UAA_PROFILE', 'local'
+      property 'net.sourceforge.cobertura.datafile', integrationCoverageFile
+    }
+
+    installer {
+      installUrl = 'http://archive.apache.org/dist/tomcat/tomcat-7/v7.0.52/bin/apache-tomcat-7.0.52.tar.gz'
+      downloadDir = file("$buildDir/download")
+      extractDir = file("$buildDir/extract")
+    }
+  }
+}
+
+project.gradle.taskGraph.whenReady { TaskExecutionGraph graph ->
+  cargo {
+    String uaaVersion = project(':cloudfoundry-identity-parent').version
+
+    deployable {
+      if (runningWithCoverage()) {
+        file = file('build/instrumented_libs/cloudfoundry-login-server-' + version + '.war')
+      } else {
+        file = file('build/libs/cloudfoundry-login-server-' + version + '.war')
+      }
+      context = 'login'
+    }
+
+    deployable {
+      file = file('uaa/uaa/build/libs/cloudfoundry-identity-uaa-' + uaaVersion + '.war')
+      context = 'uaa'
+    }
+
+    deployable {
+      file = file('uaa/samples/api/build/libs/cloudfoundry-identity-api-' + uaaVersion + '.war')
+      context = 'api'
+    }
+
+    deployable {
+      file = file('uaa/samples/app/build/libs/cloudfoundry-identity-app-' + uaaVersion + '.war')
+      context = 'app'
+    }
+
+    local {
+      if (runningWithCoverage()) {
+        extraClasspath = files(configurations.coberturaJar.files)
+      }
+    }
+  }
+}
+
+apply plugin: 'coveralls'
+
+def runningWithCoverage() {
+  project.tasks.findByName('instrument').enabled
+}

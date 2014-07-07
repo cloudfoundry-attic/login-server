@@ -30,3 +30,6 @@ coverage.ec
 git.properties
 *.md.html
 phantomjsdriver.log
+.gradle/
+build/
+/classes/

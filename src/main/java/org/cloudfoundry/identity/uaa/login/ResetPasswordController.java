@@ -45,7 +45,7 @@ public class ResetPasswordController {
         return "redirect:email_sent?code=reset_password";
     }
 
-    @RequestMapping(value = "/reset_password", method = RequestMethod.GET)
+    @RequestMapping(value = "/reset_password", method = RequestMethod.GET, params = { "email", "code" })
     public String resetPasswordPage() {
         return "reset_password";
     }

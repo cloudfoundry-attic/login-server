@@ -38,7 +38,7 @@ import java.util.Iterator;
 
 @RunWith(LoginServerClassRunner.class)
 @ContextConfiguration(classes = DefaultIntegrationTestConfig.class)
-@UnlessProfileActive(values = {"saml", "ldap", "keystone"})
+@UnlessProfileActive(values = "saml")
 public class ResetPasswordIT {
 
     @Autowired @Rule
