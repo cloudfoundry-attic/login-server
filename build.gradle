@@ -30,7 +30,6 @@ apply from: 'uaa/shared_versions.gradle'
 
 apply plugin: 'maven'
 group = 'org.cloudfoundry.identity'
-version = '1.7.1-SNAPSHOT'
 
 apply plugin: 'war'
 description = 'Cloud Foundry Login Server'
