@@ -6,12 +6,10 @@ env:
     - TESTENV=default
     - TESTENV=default,saml
 cache:
-  apt: true
   directories:
     - $HOME/.gradle
 before_install:
   - cp $TRAVIS_BUILD_DIR/uaa/scripts/travis/init.gradle $HOME/.gradle
-  - sudo apt-get -qy install expect
   - git pull --unshallow
 install:
   - $TRAVIS_BUILD_DIR/.apply_spring_profiles_to_login_yaml.sh $TESTENV

@@ -4,7 +4,6 @@ cd `dirname $0`/../..
 
 git config --global user.email "cf-identity-eng@pivotallabs.com"
 git config --global user.name "CF Login Server Travis bot"
-git config --global credential.username "$GH_TOKEN"
 
 set -x
 
@@ -16,9 +15,4 @@ echo `git commit -m "Auto-updating UAA to latest develop version"`
 
 set +x
 
-expect -c '
-spawn git push https://github.com/cloudfoundry/login-server.git develop
-expect {
-":" { send "\r" }
-}
-expect' 2>&1 | grep -v $GH_TOKEN
+git push https://$GH_TOKEN:x-oauth-basic@github.com/cloudfoundry/login-server.git develop 2>&1 | grep -v $GH_TOKEN
