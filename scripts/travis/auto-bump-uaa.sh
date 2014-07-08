@@ -7,6 +7,7 @@ git config --global user.name "CF Login Server Travis bot"
 
 set -x
 
+git checkout develop
 cd uaa
 git checkout `git tag -l 'travis-success-*' | sort -n | tail -n 1`
 cd ..
