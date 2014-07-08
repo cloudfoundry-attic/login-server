@@ -127,6 +127,10 @@ task resetCoverage(type: Delete) {
   onlyIf { runningWithCoverage() }
 }
 
+test {
+  exclude '**/*IT.class'
+}
+
 task integrationTest(type: Test) {
   dependsOn cargoStartLocal, resetCoverage
 
