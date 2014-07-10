@@ -44,8 +44,8 @@ public class AccountsControllerIntegrationTest {
     public void setUp() throws Exception {
         webApplicationContext = new XmlWebApplicationContext();
         webApplicationContext.setServletContext(new MockServletContext());
-        webApplicationContext.setConfigLocation("file:./src/main/webapp/WEB-INF/spring-servlet.xml");
         new YamlServletProfileInitializer().initialize(webApplicationContext);
+        webApplicationContext.setConfigLocation("file:./src/main/webapp/WEB-INF/spring-servlet.xml");
         webApplicationContext.addBeanFactoryPostProcessor(new UaaRestTemplateBeanFactoryPostProcessor());
         webApplicationContext.refresh();
         FilterChainProxy springSecurityFilterChain = webApplicationContext.getBean("springSecurityFilterChain", FilterChainProxy.class);
