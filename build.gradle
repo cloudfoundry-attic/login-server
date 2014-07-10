@@ -134,8 +134,6 @@ test {
 task integrationTest(type: Test) {
   dependsOn cargoStartLocal, resetCoverage
 
-  systemProperty "spring.profiles.active", System.getenv('TESTENV') ?: 'default'
-
   finalizedBy flushCoverageData
 
   filter {
@@ -213,6 +211,10 @@ project.gradle.taskGraph.whenReady { TaskExecutionGraph graph ->
         extraClasspath = files(configurations.coberturaJar.files)
       }
     }
+  }
+
+  project.tasks.withType(Test).each {
+    it.systemProperty 'spring.profiles.active', System.getProperty('spring.profiles.active', 'default')
   }
 }
 

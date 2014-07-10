@@ -15,7 +15,7 @@ install:
   - $TRAVIS_BUILD_DIR/.apply_spring_profiles_to_login_yaml.sh $TESTENV
   - cat src/main/resources/login.yml
 script:
-  - ./gradlew :cobertura
+  - ./gradlew -Dspring.profiles.active=$TESTENV :cobertura
 after_success:
   - ./gradlew :coveralls
   - python scripts/travis/travis_after_all.py
