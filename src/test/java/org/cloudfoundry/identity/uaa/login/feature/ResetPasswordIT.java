@@ -117,4 +117,23 @@ public class ResetPasswordIT {
 
         Assert.assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), containsString("Where to?"));
     }
+
+    @Test
+    public void resettingAPasswordForANonExistentUser() throws Exception {
+        webDriver.get(baseUrl + "/login");
+        Assert.assertEquals("Cloud Foundry", webDriver.getTitle());
+
+        webDriver.findElement(By.linkText("Reset password")).click();
+
+        Assert.assertEquals("Reset Password", webDriver.findElement(By.tagName("h1")).getText());
+
+        int receivedEmailSize = simpleSmtpServer.getReceivedEmailSize();
+
+        webDriver.findElement(By.name("email")).sendKeys("nonexistent@example.com");
+        webDriver.findElement(By.xpath("//input[@value='Send reset password link']")).click();
+
+        Assert.assertEquals("Instructions Sent", webDriver.findElement(By.tagName("h1")).getText());
+
+        Assert.assertEquals(receivedEmailSize, simpleSmtpServer.getReceivedEmailSize());
+    }
 }
