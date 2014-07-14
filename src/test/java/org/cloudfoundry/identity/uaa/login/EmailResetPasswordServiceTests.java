@@ -20,6 +20,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -37,6 +38,7 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withBadRequest;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -78,6 +80,28 @@ public class EmailResetPasswordServiceTests {
                 eq("user@example.com"),
                 eq("Pivotal account password reset request"),
                 contains("<a href=\"http://localhost/login/reset_password?code=the_secret_code&amp;email=user%40example.com\">Reset your password</a>")
+        );
+    }
+
+    @Test
+    public void testWhenUnprocessableEntityIsReturnedByTheUaa() throws Exception {
+        mockUaaServer.expect(requestTo("http://uaa.example.com/uaa/password_resets"))
+                .andExpect(method(POST))
+                .andRespond(withStatus(HttpStatus.UNPROCESSABLE_ENTITY));
+
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setProtocol("http");
+        request.setContextPath("/login");
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
+
+        emailResetPasswordService.forgotPassword("user@example.com");
+
+        mockUaaServer.verify();
+
+        Mockito.verify(emailService).sendMimeMessage(
+                eq("user@example.com"),
+                eq("Pivotal account password reset request"),
+                contains("Your account credentials for localhost are managed by an external service. Please contact your administrator for password recovery requests.")
         );
     }
 

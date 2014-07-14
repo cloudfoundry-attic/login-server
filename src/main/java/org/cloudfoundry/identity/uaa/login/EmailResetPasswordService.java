@@ -14,10 +14,11 @@ package org.cloudfoundry.identity.uaa.login;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import org.springframework.web.util.UriComponentsBuilder;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
@@ -47,10 +48,21 @@ public class EmailResetPasswordService implements ResetPasswordService {
     @Override
     public void forgotPassword(String email) {
         String subject = getSubjectText();
+        String htmlContent = null;
         try {
             String code = uaaTemplate.postForObject(uaaBaseUrl + "/password_resets", email, String.class);
-            String htmlContent = getEmailHtml(code, email);
+            htmlContent = getCodeSentEmailHtml(code, email);
+        } catch (HttpClientErrorException e) {
+            if (e.getStatusCode() == HttpStatus.UNPROCESSABLE_ENTITY) {
+                htmlContent = getResetUnavailableEmailHtml(email);
+            } else {
+                logger.info("Exception raised while creating password reset for " + email, e);
+            }
+        } catch (RestClientException e) {
+            logger.error("Exception raised while creating password reset for " + email, e);
+        }
 
+        if (htmlContent != null) {
             try {
                 emailService.sendMimeMessage(email, subject, htmlContent);
             } catch (MessagingException e) {
@@ -58,8 +70,6 @@ public class EmailResetPasswordService implements ResetPasswordService {
             } catch (UnsupportedEncodingException e) {
                 logger.error("Exception raised while sending message to " + email, e);
             }
-        } catch (RestClientException e) {
-            logger.info("Exception raised while creating password reset for " + email, e);
         }
     }
 
@@ -79,7 +89,7 @@ public class EmailResetPasswordService implements ResetPasswordService {
         return uaaTemplate.postForObject("{baseUrl}/password_change", formData, String.class, uriVariables);
     }
 
-    private String getEmailHtml(String code, String email) {
+    private String getCodeSentEmailHtml(String code, String email) {
         String resetUrl = ServletUriComponentsBuilder.fromCurrentContextPath().path("/reset_password").build().toUriString();
 
         final Context ctx = new Context();
@@ -88,5 +98,15 @@ public class EmailResetPasswordService implements ResetPasswordService {
         ctx.setVariable("email", email);
         ctx.setVariable("resetUrl", resetUrl);
         return templateEngine.process("reset_password", ctx);
+    }
+
+    private String getResetUnavailableEmailHtml(String email) {
+        String hostname = ServletUriComponentsBuilder.fromCurrentContextPath().build().getHost();
+
+        final Context ctx = new Context();
+        ctx.setVariable("serviceName", brand.equals("pivotal") ? "Pivotal " : "");
+        ctx.setVariable("email", email);
+        ctx.setVariable("hostname", hostname);
+        return templateEngine.process("reset_password_unavailable", ctx);
     }
 }
