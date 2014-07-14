@@ -19,7 +19,7 @@ then
     git checkout ${LAST_TRAVIS_SUCCESS}
     cd ..
     git add uaa
-    echo `git commit -m "Auto-updating UAA to latest develop version"`
+    git commit -m "Auto-updating UAA to latest develop version"
     set +x
     git push https://$GH_TOKEN:x-oauth-basic@github.com/cloudfoundry/login-server.git develop 2>&1 | grep -v $GH_TOKEN
 else
