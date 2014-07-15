@@ -23,15 +23,18 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Arrays;
+import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletResponse;
 
 @Controller
 public class ResetPasswordController {
 
     private final ResetPasswordService resetPasswordService;
+    private final Pattern emailPattern;
 
     public ResetPasswordController(ResetPasswordService resetPasswordService) {
         this.resetPasswordService = resetPasswordService;
+        emailPattern = Pattern.compile("^\\S+@\\S+\\.\\S+$");
     }
 
     @RequestMapping(value = "/forgot_password", method = RequestMethod.GET)
@@ -40,9 +43,15 @@ public class ResetPasswordController {
     }
 
     @RequestMapping(value = "/forgot_password.do", method = RequestMethod.POST)
-    public String forgotPassword(@RequestParam("email") String email) {
-        resetPasswordService.forgotPassword(email);
-        return "redirect:email_sent?code=reset_password";
+    public String forgotPassword(Model model, @RequestParam("email") String email, HttpServletResponse response) {
+        if (emailPattern.matcher(email).matches()) {
+            resetPasswordService.forgotPassword(email);
+            return "redirect:email_sent?code=reset_password";
+        } else {
+            model.addAttribute("message_code", "form_error");
+            response.setStatus(HttpStatus.UNPROCESSABLE_ENTITY.value());
+            return "forgot_password";
+        }
     }
 
     @RequestMapping(value = "/reset_password", method = RequestMethod.GET, params = { "email", "code" })
@@ -59,7 +68,7 @@ public class ResetPasswordController {
 
         ChangePasswordValidation validation = new ChangePasswordValidation(password, passwordConfirmation);
         if (!validation.valid()) {
-            model.addAttribute("message", validation.getMessage());
+            model.addAttribute("message_code", validation.getMessageCode());
             response.setStatus(HttpStatus.UNPROCESSABLE_ENTITY.value());
             return "reset_password";
         }

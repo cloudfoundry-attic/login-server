@@ -19,6 +19,7 @@ import org.cloudfoundry.identity.uaa.login.test.IntegrationTestRule;
 import org.cloudfoundry.identity.uaa.login.test.LoginServerClassRunner;
 import org.cloudfoundry.identity.uaa.login.test.TestClient;
 import org.cloudfoundry.identity.uaa.login.test.UnlessProfileActive;
+import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -60,7 +61,6 @@ public class ResetPasswordIT {
     String baseUrl;
 
     private String userEmail;
-    private String userName;
 
     @Before
     public void setUp() throws Exception {
@@ -71,8 +71,7 @@ public class ResetPasswordIT {
         testClient.createScimClient(adminAccessToken, scimClientId);
         String scimAccessToken = testClient.getOAuthAccessToken(scimClientId, "scimsecret", "client_credentials", "scim.read scim.write password.write");
         userEmail = "user" + randomInt + "@example.com";
-        userName = "JOE" + randomInt;
-        testClient.createUser(scimAccessToken, userName, userEmail, "secret");
+        testClient.createUser(scimAccessToken, userEmail, userEmail, "secret");
     }
 
     @Test
@@ -83,6 +82,11 @@ public class ResetPasswordIT {
         webDriver.findElement(By.linkText("Reset password")).click();
 
         Assert.assertEquals("Reset Password", webDriver.findElement(By.tagName("h1")).getText());
+
+        webDriver.findElement(By.name("email")).sendKeys("notAnEmail");
+        webDriver.findElement(By.xpath("//input[@value='Send reset password link']")).click();
+
+        Assert.assertThat(webDriver.findElement(By.className("error-message")).getText(), Matchers.equalTo("Please enter a valid email address."));
 
         int receivedEmailSize = simpleSmtpServer.getReceivedEmailSize();
 
@@ -108,10 +112,10 @@ public class ResetPasswordIT {
 
         Assert.assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), containsString("Where to?"));
 
-        webDriver.findElement(By.xpath("//*[text()='"+userName+"']")).click();
+        webDriver.findElement(By.xpath("//*[text()='"+userEmail+"']")).click();
         webDriver.findElement(By.linkText("Sign Out")).click();
 
-        webDriver.findElement(By.name("username")).sendKeys(userName);
+        webDriver.findElement(By.name("username")).sendKeys(userEmail);
         webDriver.findElement(By.name("password")).sendKeys("newsecret");
         webDriver.findElement(By.xpath("//input[@value='Sign in']")).click();
 

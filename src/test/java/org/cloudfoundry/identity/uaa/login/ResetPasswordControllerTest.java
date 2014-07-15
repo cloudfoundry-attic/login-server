@@ -67,6 +67,19 @@ public class ResetPasswordControllerTest {
     }
 
     @Test
+    public void testForgotPasswordFormValidationFailure() throws Exception {
+        MockHttpServletRequestBuilder post = post("/forgot_password.do")
+            .contentType(APPLICATION_FORM_URLENCODED)
+            .param("email", "notAnEmail");
+        mockMvc.perform(post)
+            .andExpect(status().isUnprocessableEntity())
+            .andExpect(view().name("forgot_password"))
+            .andExpect(model().attribute("message_code", "form_error"));
+
+        Mockito.verifyZeroInteractions(resetPasswordService);
+    }
+
+    @Test
     public void testResetPasswordPage() throws Exception {
         mockMvc.perform(get("/reset_password").param("email", "user@example.com").param("code", "secret_code"))
                 .andExpect(status().isOk())
@@ -100,7 +113,7 @@ public class ResetPasswordControllerTest {
         mockMvc.perform(post)
                 .andExpect(status().isUnprocessableEntity())
                 .andExpect(view().name("reset_password"))
-                .andExpect(model().attributeExists("message"));
+                .andExpect(model().attribute("message_code", "form_error"));
 
         Mockito.verifyZeroInteractions(resetPasswordService);
     }

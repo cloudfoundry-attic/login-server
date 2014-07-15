@@ -90,7 +90,7 @@ public class ChangePasswordControllerTest {
         mockMvc.perform(post)
                 .andExpect(status().isUnprocessableEntity())
                 .andExpect(view().name("change_password"))
-                .andExpect(model().attribute("message", "Passwords must match and not be empty"));
+                .andExpect(model().attribute("message_code", "form_error"));
 
         Mockito.verifyZeroInteractions(changePasswordService);
     }

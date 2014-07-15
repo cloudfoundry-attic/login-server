@@ -27,11 +27,6 @@ public class ChangePasswordValidation {
         return StringUtils.hasText(password) && StringUtils.hasText(passwordConfirmation) && password.equals(passwordConfirmation);
     }
 
-    @Deprecated
-    public String getMessage() {
-        return "Passwords must match and not be empty";
-    }
-
     public String getMessageCode() {
         return "form_error";
     }
