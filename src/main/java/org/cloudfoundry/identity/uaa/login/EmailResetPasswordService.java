@@ -53,7 +53,7 @@ public class EmailResetPasswordService implements ResetPasswordService {
             String code = uaaTemplate.postForObject(uaaBaseUrl + "/password_resets", email, String.class);
             htmlContent = getCodeSentEmailHtml(code, email);
         } catch (HttpClientErrorException e) {
-            if (e.getStatusCode() == HttpStatus.UNPROCESSABLE_ENTITY) {
+            if (e.getStatusCode() == HttpStatus.CONFLICT) {
                 htmlContent = getResetUnavailableEmailHtml(email);
             } else {
                 logger.info("Exception raised while creating password reset for " + email, e);

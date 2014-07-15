@@ -84,10 +84,10 @@ public class EmailResetPasswordServiceTests {
     }
 
     @Test
-    public void testWhenUnprocessableEntityIsReturnedByTheUaa() throws Exception {
+    public void testWhenConflictIsReturnedByTheUaa() throws Exception {
         mockUaaServer.expect(requestTo("http://uaa.example.com/uaa/password_resets"))
                 .andExpect(method(POST))
-                .andRespond(withStatus(HttpStatus.UNPROCESSABLE_ENTITY));
+                .andRespond(withStatus(HttpStatus.CONFLICT));
 
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.setProtocol("http");
