@@ -13,6 +13,7 @@
 package org.cloudfoundry.identity.uaa.login;
 
 import org.cloudfoundry.identity.uaa.login.test.ThymeleafConfig;
+import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,6 +30,8 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.thymeleaf.spring4.SpringTemplateEngine;
+
+import java.util.Map;
 
 import static org.mockito.Matchers.contains;
 import static org.mockito.Matchers.eq;
@@ -124,12 +127,16 @@ public class EmailResetPasswordServiceTests {
                 .andExpect(method(POST))
                 .andExpect(jsonPath("$.code").value("secret_code"))
                 .andExpect(jsonPath("$.new_password").value("new_secret"))
-                .andRespond(withSuccess("userman", APPLICATION_JSON));
+                .andRespond(withSuccess("{" +
+                    "  \"user_id\":\"usermans-id\"," +
+                    "  \"username\":\"userman\"" +
+                    "}", APPLICATION_JSON));
 
-        String username = emailResetPasswordService.resetPassword("secret_code", "new_secret");
+        Map<String,String> userInfo = emailResetPasswordService.resetPassword("secret_code", "new_secret");
 
         mockUaaServer.verify();
 
-        Assert.assertEquals("userman", username);
+        Assert.assertThat(userInfo, Matchers.hasEntry("user_id", "usermans-id"));
+        Assert.assertThat(userInfo, Matchers.hasEntry("username", "userman"));
     }
 }

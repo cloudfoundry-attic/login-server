@@ -2,14 +2,11 @@ package org.cloudfoundry.identity.uaa.login;
 
 import org.cloudfoundry.identity.uaa.authentication.Origin;
 import org.cloudfoundry.identity.uaa.authentication.UaaPrincipal;
+import org.cloudfoundry.identity.uaa.login.test.UaaRestTemplateBeanFactoryPostProcessor;
 import org.cloudfoundry.identity.uaa.test.YamlServletProfileInitializerContextInitializer;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.web.FilterChainProxy;
@@ -52,7 +49,6 @@ public class AccountsControllerIntegrationTest {
             .addFilter(springSecurityFilterChain)
             .build();
 
-
         mockUaaServer = MockRestServiceServer.createServer(webApplicationContext.getBean("authorizationTemplate", RestTemplate.class));
     }
 
@@ -83,14 +79,5 @@ public class AccountsControllerIntegrationTest {
         Assert.assertThat(principal.getId(), equalTo("newly-created-user-id"));
         Assert.assertThat(principal.getEmail(), equalTo("user@example.com"));
         Assert.assertThat(principal.getOrigin(), equalTo(Origin.UAA));
-    }
-
-    public static class UaaRestTemplateBeanFactoryPostProcessor implements BeanFactoryPostProcessor {
-        @Override
-        public void postProcessBeanFactory(ConfigurableListableBeanFactory configurableListableBeanFactory) throws BeansException {
-            BeanDefinition beanDefinition = configurableListableBeanFactory.getBeanDefinition("authorizationTemplate");
-            beanDefinition.setBeanClassName(RestTemplate.class.getCanonicalName());
-            beanDefinition.getConstructorArgumentValues().clear();
-        }
     }
 }

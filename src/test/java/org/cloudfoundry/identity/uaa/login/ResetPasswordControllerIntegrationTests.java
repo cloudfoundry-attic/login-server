@@ -12,72 +12,87 @@
  *******************************************************************************/
 package org.cloudfoundry.identity.uaa.login;
 
-import static org.junit.Assume.assumeFalse;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
-
-import org.cloudfoundry.identity.uaa.login.test.DefaultTestConfig;
-import org.cloudfoundry.identity.uaa.login.test.DefaultTestConfigContextLoader;
-
+import org.cloudfoundry.identity.uaa.authentication.Origin;
+import org.cloudfoundry.identity.uaa.authentication.UaaPrincipal;
+import org.cloudfoundry.identity.uaa.login.test.UaaRestTemplateBeanFactoryPostProcessor;
+import org.cloudfoundry.identity.uaa.test.YamlServletProfileInitializerContextInitializer;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.web.FilterChainProxy;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.context.support.XmlWebApplicationContext;
 
-import java.util.Arrays;
-import java.util.List;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@WebAppConfiguration
-@ContextConfiguration(classes = DefaultTestConfig.class, loader = DefaultTestConfigContextLoader.class)
 public class ResetPasswordControllerIntegrationTests {
 
-    @Autowired
-    WebApplicationContext webApplicationContext;
+    XmlWebApplicationContext webApplicationContext;
 
-    @Autowired
-    FilterChainProxy springSecurityFilterChain;
-    
     private MockMvc mockMvc;
+    private MockRestServiceServer mockUaaServer;
 
     @Before
     public void setUp() throws Exception {
-        List<String> profiles = Arrays.asList(webApplicationContext.getEnvironment().getActiveProfiles());
-        assumeFalse("Reset password functionality is disabled by the saml profile", profiles.contains("saml"));
-        assumeFalse("Reset password functionality is disabled by the ldap profile", profiles.contains("ldap"));
-        assumeFalse("Reset password functionality is disabled by the keystone profile", profiles.contains("keystone"));
+        webApplicationContext = new XmlWebApplicationContext();
+        new YamlServletProfileInitializerContextInitializer().initializeContext(webApplicationContext, "login.yml");
+        webApplicationContext.setConfigLocation("file:./src/main/webapp/WEB-INF/spring-servlet.xml");
+        webApplicationContext.addBeanFactoryPostProcessor(new UaaRestTemplateBeanFactoryPostProcessor());
+        webApplicationContext.refresh();
+        FilterChainProxy springSecurityFilterChain = webApplicationContext.getBean("springSecurityFilterChain", FilterChainProxy.class);
 
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
-                .addFilter(springSecurityFilterChain)
-                .build();
+            .addFilter(springSecurityFilterChain)
+            .build();
+
+        mockUaaServer = MockRestServiceServer.createServer(webApplicationContext.getBean("authorizationTemplate", RestTemplate.class));
     }
 
     @Test
-    public void testForgotPasswordPage() throws Exception {
-        mockMvc.perform(get("/forgot_password"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("forgot_password"));
-    }
+    public void testResettingAPassword() throws Exception {
+        mockUaaServer.expect(requestTo("http://localhost:8080/uaa/password_change"))
+            .andExpect(method(POST))
+            .andExpect(jsonPath("$.code").value("the_secret_code"))
+            .andExpect(jsonPath("$.new_password").value("secret"))
+            .andRespond(withSuccess("{" +
+                "\"user_id\":\"newly-created-user-id\"," +
+                "\"username\":\"user@example.com\"" +
+                "}", APPLICATION_JSON));
 
-    @Test
-    public void testResetPasswordPage() throws Exception {
-        // any code will render the page, but only a valid code actually sets a password
+        MockHttpServletRequestBuilder post = post("/reset_password.do")
+            .param("code", "the_secret_code")
+            .param("password", "secret")
+            .param("password_confirmation", "secret");
 
-        MockHttpServletRequestBuilder get = get("/reset_password")
-                .param("code", "any_code_will_show_the_page")
-                .param("email", "user@example.com");
-
-        mockMvc.perform(get)
-                .andExpect(status().isOk())
-                .andExpect(view().name("reset_password"));
+        MvcResult mvcResult = mockMvc.perform(post)
+            .andExpect(status().isFound())
+            .andExpect(redirectedUrl("home"))
+            .andReturn();
+        SecurityContext securityContext = (SecurityContext) mvcResult.getRequest().getSession().getAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY);
+        Authentication authentication = securityContext.getAuthentication();
+        Assert.assertThat(authentication.getPrincipal(), instanceOf(UaaPrincipal.class));
+        UaaPrincipal principal = (UaaPrincipal) authentication.getPrincipal();
+        Assert.assertThat(principal.getId(), equalTo("newly-created-user-id"));
+        Assert.assertThat(principal.getName(), equalTo("user@example.com"));
+        Assert.assertThat(principal.getEmail(), equalTo("user@example.com"));
+        Assert.assertThat(principal.getOrigin(), equalTo(Origin.UAA));
     }
 }

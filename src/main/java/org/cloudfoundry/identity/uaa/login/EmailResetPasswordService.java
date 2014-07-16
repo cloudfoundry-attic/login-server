@@ -14,7 +14,11 @@ package org.cloudfoundry.identity.uaa.login;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -78,15 +82,22 @@ public class EmailResetPasswordService implements ResetPasswordService {
     }
 
     @Override
-    public String resetPassword(String code, String newPassword) {
-        Map<String, String> uriVariables = new HashMap<String, String>();
+    public Map<String, String> resetPassword(String code, String newPassword) {
+        Map<String, String> uriVariables = new HashMap<>();
         uriVariables.put("baseUrl", uaaBaseUrl);
 
-        Map<String, String> formData = new HashMap<String, String>();
+        Map<String, String> formData = new HashMap<>();
         formData.put("code", code);
         formData.put("new_password", newPassword);
 
-        return uaaTemplate.postForObject("{baseUrl}/password_change", formData, String.class, uriVariables);
+        ResponseEntity<Map<String, String>> responseEntity = uaaTemplate.exchange(
+            "{baseUrl}/password_change",
+            HttpMethod.POST,
+            new HttpEntity<>(formData),
+            new ParameterizedTypeReference<Map<String, String>>() {},
+            uriVariables
+        );
+        return responseEntity.getBody();
     }
 
     private String getCodeSentEmailHtml(String code, String email) {

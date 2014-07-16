@@ -12,7 +12,9 @@
  *******************************************************************************/
 package org.cloudfoundry.identity.uaa.login;
 
+import java.util.Map;
+
 public interface ResetPasswordService {
-    void forgotPassword(String emailOrUsername);
-    String resetPassword(String code, String password);
+    void forgotPassword(String username);
+    Map<String, String> resetPassword(String code, String password);
 }

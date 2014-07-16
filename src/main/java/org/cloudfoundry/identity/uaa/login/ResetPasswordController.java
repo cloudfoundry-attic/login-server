@@ -12,6 +12,8 @@
  *******************************************************************************/
 package org.cloudfoundry.identity.uaa.login;
 
+import org.cloudfoundry.identity.uaa.authentication.Origin;
+import org.cloudfoundry.identity.uaa.authentication.UaaPrincipal;
 import org.cloudfoundry.identity.uaa.user.UaaAuthority;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -22,7 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.Arrays;
+import java.util.Map;
 import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletResponse;
 
@@ -72,9 +74,11 @@ public class ResetPasswordController {
             response.setStatus(HttpStatus.UNPROCESSABLE_ENTITY.value());
             return "reset_password";
         }
-        String username = resetPasswordService.resetPassword(code, password);
 
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username, null, Arrays.asList(UaaAuthority.UAA_USER));
+        Map<String,String> resetResponse = resetPasswordService.resetPassword(code, password);
+
+        UaaPrincipal uaaPrincipal = new UaaPrincipal(resetResponse.get("user_id"), resetResponse.get("username"), resetResponse.get("username"), Origin.UAA, null);
+        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(uaaPrincipal, null, UaaAuthority.USER_AUTHORITIES);
         SecurityContextHolder.getContext().setAuthentication(token);
 
         return "redirect:home";
