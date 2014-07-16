@@ -371,11 +371,14 @@
     <bean id="emailSentController" class="org.cloudfoundry.identity.uaa.login.EmailSentController" />
 
     <bean id="accountCreationService" class="org.cloudfoundry.identity.uaa.login.EmailAccountCreationService">
-        <constructor-arg index="0" ref="mailTemplateEngine"/>
-        <constructor-arg index="1" ref="emailService"/>
-        <constructor-arg index="2" ref="authorizationTemplate"/>
-        <constructor-arg index="3" ref="uaaUrl"/>
-        <constructor-arg index="4" value="${login.brand:oss}"/>
+        <constructor-arg>
+            <bean class="org.codehaus.jackson.map.ObjectMapper"/>
+        </constructor-arg>
+        <constructor-arg ref="mailTemplateEngine"/>
+        <constructor-arg ref="emailService"/>
+        <constructor-arg ref="authorizationTemplate"/>
+        <constructor-arg ref="uaaUrl"/>
+        <constructor-arg value="${login.brand:oss}"/>
     </bean>
 
     <bean id="changePasswordService" class="org.cloudfoundry.identity.uaa.login.UaaChangePasswordService">

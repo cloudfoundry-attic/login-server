@@ -28,7 +28,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.context.WebApplicationContext;
@@ -68,18 +67,23 @@ public class AccountsControllerTest {
 
     @Test
     public void testNewAccountPage() throws Exception {
-        mockMvc.perform(get("/accounts/new"))
+        mockMvc.perform(get("/accounts/new").param("client_id", "app"))
                 .andExpect(status().isOk())
+                .andExpect(model().attribute("client_id", "app"))
                 .andExpect(view().name("accounts/new_activation_email"));
     }
 
     @Test
     public void testSendActivationEmail() throws Exception {
-        mockMvc.perform(post("/accounts").param("email", "user1@example.com"))
-                .andExpect(status().isFound())
-                .andExpect(redirectedUrl("email_sent?code=activation"));
+        MockHttpServletRequestBuilder post = post("/accounts")
+            .param("email", "user1@example.com")
+            .param("client_id", "app");
 
-        Mockito.verify(accountCreationService).beginActivation("user1@example.com");
+        mockMvc.perform(post)
+            .andExpect(status().isFound())
+            .andExpect(redirectedUrl("email_sent?code=activation"));
+
+        Mockito.verify(accountCreationService).beginActivation("user1@example.com", "app");
     }
 
     @Test
@@ -92,7 +96,24 @@ public class AccountsControllerTest {
     @Test
     public void testCreateAccount() throws Exception {
         Mockito.when(accountCreationService.completeActivation("expiring_code", "secret"))
-            .thenReturn(new AccountCreationService.Account("newly-created-user-id", "username"));
+            .thenReturn(new AccountCreationService.AccountCreation("newly-created-user-id", "username", "//example.com/callback"));
+
+        MockHttpServletRequestBuilder post = post("/accounts")
+                .param("email", "user@example.com")
+                .param("code", "expiring_code")
+                .param("password", "secret")
+                .param("password_confirmation", "secret");
+
+        mockMvc.perform(post)
+                .andExpect(status().isFound())
+                .andExpect(model().attributeDoesNotExist("message_code"))
+                .andExpect(redirectedUrl("//example.com/callback"));
+    }
+
+    @Test
+    public void testCreateAccountWithNoRedirectUrl() throws Exception {
+        Mockito.when(accountCreationService.completeActivation("expiring_code", "secret"))
+            .thenReturn(new AccountCreationService.AccountCreation("newly-created-user-id", "username", null));
 
         MockHttpServletRequestBuilder post = post("/accounts")
                 .param("email", "user@example.com")

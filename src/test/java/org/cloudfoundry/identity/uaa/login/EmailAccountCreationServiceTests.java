@@ -1,6 +1,7 @@
 package org.cloudfoundry.identity.uaa.login;
 
 import org.cloudfoundry.identity.uaa.login.test.ThymeleafConfig;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
@@ -51,7 +52,7 @@ public class EmailAccountCreationServiceTests {
         RestTemplate uaaTemplate = new RestTemplate();
         mockUaaServer = MockRestServiceServer.createServer(uaaTemplate);
         emailService = Mockito.mock(EmailService.class);
-        emailAccountCreationService = new EmailAccountCreationService(templateEngine, emailService, uaaTemplate, "http://uaa.example.com/uaa", "pivotal");
+        emailAccountCreationService = new EmailAccountCreationService(new ObjectMapper(), templateEngine, emailService, uaaTemplate, "http://uaa.example.com/uaa", "pivotal");
     }
 
     @Test
@@ -61,14 +62,14 @@ public class EmailAccountCreationServiceTests {
         String uaaResponseJson = "{" +
                 "    \"code\":\"the_secret_code\"," +
                 "    \"expiresAt\":" + ts.getTime() + "," +
-                "    \"data\":\"user@example.com\"" +
+                "    \"data\":\"{\\\"username\\\":\\\"user@example.com\\\",\\\"client_id\\\":\\\"login\\\"}\"" +
                 "}";
 
         mockUaaServer.expect(requestTo("http://uaa.example.com/uaa/Codes"))
                 .andExpect(method(POST))
                 .andExpect(jsonPath("$.expiresAt").value(Matchers.greaterThan(ts.getTime() - 5000)))
                 .andExpect(jsonPath("$.expiresAt").value(Matchers.lessThan(ts.getTime() + 5000)))
-                .andExpect(jsonPath("$.data").value("user@example.com"))
+                .andExpect(jsonPath("$.data").exists()) // we can't tell what order the json keys will take in the serialized json, so exists is the best we can do
                 .andRespond(withSuccess(uaaResponseJson, APPLICATION_JSON));
 
         MockHttpServletRequest request = new MockHttpServletRequest();
@@ -76,7 +77,7 @@ public class EmailAccountCreationServiceTests {
         request.setContextPath("/login");
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
 
-        emailAccountCreationService.beginActivation("user@example.com");
+        emailAccountCreationService.beginActivation("user@example.com", "login");
 
         mockUaaServer.verify();
 
@@ -89,7 +90,7 @@ public class EmailAccountCreationServiceTests {
 
     @Test
     public void testCompleteActivation() throws Exception {
-        String responseJson = "{\"user_id\":\"newly-created-user-id\",\"username\":\"user@example.com\"}";
+        String responseJson = "{\"user_id\":\"newly-created-user-id\",\"username\":\"user@example.com\",\"redirect_location\":\"/login-signup-callback\"}";
         mockUaaServer.expect(requestTo("http://uaa.example.com/uaa/create_account"))
                 .andExpect(method(POST))
                 .andExpect(jsonPath("$.code").value("expiring_code"))
@@ -97,12 +98,13 @@ public class EmailAccountCreationServiceTests {
                 .andRespond(withSuccess(responseJson, APPLICATION_JSON));    // *
         // * uaa actually returns a created status, but MockRestServiceServer doesn't support the created code with a response body
 
-        AccountCreationService.Account account = emailAccountCreationService.completeActivation("expiring_code", "secret");
+        AccountCreationService.AccountCreation accountCreation = emailAccountCreationService.completeActivation("expiring_code", "secret");
 
         mockUaaServer.verify();
 
-        Assert.assertEquals("user@example.com", account.getUsername());
-        Assert.assertEquals("newly-created-user-id", account.getUserId());
+        Assert.assertEquals("user@example.com", accountCreation.getUsername());
+        Assert.assertEquals("newly-created-user-id", accountCreation.getUserId());
+        Assert.assertEquals("/login-signup-callback", accountCreation.getRedirectLocation());
     }
 
     @Test

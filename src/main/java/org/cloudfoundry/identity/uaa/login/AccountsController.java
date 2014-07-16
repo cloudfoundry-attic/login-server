@@ -39,9 +39,22 @@ public class AccountsController {
         this.accountCreationService = accountCreationService;
     }
 
-    @RequestMapping(method = POST, params = "email")
-    public String sendActivationEmail(@RequestParam("email") String email) {
-        accountCreationService.beginActivation(email);
+    @RequestMapping(value = "/new", method = GET)
+    public String activationEmail(Model model,
+                                  @RequestParam(value = "client_id", defaultValue = "login") String clientId) {
+        model.addAttribute("client_id", clientId);
+        return "accounts/new_activation_email";
+    }
+
+    @RequestMapping(value = "/new", method = GET, params = {"code", "email"})
+    public String newAccount() {
+        return "accounts/new";
+    }
+
+    @RequestMapping(method = POST, params = {"email", "client_id"})
+    public String sendActivationEmail(@RequestParam("email") String email,
+                                      @RequestParam("client_id") String clientId) {
+        accountCreationService.beginActivation(email, clientId);
         return "redirect:email_sent?code=activation";
     }
 
@@ -59,9 +72,9 @@ public class AccountsController {
             return "accounts/new";
         }
 
-        AccountCreationService.Account account;
+        AccountCreationService.AccountCreation accountCreation;
         try {
-            account = accountCreationService.completeActivation(code, password);
+            accountCreation = accountCreationService.completeActivation(code, password);
         } catch (HttpClientErrorException e) {
             if (e.getStatusCode().equals(HttpStatus.CONFLICT)) {
                 model.addAttribute("message_code", "email_already_taken");
@@ -72,20 +85,14 @@ public class AccountsController {
             return "accounts/new";
         }
 
-        UaaPrincipal uaaPrincipal = new UaaPrincipal(account.getUserId(), account.getUsername(), account.getUsername(), Origin.UAA, null);
+        UaaPrincipal uaaPrincipal = new UaaPrincipal(accountCreation.getUserId(), accountCreation.getUsername(), accountCreation.getUsername(), Origin.UAA, null);
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(uaaPrincipal, null, UaaAuthority.USER_AUTHORITIES);
         SecurityContextHolder.getContext().setAuthentication(token);
 
-        return "redirect:home";
-    }
-
-    @RequestMapping(value = "/new", method = GET)
-    public String activationEmail() {
-        return "accounts/new_activation_email";
-    }
-
-    @RequestMapping(value = "/new", method = GET, params = {"code", "email"})
-    public String newAccount() {
-        return "accounts/new";
+        String redirectLocation = accountCreation.getRedirectLocation();
+        if (redirectLocation == null) {
+            redirectLocation = "home";
+        }
+        return "redirect:" + redirectLocation;
     }
 }

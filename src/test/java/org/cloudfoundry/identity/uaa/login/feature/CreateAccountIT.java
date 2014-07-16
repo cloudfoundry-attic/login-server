@@ -34,6 +34,7 @@ import java.security.SecureRandom;
 import java.util.Iterator;
 
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = DefaultIntegrationTestConfig.class)
@@ -57,13 +58,16 @@ public class CreateAccountIT {
     @Value("${integration.test.base_url}")
     String baseUrl;
 
+    @Value("${integration.test.app_url}")
+    String appUrl;
+
     @Before
     public void setUp() {
         webDriver.get(baseUrl + "/logout.do");
     }
 
     @Test
-    public void testMessage() throws Exception {
+    public void testUserInitiatedSignup() throws Exception {
         String userEmail = "user" + new SecureRandom().nextInt() + "@example.com";
 
         webDriver.get(baseUrl + "/");
@@ -105,5 +109,40 @@ public class CreateAccountIT {
         webDriver.findElement(By.xpath("//input[@value='Sign in']")).click();
 
         Assert.assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), containsString("Where to?"));
+    }
+
+    @Test
+    public void testClientInitiatedSignup() throws Exception {
+        String userEmail = "user" + new SecureRandom().nextInt() + "@example.com";
+
+        webDriver.get(baseUrl + "/accounts/new?client_id=app");
+
+        Assert.assertEquals("Create Account", webDriver.findElement(By.tagName("h1")).getText());
+
+        int receivedEmailSize = simpleSmtpServer.getReceivedEmailSize();
+
+        webDriver.findElement(By.name("email")).sendKeys(userEmail);
+        webDriver.findElement(By.xpath("//input[@value='Send activation email']")).click();
+
+        Assert.assertEquals(receivedEmailSize + 1, simpleSmtpServer.getReceivedEmailSize());
+        Iterator receivedEmail = simpleSmtpServer.getReceivedEmail();
+        SmtpMessage message = (SmtpMessage) receivedEmail.next();
+        receivedEmail.remove();
+        Assert.assertEquals(userEmail, message.getHeaderValue("To"));
+        Assert.assertThat(message.getBody(), containsString("Activate your account"));
+
+        Assert.assertEquals("Check your email for an account activation link.", webDriver.findElement(By.cssSelector(".instructions-sent")).getText());
+
+        String link = testClient.extractLink(message.getBody());
+        webDriver.get(link);
+
+        Assert.assertEquals("Activate Your Account", webDriver.findElement(By.tagName("h1")).getText());
+
+        webDriver.findElement(By.name("password")).sendKeys("secret");
+        webDriver.findElement(By.name("password_confirmation")).sendKeys("secret");
+
+        webDriver.findElement(By.xpath("//input[@value='Activate']")).click();
+
+        Assert.assertThat(webDriver.getCurrentUrl(), equalTo(appUrl));
     }
 }
