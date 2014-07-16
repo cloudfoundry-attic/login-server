@@ -7,6 +7,7 @@
     <h1>Create Account</h1>
     <div class="island-content">
         <form th:action="@{/accounts}" method="post" novalidate="novalidate">
+            <input type="hidden" name="client_id" th:value="${client_id}"/>
             <input name="email" type="email" placeholder="Email" autofocus="autofocus" class="form-control"/>
             <input type="submit" value="Send activation email" class="island-button"/>
         </form>

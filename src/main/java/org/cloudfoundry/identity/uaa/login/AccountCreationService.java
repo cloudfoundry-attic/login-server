@@ -3,20 +3,23 @@ package org.cloudfoundry.identity.uaa.login;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 public interface AccountCreationService {
-    void beginActivation(String email);
+    void beginActivation(String email, String clientId);
 
-    Account completeActivation(String code, String password);
+    AccountCreation completeActivation(String code, String password);
 
-    public static class Account {
+    public static class AccountCreation {
         @JsonProperty("user_id")
         private String userId;
         private String username;
+        @JsonProperty("redirect_location")
+        private String redirectLocation;
 
-        public Account() {}
+        public AccountCreation() {}
 
-        public Account(String userId, String username) {
+        public AccountCreation(String userId, String username, String redirectLocation) {
             this.userId = userId;
             this.username = username;
+            this.redirectLocation = redirectLocation;
         }
 
         public String getUserId() {
@@ -33,6 +36,14 @@ public interface AccountCreationService {
 
         public void setUsername(String username) {
             this.username = username;
+        }
+
+        public String getRedirectLocation() {
+            return redirectLocation;
+        }
+
+        public void setRedirectLocation(String redirectLocation) {
+            this.redirectLocation = redirectLocation;
         }
     }
 }
