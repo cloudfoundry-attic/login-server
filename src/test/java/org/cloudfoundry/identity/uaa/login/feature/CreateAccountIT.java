@@ -34,7 +34,7 @@ import java.security.SecureRandom;
 import java.util.Iterator;
 
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.startsWith;
+import static org.hamcrest.Matchers.not;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = DefaultIntegrationTestConfig.class)
@@ -143,6 +143,6 @@ public class CreateAccountIT {
 
         webDriver.findElement(By.xpath("//input[@value='Activate']")).click();
 
-        Assert.assertThat(webDriver.getCurrentUrl(), startsWith(appUrl));
+        Assert.assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), not(containsString("Where to?")));
     }
 }
