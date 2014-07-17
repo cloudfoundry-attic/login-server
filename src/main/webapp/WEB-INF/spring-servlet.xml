@@ -390,21 +390,17 @@
         <constructor-arg ref="changePasswordService"/>
     </bean>
 
-    <beans profile="!saml">
-        <beans profile="!keystone">
-            <bean id="resetPasswordService" class="org.cloudfoundry.identity.uaa.login.EmailResetPasswordService">
-                <constructor-arg index="0" ref="mailTemplateEngine" />
-                <constructor-arg index="1" ref="emailService"/>
-                <constructor-arg index="2" ref="authorizationTemplate"/>
-                <constructor-arg index="3" ref="uaaUrl"/>
-                <constructor-arg index="4" value="${login.brand:oss}"/>
-            </bean>
+    <bean id="resetPasswordService" class="org.cloudfoundry.identity.uaa.login.EmailResetPasswordService">
+        <constructor-arg index="0" ref="mailTemplateEngine"/>
+        <constructor-arg index="1" ref="emailService"/>
+        <constructor-arg index="2" ref="authorizationTemplate"/>
+        <constructor-arg index="3" ref="uaaUrl"/>
+        <constructor-arg index="4" value="${login.brand:oss}"/>
+    </bean>
 
-            <bean id="resetPasswordController" class="org.cloudfoundry.identity.uaa.login.ResetPasswordController">
-                <constructor-arg ref="resetPasswordService"/>
-            </bean>
-        </beans>
-    </beans>
+    <bean id="resetPasswordController" class="org.cloudfoundry.identity.uaa.login.ResetPasswordController">
+        <constructor-arg ref="resetPasswordService"/>
+    </bean>
 
     <beans profile="fileMetadata">
         <bean id="metadataProviderList" class="java.util.ArrayList">
