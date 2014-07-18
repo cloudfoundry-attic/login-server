@@ -658,10 +658,4 @@
             </constructor-arg>
         </bean>
     </beans>
-
-
-    <beans profile="coverage">
-        <bean id="coverageController" class="org.cloudfoundry.identity.uaa.coverage.CoverageController" />
-    </beans>
-
 </beans>
