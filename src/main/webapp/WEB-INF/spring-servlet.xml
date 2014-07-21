@@ -40,6 +40,12 @@
     <security:http pattern="/email_sent" security="none" />
     <security:http pattern="/accounts/new" security="none" />
 
+    <bean id="xFrameOptionsFilter" class="org.cloudfoundry.identity.uaa.login.XFrameOptionsFilter">
+        <constructor-arg>
+            <bean class="org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter"/>
+        </constructor-arg>
+    </bean>
+
     <bean id="uaaUrl" class="java.lang.String">
         <constructor-arg value="${uaa.url:http://localhost:8080/uaa}"/>
     </bean>
