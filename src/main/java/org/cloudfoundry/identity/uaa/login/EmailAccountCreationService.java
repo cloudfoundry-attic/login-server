@@ -77,14 +77,15 @@ public class EmailAccountCreationService implements AccountCreationService {
     }
 
     private String getSubjectText() {
-        return brand.equals("pivotal") ? "Pivotal account activation request" : "Account activation request";
+        return brand.equals("pivotal") ? "Activate your Pivotal ID" : "Activate your account";
     }
 
     private String getEmailHtml(String code, String email) {
         String accountsUrl = ServletUriComponentsBuilder.fromCurrentContextPath().path("/accounts/new").build().toUriString();
 
         final Context ctx = new Context();
-        ctx.setVariable("servicePhrase", brand.equals("pivotal") ? "a Pivotal" : "an");
+        ctx.setVariable("serviceName", brand.equals("pivotal") ? "Pivotal" : "Cloud Foundry");
+        ctx.setVariable("servicePhrase", brand.equals("pivotal") ? "a Pivotal ID" : "an account");
         ctx.setVariable("code", code);
         ctx.setVariable("email", email);
         ctx.setVariable("accountsUrl", accountsUrl);

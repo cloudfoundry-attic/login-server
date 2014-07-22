@@ -7,6 +7,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -22,7 +23,9 @@ import org.thymeleaf.spring4.SpringTemplateEngine;
 
 import java.sql.Timestamp;
 
-import static org.mockito.Matchers.contains;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.eq;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
@@ -42,6 +45,7 @@ public class EmailAccountCreationServiceTests {
     private EmailAccountCreationService emailAccountCreationService;
     private MockRestServiceServer mockUaaServer;
     private EmailService emailService;
+    private RestTemplate uaaTemplate;
 
     @Autowired
     @Qualifier("mailTemplateEngine")
@@ -49,7 +53,7 @@ public class EmailAccountCreationServiceTests {
 
     @Before
     public void setUp() throws Exception {
-        RestTemplate uaaTemplate = new RestTemplate();
+        uaaTemplate = new RestTemplate();
         mockUaaServer = MockRestServiceServer.createServer(uaaTemplate);
         emailService = Mockito.mock(EmailService.class);
         emailAccountCreationService = new EmailAccountCreationService(new ObjectMapper(), templateEngine, emailService, uaaTemplate, "http://uaa.example.com/uaa", "pivotal");
@@ -57,35 +61,42 @@ public class EmailAccountCreationServiceTests {
 
     @Test
     public void testBeginActivation() throws Exception {
-        Timestamp ts = new Timestamp(System.currentTimeMillis() + (60 * 60 * 1000)); // 1 hour
-
-        String uaaResponseJson = "{" +
-                "    \"code\":\"the_secret_code\"," +
-                "    \"expiresAt\":" + ts.getTime() + "," +
-                "    \"data\":\"{\\\"username\\\":\\\"user@example.com\\\",\\\"client_id\\\":\\\"login\\\"}\"" +
-                "}";
-
-        mockUaaServer.expect(requestTo("http://uaa.example.com/uaa/Codes"))
-                .andExpect(method(POST))
-                .andExpect(jsonPath("$.expiresAt").value(Matchers.greaterThan(ts.getTime() - 5000)))
-                .andExpect(jsonPath("$.expiresAt").value(Matchers.lessThan(ts.getTime() + 5000)))
-                .andExpect(jsonPath("$.data").exists()) // we can't tell what order the json keys will take in the serialized json, so exists is the best we can do
-                .andRespond(withSuccess(uaaResponseJson, APPLICATION_JSON));
-
-        MockHttpServletRequest request = new MockHttpServletRequest();
-        request.setProtocol("http");
-        request.setContextPath("/login");
-        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
+        setUpForSuccess();
 
         emailAccountCreationService.beginActivation("user@example.com", "login");
 
         mockUaaServer.verify();
 
+        ArgumentCaptor<String> emailBodyArgument = ArgumentCaptor.forClass(String.class);
         Mockito.verify(emailService).sendMimeMessage(
-                eq("user@example.com"),
-                eq("Pivotal account activation request"),
-                contains("<a href=\"http://localhost/login/accounts/new?code=the_secret_code&amp;email=user%40example.com\">Activate your account</a>")
+            eq("user@example.com"),
+            eq("Activate your Pivotal ID"),
+            emailBodyArgument.capture()
         );
+        String emailBody = emailBodyArgument.getValue();
+        assertThat(emailBody, containsString("a Pivotal ID"));
+        assertThat(emailBody, containsString("<a href=\"http://localhost/login/accounts/new?code=the_secret_code&amp;email=user%40example.com\">Activate your account</a>"));
+        assertThat(emailBody, not(containsString("Cloud Foundry")));
+    }
+
+    @Test
+    public void testBeginActivationWithOssBrand() throws Exception {
+        emailAccountCreationService = new EmailAccountCreationService(new ObjectMapper(), templateEngine, emailService, uaaTemplate, "http://uaa.example.com/uaa", "oss");
+
+        setUpForSuccess();
+
+        emailAccountCreationService.beginActivation("user@example.com", "login");
+
+        ArgumentCaptor<String> emailBodyArgument = ArgumentCaptor.forClass(String.class);
+        Mockito.verify(emailService).sendMimeMessage(
+            eq("user@example.com"),
+            eq("Activate your account"),
+            emailBodyArgument.capture()
+        );
+        String emailBody = emailBodyArgument.getValue();
+        assertThat(emailBody, containsString("an account"));
+        assertThat(emailBody, containsString("<a href=\"http://localhost/login/accounts/new?code=the_secret_code&amp;email=user%40example.com\">Activate your account</a>"));
+        assertThat(emailBody, not(containsString("Pivotal")));
     }
 
     @Test
@@ -119,7 +130,7 @@ public class EmailAccountCreationServiceTests {
             emailAccountCreationService.completeActivation("expiring_code", "secret");
             Assert.fail();
         } catch (HttpClientErrorException e) {
-            Assert.assertThat(e.getStatusCode(), Matchers.equalTo(BAD_REQUEST));
+            assertThat(e.getStatusCode(), Matchers.equalTo(BAD_REQUEST));
         }
     }
 
@@ -135,7 +146,29 @@ public class EmailAccountCreationServiceTests {
             emailAccountCreationService.completeActivation("expiring_code", "secret");
             Assert.fail();
         } catch (HttpClientErrorException e) {
-            Assert.assertThat(e.getStatusCode(), Matchers.equalTo(CONFLICT));
+            assertThat(e.getStatusCode(), Matchers.equalTo(CONFLICT));
         }
+    }
+
+    private void setUpForSuccess() {
+        Timestamp ts = new Timestamp(System.currentTimeMillis() + (60 * 60 * 1000)); // 1 hour
+
+        String uaaResponseJson = "{" +
+            "    \"code\":\"the_secret_code\"," +
+            "    \"expiresAt\":" + ts.getTime() + "," +
+            "    \"data\":\"{\\\"username\\\":\\\"user@example.com\\\",\\\"client_id\\\":\\\"login\\\"}\"" +
+            "}";
+
+        mockUaaServer.expect(requestTo("http://uaa.example.com/uaa/Codes"))
+            .andExpect(method(POST))
+            .andExpect(jsonPath("$.expiresAt").value(Matchers.greaterThan(ts.getTime() - 5000)))
+            .andExpect(jsonPath("$.expiresAt").value(Matchers.lessThan(ts.getTime() + 5000)))
+            .andExpect(jsonPath("$.data").exists()) // we can't tell what order the json keys will take in the serialized json, so exists is the best we can do
+            .andRespond(withSuccess(uaaResponseJson, APPLICATION_JSON));
+
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setProtocol("http");
+        request.setContextPath("/login");
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
     }
 }

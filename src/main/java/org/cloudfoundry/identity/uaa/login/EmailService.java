@@ -34,7 +34,7 @@ public class EmailService {
 
     private Address[] getSenderAddresses() throws AddressException, UnsupportedEncodingException {
         String host = UriComponentsBuilder.fromHttpUrl(loginUrl).build().getHost();
-        String name = brand.equals("pivotal") ? "Pivotal" : "Cloudfoundry";
+        String name = brand.equals("pivotal") ? "Pivotal" : "Cloud Foundry";
         return new Address[]{new InternetAddress("admin@" + host, name)};
     }
 
