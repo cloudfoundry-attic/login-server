@@ -8577,6 +8577,7 @@ body {
 h1 {
   font-size: 32px;
   font-weight: 300;
+  line-height: 1em;
   text-transform: none;
   margin-top: 0;
   margin-bottom: 16px; }
@@ -8590,7 +8591,33 @@ h2 {
   text-align: center; }
   .island .island-content {
     width: 196px;
-    margin: 0 auto 0 auto; }
+    margin: 0 auto; }
+
+.island-landscape {
+  border: 1px solid #e0e4e5;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 50px;
+  width: 85%;
+  max-width: 735px; }
+  .island-landscape:before, .island-landscape:after {
+    content: " ";
+    /* 1 */
+    display: table;
+    /* 2 */ }
+  .island-landscape:after {
+    clear: both; }
+  .island-landscape .island-title {
+    float: left;
+    width: 300px; }
+    .island-landscape .island-title p {
+      font-weight: 300; }
+      .island-landscape .island-title p strong {
+        font-weight: 400; }
+  .island-landscape .island-content {
+    float: right;
+    width: 230px;
+    margin: 0 auto; }
 
 form {
   margin-bottom: 8px; }
@@ -8600,8 +8627,22 @@ input {
   margin-bottom: 20px; }
 
 .form-control {
-  font-size: 14px;
+  font-size: 16px;
   height: 34px; }
+
+::-webkit-input-placeholder {
+  font-weight: 400; }
+
+:-moz-placeholder {
+  /* Firefox 18- */
+  font-weight: 400; }
+
+::-moz-placeholder {
+  /* Firefox 19+ */
+  font-weight: 400; }
+
+:-ms-input-placeholder {
+  font-weight: 400; }
 
 .fa-envelope-o {
   font-size: 36px;
@@ -8619,8 +8660,8 @@ input {
   color: #9faaad; }
 
 .email-display {
-  color: #7f7f7f;
-  font-size: 14px;
+  color: #43575c;
+  font-size: 16px;
   margin-bottom: 16px; }
 
 .left {
@@ -8845,8 +8886,8 @@ h1 {
 .header {
   height: 168px; }
 
-.island {
-  padding-top: 32px; }
+.island, .island-landscape {
+  margin-top: 32px; }
 
 .panel-container {
-  padding-top: 32px; }
+  margin-top: 32px; }
