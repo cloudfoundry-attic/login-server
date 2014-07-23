@@ -73,12 +73,12 @@ public class CreateAccountIT {
         webDriver.get(baseUrl + "/");
         webDriver.findElement(By.xpath("//*[text()='Create account']")).click();
 
-        Assert.assertEquals("Create Account", webDriver.findElement(By.tagName("h1")).getText());
+        Assert.assertEquals("Create your account", webDriver.findElement(By.tagName("h1")).getText());
 
         int receivedEmailSize = simpleSmtpServer.getReceivedEmailSize();
 
         webDriver.findElement(By.name("email")).sendKeys(userEmail);
-        webDriver.findElement(By.xpath("//input[@value='Send activation email']")).click();
+        webDriver.findElement(By.xpath("//input[@value='Send activation link']")).click();
 
         Assert.assertEquals(receivedEmailSize + 1, simpleSmtpServer.getReceivedEmailSize());
         Iterator receivedEmail = simpleSmtpServer.getReceivedEmail();
@@ -117,12 +117,12 @@ public class CreateAccountIT {
 
         webDriver.get(baseUrl + "/accounts/new?client_id=app");
 
-        Assert.assertEquals("Create Account", webDriver.findElement(By.tagName("h1")).getText());
+        Assert.assertEquals("Create your account", webDriver.findElement(By.tagName("h1")).getText());
 
         int receivedEmailSize = simpleSmtpServer.getReceivedEmailSize();
 
         webDriver.findElement(By.name("email")).sendKeys(userEmail);
-        webDriver.findElement(By.xpath("//input[@value='Send activation email']")).click();
+        webDriver.findElement(By.xpath("//input[@value='Send activation link']")).click();
 
         Assert.assertEquals(receivedEmailSize + 1, simpleSmtpServer.getReceivedEmailSize());
         Iterator receivedEmail = simpleSmtpServer.getReceivedEmail();

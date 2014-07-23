@@ -61,6 +61,24 @@ public class AccountsControllerIntegrationTest {
     }
 
     @Test
+    public void testCreateActivationEmailPage() throws Exception {
+        ((MockEnvironment) webApplicationContext.getEnvironment()).setProperty("login.brand", "oss");
+
+        mockMvc.perform(get("/accounts/new"))
+                .andExpect(content().string(containsString("Create your account")))
+                .andExpect(content().string(not(containsString("Pivotal ID"))));
+    }
+
+    @Test
+    public void testCreateActivationEmailPageWithPivotalBrand() throws Exception {
+        ((MockEnvironment) webApplicationContext.getEnvironment()).setProperty("login.brand", "pivotal");
+
+        mockMvc.perform(get("/accounts/new"))
+            .andExpect(content().string(containsString("Create your Pivotal ID")))
+            .andExpect(content().string(not(containsString("Create your account"))));
+    }
+
+    @Test
     public void testCreateAccountPage() throws Exception {
         ((MockEnvironment) webApplicationContext.getEnvironment()).setProperty("login.brand", "oss");
 

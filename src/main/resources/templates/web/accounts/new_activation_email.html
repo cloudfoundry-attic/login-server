@@ -1,17 +1,28 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layouts/main">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layouts/main"
+      th:with="pivotal=${@environment.getProperty('login.brand') == 'pivotal'}">
 <head>
 </head>
 <body>
-<div class="island" layout:fragment="page-content">
-    <h1>Create Account</h1>
+<div class="island-landscape" layout:fragment="page-content">
+    <div class="island-title">
+        <h1>Create your <th:block th:text="${pivotal ? 'Pivotal ID' : 'account'}">account</th:block></h1>
+        <p th:if="${pivotal}">
+            A <strong>Pivotal ID</strong> lets you sign in to Pivotal products
+            using a single username and password.
+        </p>
+    </div>
     <div class="island-content">
         <form th:action="@{/accounts}" method="post" novalidate="novalidate">
             <input type="hidden" name="client_id" th:value="${client_id}"/>
-            <input name="email" type="email" placeholder="Email" autofocus="autofocus" class="form-control"/>
-            <input type="submit" value="Send activation email" class="island-button"/>
+            <input name="email" type="email" placeholder="Enter your email" autofocus="autofocus" class="form-control"/>
+            <input type="submit" value="Send activation link" class="island-button"/>
         </form>
-        <a href="/login" th:href="@{/login}" class="link-lowlight">Back to Sign In</a>
+    </div>
+    <div class="island-footer">
+        <a href="/login" th:href="@{/login}" class="link-lowlight">Already joined? Sign in.</a>
     </div>
 </div>
 </body>
