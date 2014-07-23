@@ -1,36 +1,51 @@
 set -e -x
 
 #clean up source code, we don't need that anymore
-rm -rf ${BUILD_DIR}/uaa/scim
 rm -rf ${BUILD_DIR}/uaa/common
-rm -rf ${BUILD_DIR}/uaa/gatling
-rm -rf ${BUILD_DIR}/uaa/samples
 rm -rf ${BUILD_DIR}/uaa/docs
+rm -rf ${BUILD_DIR}/uaa/gatling
+rm -rf ${BUILD_DIR}/uaa/gem
+rm -rf ${BUILD_DIR}/uaa/gradle
+rm -rf ${BUILD_DIR}/uaa/samples
+rm -rf ${BUILD_DIR}/uaa/scim
+rm -rf ${BUILD_DIR}/uaa/scripts
 rm -rf ${BUILD_DIR}/uaa/uaa
 
-rm -f ${BUILD_DIR}/uaa/README.md
-rm -f ${BUILD_DIR}/uaa/NOTICE
-rm -f ${BUILD_DIR}/uaa/.run-script.sh
+rm -f ${BUILD_DIR}/uaa/.clean-cf-release-build
+rm -f ${BUILD_DIR}/uaa/.git
+rm -f ${BUILD_DIR}/uaa/.gitignore
+rm -f ${BUILD_DIR}/uaa/.gitreview
 rm -f ${BUILD_DIR}/uaa/.travis.yml
-rm -f ${BUILD_DIR}/uaa/pom.xml
+rm -f ${BUILD_DIR}/uaa/build.gradle
+rm -f ${BUILD_DIR}/uaa/gradle.properties
+rm -f ${BUILD_DIR}/uaa/gradlew
+rm -f ${BUILD_DIR}/uaa/gradlew.bat
 rm -f ${BUILD_DIR}/uaa/LICENSE
+rm -f ${BUILD_DIR}/uaa/NOTICE
+rm -f ${BUILD_DIR}/uaa/README.md
+rm -f ${BUILD_DIR}/uaa/settings.gradle
+rm -f ${BUILD_DIR}/uaa/shared_versions.gradle
 
+rm -rf ${BUILD_DIR}/login/.gradle
+rm -rf ${BUILD_DIR}/login/docs
+rm -rf ${BUILD_DIR}/login/gradle
+rm -rf ${BUILD_DIR}/login/scripts
 rm -rf ${BUILD_DIR}/login/src
 rm -rf ${BUILD_DIR}/login/uaa
-rm -rf ${BUILD_DIR}/login/docs
 
-rm -f ${BUILD_DIR}/login/README.md
-rm -f ${BUILD_DIR}/login/NOTICE
 rm -f ${BUILD_DIR}/login/.apply_spring_profiles_to_login_yaml.sh
-rm -f ${BUILD_DIR}/login/.cobertura-instrument.sh
-rm -f ${BUILD_DIR}/login/.cobertura-report.sh
+rm -f ${BUILD_DIR}/login/.git
 rm -f ${BUILD_DIR}/login/.gitignore
+rm -f ${BUILD_DIR}/login/.gitmodules
 rm -f ${BUILD_DIR}/login/.gitreview
-rm -f ${BUILD_DIR}/login/cloudfoundry*.iml
-rm -f ${BUILD_DIR}/login/.run-script.sh
 rm -f ${BUILD_DIR}/login/.travis.yml
-rm -f ${BUILD_DIR}/login/settings.gradle
 rm -f ${BUILD_DIR}/login/build.gradle
 rm -f ${BUILD_DIR}/login/build_properties.gradle
 rm -f ${BUILD_DIR}/login/gradle.properties
+rm -f ${BUILD_DIR}/login/gradlew
+rm -f ${BUILD_DIR}/login/gradlew.bat
 rm -f ${BUILD_DIR}/login/LICENSE
+rm -f ${BUILD_DIR}/login/NOTICE
+rm -f ${BUILD_DIR}/login/OpenAM-README.md
+rm -f ${BUILD_DIR}/login/README.md
+rm -f ${BUILD_DIR}/login/settings.gradle
