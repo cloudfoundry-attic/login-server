@@ -92,12 +92,12 @@ public class CreateAccountIT {
         String link = testClient.extractLink(message.getBody());
         webDriver.get(link);
 
-        Assert.assertEquals("Activate Your Account", webDriver.findElement(By.tagName("h1")).getText());
+        Assert.assertEquals("Create your account", webDriver.findElement(By.tagName("h1")).getText());
 
         webDriver.findElement(By.name("password")).sendKeys("secret");
         webDriver.findElement(By.name("password_confirmation")).sendKeys("secret");
 
-        webDriver.findElement(By.xpath("//input[@value='Activate']")).click();
+        webDriver.findElement(By.xpath("//input[@value='Create account']")).click();
 
         Assert.assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), containsString("Where to?"));
 
@@ -136,12 +136,12 @@ public class CreateAccountIT {
         String link = testClient.extractLink(message.getBody());
         webDriver.get(link);
 
-        Assert.assertEquals("Activate Your Account", webDriver.findElement(By.tagName("h1")).getText());
+        Assert.assertEquals("Create your account", webDriver.findElement(By.tagName("h1")).getText());
 
         webDriver.findElement(By.name("password")).sendKeys("secret");
         webDriver.findElement(By.name("password_confirmation")).sendKeys("secret");
 
-        webDriver.findElement(By.xpath("//input[@value='Activate']")).click();
+        webDriver.findElement(By.xpath("//input[@value='Create account']")).click();
 
         Assert.assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), not(containsString("Where to?")));
     }

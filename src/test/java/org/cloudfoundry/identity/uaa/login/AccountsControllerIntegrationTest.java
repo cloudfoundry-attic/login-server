@@ -7,6 +7,7 @@ import org.cloudfoundry.identity.uaa.test.YamlServletProfileInitializerContextIn
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.mock.env.MockEnvironment;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.web.FilterChainProxy;
@@ -19,13 +20,17 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.support.XmlWebApplicationContext;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.not;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -35,10 +40,13 @@ public class AccountsControllerIntegrationTest {
 
     private MockMvc mockMvc;
     private MockRestServiceServer mockUaaServer;
+    private MockEnvironment environment;
 
     @Before
     public void setUp() throws Exception {
+        environment = new MockEnvironment();
         webApplicationContext = new XmlWebApplicationContext();
+        webApplicationContext.setEnvironment(environment);
         new YamlServletProfileInitializerContextInitializer().initializeContext(webApplicationContext, "login.yml");
         webApplicationContext.setConfigLocation("file:./src/main/webapp/WEB-INF/spring-servlet.xml");
         webApplicationContext.addBeanFactoryPostProcessor(new UaaRestTemplateBeanFactoryPostProcessor());
@@ -50,6 +58,24 @@ public class AccountsControllerIntegrationTest {
             .build();
 
         mockUaaServer = MockRestServiceServer.createServer(webApplicationContext.getBean("authorizationTemplate", RestTemplate.class));
+    }
+
+    @Test
+    public void testCreateAccountPage() throws Exception {
+        ((MockEnvironment) webApplicationContext.getEnvironment()).setProperty("login.brand", "oss");
+
+        mockMvc.perform(get("/accounts/new").param("code", "the_secret_code").param("email", "user@example.com"))
+            .andExpect(content().string(containsString("Create your account")))
+            .andExpect(content().string(not(containsString("Pivotal ID"))));
+    }
+
+    @Test
+    public void testCreateAccountPageWithPivotalBrand() throws Exception {
+        ((MockEnvironment) webApplicationContext.getEnvironment()).setProperty("login.brand", "pivotal");
+
+        mockMvc.perform(get("/accounts/new").param("code", "the_secret_code").param("email", "user@example.com"))
+            .andExpect(content().string(containsString("Create your Pivotal ID")))
+            .andExpect(content().string(not(containsString("Create account"))));
     }
 
     @Test
