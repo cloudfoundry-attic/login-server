@@ -93,6 +93,8 @@ public class ResetPasswordIT {
         webDriver.findElement(By.name("email")).sendKeys(userEmail);
         webDriver.findElement(By.xpath("//input[@value='Send reset password link']")).click();
 
+        Assert.assertEquals("Instructions Sent", webDriver.findElement(By.tagName("h1")).getText());
+
         Assert.assertEquals(receivedEmailSize + 1, simpleSmtpServer.getReceivedEmailSize());
         Iterator receivedEmail = simpleSmtpServer.getReceivedEmail();
         SmtpMessage message = (SmtpMessage) receivedEmail.next();

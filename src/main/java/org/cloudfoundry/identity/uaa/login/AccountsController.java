@@ -21,6 +21,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.HttpClientErrorException;
 
@@ -55,7 +56,12 @@ public class AccountsController {
     public String sendActivationEmail(@RequestParam("email") String email,
                                       @RequestParam("client_id") String clientId) {
         accountCreationService.beginActivation(email, clientId);
-        return "redirect:email_sent?code=activation";
+        return "redirect:accounts/email_sent";
+    }
+
+    @RequestMapping(value = "/email_sent", method = RequestMethod.GET)
+    public String emailSent() {
+        return "accounts/email_sent";
     }
 
     @RequestMapping(method = POST, params = {"email", "code", "password", "password_confirmation"})

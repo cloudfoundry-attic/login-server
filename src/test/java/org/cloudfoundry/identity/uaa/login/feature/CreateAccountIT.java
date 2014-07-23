@@ -87,7 +87,8 @@ public class CreateAccountIT {
         Assert.assertEquals(userEmail, message.getHeaderValue("To"));
         Assert.assertThat(message.getBody(), containsString("Activate your account"));
 
-        Assert.assertEquals("Check your email for an account activation link.", webDriver.findElement(By.cssSelector(".instructions-sent")).getText());
+        Assert.assertEquals("Create your account", webDriver.findElement(By.tagName("h1")).getText());
+        Assert.assertEquals("Check email for an activation link.", webDriver.findElement(By.cssSelector(".instructions-sent")).getText());
 
         String link = testClient.extractLink(message.getBody());
         webDriver.get(link);
@@ -131,7 +132,7 @@ public class CreateAccountIT {
         Assert.assertEquals(userEmail, message.getHeaderValue("To"));
         Assert.assertThat(message.getBody(), containsString("Activate your account"));
 
-        Assert.assertEquals("Check your email for an account activation link.", webDriver.findElement(By.cssSelector(".instructions-sent")).getText());
+        Assert.assertEquals("Check email for an activation link.", webDriver.findElement(By.cssSelector(".instructions-sent")).getText());
 
         String link = testClient.extractLink(message.getBody());
         webDriver.get(link);

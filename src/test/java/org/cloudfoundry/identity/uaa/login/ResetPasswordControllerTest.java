@@ -80,6 +80,13 @@ public class ResetPasswordControllerTest {
     }
 
     @Test
+    public void testInstructions() throws Exception {
+        mockMvc.perform(get("/email_sent").param("code", "reset_password"))
+                .andExpect(status().isOk())
+                .andExpect(model().attribute("code", "reset_password"));
+    }
+
+    @Test
     public void testResetPasswordPage() throws Exception {
         mockMvc.perform(get("/reset_password").param("email", "user@example.com").param("code", "secret_code"))
                 .andExpect(status().isOk())

@@ -8620,6 +8620,15 @@ h2 {
     float: right;
     width: 230px;
     margin: 0 auto; }
+    .island-landscape .island-content .fa-envelope-o {
+      float: left;
+      font-size: 42px;
+      width: 25%; }
+    .island-landscape .island-content .instructions-sent {
+      float: right;
+      width: 75%; }
+    .island-landscape .island-content .island-button, .island-landscape .island-content .forgot-password-button {
+      clear: both; }
 
 .island-footer {
   bottom: -2em;
@@ -8664,7 +8673,8 @@ input {
   top: 5px; }
 
 .instructions-sent {
-  color: #9faaad; }
+  color: #43575c;
+  font-weight: 300; }
 
 .email-display {
   color: #43575c;
@@ -8859,6 +8869,12 @@ input {
   height: 34px;
   padding: 0;
   line-height: 14px; }
+  .island-button[disabled], [disabled].forgot-password-button {
+    background-color: white;
+    border-width: 1px 2px 2px 1px;
+    border-color: rgba(0, 0, 0, 0.16);
+    color: #7f7f7f;
+    opacity: 1; }
 
 .forgot-password-button {
   letter-spacing: 0; }

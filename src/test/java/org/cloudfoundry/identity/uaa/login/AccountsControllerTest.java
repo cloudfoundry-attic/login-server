@@ -81,7 +81,7 @@ public class AccountsControllerTest {
 
         mockMvc.perform(post)
             .andExpect(status().isFound())
-            .andExpect(redirectedUrl("email_sent?code=activation"));
+            .andExpect(redirectedUrl("accounts/email_sent"));
 
         Mockito.verify(accountCreationService).beginActivation("user1@example.com", "app");
     }

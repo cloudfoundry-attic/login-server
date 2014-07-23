@@ -39,6 +39,7 @@
     <security:http pattern="/reset_password" security="none" />
     <security:http pattern="/email_sent" security="none" />
     <security:http pattern="/accounts/new" security="none" />
+    <security:http pattern="/accounts/email_sent" security="none" />
 
     <bean id="xFrameOptionsFilter" class="org.cloudfoundry.identity.uaa.login.XFrameOptionsFilter" />
 
@@ -369,8 +370,6 @@
         <constructor-arg index="1" value="${login.url:http://localhost:8080/login}"/>
         <constructor-arg index="2" value="${login.brand:oss}"/>
     </bean>
-
-    <bean id="emailSentController" class="org.cloudfoundry.identity.uaa.login.EmailSentController" />
 
     <bean id="accountCreationService" class="org.cloudfoundry.identity.uaa.login.EmailAccountCreationService">
         <constructor-arg>
