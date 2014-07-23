@@ -16,6 +16,7 @@ rm -f ${BUILD_DIR}/uaa/pom.xml
 rm -f ${BUILD_DIR}/uaa/LICENSE
 
 rm -rf ${BUILD_DIR}/login/src
+rm -rf ${BUILD_DIR}/login/uaa
 rm -rf ${BUILD_DIR}/login/docs
 
 rm -f ${BUILD_DIR}/login/README.md
@@ -28,5 +29,8 @@ rm -f ${BUILD_DIR}/login/.gitreview
 rm -f ${BUILD_DIR}/login/cloudfoundry*.iml
 rm -f ${BUILD_DIR}/login/.run-script.sh
 rm -f ${BUILD_DIR}/login/.travis.yml
-rm -f ${BUILD_DIR}/login/pom.xml
+rm -f ${BUILD_DIR}/login/settings.gradle
+rm -f ${BUILD_DIR}/login/build.gradle
+rm -f ${BUILD_DIR}/login/build_properties.gradle
+rm -f ${BUILD_DIR}/login/gradle.properties
 rm -f ${BUILD_DIR}/login/LICENSE
