@@ -8598,10 +8598,10 @@ h2 {
   border: 1px solid #e0e4e5;
   margin-left: auto;
   margin-right: auto;
-  max-width: 735px;
-  padding: 50px;
+  max-width: 700px;
+  padding: 40px;
   position: relative;
-  width: 85%; }
+  width: 88%; }
   .island-landscape:before, .island-landscape:after {
     content: " ";
     /* 1 */
@@ -8630,6 +8630,15 @@ h2 {
     .island-landscape .island-content .island-button, .island-landscape .island-content .forgot-password-button {
       clear: both; }
 
+@media (max-width: 720px) {
+  .island-landscape {
+    border: none;
+    padding: 0; }
+    .island-landscape .island-title {
+      float: none;
+      margin: 0 auto 40px; }
+    .island-landscape .island-content {
+      float: none; } }
 .island-footer {
   bottom: -2em;
   position: absolute;
