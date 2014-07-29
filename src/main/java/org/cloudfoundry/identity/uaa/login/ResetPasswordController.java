@@ -12,6 +12,8 @@
  *******************************************************************************/
 package org.cloudfoundry.identity.uaa.login;
 
+import org.cloudfoundry.identity.uaa.authentication.Origin;
+import org.cloudfoundry.identity.uaa.authentication.UaaPrincipal;
 import org.cloudfoundry.identity.uaa.user.UaaAuthority;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -21,18 +23,21 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.Arrays;
+import java.util.Map;
+import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletResponse;
 
 @Controller
 public class ResetPasswordController {
 
     private final ResetPasswordService resetPasswordService;
+    private final Pattern emailPattern;
 
     public ResetPasswordController(ResetPasswordService resetPasswordService) {
         this.resetPasswordService = resetPasswordService;
+        emailPattern = Pattern.compile("^\\S+@\\S+\\.\\S+$");
     }
 
     @RequestMapping(value = "/forgot_password", method = RequestMethod.GET)
@@ -41,40 +46,47 @@ public class ResetPasswordController {
     }
 
     @RequestMapping(value = "/forgot_password.do", method = RequestMethod.POST)
-    public String forgotPassword(@ModelAttribute("email") String email) {
-        resetPasswordService.forgotPassword(ServletUriComponentsBuilder.fromCurrentContextPath(), email);
-        return "redirect:email_sent";
+    public String forgotPassword(Model model, @RequestParam("email") String email, HttpServletResponse response) {
+        if (emailPattern.matcher(email).matches()) {
+            resetPasswordService.forgotPassword(email);
+            return "redirect:email_sent?code=reset_password";
+        } else {
+            model.addAttribute("message_code", "form_error");
+            response.setStatus(HttpStatus.UNPROCESSABLE_ENTITY.value());
+            return "forgot_password";
+        }
     }
 
     @RequestMapping(value = "/email_sent", method = RequestMethod.GET)
-    public String emailSentPage() {
+    public String emailSentPage(@ModelAttribute("code") String code) {
         return "email_sent";
     }
 
-    @RequestMapping(value = "/reset_password", method = RequestMethod.GET)
+    @RequestMapping(value = "/reset_password", method = RequestMethod.GET, params = { "email", "code" })
     public String resetPasswordPage() {
         return "reset_password";
     }
 
     @RequestMapping(value = "/reset_password.do", method = RequestMethod.POST)
     public String resetPassword(Model model,
-                                @ModelAttribute("code") String code,
-                                @ModelAttribute("password") String password,
-                                @ModelAttribute("password_confirmation") String passwordConfirmation,
+                                @RequestParam("code") String code,
+                                @RequestParam("password") String password,
+                                @RequestParam("password_confirmation") String passwordConfirmation,
                                 HttpServletResponse response) {
 
         ChangePasswordValidation validation = new ChangePasswordValidation(password, passwordConfirmation);
         if (!validation.valid()) {
-            model.addAttribute("message", validation.getMessage());
+            model.addAttribute("message_code", validation.getMessageCode());
             response.setStatus(HttpStatus.UNPROCESSABLE_ENTITY.value());
             return "reset_password";
         }
-        String username = resetPasswordService.resetPassword(code, password);
 
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username, null, Arrays.asList(UaaAuthority.UAA_USER));
+        Map<String,String> resetResponse = resetPasswordService.resetPassword(code, password);
+
+        UaaPrincipal uaaPrincipal = new UaaPrincipal(resetResponse.get("user_id"), resetResponse.get("username"), resetResponse.get("username"), Origin.UAA, null);
+        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(uaaPrincipal, null, UaaAuthority.USER_AUTHORITIES);
         SecurityContextHolder.getContext().setAuthentication(token);
 
-        model.asMap().clear();
         return "redirect:home";
     }
 }

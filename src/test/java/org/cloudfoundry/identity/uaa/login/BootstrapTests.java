@@ -62,11 +62,6 @@ public class BootstrapTests {
         context = getServletContext("saml,fileMetadata", "./src/main/resources/login.yml", "file:./src/main/webapp/WEB-INF/spring-servlet.xml");
         assertNotNull(context.getBean("viewResolver", ViewResolver.class));
         assertNotNull(context.getBean("samlLogger", SAMLDefaultLogger.class));
-        try {
-            context.getBean("resetPasswordController", ResetPasswordController.class);
-            fail("Bean resetPasswordController found in saml profile.");
-        } catch (NoSuchBeanDefinitionException e) {
-        }
     }
 
     private GenericXmlApplicationContext getServletContext(String profiles, String loginYmlPath, String... resources) {

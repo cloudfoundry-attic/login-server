@@ -17,12 +17,10 @@
 #tiles:
 #  - name: Pivotal Network
 #    login-link: https://network.gopivotal.com/login
-#    signup-link: https://network.gopivotal.com/registrations/new
 #    image: /resources/pivotal/images/network-logo-gray.png
 #    image-hover: /resources/pivotal/images/network-logo-teal.png
 #  - name: Pivotal Web Services
 #    login-link: https://console.10.244.0.34.xip.io
-#    signup-link: https://console.10.244.0.34.xip.io/register
 #    image: /resources/pivotal/images/pws-logo-gray.png
 #    image-hover: /resources/pivotal/images/pws-logo-teal.png
 #  - name: Pivotal Partners
@@ -31,9 +29,15 @@
 #    image-hover: /resources/pivotal/images/partners-logo-teal.png
 
 links:
+  # Custom external create account link
+  #signup: http://some-oauth-client.example.com/signup
   passwd: http://localhost:8080/login/forgot_password
 
 login:
+  # Enable create account on the Login Server (enabled by default)
+  # - links.signup will still be used if present
+  #signupsEnabled: false
+
   # the brand to use for password reset emails and page titles
   # (defaults to oss)
   #brand: pivotal

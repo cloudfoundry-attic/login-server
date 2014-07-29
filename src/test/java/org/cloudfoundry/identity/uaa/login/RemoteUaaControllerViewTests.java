@@ -129,6 +129,14 @@ public class RemoteUaaControllerViewTests {
                 .andExpect(xpath("//input[@type='checkbox' and @name='scope.3' and @value='scope.cloud_controller.read' and @checked='checked']").doesNotExist());
     }
 
+    @Test
+    public void testSignupsDisabled() throws Exception {
+        environment.setProperty("login.signupsEnabled", "false");
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/login"))
+            .andExpect(xpath("//a[text()='Create account']").doesNotExist());
+    }
+
     @Configuration
     @EnableWebMvc
     @Import(ThymeleafConfig.class)

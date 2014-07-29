@@ -57,7 +57,6 @@ public class ChangePasswordIT {
     String baseUrl;
     
     private String userEmail;
-    private String userName;
 
     @Before
     public void setUp() throws Exception {
@@ -71,27 +70,26 @@ public class ChangePasswordIT {
         String scimAccessToken = testClient.getOAuthAccessToken(scimClientId, "scimsecret", "client_credentials", "scim.read scim.write password.write");
 
         userEmail = "user" + randomInt + "@example.com";
-        userName = "JOE" + randomInt;
-        testClient.createUser(scimAccessToken, userName, userEmail, "secret");
+        testClient.createUser(scimAccessToken, userEmail, userEmail, "secret");
     }
 
     @Test
     public void testChangePassword() throws Exception {
-        signIn(userName, "secret");
+        signIn(userEmail, "secret");
 
         changePassword("secret", "newsecret", "new");
         WebElement errorMessage = webDriver.findElement(By.className("error-message"));
         Assert.assertTrue(errorMessage.isDisplayed());
-        Assert.assertEquals("Passwords must match and not be empty", errorMessage.getText());
+        Assert.assertEquals("Passwords must match and not be empty.", errorMessage.getText());
 
         changePassword("secret", "newsecret", "newsecret");
         signOut();
 
-        signIn(userName, "newsecret");
+        signIn(userEmail, "newsecret");
     }
 
     private void changePassword(String originalPassword, String newPassword, String confirmPassword) {
-        webDriver.findElement(By.xpath("//*[text()='"+userName+"']")).click();
+        webDriver.findElement(By.xpath("//*[text()='"+userEmail+"']")).click();
         webDriver.findElement(By.linkText("Account Settings")).click();
         webDriver.findElement(By.linkText("Change Password")).click();
         webDriver.findElement(By.name("current_password")).sendKeys(originalPassword);
@@ -102,7 +100,7 @@ public class ChangePasswordIT {
     }
 
     private void signOut() {
-        webDriver.findElement(By.xpath("//*[text()='"+userName+"']")).click();
+        webDriver.findElement(By.xpath("//*[text()='"+userEmail+"']")).click();
         webDriver.findElement(By.linkText("Sign Out")).click();
     }
 

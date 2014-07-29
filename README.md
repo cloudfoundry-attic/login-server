@@ -11,27 +11,23 @@ from the UAA and no data are stored locally).
 ## Running and Testing the Login Server
 
 The Login Server is a standard JEE servlet application, and you can
-build a war file and deploy it to any container you like (`mvn
-package` and look in the `target` directory).  For convenience there
-is also a Maven profile that will run the Login Server, the UAA and
-some sample apps all in the same container from the command line
-(assuming you have the UAA and Login Server cloned in separate
-directories with a common parent):
+build a war file and deploy it to any container you like (`./gradlew
+:war` and look in the `build/libs` directory).  For convenience there
+is also a Gradle task that will run the Login Server, the UAA and
+some sample apps all in the same container from the command line:
 
-    $ (cd uaa; mvn clean install)
-    $ cd login-server
-    $ mvn clean install
-    $ mvn tomcat7:run -P integration
+    $ ./gradlew run
 
-The unit tests will have been run as part of `mvn install`, or can be
-run on their own with `mvn test`.
-
-You can run the Login Server integration tests using the command line as
-well. These integration tests will be skipped automatically if a Login
-Server and UAA have not been started locally. These tests require
+You can run the Login Server tests using the command line as
+well. The integration tests require
 [PhantomJS](http://phantomjs.org/download.html) to be installed.
 
-    $ mvn verify
+    $ ./gradlew :test
+    $ ./gradlew :integrationTest
+
+You can run all tests for the login server and the uaa with
+
+    $ ./gradlew test integrationTest
 
 There are two documents that can help you configure the login server in your environment.
     

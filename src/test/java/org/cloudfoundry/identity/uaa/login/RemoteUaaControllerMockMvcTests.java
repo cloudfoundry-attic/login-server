@@ -14,6 +14,7 @@ package org.cloudfoundry.identity.uaa.login;
 
 import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -128,6 +129,41 @@ public class RemoteUaaControllerMockMvcTests {
     @Test
     public void testCustomSignupLink() throws Exception {
         MockEnvironment environment = new MockEnvironment();
+        environment.setProperty("links.signup", "http://www.example.com/signup");
+
+        RemoteUaaController controller = new RemoteUaaController(environment, new RestTemplate());
+        Prompt first = new Prompt("how", "text", "How did I get here?");
+        Prompt second = new Prompt("where", "password", "Where does that highway go to?");
+        controller.setPrompts(Arrays.asList(first, second));
+
+        MockMvc mockMvc = getMockMvc(controller);
+
+        mockMvc.perform(get("/login").accept(TEXT_HTML))
+                .andExpect(status().isOk())
+                .andExpect(model().attribute("createAccountLink", "http://www.example.com/signup"));
+    }
+
+    @Test
+    public void testLocalSignupDisabled() throws Exception {
+        MockEnvironment environment = new MockEnvironment();
+        environment.setProperty("login.signupsEnabled", "false");
+
+        RemoteUaaController controller = new RemoteUaaController(environment, new RestTemplate());
+        Prompt first = new Prompt("how", "text", "How did I get here?");
+        Prompt second = new Prompt("where", "password", "Where does that highway go to?");
+        controller.setPrompts(Arrays.asList(first, second));
+
+        MockMvc mockMvc = getMockMvc(controller);
+
+        mockMvc.perform(get("/login").accept(TEXT_HTML))
+                .andExpect(status().isOk())
+                .andExpect(model().attribute("createAccountLink", nullValue()));
+    }
+
+    @Test
+    public void testCustomSignupLinkWithLocalSignupDisabled() throws Exception {
+        MockEnvironment environment = new MockEnvironment();
+        environment.setProperty("login.signupsEnabled", "false");
         environment.setProperty("links.signup", "http://www.example.com/signup");
 
         RemoteUaaController controller = new RemoteUaaController(environment, new RestTemplate());

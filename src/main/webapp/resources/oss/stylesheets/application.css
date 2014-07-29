@@ -8577,6 +8577,7 @@ body {
 h1 {
   font-size: 32px;
   font-weight: 300;
+  line-height: 1em;
   text-transform: none;
   margin-top: 0;
   margin-bottom: 16px; }
@@ -8587,10 +8588,61 @@ h2 {
   color: #939393; }
 
 .island {
+  position: relative;
   text-align: center; }
   .island .island-content {
     width: 196px;
-    margin: 0 auto 0 auto; }
+    margin: 0 auto; }
+
+.island-landscape {
+  border: 1px solid #e0e4e5;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 700px;
+  padding: 40px;
+  position: relative;
+  width: 88%; }
+  .island-landscape:before, .island-landscape:after {
+    content: " ";
+    /* 1 */
+    display: table;
+    /* 2 */ }
+  .island-landscape:after {
+    clear: both; }
+  .island-landscape .island-title {
+    float: left;
+    width: 300px; }
+    .island-landscape .island-title p {
+      font-weight: 300; }
+      .island-landscape .island-title p strong {
+        font-weight: 400; }
+  .island-landscape .island-content {
+    float: right;
+    width: 230px;
+    margin: 0 auto; }
+    .island-landscape .island-content .fa-envelope-o {
+      float: left;
+      font-size: 42px;
+      width: 25%; }
+    .island-landscape .island-content .instructions-sent {
+      float: right;
+      width: 75%; }
+    .island-landscape .island-content .island-button, .island-landscape .island-content .forgot-password-button {
+      clear: both; }
+
+@media (max-width: 720px) {
+  .island-landscape {
+    border: none;
+    padding: 0; }
+    .island-landscape .island-title {
+      float: none;
+      margin: 0 auto 40px; }
+    .island-landscape .island-content {
+      float: none; } }
+.island-footer {
+  bottom: -2em;
+  position: absolute;
+  right: 0; }
 
 form {
   margin-bottom: 8px; }
@@ -8600,8 +8652,22 @@ input {
   margin-bottom: 20px; }
 
 .form-control {
-  font-size: 14px;
+  font-size: 16px;
   height: 34px; }
+
+::-webkit-input-placeholder {
+  font-weight: 400; }
+
+:-moz-placeholder {
+  /* Firefox 18- */
+  font-weight: 400; }
+
+::-moz-placeholder {
+  /* Firefox 19+ */
+  font-weight: 400; }
+
+:-ms-input-placeholder {
+  font-weight: 400; }
 
 .fa-envelope-o {
   font-size: 36px;
@@ -8616,11 +8682,12 @@ input {
   top: 5px; }
 
 .instructions-sent {
-  color: #9faaad; }
+  color: #43575c;
+  font-weight: 300; }
 
 .email-display {
-  color: #7f7f7f;
-  font-size: 14px;
+  color: #43575c;
+  font-size: 16px;
   margin-bottom: 16px; }
 
 .left {
@@ -8635,7 +8702,7 @@ input {
 
 .link-lowlight {
   color: #7f7f7f;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 300; }
 
 .error-message {
@@ -8643,7 +8710,7 @@ input {
   color: #ab2a2a;
   width: 100%;
   font-size: 11px;
-  padding: 12px 0;
+  padding: 12px;
   line-height: 12px;
   margin-bottom: 20px; }
 
@@ -8811,6 +8878,12 @@ input {
   height: 34px;
   padding: 0;
   line-height: 14px; }
+  .island-button[disabled], [disabled].forgot-password-button {
+    background-color: white;
+    border-width: 1px 2px 2px 1px;
+    border-color: rgba(0, 0, 0, 0.16);
+    color: #7f7f7f;
+    opacity: 1; }
 
 .forgot-password-button {
   letter-spacing: 0; }
@@ -8845,8 +8918,8 @@ h1 {
 .header {
   height: 168px; }
 
-.island {
-  padding-top: 32px; }
+.island, .island-landscape {
+  margin-top: 32px; }
 
 .panel-container {
-  padding-top: 32px; }
+  margin-top: 32px; }

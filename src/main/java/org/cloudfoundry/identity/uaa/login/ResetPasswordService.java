@@ -12,9 +12,9 @@
  *******************************************************************************/
 package org.cloudfoundry.identity.uaa.login;
 
-import org.springframework.web.util.UriComponentsBuilder;
+import java.util.Map;
 
 public interface ResetPasswordService {
-    void forgotPassword(UriComponentsBuilder uriComponentsBuilder, String emailOrUsername);
-    String resetPassword(String code, String password);
+    void forgotPassword(String username);
+    Map<String, String> resetPassword(String code, String password);
 }

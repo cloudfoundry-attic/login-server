@@ -39,14 +39,4 @@ public class TileInfo {
         }
         return loginTiles;
     }
-
-    public List<Map<String,String>> getSignupTiles() {
-        List<Map<String,String>> signupTiles = new ArrayList<>();
-        for (Map<String,String> tile : tiles) {
-            if (!StringUtils.isEmpty(tile.get("signup-link"))) {
-                signupTiles.add(tile);
-            }
-        }
-        return signupTiles;
-    }
 }

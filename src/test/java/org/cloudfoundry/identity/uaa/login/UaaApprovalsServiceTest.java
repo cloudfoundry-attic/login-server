@@ -26,7 +26,6 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 import org.cloudfoundry.identity.uaa.oauth.approval.Approval;
-import org.cloudfoundry.identity.uaa.test.UaaTestAccounts;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,7 +40,6 @@ public class UaaApprovalsServiceTest {
 
     private MockRestServiceServer mockUaaServer;
     private UaaApprovalsService approvalsService;
-    private UaaTestAccounts testAccounts = UaaTestAccounts.standard(null);
 
     @Before
     public void setUp() throws Exception {
@@ -87,7 +85,7 @@ public class UaaApprovalsServiceTest {
                 .andExpect(method(PUT))
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$[0].clientId").value("app"))
-                .andExpect(jsonPath("$[0].userName").value(testAccounts.getUserName()))
+                .andExpect(jsonPath("$[0].userId").value("user-id"))
                 .andExpect(jsonPath("$[0].scope").value("thing.write"))
                 .andExpect(jsonPath("$[0].status").value("APPROVED"))
                 .andRespond(withSuccess());
@@ -95,7 +93,7 @@ public class UaaApprovalsServiceTest {
         List<UaaApprovalsService.DescribedApproval> approvals = new ArrayList<UaaApprovalsService.DescribedApproval>();
         UaaApprovalsService.DescribedApproval approval = new UaaApprovalsService.DescribedApproval();
         approval.setClientId("app");
-        approval.setUserId(testAccounts.getUserName());
+        approval.setUserId("user-id");
         approval.setScope("thing.write");
         approval.setStatus(Approval.ApprovalStatus.APPROVED);
         approval.setDescription("Write to your thing resources");

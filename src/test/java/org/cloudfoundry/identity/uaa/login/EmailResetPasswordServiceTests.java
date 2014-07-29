@@ -12,33 +12,37 @@
  *******************************************************************************/
 package org.cloudfoundry.identity.uaa.login;
 
-import static org.hamcrest.Matchers.containsString;
+import org.cloudfoundry.identity.uaa.login.test.ThymeleafConfig;
+import org.hamcrest.Matchers;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.web.client.MockRestServiceServer;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+import org.thymeleaf.spring4.SpringTemplateEngine;
+
+import java.util.Map;
+
+import static org.mockito.Matchers.contains;
+import static org.mockito.Matchers.eq;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withBadRequest;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
-
-import org.cloudfoundry.identity.uaa.login.test.FakeJavaMailSender;
-import org.cloudfoundry.identity.uaa.login.test.ThymeleafConfig;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.web.client.MockRestServiceServer;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
-import org.thymeleaf.spring4.SpringTemplateEngine;
-
-import java.util.Arrays;
-import javax.mail.Message;
-import javax.mail.internet.InternetAddress;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = ThymeleafConfig.class)
@@ -46,8 +50,7 @@ public class EmailResetPasswordServiceTests {
 
     private EmailResetPasswordService emailResetPasswordService;
     private MockRestServiceServer mockUaaServer;
-    private UriComponentsBuilder uriComponentsBuilder;
-    private FakeJavaMailSender mailSender;
+    private EmailService emailService;
 
     @Autowired
     @Qualifier("mailTemplateEngine")
@@ -57,9 +60,8 @@ public class EmailResetPasswordServiceTests {
     public void setUp() throws Exception {
         RestTemplate uaaTemplate = new RestTemplate();
         mockUaaServer = MockRestServiceServer.createServer(uaaTemplate);
-        uriComponentsBuilder = UriComponentsBuilder.fromUriString("http://login.example.com/login");
-        mailSender = new FakeJavaMailSender();
-        emailResetPasswordService = new EmailResetPasswordService(templateEngine, uaaTemplate, "http://uaa.example.com/uaa", mailSender, "pivotal", "http://login.example.com/login");
+        emailService = Mockito.mock(EmailService.class);
+        emailResetPasswordService = new EmailResetPasswordService(templateEngine, emailService, uaaTemplate, "http://uaa.example.com/uaa", "pivotal");
     }
 
     @Test
@@ -68,17 +70,42 @@ public class EmailResetPasswordServiceTests {
                 .andExpect(method(POST))
                 .andRespond(withSuccess("the_secret_code", APPLICATION_JSON));
 
-        emailResetPasswordService.forgotPassword(uriComponentsBuilder, "user@example.com");
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setProtocol("http");
+        request.setContextPath("/login");
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
+
+        emailResetPasswordService.forgotPassword("user@example.com");
 
         mockUaaServer.verify();
 
-        Assert.assertEquals(1, mailSender.getSentMessages().size());
+        Mockito.verify(emailService).sendMimeMessage(
+                eq("user@example.com"),
+                eq("Pivotal account password reset request"),
+                contains("<a href=\"http://localhost/login/reset_password?code=the_secret_code&amp;email=user%40example.com\">Reset your password</a>")
+        );
+    }
 
-        FakeJavaMailSender.MimeMessageWrapper messageWrapper = mailSender.getSentMessages().get(0);
-        Assert.assertEquals(Arrays.asList(new InternetAddress("user@example.com")), messageWrapper.getRecipients(Message.RecipientType.TO));
-        Assert.assertEquals(Arrays.asList(new InternetAddress("admin@login.example.com")), messageWrapper.getFrom());
-        Assert.assertEquals("Pivotal", ((InternetAddress)messageWrapper.getFrom().get(0)).getPersonal());
-        Assert.assertThat(messageWrapper.getContentString(), containsString("<a href=\"http://login.example.com/login/reset_password?code=the_secret_code&amp;email=user%40example.com\">Reset your password</a>"));
+    @Test
+    public void testWhenConflictIsReturnedByTheUaa() throws Exception {
+        mockUaaServer.expect(requestTo("http://uaa.example.com/uaa/password_resets"))
+                .andExpect(method(POST))
+                .andRespond(withStatus(HttpStatus.CONFLICT));
+
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setProtocol("http");
+        request.setContextPath("/login");
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
+
+        emailResetPasswordService.forgotPassword("user@example.com");
+
+        mockUaaServer.verify();
+
+        Mockito.verify(emailService).sendMimeMessage(
+                eq("user@example.com"),
+                eq("Pivotal account password reset request"),
+                contains("Your account credentials for localhost are managed by an external service. Please contact your administrator for password recovery requests.")
+        );
     }
 
     @Test
@@ -87,11 +114,11 @@ public class EmailResetPasswordServiceTests {
                 .andExpect(method(POST))
                 .andRespond(withBadRequest());
 
-        emailResetPasswordService.forgotPassword(uriComponentsBuilder, "user@example.com");
+        emailResetPasswordService.forgotPassword("user@example.com");
 
         mockUaaServer.verify();
 
-        Assert.assertEquals(0, mailSender.getSentMessages().size());
+        Mockito.verifyZeroInteractions(emailService);
     }
 
     @Test
@@ -100,12 +127,16 @@ public class EmailResetPasswordServiceTests {
                 .andExpect(method(POST))
                 .andExpect(jsonPath("$.code").value("secret_code"))
                 .andExpect(jsonPath("$.new_password").value("new_secret"))
-                .andRespond(withSuccess("userman", APPLICATION_JSON));
+                .andRespond(withSuccess("{" +
+                    "  \"user_id\":\"usermans-id\"," +
+                    "  \"username\":\"userman\"" +
+                    "}", APPLICATION_JSON));
 
-        String username = emailResetPasswordService.resetPassword("secret_code", "new_secret");
+        Map<String,String> userInfo = emailResetPasswordService.resetPassword("secret_code", "new_secret");
 
         mockUaaServer.verify();
 
-        Assert.assertEquals("userman", username);
+        Assert.assertThat(userInfo, Matchers.hasEntry("user_id", "usermans-id"));
+        Assert.assertThat(userInfo, Matchers.hasEntry("username", "userman"));
     }
 }

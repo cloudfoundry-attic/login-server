@@ -1,4 +1,3 @@
-target/
 *~
 #*
 .#*
@@ -28,5 +27,9 @@ Servers/
 *.swo
 coverage.ec
 git.properties
+build.properties
 *.md.html
 phantomjsdriver.log
+.gradle/
+build/
+/classes/

@@ -50,13 +50,13 @@ public class ChangePasswordController {
 
         ChangePasswordValidation validation = new ChangePasswordValidation(newPassword, confirmPassword);
         if (!validation.valid()) {
-            model.addAttribute("message", validation.getMessage());
+            model.addAttribute("message_code", validation.getMessageCode());
             response.setStatus(HttpStatus.UNPROCESSABLE_ENTITY.value());
             return "change_password";
         }
 
         SecurityContext securityContext = SecurityContextHolder.getContext();
-        String username = (String) securityContext.getAuthentication().getName();
+        String username = securityContext.getAuthentication().getName();
 
         try {
             changePasswordService.changePassword(username, currentPassword, newPassword);
