@@ -79,6 +79,7 @@ public class ResetPasswordControllerIntegrationTests {
 
         MockHttpServletRequestBuilder post = post("/reset_password.do")
             .param("code", "the_secret_code")
+            .param("email", "user@example.com")
             .param("password", "secret")
             .param("password_confirmation", "secret");
 
@@ -86,6 +87,7 @@ public class ResetPasswordControllerIntegrationTests {
             .andExpect(status().isFound())
             .andExpect(redirectedUrl("home"))
             .andReturn();
+
         SecurityContext securityContext = (SecurityContext) mvcResult.getRequest().getSession().getAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY);
         Authentication authentication = securityContext.getAuthentication();
         Assert.assertThat(authentication.getPrincipal(), instanceOf(UaaPrincipal.class));
