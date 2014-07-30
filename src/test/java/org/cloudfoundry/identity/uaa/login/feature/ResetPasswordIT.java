@@ -108,13 +108,10 @@ public class ResetPasswordIT {
         webDriver.get(link);
 
         webDriver.findElement(By.name("password")).sendKeys("newsecret");
-        webDriver.findElement(By.name("password_confirmation")).sendKeys("");
-        webDriver.findElement(By.xpath("//input[@value='Create new password']")).click();
-        Assert.assertThat(webDriver.findElement(By.cssSelector(".error-message")).getText(), containsString("Passwords must match and not be empty."));
-
-        webDriver.findElement(By.name("password")).sendKeys("newsecret");
         webDriver.findElement(By.name("password_confirmation")).sendKeys("newsecret");
+
         webDriver.findElement(By.xpath("//input[@value='Create new password']")).click();
+
         Assert.assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), containsString("Where to?"));
 
         webDriver.findElement(By.xpath("//*[text()='"+userEmail+"']")).click();

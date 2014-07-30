@@ -70,7 +70,6 @@ public class ResetPasswordController {
     @RequestMapping(value = "/reset_password.do", method = RequestMethod.POST)
     public String resetPassword(Model model,
                                 @RequestParam("code") String code,
-                                @RequestParam("email") String email,
                                 @RequestParam("password") String password,
                                 @RequestParam("password_confirmation") String passwordConfirmation,
                                 HttpServletResponse response) {
@@ -78,8 +77,6 @@ public class ResetPasswordController {
         ChangePasswordValidation validation = new ChangePasswordValidation(password, passwordConfirmation);
         if (!validation.valid()) {
             model.addAttribute("message_code", validation.getMessageCode());
-            model.addAttribute("email", email);
-            model.addAttribute("code", code);
             response.setStatus(HttpStatus.UNPROCESSABLE_ENTITY.value());
             return "reset_password";
         }
