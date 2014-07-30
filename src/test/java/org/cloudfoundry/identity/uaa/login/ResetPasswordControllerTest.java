@@ -98,6 +98,7 @@ public class ResetPasswordControllerTest {
         MockHttpServletRequestBuilder post = post("/reset_password.do")
                 .contentType(APPLICATION_FORM_URLENCODED)
                 .param("code", "secret_code")
+                .param("email", "foo@example.com")
                 .param("password", "password")
                 .param("password_confirmation", "password");
         mockMvc.perform(post)
@@ -115,12 +116,16 @@ public class ResetPasswordControllerTest {
         MockHttpServletRequestBuilder post = post("/reset_password.do")
                 .contentType(APPLICATION_FORM_URLENCODED)
                 .param("code", "123456")
+                .param("email", "foo@example.com")
                 .param("password", "pass")
                 .param("password_confirmation", "word");
+
         mockMvc.perform(post)
                 .andExpect(status().isUnprocessableEntity())
                 .andExpect(view().name("reset_password"))
-                .andExpect(model().attribute("message_code", "form_error"));
+                .andExpect(model().attribute("message_code", "form_error"))
+                .andExpect(model().attribute("email", "foo@example.com"))
+                .andExpect(model().attribute("code", "123456"));
 
         Mockito.verifyZeroInteractions(resetPasswordService);
     }
