@@ -2,8 +2,8 @@
 
 cd `dirname $0`/..
 
-if [ "$#" -ne 1 ]; then
-    echo "Usage: $(basename $0) login_server_release_version"
+if [ "$#" -ne 2 ]; then
+    echo "Usage: $(basename $0) login_server_release_version uaa_tag"
     exit 1
 fi
 
@@ -13,6 +13,13 @@ set -x
 
 git checkout develop
 git checkout -b releases/$1
+# Update submodule pointers; Clean out any submodule changes
+git submodule foreach --recursive 'git submodule sync; git clean -d --force --force'
+# Update submodule content, checkout if necessary
+git submodule update --init --recursive --force
+cd uaa
+git checkout tags/$2
+cd ..
 ./scripts/set-version.sh $1
 git commit -am "Bump release version to $1"
 git push --set-upstream origin releases/$1
