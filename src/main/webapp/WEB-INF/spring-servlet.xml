@@ -469,17 +469,21 @@
         <!-- IDP Discovery Service -->
         <bean id="samlIDPDiscovery" class="org.springframework.security.saml.SAMLDiscovery" />
 
+        <bean id="extendedMetaData" class="org.springframework.security.saml.metadata.ExtendedMetadata">
+            <property name="idpDiscoveryEnabled" value="true" />
+            <property name="alias" value="${login.idpEntityAlias}" />
+            <property name="signMetadata" value="true" />
+        </bean>
+
         <!-- Filter automatically generates default SP metadata -->
         <bean id="metadataGeneratorFilter" class="org.springframework.security.saml.metadata.MetadataGeneratorFilter">
             <constructor-arg>
                 <bean class="org.springframework.security.saml.metadata.MetadataGenerator">
-                    <property name="includeDiscovery" value="true" />
+                    <property name="extendedMetadata" ref="extendedMetaData"/>
                     <property name="requestSigned" value="true" />
                     <property name="wantAssertionSigned" value="false" />
-                    <property name="signMetadata" value="true" />
                     <property name="entityBaseURL" value="${login.entityBaseURL}" />
                     <property name="entityId" value="${login.entityID}" />
-                    <property name="entityAlias" value="${login.idpEntityAlias}" />
                 </bean>
             </constructor-arg>
         </bean>
