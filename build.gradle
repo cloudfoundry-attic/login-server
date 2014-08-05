@@ -49,6 +49,7 @@ repositories {
   maven { url "http://objectstyle.org/maven2/" }
   maven { url "http://repo.springsource.org/ext-release-local" }
   maven { url "http://repo.maven.apache.org/maven2" }
+  maven { url "http://repo.spring.io/repo" }
 }
 
 dependencies {
@@ -59,7 +60,7 @@ dependencies {
   }
   compile group: 'org.springframework', name: 'spring-context-support', version:springVersion
   compile group: 'org.springframework.security', name: 'spring-security-openid', version:springSecurityVersion
-  compile(group: 'org.springframework.security.extensions', name: 'spring-security-saml2-core', version:'1.0.0.RC3-SNAPSHOT') {
+  compile(group: 'org.springframework.security.extensions', name: 'spring-security-saml2-core', version:'1.0.0.RELEASE') {
     exclude(module: 'bcprov-jdk15')
   }
   compile group: 'org.thymeleaf', name: 'thymeleaf-spring4', version:'2.1.2.RELEASE'
