@@ -108,12 +108,19 @@ public class SamlRemoteUaaController extends RemoteUaaController {
         Collection<? extends GrantedAuthority> authorities = null;
 
         if (principal instanceof ExpiringUsernameAuthenticationToken) {
-            appendField(login, "username",
-                            ((SamlUserDetails) (((ExpiringUsernameAuthenticationToken) principal).getPrincipal()))
-                                            .getUsername());
+            ExpiringUsernameAuthenticationToken et = (ExpiringUsernameAuthenticationToken)principal;
+            if (et.getPrincipal() instanceof String ) {
+                appendField(login, "username", et.getPrincipal());
+                authorities = et.getAuthorities();
+            } else {
+                appendField(login, "username",
+                    ((SamlUserDetails) (((ExpiringUsernameAuthenticationToken) principal).getPrincipal()))
+                        .getUsername());
+                authorities = ((SamlUserDetails) (((ExpiringUsernameAuthenticationToken) principal).getPrincipal()))
+                    .getAuthorities();
+            }
 
-            authorities = ((SamlUserDetails) (((ExpiringUsernameAuthenticationToken) principal).getPrincipal()))
-                            .getAuthorities();
+            
         }
 
         if (principal instanceof Authentication) {
