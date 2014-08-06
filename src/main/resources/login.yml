@@ -33,6 +33,8 @@ links:
   #signup: http://some-oauth-client.example.com/signup
   passwd: http://localhost:8080/login/forgot_password
 
+#spring_profiles: saml
+
 login:
   # Enable create account on the Login Server (enabled by default)
   # - links.signup will still be used if present
@@ -108,29 +110,29 @@ login:
   
     -----END CERTIFICATE-----'
 
-  # The entity alias of the IDP when vCenter SSO
-  idpEntityAlias: vshpere.local
-  # The entity alias of the IDP when Open AM
-  #idpEntityAlias: openam-local
-  
-  # URL of the IDP metadata
-  idpMetadataURL: https://win2012-sso2:7444/websso/SAML2/Metadata/vsphere.local
+# vCenter SSO Configuration
+#  idpEntityAlias: vshpere.local
+#  idpMetadataURL: https://win2012-sso2.localdomain:7444/websso/SAML2/Metadata/vsphere.local
+#  saml:
+#    #vCenter SSO responds to persistent
+#    nameID: urn:oasis:names:tc:SAML:2.0:nameid-format:persistent
+#    #vCenter SSO use 0, try 1 otherwise
+#    assertionConsumerIndex: 0
+
+# Local OpenAM configuration
+#  idpEntityAlias: openam-local
+#  idpMetadataURL: http://localhost:8081/openam/saml2/jsp/exportmetadata.jsp?entityid=http://localhost:8081/openam
+#  saml:
+#    #openAM responds to emailAddress
+#    nameID: urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress
+#    assertionConsumerIndex: 0
+#    signMetaData: false
+#    signRequest: false
+#    socketFactory: org.apache.commons.httpclient.protocol.DefaultProtocolSocketFactory
+
   #if using file based, change the spring profile to 'fileMetadata'
   #idpMetadataFile: /Users/johndoe/dev/login-server/src/main/resources/idp.xml
-  #if using OpenAM one can set the URL
-  #idpMetadataURL: http://openam.example.com:8181/openam/saml2/jsp/exportmetadata.jsp?entityid=http://openam.example.com:8181/openam
-  
-  
-  saml:
-    #openAM responds to emailAddress
-    #nameID: urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress
-    
-    #vCenter SSO responds to persistent
-    nameID: urn:oasis:names:tc:SAML:2.0:nameid-format:persistent
-    
-    #vCenter SSO use 0, try 1 otherwise
-    assertionConsumerIndex: 0
-  
+
   authorize:
     url: http://localhost:8080/login/oauth/authorize
 
@@ -158,4 +160,3 @@ smtp:
   user:
   password:
 
-#spring_profiles: saml
