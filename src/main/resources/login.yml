@@ -128,7 +128,8 @@ login:
     #vCenter SSO responds to persistent
     nameID: urn:oasis:names:tc:SAML:2.0:nameid-format:persistent
     
-    assertionConsumerIndex: 1
+    #vCenter SSO use 0, try 1 otherwise
+    assertionConsumerIndex: 0
   
   authorize:
     url: http://localhost:8080/login/oauth/authorize
