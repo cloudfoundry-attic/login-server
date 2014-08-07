@@ -641,7 +641,14 @@
             </property>
         </bean>
 
-        <bean id="acceptSSLSocketFactory" class="${login.saml.socketFactory:org.apache.commons.httpclient.contrib.ssl.EasySSLProtocolSocketFactory}" />
+        <bean id="metaDataUrl" class="java.lang.String">
+            <constructor-arg value="${login.idpMetadataURL:http://localhost:8080/notvalid}"/>
+        </bean>
+
+        <bean id="socketFactoryClass" class="java.lang.String">
+            <!-- if the socket factory has not been configured, select one based on the URL -->
+            <constructor-arg value="${login.saml.socket.socketFactory:#{metaDataUrl.startsWith('https:')?'org.apache.commons.httpclient.contrib.ssl.EasySSLProtocolSocketFactory':'org.apache.commons.httpclient.protocol.DefaultProtocolSocketFactory'}}"/>
+        </bean>
 
         <bean id="extendedMetadataDelegate" class="org.springframework.security.saml.metadata.ExtendedMetadataDelegate">
             <constructor-arg>
@@ -650,7 +657,11 @@
                     <constructor-arg ref="metadataFetchingHttpClient" />
                     <constructor-arg value="${login.idpMetadataURL:http://localhost:8080/notvalid}" />
                     <property name="parserPool" ref="parserPool" />
-                    <property name="socketFactory" ref="acceptSSLSocketFactory" />
+                    <property name="socketFactory">
+                        <bean class="org.cloudfoundry.identity.uaa.login.util.IndirectBeanCreator" factory-method="getBean">
+                            <constructor-arg ref="socketFactoryClass"/>
+                        </bean>
+                    </property>
                 </bean>
             </constructor-arg>
             <constructor-arg>

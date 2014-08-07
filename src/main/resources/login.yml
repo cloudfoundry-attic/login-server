@@ -128,7 +128,6 @@ login:
 #    assertionConsumerIndex: 0
 #    signMetaData: false
 #    signRequest: false
-#    socketFactory: org.apache.commons.httpclient.protocol.DefaultProtocolSocketFactory
 
   #if using file based, change the spring profile to 'fileMetadata'
   #idpMetadataFile: /Users/johndoe/dev/login-server/src/main/resources/idp.xml
