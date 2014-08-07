@@ -505,7 +505,8 @@
         </bean>
 
         <bean name="httpClientParams" class="org.apache.commons.httpclient.params.HttpClientParams">
-            <property name="connectionManagerTimeout" value="30000" />
+            <property name="connectionManagerTimeout" value="${login.saml.socket.connectionManagerTimeout:10000}" />
+            <property name="soTimeout" value="${login.saml.socket.soTimeout:10000}" />
         </bean>
 
         <!-- SAML Authentication Provider responsible for validating of received
