@@ -1,64 +1,87 @@
-## Setting up OpenAM with the SAML Login server
+##Introduction
+This document outlines a very simple SAML integration between the OpenAM server and the 
+Cloud Foundry login-server. 
 
-- Follow this guide to set up OpenAM on tomcat http://openam.forgerock.org/openam-documentation/openam-doc-source/doc/install-guide/
+###Step 1
 
-- Set the OpenAM tomcat port to 8081 so that it is usable along with the uaa and login server listening on 8080
+Download and install software
 
-- Create the openam script per the suggestions in the openam install guide.
-  - For a mac, JDK_HOME is "/System/Library/Frameworks/JavaVM.framework/Home"
-  
-- Create the SAML Login Server service provider certificate
-  - Follow these commands to create a key and certificate. Enter a password to protect the private key when prompted.
-  - `openssl genrsa -des3 -out server.key 1024`
-  - `openssl req -new -nodes -out server.csr -key server.key -days 365 -subj "/CN=saml_login,OU=test,O=vmware,O=com"`
-  - `openssl x509 -req -days 365 -in server.csr -signkey server.key -out server.crt`
+  - a) Download a Tomcat .tar.gz from [http://tomcat.apache.org](http://tomcat.apache.org)
+  - b) Download OpenAM WAR file [https://backstage.forgerock.com/#!/downloads/enterprise/OpenAM](https://backstage.forgerock.com/#!/downloads/enterprise/OpenAM) (look for OpenAM 11 non subscription)
+  - c) Unzip Apache Tomcat
+  - d) Create a directory under `apache-tomcat-7.0.55/webapps/` called 'openam'
+  - e) Extract contents (zip) of OpenAM-11.0.0.war into `apache-tomcat-7.0.55/webapps/openam`
 
-  server.key is the private key protected by the password
-  server.crt is the certificate
-  
-- Set up login.yml with the SAML service provider certificate 
-  - See src/main/resources/login.yml for an example
-  - Paste the of server.key to _serviceProviderKey_ property in the login.yml.
-  - Fill in the password to the _serviceProviderKeyPassword_ in the login.yml.
-  - Paste the of server.crt to the _serviceProviderCertificate_ property in the login.yml. 
+###Step 2
+Open apache-tomcat-7.0.55/conf/server.xml
 
-- Install the saml login server certificate in the jdk trust store at "/System/Library/Frameworks/JavaVM.framework/Home/lib/security/cacerts"
-  - `keytool -importcert -file server.crt -alias samlcert -storepass changeit -trustcacerts -keystore cacerts`
+  - a) Change the value 8005 to -1 on the line 
+    `<Server port="8005" shutdown="SHUTDOWN">`
+  - b) Change the value 8080 to 8081 on the line 
+    `<Connector port="8080" protocol="HTTP/1.1"
+               connectionTimeout="20000"
+               redirectPort="8443" />`
+  - c) Remove the line 
+    `<Connector port="8009" protocol="AJP/1.3" redirectPort="8443" />`
+  - d) Go to the directory apache-tomcat-7.0.55/bin
+  - e) Start Tomcat on port 8081 by typing `./catalina.sh run` (Ctrl+C to kill it)
 
-- Install the saml login server certificate in the OpenAM trust store
-  - `keytool -importcert -file server.crt -alias samlcert -storepass changeit -trustcacerts -keystore keystore.jks`
+###Step 3
+Initialize OpenAM
 
-- Start up the login server, uaa and sample apps
-  - `export MAVEN_OPTS="-Xmx768m -XX:MaxPermSize=256m"`
-  - modify login.yml to contain spring_profiles: saml 
-  - `cd login-server; mvn tomcat7:run -Pintegration`
+  - a) Go to [http://localhost:8081/openam](http://localhost:8081/openam)
+  - b) Click 'Create Default Configuration' and set password for amAdmin and UrlAccessAgent
+  - c) Click Create
+     (this will create the directory ~/openam 
+      if you wish to restart an installation, wipe this dir clean and restart tomcat)
+  - d) Log in as amAdmin and the password you just created
 
-- Create an OpenAM Hosted Identity provider and a circle of trust
+###Step 4
+Setup OpenAM as an Identity Provider (IDP)
 
-- Configure a Remote Service Provider using the metadata located at `http://localhost:8080/login/saml/metadata`
+  - a) Click "Create Hosted Identity Provider"
+  - b) Select 'test' for the signing key
+  - c) Type 'circleoftrust' for "New Circle of Trust" (value is not used by us)
+  - d) Add an attribute by name `urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified` and value `mail` (this means the email will become the username)
+  - e) Click 'Add' on the attribute
+  - f) Click 'Configure'
 
-- Create a user in OpenAM. Set the user's email address
 
-- Go to Federation -> Click the link matching your IDP Entity Provider -> NameID Value Map
-  - Add urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified=mail
+###Step 5
+Configure and start login-server/UAA
 
-There are two ways to configure the SAML Login server
+  - a) Configure login.yml
+  - b) uncomment the OpenAM section under '# Local OpenAM configuration'
+  - c) make sure you have 'spring_profiles: saml,default'
+  - d) Start UAA/Login server on port 8080 (./gradlew run)
 
-- Set the configuration to have the SAML login server get the IDP metadata
+        DEBUG --- MetadataManager: Initializing provider data org.cloudfoundry.identity.uaa.login.ssl.FixedHttpMetaDataProvider@41f4a18b
+        DEBUG --- MetadataManager: Found metadata EntityDescriptor with ID
+        DEBUG --- MetadataManager: Remote entity http://localhost:8081/openam available
+        DEBUG --- MetadataManager: Metadata provider was initialized org.cloudfoundry.identity.uaa.login.ssl.FixedHttpMetaDataProvider@41f4a18b
+        DEBUG --- MetadataManager: Reloading metadata was finished
 
-  <pre>
-    login:
-      idpMetadataURL: http://openam.example.com:8181/openam/saml2/jsp/exportmetadata.jsp?entityid=http://openam.example.com:8181/openam
-  </pre>
+###Step 6
+Configure OpenAM to have login-server as a service that wishes to authenticate
 
-- Export the IDP metadata from a URL similar to `http://openam.example.org:8081/openam/saml2/jsp/exportmetadata.jsp?entityid=http://openam.example.org:8081/openam` to a file
-  - Set the configuration to point to that file
-  
-  <pre>
-    login:
-      idpMetadataFile: /path/to/idpMetadata.xml
-  </pre>
+  - a) Click 'register a service provider'
+  - b) Put the 'http://localhost:8080/login/saml/metadata' as the URL
+  - c) Click 'Configure'
 
-  - To use this option, run the SAML metadata with both the fileMetadata and default profiles. `mvn tomcat7:run -Pintegration -Dspring.profiles.active=saml,fileMetadata,default`
+###Step 7
+Create a SAML user
 
-- Test the configuration by going to http://localhost:8080/app
+  - a) Click 'Access Control'
+  - b) Click '/ (Top Level Realm)'
+  - c) Click 'Subjects'
+  - d) Click 'New'
+    Enter user information - 
+    After the user is created, click on it again, and give the user an email address
+  - e) Log out of OpenAM
+
+###Step 8
+Test SAML Authentication
+
+  - a) Go to http://localhost:8080/login
+  - b) Click "Use your corporate credentials"
+  - c) Sign in with the user you created
