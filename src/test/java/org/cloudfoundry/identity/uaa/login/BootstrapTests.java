@@ -16,9 +16,11 @@ import org.apache.commons.httpclient.contrib.ssl.EasySSLProtocolSocketFactory;
 import org.apache.commons.httpclient.contrib.ssl.StrictSSLProtocolSocketFactory;
 import org.apache.commons.httpclient.protocol.DefaultProtocolSocketFactory;
 import org.cloudfoundry.identity.uaa.config.YamlPropertiesFactoryBean;
+import org.cloudfoundry.identity.uaa.login.ssl.FixedHttpMetaDataProvider;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.opensaml.saml2.metadata.provider.FilesystemMetadataProvider;
 import org.springframework.context.support.GenericXmlApplicationContext;
 import org.springframework.core.env.PropertiesPropertySource;
 import org.springframework.core.io.FileSystemResource;
@@ -62,12 +64,23 @@ public class BootstrapTests {
 
     @Test
     public void testSamlProfile() throws Exception {
-        System.setProperty("idpMetadataFile", "./src/test/resources/test.saml.metadata");
+        System.setProperty("login.saml.metadataTrustCheck", "false");
+        context = getServletContext("saml", "./src/main/resources/login.yml", "file:./src/main/webapp/WEB-INF/spring-servlet.xml");
+        assertNotNull(context.getBean("viewResolver", ViewResolver.class));
+        assertNotNull(context.getBean("samlLogger", SAMLDefaultLogger.class));
+        assertFalse(context.getBean("extendedMetadataDelegate", ExtendedMetadataDelegate.class).isMetadataTrustCheck());
+        assertEquals(FixedHttpMetaDataProvider.class, context.getBean(ExtendedMetadataDelegate.class).getDelegate().getClass());
+    }
+
+    @Test
+    public void testSamlProfileMetadataFile() throws Exception {
+        System.setProperty("login.idpMetadataFile", "./src/test/resources/test.saml.metadata");
         System.setProperty("login.saml.metadataTrustCheck", "false");
         context = getServletContext("saml,fileMetadata", "./src/main/resources/login.yml", "file:./src/main/webapp/WEB-INF/spring-servlet.xml");
         assertNotNull(context.getBean("viewResolver", ViewResolver.class));
         assertNotNull(context.getBean("samlLogger", SAMLDefaultLogger.class));
         assertFalse(context.getBean("extendedMetadataDelegate", ExtendedMetadataDelegate.class).isMetadataTrustCheck());
+        assertEquals(FilesystemMetadataProvider.class, context.getBean(ExtendedMetadataDelegate.class).getDelegate().getClass());
     }
 
     @Test

@@ -403,26 +403,6 @@
         <constructor-arg ref="resetPasswordService"/>
     </bean>
 
-    <beans profile="fileMetadata">
-        <bean id="metadataProviderList" class="java.util.ArrayList">
-            <constructor-arg>
-                <list>
-                    <bean class="org.springframework.security.saml.metadata.ExtendedMetadataDelegate">
-                        <constructor-arg>
-                            <bean class="org.opensaml.saml2.metadata.provider.FilesystemMetadataProvider">
-                                <constructor-arg value="${login.idpMetadataFile}" />
-                                <property name="parserPool" ref="parserPool" />
-                            </bean>
-                        </constructor-arg>
-                        <constructor-arg>
-                            <bean class="org.springframework.security.saml.metadata.ExtendedMetadata" />
-                        </constructor-arg>
-                    </bean>
-                </list>
-            </constructor-arg>
-        </bean>
-    </beans>
-
     <beans profile="saml">
         <!-- Register authentication manager with SAML provider -->
         <security:authentication-manager id="authenticationManager">
@@ -677,5 +657,21 @@
                 </list>
             </constructor-arg>
         </bean>
+
+        <beans profile="fileMetadata">
+            <bean id="extendedMetadataDelegate" class="org.springframework.security.saml.metadata.ExtendedMetadataDelegate">
+                <constructor-arg>
+                    <bean class="org.opensaml.saml2.metadata.provider.FilesystemMetadataProvider">
+                        <constructor-arg value="${login.idpMetadataFile}" />
+                        <property name="parserPool" ref="parserPool" />
+                    </bean>
+                </constructor-arg>
+                <constructor-arg>
+                    <bean class="org.springframework.security.saml.metadata.ExtendedMetadata" />
+                </constructor-arg>
+                <property name="metadataTrustCheck" value="${login.saml.metadataTrustCheck:true}"/>
+            </bean>
+        </beans>
+
     </beans>
 </beans>
