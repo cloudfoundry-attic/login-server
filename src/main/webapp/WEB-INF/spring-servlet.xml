@@ -642,23 +642,26 @@
 
         <bean id="acceptSSLSocketFactory" class="${login.saml.socketFactory:org.apache.commons.httpclient.contrib.ssl.EasySSLProtocolSocketFactory}" />
 
+        <bean id="extendedMetadataDelegate" class="org.springframework.security.saml.metadata.ExtendedMetadataDelegate">
+            <constructor-arg>
+                <bean class="org.cloudfoundry.identity.uaa.login.ssl.FixedHttpMetaDataProvider">
+                    <constructor-arg ref="metadataFetchingHttpClientTimer" />
+                    <constructor-arg ref="metadataFetchingHttpClient" />
+                    <constructor-arg value="${login.idpMetadataURL:http://localhost:8080/notvalid}" />
+                    <property name="parserPool" ref="parserPool" />
+                    <property name="socketFactory" ref="acceptSSLSocketFactory" />
+                </bean>
+            </constructor-arg>
+            <constructor-arg>
+                <bean class="org.springframework.security.saml.metadata.ExtendedMetadata" />
+            </constructor-arg>
+            <property name="metadataTrustCheck" value="${login.saml.metadataTrustCheck:true}"/>
+        </bean>
+
         <bean id="metadataProviderList" class="java.util.ArrayList">
             <constructor-arg>
                 <list>
-                    <bean class="org.springframework.security.saml.metadata.ExtendedMetadataDelegate">
-                        <constructor-arg>
-                            <bean class="org.cloudfoundry.identity.uaa.login.ssl.FixedHttpMetaDataProvider">
-                                <constructor-arg ref="metadataFetchingHttpClientTimer" />
-                                <constructor-arg ref="metadataFetchingHttpClient" />
-                                <constructor-arg value="${login.idpMetadataURL:http://localhost:8080/notvalid}" />
-                                <property name="parserPool" ref="parserPool" />
-                                <property name="socketFactory" ref="acceptSSLSocketFactory" />
-                            </bean>
-                        </constructor-arg>
-                        <constructor-arg>
-                            <bean class="org.springframework.security.saml.metadata.ExtendedMetadata" />
-                        </constructor-arg>
-                    </bean>
+                    <ref bean="extendedMetadataDelegate" />
                 </list>
             </constructor-arg>
         </bean>

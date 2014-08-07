@@ -16,17 +16,17 @@ import org.cloudfoundry.identity.uaa.config.YamlPropertiesFactoryBean;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.support.GenericXmlApplicationContext;
 import org.springframework.core.env.PropertiesPropertySource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.security.saml.log.SAMLDefaultLogger;
+import org.springframework.security.saml.metadata.ExtendedMetadataDelegate;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.ViewResolver;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
 
 /**
  * @author Dave Syer
@@ -59,9 +59,11 @@ public class BootstrapTests {
     @Test
     public void testSamlProfile() throws Exception {
         System.setProperty("idpMetadataFile", "./src/test/resources/test.saml.metadata");
+        System.setProperty("login.saml.metadataTrustCheck", "false");
         context = getServletContext("saml,fileMetadata", "./src/main/resources/login.yml", "file:./src/main/webapp/WEB-INF/spring-servlet.xml");
         assertNotNull(context.getBean("viewResolver", ViewResolver.class));
         assertNotNull(context.getBean("samlLogger", SAMLDefaultLogger.class));
+        assertFalse(context.getBean("extendedMetadataDelegate", ExtendedMetadataDelegate.class).isMetadataTrustCheck());
     }
 
     private GenericXmlApplicationContext getServletContext(String profiles, String loginYmlPath, String... resources) {
