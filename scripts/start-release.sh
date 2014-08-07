@@ -14,7 +14,7 @@ set -x
 git checkout develop
 git checkout -b releases/$1
 # Update submodule pointers; Clean out any submodule changes
-git submodule foreach --recursive 'git submodule sync; git clean -d --force --force'
+git submodule foreach --recursive 'git submodule sync; git clean -d --force'
 # Update submodule content, checkout if necessary
 git submodule update --init --recursive --force
 cd uaa
