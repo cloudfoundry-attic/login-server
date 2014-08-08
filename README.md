@@ -8,6 +8,15 @@ identity management tasks to the UAA.  Also provides OAuth2 endpoints
 issuing tokens to client apps for `run.pivotal.io` (the tokens come
 from the UAA and no data are stored locally).
 
+## Co-ordinates
+
+* Tokens: [A note on tokens, scopes and authorities](https://github.com/cloudfoundry/uaa/tree/master/docs/UAA-Tokens.md)
+* Technical forum: [vcap-dev google group](https://groups.google.com/a/cloudfoundry.org/forum/?fromgroups#!forum/vcap-dev)
+* Docs: [docs/](https://github.com/cloudfoundry/login-server/tree/master/docs)
+* API Documentation: [Login-APIs.md](https://github.com/cloudfoundry/login-server/tree/master/docs/Login-APIs.md)
+* Specification: [The Oauth 2 Authorization Framework](http://tools.ietf.org/html/rfc6749)
+* SAML: [OpenAM-README.md](https://github.com/cloudfoundry/login-server/tree/master/docs/OpenAM-README.md)
+
 ## Running and Testing the Login Server
 
 The Login Server is a standard JEE servlet application, and you can

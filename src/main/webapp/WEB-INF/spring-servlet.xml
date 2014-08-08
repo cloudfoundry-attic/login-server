@@ -403,26 +403,6 @@
         <constructor-arg ref="resetPasswordService"/>
     </bean>
 
-    <beans profile="fileMetadata">
-        <bean id="metadataProviderList" class="java.util.ArrayList">
-            <constructor-arg>
-                <list>
-                    <bean class="org.springframework.security.saml.metadata.ExtendedMetadataDelegate">
-                        <constructor-arg>
-                            <bean class="org.opensaml.saml2.metadata.provider.FilesystemMetadataProvider">
-                                <constructor-arg value="${login.idpMetadataFile}" />
-                                <property name="parserPool" ref="parserPool" />
-                            </bean>
-                        </constructor-arg>
-                        <constructor-arg>
-                            <bean class="org.springframework.security.saml.metadata.ExtendedMetadata" />
-                        </constructor-arg>
-                    </bean>
-                </list>
-            </constructor-arg>
-        </bean>
-    </beans>
-
     <beans profile="saml">
         <!-- Register authentication manager with SAML provider -->
         <security:authentication-manager id="authenticationManager">
@@ -471,8 +451,8 @@
 
         <bean id="extendedMetaData" class="org.springframework.security.saml.metadata.ExtendedMetadata">
             <property name="idpDiscoveryEnabled" value="true" />
-            <property name="alias" value="${login.idpEntityAlias}" />
-            <property name="signMetadata" value="true" />
+            <property name="alias" value="${login.idpEntityAlias:'unit-test-idp'}" />
+            <property name="signMetadata" value="${login.saml.signMetaData:true}" />
         </bean>
 
         <!-- Filter automatically generates default SP metadata -->
@@ -480,8 +460,8 @@
             <constructor-arg>
                 <bean class="org.springframework.security.saml.metadata.MetadataGenerator">
                     <property name="extendedMetadata" ref="extendedMetaData"/>
-                    <property name="requestSigned" value="true" />
-                    <property name="wantAssertionSigned" value="false" />
+                    <property name="requestSigned" value="${login.saml.signRequest:true}" />
+                    <property name="wantAssertionSigned" value="${login.saml.wantAssertionSigned:false}" />
                     <property name="entityBaseURL" value="${login.entityBaseURL}" />
                     <property name="entityId" value="${login.entityID}" />
                 </bean>
@@ -505,7 +485,8 @@
         </bean>
 
         <bean name="httpClientParams" class="org.apache.commons.httpclient.params.HttpClientParams">
-            <property name="connectionManagerTimeout" value="30000" />
+            <property name="connectionManagerTimeout" value="${login.saml.socket.connectionManagerTimeout:10000}" />
+            <property name="soTimeout" value="${login.saml.socket.soTimeout:10000}" />
         </bean>
 
         <!-- SAML Authentication Provider responsible for validating of received
@@ -640,27 +621,57 @@
             </property>
         </bean>
 
-        <bean id="acceptSSLSocketFactory" class="org.apache.commons.httpclient.contrib.ssl.EasySSLProtocolSocketFactory" />
+        <bean id="metaDataUrl" class="java.lang.String">
+            <constructor-arg value="${login.idpMetadataURL:http://localhost:8080/notvalid}"/>
+        </bean>
+
+        <bean id="socketFactoryClass" class="java.lang.String">
+            <!-- if the socket factory has not been configured, select one based on the URL -->
+            <constructor-arg value="${login.saml.socket.socketFactory:#{metaDataUrl.startsWith('https:')?'org.apache.commons.httpclient.contrib.ssl.EasySSLProtocolSocketFactory':'org.apache.commons.httpclient.protocol.DefaultProtocolSocketFactory'}}"/>
+        </bean>
+
+        <bean id="extendedMetadataDelegate" class="org.springframework.security.saml.metadata.ExtendedMetadataDelegate">
+            <constructor-arg>
+                <bean class="org.cloudfoundry.identity.uaa.login.ssl.FixedHttpMetaDataProvider">
+                    <constructor-arg ref="metadataFetchingHttpClientTimer" />
+                    <constructor-arg ref="metadataFetchingHttpClient" />
+                    <constructor-arg value="${login.idpMetadataURL:http://localhost:8080/notvalid}" />
+                    <property name="parserPool" ref="parserPool" />
+                    <property name="socketFactory">
+                        <bean class="org.cloudfoundry.identity.uaa.login.util.IndirectBeanCreator" factory-method="getBean">
+                            <constructor-arg ref="socketFactoryClass"/>
+                        </bean>
+                    </property>
+                </bean>
+            </constructor-arg>
+            <constructor-arg>
+                <bean class="org.springframework.security.saml.metadata.ExtendedMetadata" />
+            </constructor-arg>
+            <property name="metadataTrustCheck" value="${login.saml.metadataTrustCheck:true}"/>
+        </bean>
 
         <bean id="metadataProviderList" class="java.util.ArrayList">
             <constructor-arg>
                 <list>
-                    <bean class="org.springframework.security.saml.metadata.ExtendedMetadataDelegate">
-                        <constructor-arg>
-                            <bean class="org.cloudfoundry.identity.uaa.login.ssl.FixedHttpMetaDataProvider">
-                                <constructor-arg ref="metadataFetchingHttpClientTimer" />
-                                <constructor-arg ref="metadataFetchingHttpClient" />
-                                <constructor-arg value="${login.idpMetadataURL:''}" />
-                                <property name="parserPool" ref="parserPool" />
-                                <property name="socketFactory" ref="acceptSSLSocketFactory" />
-                            </bean>
-                        </constructor-arg>
-                        <constructor-arg>
-                            <bean class="org.springframework.security.saml.metadata.ExtendedMetadata" />
-                        </constructor-arg>
-                    </bean>
+                    <ref bean="extendedMetadataDelegate" />
                 </list>
             </constructor-arg>
         </bean>
+
+        <beans profile="fileMetadata">
+            <bean id="extendedMetadataDelegate" class="org.springframework.security.saml.metadata.ExtendedMetadataDelegate">
+                <constructor-arg>
+                    <bean class="org.opensaml.saml2.metadata.provider.FilesystemMetadataProvider">
+                        <constructor-arg value="${login.idpMetadataFile}" />
+                        <property name="parserPool" ref="parserPool" />
+                    </bean>
+                </constructor-arg>
+                <constructor-arg>
+                    <bean class="org.springframework.security.saml.metadata.ExtendedMetadata" />
+                </constructor-arg>
+                <property name="metadataTrustCheck" value="${login.saml.metadataTrustCheck:true}"/>
+            </bean>
+        </beans>
+
     </beans>
 </beans>
