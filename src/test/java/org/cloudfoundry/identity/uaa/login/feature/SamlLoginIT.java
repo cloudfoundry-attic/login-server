@@ -16,7 +16,6 @@ import org.cloudfoundry.identity.uaa.login.test.DefaultIntegrationTestConfig;
 import org.cloudfoundry.identity.uaa.login.test.IfProfileActive;
 import org.cloudfoundry.identity.uaa.login.test.IntegrationTestRule;
 import org.cloudfoundry.identity.uaa.login.test.LoginServerClassRunner;
-import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,7 +23,20 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.web.client.RestOperations;
+
+import java.util.Map;
+
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.TEXT_HTML_VALUE;
 
 @RunWith(LoginServerClassRunner.class)
 @ContextConfiguration(classes = DefaultIntegrationTestConfig.class)
@@ -35,6 +47,9 @@ public class SamlLoginIT {
     public IntegrationTestRule integrationTestRule;
 
     @Autowired
+    RestOperations restOperations;
+
+    @Autowired
     WebDriver webDriver;
 
     @Value("${integration.test.base_url}")
@@ -43,12 +58,41 @@ public class SamlLoginIT {
     @Test
     public void testSamlVariations() throws Exception {
         webDriver.get(baseUrl + "/login");
-        Assert.assertEquals("Cloud Foundry", webDriver.getTitle());
+        assertEquals("Cloud Foundry", webDriver.getTitle());
 
         webDriver.findElement(By.name("username"));
         webDriver.findElement(By.name("password"));
         webDriver.findElement(By.xpath("//a[text()='Use your corporate credentials']"));
         webDriver.findElement(By.xpath("//input[@value='Sign in']"));
-        Assert.assertEquals(3, webDriver.findElements(By.xpath("//input")).size());
+        assertEquals(3, webDriver.findElements(By.xpath("//input")).size());
+    }
+
+    @Test
+    public void testContentTypes() throws Exception {
+        String loginUrl = baseUrl + "/login";
+
+        HttpHeaders jsonHeaders = new HttpHeaders();
+        jsonHeaders.add("Accept", "application/json");
+        ResponseEntity<Map> jsonResponseEntity = restOperations.exchange(loginUrl,
+            HttpMethod.GET,
+            new HttpEntity<>(jsonHeaders),
+            Map.class);
+        assertThat(jsonResponseEntity.getHeaders().get("Content-Type").get(0), containsString(APPLICATION_JSON_VALUE));
+
+        HttpHeaders htmlHeaders = new HttpHeaders();
+        htmlHeaders.add("Accept", "text/html");
+        ResponseEntity<Void> htmlResponseEntity = restOperations.exchange(loginUrl,
+            HttpMethod.GET,
+            new HttpEntity<>(htmlHeaders),
+            Void.class);
+        assertThat(htmlResponseEntity.getHeaders().get("Content-Type").get(0), containsString(TEXT_HTML_VALUE));
+
+        HttpHeaders defaultHeaders = new HttpHeaders();
+        defaultHeaders.add("Accept", "*/*");
+        ResponseEntity<Void> defaultResponseEntity = restOperations.exchange(loginUrl,
+            HttpMethod.GET,
+            new HttpEntity<>(defaultHeaders),
+            Void.class);
+        assertThat(defaultResponseEntity.getHeaders().get("Content-Type").get(0), containsString(TEXT_HTML_VALUE));
     }
 }
