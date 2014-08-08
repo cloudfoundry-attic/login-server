@@ -46,6 +46,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
@@ -76,7 +77,7 @@ public class SamlRemoteUaaController extends RemoteUaaController {
     }
 
     @Override
-    @RequestMapping(value = { "/info", "/login" }, method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
+    @RequestMapping(value = { "/info", "/login" }, method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE, headers = "Accept=application/json")
     public String prompts(HttpServletRequest request, @RequestHeader HttpHeaders headers, Map<String, Object> model,
                     Principal principal) throws Exception {
         // Entity ID to start the discovery
@@ -85,7 +86,7 @@ public class SamlRemoteUaaController extends RemoteUaaController {
         return super.prompts(request, headers, model, principal);
     }
 
-    @RequestMapping(value = { "/info", "/login" }, method = RequestMethod.GET, produces = TEXT_HTML_VALUE)
+    @RequestMapping(value = { "/info", "/login" }, method = RequestMethod.GET, produces = TEXT_HTML_VALUE, headers = "Accept=text/html, */*")
     public String samlUiPrompts(HttpServletRequest request, @RequestHeader HttpHeaders headers, Map<String, Object> model,
                           Principal principal) throws Exception {
 
