@@ -15,7 +15,8 @@ from the UAA and no data are stored locally).
 * Docs: [docs/](https://github.com/cloudfoundry/login-server/tree/master/docs)
 * API Documentation: [Login-APIs.md](https://github.com/cloudfoundry/login-server/tree/master/docs/Login-APIs.md)
 * Specification: [The Oauth 2 Authorization Framework](http://tools.ietf.org/html/rfc6749)
-* SAML: [OpenAM-README.md](https://github.com/cloudfoundry/login-server/tree/master/docs/OpenAM-README.md)
+* SAML: [OpenAM-README.md](https://github.com/cloudfoundry/login-server/tree/master/docs/OpenAM-README.md),
+        [Okta-README.md](https://github.com/cloudfoundry/login-server/tree/master/docs/Okta-README.md)
 
 ## Running and Testing the Login Server
 
