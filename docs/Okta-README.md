@@ -15,6 +15,17 @@ Configure and start the login-server/UAA
    - a) Configure login.yml
    - b) Uncomment the Okta section under '# Local Okta configuration'
    - c) Make sure the spring_profiles is set to 'saml,default,fileMetadata'
+
+           spring_profiles: saml,default,fileMetadata
+           login:
+             idpEntityAlias: okta-local
+             idpMetadataFile: sample-okta-localhost.xml
+             saml:
+               nameID: urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress
+               assertionConsumerIndex: 0
+               signMetaData: true
+               signRequest: true
+
    - d) Start the UAA/Login Server on port 8080 (./gradlew run)
 
 ###Step 2
