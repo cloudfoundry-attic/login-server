@@ -33,7 +33,8 @@ links:
   #signup: http://some-oauth-client.example.com/signup
   passwd: http://localhost:8080/login/forgot_password
 
-#spring_profiles: saml,default #,fileMetadata
+#spring_profiles: saml,default
+#spring_profiles: saml,default,fileMetadata
 
 login:
   # Enable create account on the Login Server (enabled by default)
@@ -134,12 +135,12 @@ login:
 
 # Local Okta configuration
 #  idpEntityAlias: okta-local
-#  idpMetadataFile: /Users/johndoe/workspace/metadata
+#  idpMetadataFile: sample-okta-localhost.xml
 #  saml:
 #    nameID: urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress
 #    assertionConsumerIndex: 0
-#    signMetaData: false
-#    signRequest: false
+#    signMetaData: true
+#    signRequest: true
 
   authorize:
     url: http://localhost:8080/login/oauth/authorize

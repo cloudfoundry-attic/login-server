@@ -662,7 +662,13 @@
             <bean id="extendedMetadataDelegate" class="org.springframework.security.saml.metadata.ExtendedMetadataDelegate">
                 <constructor-arg>
                     <bean class="org.opensaml.saml2.metadata.provider.FilesystemMetadataProvider">
-                        <constructor-arg value="${login.idpMetadataFile}" />
+                        <constructor-arg>
+                            <bean id="metaDataFile"
+                                  class="org.cloudfoundry.identity.uaa.login.util.FileLocator"
+                                  factory-method="locate">
+                                <constructor-arg value="${login.idpMetadataFile}"/>
+                            </bean>
+                        </constructor-arg>
                         <property name="parserPool" ref="parserPool" />
                     </bean>
                 </constructor-arg>
