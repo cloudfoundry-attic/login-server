@@ -149,6 +149,6 @@ public class ResetPasswordControllerTest {
                 .andExpect(view().name("forgot_password"))
                 .andExpect(model().attribute("message_code", "bad_code"));
 
-        verify(resetPasswordService);
+        verify(resetPasswordService).resetPassword("bad_code", "password");
     }
 }
