@@ -1,6 +1,36 @@
 ##Introduction
 This document outlines a very simple SAML integration between Okta and the
-Cloud Foundry login-server. It assumes that you have a SAML application setup on Okta Preview with admin rights to it.
+Cloud Foundry login-server. 
+It assumes that you have a SAML application setup on Okta Preview with admin rights to it.
+
+##Pivotal Preview and Standalone Login Server
+The login-server comes with with a `sample-okta-metadata.xml` file
+that will redirect your SAML request back to http://localhost:8080/login
+This configuration requires you to have an account on 
+https://pivotal.oktapreview.com
+
+###Step 1
+Configure and start the login-server/UAA
+
+   - a) Configure login.yml
+   - b) Uncomment the Okta section under '# Local Okta configuration'
+   - c) Make sure the spring_profiles is set to 'saml,default,fileMetadata'
+   - d) Start the UAA/Login Server on port 8080 (./gradlew run)
+
+###Step 2
+Test SAML authentication
+
+  - a) Go to http://localhost:8080/login
+  - b) Click `Use your corporate credentials`
+  - c) Authenticate on the Okta server
+  - d) You should be redirected to 'localhost:8080/login' and be signed in with your credentials (email address)
+  
+##Pivotal Preview - Configure Custom Application
+To configure a custom redirect URL on the https://pivotal.oktapreview.com 
+domain, the steps are outlined.
+
+If you have your own Okta domain setup, follow these steps, and 
+replace the Pivotal values with your own.
 
 ###Step 1
 Download the IDP Metadata
