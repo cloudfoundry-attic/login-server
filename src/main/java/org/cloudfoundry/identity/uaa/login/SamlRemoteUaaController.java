@@ -46,7 +46,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
@@ -82,7 +81,9 @@ public class SamlRemoteUaaController extends RemoteUaaController {
                     Principal principal) throws Exception {
         // Entity ID to start the discovery
         model.put("entityID", entityID);
-        model.put("saml", Boolean.TRUE);
+
+        Boolean showSamlLoginLink = environment.getProperty("login.showSamlLoginLink") != null ? Boolean.valueOf(environment.getProperty("login.showSamlLoginLink")) : true;
+        model.put("showSamlLoginLink", showSamlLoginLink);
         return super.prompts(request, headers, model, principal);
     }
 

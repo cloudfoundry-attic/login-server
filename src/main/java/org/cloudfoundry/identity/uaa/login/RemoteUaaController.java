@@ -110,7 +110,7 @@ public class RemoteUaaController extends AbstractControllerInfo {
 
     private static final String USER_AGENT = "user-agent";
 
-    private final Environment environment;
+    protected final Environment environment;
 
     private RestOperations defaultTemplate = new RestTemplate();
 

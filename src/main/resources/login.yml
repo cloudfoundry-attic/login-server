@@ -51,6 +51,8 @@ login:
   entityBaseURL: http://localhost:8080/login
   # The entityID of this SP
   entityID: cloudfoundry-saml-login-local
+  # Show link to login with your corporate credentials when saml profile is active. Defaults to true.
+  showSamlLoginLink: false
   # The location and credentials of the certificate for this SP
   # See README.md for details on how to create this.
   serviceProviderKey: ! '-----BEGIN RSA PRIVATE KEY-----

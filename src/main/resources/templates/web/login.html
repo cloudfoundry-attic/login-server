@@ -20,7 +20,7 @@
                        class="form-control"/>
                 <input type="submit" value="Sign in" class="island-button"/>
             </form>
-            <div th:if="${saml}" class="saml-login">
+            <div th:if="${showSamlLoginLink}" class="saml-login">
                 OR<br/>
                 <a href="" th:href="@{saml/discovery(returnIDParam=idp,entityID=${entityID})}" class="saml-login-link">Use your corporate credentials</a>
             </div>
