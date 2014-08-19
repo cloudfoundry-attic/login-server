@@ -76,7 +76,7 @@ public class LoginMockMvcIntegrationTests {
 
         mockMvc.perform(get("/login"))
                 .andExpect(status().isOk())
-                .andExpect(model().attributeDoesNotExist("saml"));
+                .andExpect(model().attributeDoesNotExist("showSamlLoginLink"));
     }
 
     @Test
@@ -85,7 +85,7 @@ public class LoginMockMvcIntegrationTests {
 
         mockMvc.perform(get("/login"))
                 .andExpect(status().isOk())
-                .andExpect(model().attributeExists("saml"));
+                .andExpect(model().attributeExists("showSamlLoginLink"));
     }
 
     @Test
