@@ -679,5 +679,20 @@
             </bean>
         </beans>
 
+        <beans profile="configMetadata">
+            <bean id="extendedMetadataDelegate" class="org.springframework.security.saml.metadata.ExtendedMetadataDelegate">
+                <constructor-arg>
+                    <bean class="org.cloudfoundry.identity.uaa.login.ConfigMetadataProvider">
+                        <constructor-arg value="${login.idpMetadata}"/>
+                        <property name="parserPool" ref="parserPool" />
+                    </bean>
+                </constructor-arg>
+                <constructor-arg>
+                    <bean class="org.springframework.security.saml.metadata.ExtendedMetadata" />
+                </constructor-arg>
+                <property name="metadataTrustCheck" value="${login.saml.metadataTrustCheck:true}"/>
+            </bean>
+        </beans>
+
     </beans>
 </beans>

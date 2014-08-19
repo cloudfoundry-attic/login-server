@@ -30,6 +30,9 @@ import org.springframework.security.saml.metadata.ExtendedMetadataDelegate;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.ViewResolver;
 
+import java.io.File;
+import java.util.Scanner;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -68,7 +71,7 @@ public class BootstrapTests {
         context = getServletContext("saml", "./src/main/resources/login.yml", "file:./src/main/webapp/WEB-INF/spring-servlet.xml");
         assertNotNull(context.getBean("viewResolver", ViewResolver.class));
         assertNotNull(context.getBean("samlLogger", SAMLDefaultLogger.class));
-        assertFalse(context.getBean("extendedMetadataDelegate", ExtendedMetadataDelegate.class).isMetadataTrustCheck());
+        assertFalse(context.getBean(ExtendedMetadataDelegate.class).isMetadataTrustCheck());
         assertEquals(FixedHttpMetaDataProvider.class, context.getBean(ExtendedMetadataDelegate.class).getDelegate().getClass());
     }
 
@@ -79,8 +82,17 @@ public class BootstrapTests {
         context = getServletContext("saml,fileMetadata", "./src/main/resources/login.yml", "file:./src/main/webapp/WEB-INF/spring-servlet.xml");
         assertNotNull(context.getBean("viewResolver", ViewResolver.class));
         assertNotNull(context.getBean("samlLogger", SAMLDefaultLogger.class));
-        assertFalse(context.getBean("extendedMetadataDelegate", ExtendedMetadataDelegate.class).isMetadataTrustCheck());
+        assertFalse(context.getBean(ExtendedMetadataDelegate.class).isMetadataTrustCheck());
         assertEquals(FilesystemMetadataProvider.class, context.getBean(ExtendedMetadataDelegate.class).getDelegate().getClass());
+    }
+
+    @Test
+    public void testSamlProfileMetadataConfig() throws Exception {
+        String metadataString = new Scanner(new File("./src/main/resources/idp.xml")).useDelimiter("\\Z").next();
+        System.setProperty("login.idpMetadata", metadataString);
+        context = getServletContext("saml,configMetadata", "./src/main/resources/login.yml", "file:./src/main/webapp/WEB-INF/spring-servlet.xml");
+        assertEquals(ConfigMetadataProvider.class, context.getBean(ExtendedMetadataDelegate.class).getDelegate().getClass());
+        assertNotNull(context.getBean(ExtendedMetadataDelegate.class).getEntityDescriptor("http://openam.example.com:8181/openam"));
     }
 
     @Test
