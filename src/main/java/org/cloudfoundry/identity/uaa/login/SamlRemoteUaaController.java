@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -36,6 +37,8 @@ import org.cloudfoundry.identity.uaa.authentication.Origin;
 import org.cloudfoundry.identity.uaa.authentication.UaaAuthenticationDetails;
 import org.cloudfoundry.identity.uaa.client.SocialClientUserDetails;
 import org.cloudfoundry.identity.uaa.codestore.ExpiringCode;
+import org.cloudfoundry.identity.uaa.login.saml.IdentityProviderDefinition;
+import org.cloudfoundry.identity.uaa.login.saml.LoginSamlAuthenticationToken;
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -64,9 +67,13 @@ public class SamlRemoteUaaController extends RemoteUaaController {
 
     private static final Log logger = LogFactory.getLog(SamlRemoteUaaController.class);
 
-    public static final String SAML_ORIGIN = "login-saml";
-
     private final ObjectMapper mapper = new ObjectMapper();
+
+    public void setIdpDefinitions(List<IdentityProviderDefinition> idpDefinitions) {
+        this.idpDefinitions = idpDefinitions;
+    }
+
+    private List<IdentityProviderDefinition> idpDefinitions;
 
     @Value("${login.entityID}")
     public String entityID = "";
@@ -81,9 +88,7 @@ public class SamlRemoteUaaController extends RemoteUaaController {
                     Principal principal) throws Exception {
         // Entity ID to start the discovery
         model.put("entityID", entityID);
-
-        Boolean showSamlLoginLink = environment.getProperty("login.showSamlLoginLink") != null ? Boolean.valueOf(environment.getProperty("login.showSamlLoginLink")) : true;
-        model.put("showSamlLoginLink", showSamlLoginLink);
+        model.put("idpDefinitions", idpDefinitions);
         return super.prompts(request, headers, model, principal);
     }
 
@@ -103,14 +108,12 @@ public class SamlRemoteUaaController extends RemoteUaaController {
     @Override
     protected Map<String, String> getLoginCredentials(Principal principal) {
         Map<String, String> login = super.getLoginCredentials(principal);
-        if (!login.containsKey(Origin.ORIGIN)) {
-            appendField(login, Origin.ORIGIN, SAML_ORIGIN);
-            appendField(login, UaaAuthenticationDetails.ADD_NEW, "true");
-        }
         Collection<? extends GrantedAuthority> authorities = null;
 
-        if (principal instanceof ExpiringUsernameAuthenticationToken) {
-            ExpiringUsernameAuthenticationToken et = (ExpiringUsernameAuthenticationToken)principal;
+        if (principal instanceof LoginSamlAuthenticationToken) {
+            appendField(login, UaaAuthenticationDetails.ADD_NEW, "true");
+            LoginSamlAuthenticationToken et = (LoginSamlAuthenticationToken)principal;
+            appendField(login, Origin.ORIGIN, et.getIdpAlias());
             if (et.getPrincipal() instanceof String ) {
                 appendField(login, "username", et.getPrincipal());
                 authorities = et.getAuthorities();
@@ -121,8 +124,6 @@ public class SamlRemoteUaaController extends RemoteUaaController {
                 authorities = ((SamlUserDetails) (((ExpiringUsernameAuthenticationToken) principal).getPrincipal()))
                     .getAuthorities();
             }
-
-            
         }
 
         if (principal instanceof Authentication) {

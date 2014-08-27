@@ -34,8 +34,6 @@ links:
   passwd: http://localhost:8080/login/forgot_password
 
 #spring_profiles: saml,default
-#spring_profiles: saml,default,fileMetadata
-#spring_profiles: saml,default,configMetadata
 
 login:
   # Enable create account on the Login Server (enabled by default)
@@ -47,13 +45,8 @@ login:
   #brand: pivotal
   #base URL that the login server can be reached at
   url: http://localhost:8080/login
-  # The entity base url is the location of this application
-  # (The host and port of the application that will accept assertions) 
-  entityBaseURL: http://localhost:8080/login
-  # The entityID of this SP
-  entityID: cloudfoundry-saml-login-local
-  # Show link to login with your corporate credentials when saml profile is active. Defaults to true.
-  #showSamlLoginLink: false
+
+  # SAML Key Configuration
   # The location and credentials of the certificate for this SP
   # See README.md for details on how to create this.
   serviceProviderKey: ! '-----BEGIN RSA PRIVATE KEY-----
@@ -114,83 +107,73 @@ login:
   
     -----END CERTIFICATE-----'
 
-# vCenter SSO Configuration
-#  idpEntityAlias: vshpere.local
-#  idpMetadataURL: https://win2012-sso2.localdomain:7444/websso/SAML2/Metadata/vsphere.local
-#  saml:
-#    #vCenter SSO responds to persistent
-#    nameID: urn:oasis:names:tc:SAML:2.0:nameid-format:persistent
-#    #vCenter SSO use 0, try 1 otherwise
-#    assertionConsumerIndex: 0
+  # SAML - The entity base url is the location of this application
+  # (The host and port of the application that will accept assertions)
+  entityBaseURL: http://localhost:8080/login
+  # The entityID of this SP
+  entityID: cloudfoundry-saml-login
+  saml:
+    #Default nameID
+    nameID: 'urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified'
+    #Default assertionConsumerIndex
+    assertionConsumerIndex: 0
+    #Local/SP metadata - sign metadata
+    signMetaData: true
+    #Local/SP metadata - requests signed
+    signRequest: true
+    #Local/SP metadata - sign metadata
+    socket:
+      # URL metadata fetch - pool timeout
+      connectionManagerTimeout: 10000
+      # URL metadata fetch - read timeout
+      soTimeout: 10000
 
-# Local OpenAM configuration
-#  idpEntityAlias: openam-local
-#  idpMetadataURL: http://localhost:8081/openam/saml2/jsp/exportmetadata.jsp?entityid=http://localhost:8081/openam
-#  saml:
-#    #openAM responds to emailAddress
-#    nameID: urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress
-#    assertionConsumerIndex: 0
-#    signMetaData: false
-#    signRequest: false
-
-  #if using file based, change the spring profile to 'fileMetadata'
-  #idpMetadataFile: /Users/johndoe/dev/login-server/src/main/resources/idp.xml
-
-  # if using IDP metadata entered here, change the spring profile to 'configMetadata'
-#  idpMetadata: |
-#    <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-#    <EntityDescriptor entityID="http://openam.example.com:8181/openam" xmlns="urn:oasis:names:tc:SAML:2.0:metadata">
-#        <IDPSSODescriptor WantAuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
-#            <KeyDescriptor use="signing">
-#                <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
-#                    <ds:X509Data>
-#                        <ds:X509Certificate>
-#    MIICQDCCAakCBEeNB0swDQYJKoZIhvcNAQEEBQAwZzELMAkGA1UEBhMCVVMxEzARBgNVBAgTCkNh
-#    bGlmb3JuaWExFDASBgNVBAcTC1NhbnRhIENsYXJhMQwwCgYDVQQKEwNTdW4xEDAOBgNVBAsTB09w
-#    ZW5TU08xDTALBgNVBAMTBHRlc3QwHhcNMDgwMTE1MTkxOTM5WhcNMTgwMTEyMTkxOTM5WjBnMQsw
-#    CQYDVQQGEwJVUzETMBEGA1UECBMKQ2FsaWZvcm5pYTEUMBIGA1UEBxMLU2FudGEgQ2xhcmExDDAK
-#    BgNVBAoTA1N1bjEQMA4GA1UECxMHT3BlblNTTzENMAsGA1UEAxMEdGVzdDCBnzANBgkqhkiG9w0B
-#    AQEFAAOBjQAwgYkCgYEArSQc/U75GB2AtKhbGS5piiLkmJzqEsp64rDxbMJ+xDrye0EN/q1U5Of+
-#    RkDsaN/igkAvV1cuXEgTL6RlafFPcUX7QxDhZBhsYF9pbwtMzi4A4su9hnxIhURebGEmxKW9qJNY
-#    Js0Vo5+IgjxuEWnjnnVgHTs1+mq5QYTA7E6ZyL8CAwEAATANBgkqhkiG9w0BAQQFAAOBgQB3Pw/U
-#    QzPKTPTYi9upbFXlrAKMwtFf2OW4yvGWWvlcwcNSZJmTJ8ARvVYOMEVNbsT4OFcfu2/PeYoAdiDA
-#    cGy/F2Zuj8XJJpuQRSE6PtQqBuDEHjjmOQJ0rV/r8mO1ZCtHRhpZ5zYRjhRC9eCbjx9VrFax0JDC
-#    /FfwWigmrW0Y0Q==
-#                        </ds:X509Certificate>
-#                    </ds:X509Data>
-#                </ds:KeyInfo>
-#            </KeyDescriptor>
-#            <ArtifactResolutionService index="0" isDefault="true" Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="http://openam.example.com:8181/openam/ArtifactResolver/metaAlias/idp"/>
-#            <SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="http://openam.example.com:8181/openam/IDPSloRedirect/metaAlias/idp" ResponseLocation="http://openam.example.com:8181/openam/IDPSloRedirect/metaAlias/idp"/>
-#            <SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="http://openam.example.com:8181/openam/IDPSloPOST/metaAlias/idp" ResponseLocation="http://openam.example.com:8181/openam/IDPSloPOST/metaAlias/idp"/>
-#            <SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="http://openam.example.com:8181/openam/IDPSloSoap/metaAlias/idp"/>
-#            <ManageNameIDService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="http://openam.example.com:8181/openam/IDPMniRedirect/metaAlias/idp" ResponseLocation="http://openam.example.com:8181/openam/IDPMniRedirect/metaAlias/idp"/>
-#            <ManageNameIDService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="http://openam.example.com:8181/openam/IDPMniPOST/metaAlias/idp" ResponseLocation="http://openam.example.com:8181/openam/IDPMniPOST/metaAlias/idp"/>
-#            <ManageNameIDService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="http://openam.example.com:8181/openam/IDPMniSoap/metaAlias/idp"/>
-#            <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</NameIDFormat>
-#            <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>
-#            <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</NameIDFormat>
-#            <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</NameIDFormat>
-#            <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName</NameIDFormat>
-#            <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos</NameIDFormat>
-#            <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName</NameIDFormat>
-#            <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="http://openam.example.com:8181/openam/SSORedirect/metaAlias/idp"/>
-#            <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="http://openam.example.com:8181/openam/SSOPOST/metaAlias/idp"/>
-#            <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="http://openam.example.com:8181/openam/SSOSoap/metaAlias/idp"/>
-#            <NameIDMappingService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="http://openam.example.com:8181/openam/NIMSoap/metaAlias/idp"/>
-#            <AssertionIDRequestService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="http://openam.example.com:8181/openam/AIDReqSoap/IDPRole/metaAlias/idp"/>
-#            <AssertionIDRequestService Binding="urn:oasis:names:tc:SAML:2.0:bindings:URI" Location="http://openam.example.com:8181/openam/AIDReqUri/IDPRole/metaAlias/idp"/>
-#        </IDPSSODescriptor>
-#    </EntityDescriptor>
-
-# Local Okta configuration
-#  idpEntityAlias: okta-local
-#  idpMetadataFile: sample-okta-localhost.xml
-#  saml:
-#    nameID: urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress
-#    assertionConsumerIndex: 0
-#    signMetaData: true
-#    signRequest: true
+#  saml-providers:
+#    okta-local:
+#      idpMetadata: sample-okta-localhost.xml
+#      saml:
+#        nameID: urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress
+#        assertionConsumerIndex: 0
+#        metadataTrustCheck: true
+#      showSamlLoginLink: true
+#      linkText: 'Okta Preview 1'
+#      iconUrl: 'http://link.to/icon.jpg'
+#    okta-local-2:
+#      idpMetadata: |
+#        <?xml version="1.0" encoding="UTF-8"?><md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" entityID="http://www.okta.com/k2lw4l5bPODCMIIDBRYZ"><md:IDPSSODescriptor WantAuthnRequestsSigned="true" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol"><md:KeyDescriptor use="signing"><ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#"><ds:X509Data><ds:X509Certificate>MIICmTCCAgKgAwIBAgIGAUPATqmEMA0GCSqGSIb3DQEBBQUAMIGPMQswCQYDVQQGEwJVUzETMBEG
+#        A1UECAwKQ2FsaWZvcm5pYTEWMBQGA1UEBwwNU2FuIEZyYW5jaXNjbzENMAsGA1UECgwET2t0YTEU
+#        MBIGA1UECwwLU1NPUHJvdmlkZXIxEDAOBgNVBAMMB1Bpdm90YWwxHDAaBgkqhkiG9w0BCQEWDWlu
+#        Zm9Ab2t0YS5jb20wHhcNMTQwMTIzMTgxMjM3WhcNNDQwMTIzMTgxMzM3WjCBjzELMAkGA1UEBhMC
+#        VVMxEzARBgNVBAgMCkNhbGlmb3JuaWExFjAUBgNVBAcMDVNhbiBGcmFuY2lzY28xDTALBgNVBAoM
+#        BE9rdGExFDASBgNVBAsMC1NTT1Byb3ZpZGVyMRAwDgYDVQQDDAdQaXZvdGFsMRwwGgYJKoZIhvcN
+#        AQkBFg1pbmZvQG9rdGEuY29tMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCeil67/TLOiTZU
+#        WWgW2XEGgFZ94bVO90v5J1XmcHMwL8v5Z/8qjdZLpGdwI7Ph0CyXMMNklpaR/Ljb8fsls3amdT5O
+#        Bw92Zo8ulcpjw2wuezTwL0eC0wY/GQDAZiXL59npE6U+fH1lbJIq92hx0HJSru/0O1q3+A/+jjZL
+#        3tL/SwIDAQABMA0GCSqGSIb3DQEBBQUAA4GBAI5BoWZoH6Mz9vhypZPOJCEKa/K+biZQsA4Zqsuk
+#        vvphhSERhqk/Nv76Vkl8uvJwwHbQrR9KJx4L3PRkGCG24rix71jEuXVGZUsDNM3CUKnARx4MEab6
+#        GFHNkZ6DmoT/PFagngecHu+EwmuDtaG0rEkFrARwe+d8Ru0BN558abFb</ds:X509Certificate></ds:X509Data></ds:KeyInfo></md:KeyDescriptor><md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</md:NameIDFormat><md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat><md:SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://pivotal.oktapreview.com/app/pivotal_pivotalcfstaging_1/k2lw4l5bPODCMIIDBRYZ/sso/saml"/><md:SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://pivotal.oktapreview.com/app/pivotal_pivotalcfstaging_1/k2lw4l5bPODCMIIDBRYZ/sso/saml"/></md:IDPSSODescriptor></md:EntityDescriptor>
+#      saml:
+#        nameID: urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress
+#        assertionConsumerIndex: 0
+#        metadataTrustCheck: true
+#      showSamlLoginLink: true
+#      linkText: 'Okta Preview 2'
+#    vsphere.local:
+#      idpMetadata: https://win2012-sso2.localdomain:7444/websso/SAML2/Metadata/vsphere.local
+#      saml:
+#        nameID: urn:oasis:names:tc:SAML:2.0:nameid-format:persistent
+#        assertionConsumerIndex: 0
+#      showSamlLoginLink: true
+#      linkText: 'Log in with vCenter SSO'
+#    openam-local:
+#      idpMetadata: http://localhost:8081/openam/saml2/jsp/exportmetadata.jsp?entityid=http://localhost:8081/openam
+#      saml:
+#        nameID: urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress
+#        assertionConsumerIndex: 0
+#        signMetaData: false
+#        signRequest: false
+#      showSamlLoginLink: true
+#      linkText: 'Log in with OpenAM'
 
   authorize:
     url: http://localhost:8080/login/oauth/authorize
@@ -218,4 +201,3 @@ smtp:
   port: 2525
   user:
   password:
-
