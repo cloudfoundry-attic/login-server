@@ -41,7 +41,8 @@ login:
   # Enable create account on the Login Server (enabled by default)
   # - links.signup will still be used if present
   #signupsEnabled: false
-
+  # Enable sending invitations on the Login Server (disabled by default)
+  #invitationsEnabled: true
   # the brand to use for password reset emails and page titles
   # (defaults to oss)
   #brand: pivotal

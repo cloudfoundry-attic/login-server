@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.mock.env.MockEnvironment;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -90,8 +91,13 @@ public class HomeControllerViewTests {
         }
 
         @Bean
-        HomeController homeController() {
-            HomeController homeController = new HomeController();
+        MockEnvironment environment() {
+            return new MockEnvironment();
+        }
+
+        @Bean
+        HomeController homeController(MockEnvironment environment) {
+            HomeController homeController = new HomeController(environment);
             homeController.setUaaBaseUrl("http://uaa.example.com");
             return homeController;
         }

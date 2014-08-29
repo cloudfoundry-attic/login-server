@@ -18,6 +18,7 @@
             </li>
         </ul>
         <div th:each="tile : ${tiles}" class="image-preload" th:style="'background-image: url(' + @{${tile.get('image-hover')}} + ')'"></div>
+        <a th:unless="${#strings.isEmpty(invitationsLink)}" href="/invitations/new" th:href="@{${invitationsLink}}">Invite Users</a>
     </div>
 </body>
 </html>

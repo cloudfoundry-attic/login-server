@@ -133,6 +133,7 @@
 	</util:map>
 
 	<bean id="homeController" class="org.cloudfoundry.identity.uaa.login.HomeController">
+        <constructor-arg ref="environment" />
 	    <property name="uaaBaseUrl" value="${uaa.url:http://localhost:8080/uaa}" />
 		<property name="links" ref="links" />
 	</bean>
