@@ -75,7 +75,7 @@ public class BootstrapTests {
 
     @Test
     public void testRootContextDefaults() throws Exception {
-        context = getServletContext(null, "./src/test/resources/test/config/login.yml", "file:./src/main/webapp/WEB-INF/spring-servlet.xml");
+        context = getServletContext(null, "./src/main/resources/login.yml", "file:./src/main/webapp/WEB-INF/spring-servlet.xml");
         assertNotNull(context.getBean("viewResolver", ViewResolver.class));
         assertNotNull(context.getBean("resetPasswordController", ResetPasswordController.class));
     }
@@ -83,7 +83,7 @@ public class BootstrapTests {
     @Test
     public void testSamlProfileNoData() throws Exception {
         System.setProperty("login.saml.metadataTrustCheck", "false");
-        context = getServletContext("saml", "./src/main/resources/login.yml", "file:./src/main/webapp/WEB-INF/spring-servlet.xml");
+        context = getServletContext("default", "./src/main/resources/login.yml", "file:./src/main/webapp/WEB-INF/spring-servlet.xml");
         Assume.assumeTrue(context.getEnvironment().getProperty("login.idpMetadataURL")==null);
         assertNotNull(context.getBean("viewResolver", ViewResolver.class));
         assertNotNull(context.getBean("samlLogger", SAMLDefaultLogger.class));
@@ -97,7 +97,7 @@ public class BootstrapTests {
         System.setProperty("login.idpMetadataURL", "http://localhost:9696/nodata");
         System.setProperty("login.idpEntityAlias", "testIDPFile");
 
-        context = getServletContext("saml", "./src/main/resources/login.yml", "file:./src/main/webapp/WEB-INF/spring-servlet.xml");
+        context = getServletContext("default", "./src/main/resources/login.yml", "file:./src/main/webapp/WEB-INF/spring-servlet.xml");
         assertNotNull(context.getBean("viewResolver", ViewResolver.class));
         assertNotNull(context.getBean("samlLogger", SAMLDefaultLogger.class));
         assertFalse(context.getBean(IdentityProviderConfigurator.class).isLegacyMetadataTrustCheck());
@@ -144,7 +144,7 @@ public class BootstrapTests {
         System.setProperty("login.idpMetadataURL", "https://localhost:9696/nodata");
         System.setProperty("login.idpEntityAlias", "testIDPUrl");
 
-        context = getServletContext("saml", "./src/main/resources/login.yml", "file:./src/main/webapp/WEB-INF/spring-servlet.xml");
+        context = getServletContext("default", "./src/main/resources/login.yml", "file:./src/main/webapp/WEB-INF/spring-servlet.xml");
         assertNotNull(context.getBean("viewResolver", ViewResolver.class));
         assertNotNull(context.getBean("samlLogger", SAMLDefaultLogger.class));
         assertFalse(context.getBean(IdentityProviderConfigurator.class).isLegacyMetadataTrustCheck());
