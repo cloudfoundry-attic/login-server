@@ -8,7 +8,7 @@ import java.io.File;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-public class IdentityProviderDefinitionTest {
+public class IdentityProviderDefinitionTests {
 
     @Test
     public void testGetType() throws Exception {
@@ -21,7 +21,7 @@ public class IdentityProviderDefinitionTest {
         assertEquals(IdentityProviderDefinition.MetadataLocation.URL, def.getType());
         def.setMetaDataLocation("sample-okta-localhost.xml");
         assertEquals(IdentityProviderDefinition.MetadataLocation.FILE, def.getType());
-        File f = new File(System.getProperty("java.io.tmpdir"),IdentityProviderDefinitionTest.class.getName()+".testcase");
+        File f = new File(System.getProperty("java.io.tmpdir"),IdentityProviderDefinitionTests.class.getName()+".testcase");
         f.createNewFile();
         f.deleteOnExit();
         def.setMetaDataLocation(f.getAbsolutePath());

@@ -32,7 +32,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class IdentityProviderConfiguratorTest {
+public class IdentityProviderConfiguratorTests {
 
     IdentityProviderConfigurator conf = null;
     Map<String, Map<String, Object>>  data = null;
