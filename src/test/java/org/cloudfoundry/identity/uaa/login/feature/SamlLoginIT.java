@@ -12,8 +12,14 @@
  *******************************************************************************/
 package org.cloudfoundry.identity.uaa.login.feature;
 
+import java.util.Map;
+
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.TEXT_HTML_VALUE;
 import org.cloudfoundry.identity.uaa.login.test.DefaultIntegrationTestConfig;
-import org.cloudfoundry.identity.uaa.login.test.IfProfileActive;
 import org.cloudfoundry.identity.uaa.login.test.IntegrationTestRule;
 import org.cloudfoundry.identity.uaa.login.test.LoginServerClassRunner;
 import org.junit.Rule;
@@ -30,17 +36,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.web.client.RestOperations;
 
-import java.util.Map;
-
-import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.http.MediaType.TEXT_HTML_VALUE;
-
 @RunWith(LoginServerClassRunner.class)
 @ContextConfiguration(classes = DefaultIntegrationTestConfig.class)
-@IfProfileActive("saml")
 public class SamlLoginIT {
 
     @Autowired @Rule
@@ -63,6 +60,10 @@ public class SamlLoginIT {
         webDriver.findElement(By.name("username"));
         webDriver.findElement(By.name("password"));
         webDriver.findElement(By.xpath("//a[text()='Use your corporate credentials']"));
+        webDriver.findElement(By.xpath("//a[text()='Okta Preview 1']"));
+        webDriver.findElement(By.xpath("//a[text()='Okta Preview 2']"));
+        webDriver.findElement(By.xpath("//a[text()='Log in with OpenAM']"));
+        webDriver.findElement(By.xpath("//a[text()='Log in with vCenter SSO']"));
         webDriver.findElement(By.xpath("//input[@value='Sign in']"));
         assertEquals(3, webDriver.findElements(By.xpath("//input")).size());
     }

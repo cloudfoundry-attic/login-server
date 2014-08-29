@@ -62,8 +62,6 @@
         <property name="codeExpirationMillis" value="300000" />
     </bean>
 
-    <bean id="uaaController" class="org.cloudfoundry.identity.uaa.login.RemoteUaaController" parent="abstractRemoteUaaController"/>
-
     <!-- Pattern:/autologin -->
     <http pattern="/autologin" create-session="stateless" entry-point-ref="basicAuthenticationEntryPoint"
         xmlns="http://www.springframework.org/schema/security">
@@ -405,7 +403,5 @@
         <constructor-arg ref="resetPasswordService"/>
     </bean>
 
-    <beans profile="saml">
-      <import resource="saml-providers.xml"/>
-    </beans>
+    <import resource="saml-providers.xml"/>
 </beans>
