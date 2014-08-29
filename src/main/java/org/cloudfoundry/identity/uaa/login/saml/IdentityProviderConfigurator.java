@@ -161,8 +161,8 @@ public class IdentityProviderConfigurator {
 
         for (Map.Entry entry : providers.entrySet()) {
             String alias = (String)entry.getKey();
-            String metaDataLocation = (String)((Map)entry.getValue()).get("idpMetadata");
-            Map<String, Object> saml = (Map<String, Object>)((Map)entry.getValue()).get("saml");
+            Map<String, Object> saml = (Map<String, Object>)entry.getValue();
+            String metaDataLocation = (String)saml.get("idpMetadata");
             String nameID = (String)saml.get("nameID");
             Integer assertionIndex = (Integer)saml.get("assertionConsumerIndex");
             Boolean trustCheck = (Boolean)saml.get("metadataTrustCheck");
