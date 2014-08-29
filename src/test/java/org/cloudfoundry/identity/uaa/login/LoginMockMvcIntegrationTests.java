@@ -80,15 +80,6 @@ public class LoginMockMvcIntegrationTests {
     }
 
     @Test
-    public void testLoginSaml() throws Exception {
-        Assume.assumeTrue("Functionality is enabled by the saml profile", Arrays.asList(webApplicationContext.getEnvironment().getActiveProfiles()).contains("saml"));
-
-        mockMvc.perform(get("/login"))
-                .andExpect(status().isOk())
-                .andExpect(model().attributeExists("showSamlLoginLink"));
-    }
-
-    @Test
     public void testLoginWithEmptyLinks() throws Exception {
         Map<String, String> links = (Map<String, String>) webApplicationContext.getBean("links", Map.class);
         links.put("passwd", "");
