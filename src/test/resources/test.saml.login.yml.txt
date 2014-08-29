@@ -1,5 +1,5 @@
 #BEGIN SAML PROVIDERS - Used by travis tests
-    saml-providers:
+    providers:
       okta-local:
         idpMetadata: sample-okta-localhost.xml
         saml:

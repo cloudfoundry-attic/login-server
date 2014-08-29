@@ -126,7 +126,7 @@ login:
       # URL metadata fetch - read timeout
       soTimeout: 10000
 #BEGIN SAML PROVIDERS
-#    saml-providers:
+#    providers:
 #      okta-local:
 #        idpMetadata: sample-okta-localhost.xml
 #        saml:

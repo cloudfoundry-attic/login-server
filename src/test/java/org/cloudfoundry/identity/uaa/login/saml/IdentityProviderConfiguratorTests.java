@@ -37,7 +37,7 @@ public class IdentityProviderConfiguratorTests {
     IdentityProviderConfigurator conf = null;
     Map<String, Map<String, Object>>  data = null;
 
-    String sampleYaml = "  saml-providers:\n" +
+    String sampleYaml = "  providers:\n" +
         "    okta-local:\n" +
         "      idpMetadata: sample-okta-localhost.xml\n" +
         "      saml:\n" +
@@ -101,7 +101,7 @@ public class IdentityProviderConfiguratorTests {
         factory.setResources(resources.toArray(new Resource[resources.size()]));
         Map<String, Object> tmpdata = factory.getObject();
         data = new HashMap<>();
-        for (Map.Entry<String, Object> entry : ((Map<String, Object>)tmpdata.get("saml-providers")).entrySet()) {
+        for (Map.Entry<String, Object> entry : ((Map<String, Object>)tmpdata.get("providers")).entrySet()) {
             data.put(entry.getKey(), (Map<String, Object>)entry.getValue());
         }
     }
