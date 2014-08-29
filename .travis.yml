@@ -12,7 +12,7 @@ before_install:
   - cp $TRAVIS_BUILD_DIR/uaa/scripts/travis/init.gradle $HOME/.gradle
   - git pull --unshallow
 install:
-  - $TRAVIS_BUILD_DIR/.apply_spring_profiles_to_login_yaml.sh $TESTENV
+  - $TRAVIS_BUILD_DIR/scripts/travis/apply_spring_profiles_to_login_yaml.sh $TESTENV
   - cat src/main/resources/login.yml
 script:
   - ./gradlew -Dspring.profiles.active=$TESTENV :cobertura
