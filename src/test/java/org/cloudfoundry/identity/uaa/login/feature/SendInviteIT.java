@@ -14,22 +14,36 @@ package org.cloudfoundry.identity.uaa.login.feature;
 
 import com.dumbster.smtp.SimpleSmtpServer;
 import com.dumbster.smtp.SmtpMessage;
+import org.apache.commons.io.FileUtils;
 import org.cloudfoundry.identity.uaa.login.test.DefaultIntegrationTestConfig;
+import org.cloudfoundry.identity.uaa.login.test.IfProfileActive;
 import org.cloudfoundry.identity.uaa.login.test.IntegrationTestRule;
 import org.cloudfoundry.identity.uaa.login.test.TestClient;
+import org.cloudfoundry.identity.uaa.test.TestProfileEnvironment;
+import org.cloudfoundry.identity.uaa.test.UaaTestAccounts;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContextInitializer;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.core.env.MutablePropertySources;
+import org.springframework.core.env.StandardEnvironment;
+import org.springframework.mock.env.MockPropertySource;
 import org.springframework.security.oauth2.client.test.TestAccounts;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.io.File;
+import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.Iterator;
 
@@ -62,6 +76,12 @@ public class SendInviteIT {
 
     private HomeIT.HomePagePerspective asOnHomePage;
 
+    @BeforeClass
+    public static void setProperties() {
+        System.setProperty("login.invitationsEnabled", "true");
+    }
+
+
     @Before
     public void setUp() {
         webDriver.get(baseUrl + "/logout.do");
@@ -79,6 +99,14 @@ public class SendInviteIT {
         webDriver.findElement(By.xpath("//*[text()='Invite Users']")).click();
 
         int receivedEmailSize = simpleSmtpServer.getReceivedEmailSize();
+//        File scrFile = ((TakesScreenshot) webDriver).getScreenshotAs(
+//            OutputType.FILE);
+//        String scrFilename = "Screenshot.png";
+//        File outputFile = new File("/Users/pivotal/Downloads", scrFilename);
+//        try {
+//            FileUtils.copyFile(scrFile, outputFile);
+//        } catch (IOException ioe) {
+//        }
 
         webDriver.findElement(By.name("email")).sendKeys(userEmail);
         webDriver.findElement(By.xpath("//input[@value='Send invite']")).click();
@@ -96,5 +124,15 @@ public class SendInviteIT {
         webDriver.get(link);
 
         Assert.assertEquals("Create your account", webDriver.findElement(By.tagName("h1")).getText());
+    }
+
+    public static class PropertyMockingApplicationContextInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
+
+        @Override
+        public void initialize(ConfigurableApplicationContext applicationContext) {
+//            MutablePropertySources propertySources = TestProfileEnvironment.getEnvironment().getPropertySources();
+//            MockPropertySource mockEnvVars = new MockPropertySource().withProperty("login.invitationsEnabled", true);
+//            propertySources.replace(StandardEnvironment.SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME, mockEnvVars);
+        }
     }
 }
