@@ -40,10 +40,9 @@ public class IdentityProviderConfiguratorTests {
     String sampleYaml = "  providers:\n" +
         "    okta-local:\n" +
         "      idpMetadata: sample-okta-localhost.xml\n" +
-        "      saml:\n" +
-        "        nameID: urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress\n" +
-        "        assertionConsumerIndex: 0\n" +
-        "        metadataTrustCheck: true\n" +
+        "      nameID: urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress\n" +
+        "      assertionConsumerIndex: 0\n" +
+        "      metadataTrustCheck: true\n" +
         "      showSamlLoginLink: true\n" +
         "      linkText: 'Okta Preview 1'\n" +
         "      iconUrl: 'http://link.to/icon.jpg'\n" +
@@ -61,28 +60,25 @@ public class IdentityProviderConfiguratorTests {
         "        3tL/SwIDAQABMA0GCSqGSIb3DQEBBQUAA4GBAI5BoWZoH6Mz9vhypZPOJCEKa/K+biZQsA4Zqsuk\n" +
         "        vvphhSERhqk/Nv76Vkl8uvJwwHbQrR9KJx4L3PRkGCG24rix71jEuXVGZUsDNM3CUKnARx4MEab6\n" +
         "        GFHNkZ6DmoT/PFagngecHu+EwmuDtaG0rEkFrARwe+d8Ru0BN558abFb</ds:X509Certificate></ds:X509Data></ds:KeyInfo></md:KeyDescriptor><md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</md:NameIDFormat><md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat><md:SingleSignOnService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\" Location=\"https://pivotal.oktapreview.com/app/pivotal_pivotalcfstaging_1/k2lw4l5bPODCMIIDBRYZ/sso/saml\"/><md:SingleSignOnService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect\" Location=\"https://pivotal.oktapreview.com/app/pivotal_pivotalcfstaging_1/k2lw4l5bPODCMIIDBRYZ/sso/saml\"/></md:IDPSSODescriptor></md:EntityDescriptor>\n" +
-        "      saml:\n" +
-        "        nameID: urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress\n" +
-        "        assertionConsumerIndex: 0\n" +
-        "        metadataTrustCheck: true\n" +
+        "      nameID: urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress\n" +
+        "      assertionConsumerIndex: 0\n" +
+        "      metadataTrustCheck: true\n" +
         "      showSamlLoginLink: true\n" +
         "      linkText: 'Okta Preview 2'\n" +
         "    vsphere.local:\n" +
         "      idpMetadata: https://win2012-sso2.localdomain:7444/websso/SAML2/Metadata/vsphere.local\n" +
-        "      saml:\n" +
-        "        nameID: urn:oasis:names:tc:SAML:2.0:nameid-format:persistent\n" +
-        "        assertionConsumerIndex: 1\n" +
-        "        metadataTrustCheck: false\n"+
+        "      nameID: urn:oasis:names:tc:SAML:2.0:nameid-format:persistent\n" +
+        "      assertionConsumerIndex: 1\n" +
+        "      metadataTrustCheck: false\n"+
         "      showSamlLoginLink: false\n" +
         "      linkText: 'Log in with vCenter SSO'\n" +
         "      iconUrl: 'http://vsphere.local/iconurl.jpg'\n" +
         "    openam-local:\n" +
         "      idpMetadata: http://localhost:8081/openam/saml2/jsp/exportmetadata.jsp?entityid=http://localhost:8081/openam\n" +
-        "      saml:\n" +
-        "        nameID: urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress\n" +
-        "        assertionConsumerIndex: 0\n" +
-        "        signMetaData: false\n" +
-        "        signRequest: false\n" +
+        "      nameID: urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress\n" +
+        "      assertionConsumerIndex: 0\n" +
+        "      signMetaData: false\n" +
+        "      signRequest: false\n" +
         "      showSamlLoginLink: true\n" +
         "      linkText: 'Log in with OpenAM'\n";
 

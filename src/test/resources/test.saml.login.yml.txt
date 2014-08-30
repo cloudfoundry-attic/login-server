@@ -23,26 +23,23 @@
           3tL/SwIDAQABMA0GCSqGSIb3DQEBBQUAA4GBAI5BoWZoH6Mz9vhypZPOJCEKa/K+biZQsA4Zqsuk
           vvphhSERhqk/Nv76Vkl8uvJwwHbQrR9KJx4L3PRkGCG24rix71jEuXVGZUsDNM3CUKnARx4MEab6
           GFHNkZ6DmoT/PFagngecHu+EwmuDtaG0rEkFrARwe+d8Ru0BN558abFb</ds:X509Certificate></ds:X509Data></ds:KeyInfo></md:KeyDescriptor><md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</md:NameIDFormat><md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat><md:SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://pivotal.oktapreview.com/app/pivotal_pivotalcfstaging_1/k2lw4l5bPODCMIIDBRYZ/sso/saml"/><md:SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://pivotal.oktapreview.com/app/pivotal_pivotalcfstaging_1/k2lw4l5bPODCMIIDBRYZ/sso/saml"/></md:IDPSSODescriptor></md:EntityDescriptor>#      saml:
-        saml:
-          nameID: urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress
-          assertionConsumerIndex: 0
-          metadataTrustCheck: true
+        nameID: urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress
+        assertionConsumerIndex: 0
+        metadataTrustCheck: true
         showSamlLoginLink: true
         linkText: 'Okta Preview 2'
       vsphere.local:
         idpMetadata: https://win2012-sso2.localdomain:7444/websso/SAML2/Metadata/vsphere.local
-        saml:
-          nameID: urn:oasis:names:tc:SAML:2.0:nameid-format:persistent
-          assertionConsumerIndex: 0
+        nameID: urn:oasis:names:tc:SAML:2.0:nameid-format:persistent
+        assertionConsumerIndex: 0
         showSamlLoginLink: true
         linkText: 'Log in with vCenter SSO'
       openam-local:
         idpMetadata: http://localhost:8081/openam/saml2/jsp/exportmetadata.jsp?entityid=http://localhost:8081/openam
-        saml:
-          nameID: urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress
-          assertionConsumerIndex: 0
-          signMetaData: false
-          signRequest: false
+        nameID: urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress
+        assertionConsumerIndex: 0
+        signMetaData: false
+        signRequest: false
         showSamlLoginLink: true
         linkText: 'Log in with OpenAM'
 
