@@ -40,4 +40,4 @@ git clean -ffd
 
 set +x # stop showing commands
 
-echo "CF Release has been updated"
+echo "Login Server Submodules have been updated"
