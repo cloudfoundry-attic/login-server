@@ -192,6 +192,7 @@ public class RemoteUaaController extends AbstractControllerInfo {
         String path = extractPath(request);
         model.putAll(getLoginInfo(getUaaBaseUrl() + "/" + path, getRequestHeaders(headers)));
         model.put("links", getLinksInfo());
+        setCommitInfo(model);
         if (principal == null) {
             String customSignupLink = environment.getProperty("links.signup");
             if (customSignupLink != null) {
@@ -357,6 +358,13 @@ public class RemoteUaaController extends AbstractControllerInfo {
         body.add("client_id", basic[0]);
         body.add("client_secret", basic[1]);
         body.add("source", "login");
+
+        //remove multiple values as the UAA can't handle it
+        body.remove("grant_type");
+        if (!extractPath(request).contains("grant_type")) {
+            body.add("grant_type", "password");
+        }
+
         HttpEntity entity = new HttpEntity(body, headers);
         return passthru(request, entity, model, true);
     }

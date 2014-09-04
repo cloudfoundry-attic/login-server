@@ -13,14 +13,6 @@
 
 package org.cloudfoundry.identity.uaa.login;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -29,11 +21,19 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.cloudfoundry.identity.uaa.authentication.AuthzAuthenticationRequest;
 import org.cloudfoundry.identity.uaa.authentication.UaaAuthenticationDetails;
+import org.cloudfoundry.identity.uaa.client.SocialClientUserDetails;
 import org.cloudfoundry.identity.uaa.codestore.ExpiringCode;
 import org.cloudfoundry.identity.uaa.user.UaaAuthority;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -122,9 +122,6 @@ public class PasscodeAuthenticationFilter implements Filter {
             if (eCode != null && eCode.getData() != null) {
                 pi = new ObjectMapper().readValue(eCode.getData(), PasscodeInformation.class);
             }
-            if (!pi.getUserId().equals(username)) {
-                throw new BadCredentialsException("Username mismatch");
-            }
 
             if (pi != null) {
                 logger.info("Successful authentication request for " + username);
@@ -135,17 +132,19 @@ public class PasscodeAuthenticationFilter implements Filter {
                     externalAuthorities = (Collection<GrantedAuthority>) pi.getAuthorizationParameters().get(
                                     "authorities");
                 }
-
-                Authentication result = new UsernamePasswordAuthenticationToken(username, null,
-                                externalAuthorities == null ? UaaAuthority.USER_AUTHORITIES : externalAuthorities);
+                SocialClientUserDetails principal = new SocialClientUserDetails(pi.getUsername(), pi.getSamlAuthorities());
+                principal.setSource(pi.getOrigin());
+                Authentication result = new UsernamePasswordAuthenticationToken(
+                    principal,
+                    null,
+                    externalAuthorities == null ? UaaAuthority.USER_AUTHORITIES : externalAuthorities
+                );
 
                 SecurityContextHolder.getContext().setAuthentication(result);
-            }
-            else {
+            } else {
                 authenticationEntryPoint.commence(req, res, new BadCredentialsException("Invalid passcode"));
             }
-        }
-        else {
+        } else {
             // Authenticate user against the UAA
             logger.debug("Located credentials in request, with keys: " + loginInfo.keySet());
             if (methods != null && !methods.contains(req.getMethod().toUpperCase())) {
