@@ -26,6 +26,8 @@ build a war file and deploy it to any container you like (`./gradlew
 is also a Gradle task that will run the Login Server, the UAA and
 some sample apps all in the same container from the command line:
 
+    $ git clone https://github.com/cloudfoundry/login-server.git
+    $ cd login-server && ./update
     $ ./gradlew run
 
 You can run the Login Server tests using the command line as
