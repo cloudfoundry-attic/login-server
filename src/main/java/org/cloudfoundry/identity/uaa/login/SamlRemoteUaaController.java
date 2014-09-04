@@ -86,9 +86,6 @@ public class SamlRemoteUaaController extends RemoteUaaController {
     @RequestMapping(value = { "/info", "/login" }, method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE, headers = "Accept=application/json")
     public String prompts(HttpServletRequest request, @RequestHeader HttpHeaders headers, Map<String, Object> model,
                     Principal principal) throws Exception {
-        // Entity ID to start the discovery
-        model.put("entityID", entityID);
-        model.put("idpDefinitions", idpDefinitions);
         return super.prompts(request, headers, model, principal);
     }
 
@@ -100,6 +97,9 @@ public class SamlRemoteUaaController extends RemoteUaaController {
 
         Map<String,Object> prompts = new LinkedHashMap<String, Object>((Map<String, Object>) model.get("prompts"));
         prompts.remove("passcode");
+        // Entity ID to start the discovery
+        model.put("entityID", entityID);
+        model.put("idpDefinitions", idpDefinitions);
         model.put("prompts", prompts);
 
         return logicalViewName;
@@ -229,7 +229,11 @@ public class SamlRemoteUaaController extends RemoteUaaController {
         String username = null;
         Map<String, Object> authorizationParameters = null;
 
-        if (principal instanceof ExpiringUsernameAuthenticationToken) {
+        if (principal instanceof LoginSamlAuthenticationToken) {
+            username = principal.getName();
+            //TODO collect authorities here?
+            //and possible convert them into SamlAuthority
+        } else if (principal instanceof ExpiringUsernameAuthenticationToken) {
             username = ((SamlUserDetails) ((ExpiringUsernameAuthenticationToken) principal).getPrincipal())
                             .getUsername();
 
