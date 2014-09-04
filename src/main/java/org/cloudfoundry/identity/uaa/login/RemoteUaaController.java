@@ -192,6 +192,7 @@ public class RemoteUaaController extends AbstractControllerInfo {
         String path = extractPath(request);
         model.putAll(getLoginInfo(getUaaBaseUrl() + "/" + path, getRequestHeaders(headers)));
         model.put("links", getLinksInfo());
+        setCommitInfo(model);
         if (principal == null) {
             String customSignupLink = environment.getProperty("links.signup");
             if (customSignupLink != null) {

@@ -27,7 +27,7 @@ allprojects {
 }
 
 apply from: 'uaa/shared_versions.gradle'
-apply from: 'build_properties.gradle'
+apply from: 'uaa/uaa/build_properties.gradle'
 
 apply plugin: 'maven'
 group = 'org.cloudfoundry.identity'
