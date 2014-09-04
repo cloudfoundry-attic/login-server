@@ -67,6 +67,8 @@ public class SamlRemoteUaaController extends RemoteUaaController {
 
     private static final Log logger = LogFactory.getLog(SamlRemoteUaaController.class);
 
+    public static final String NotANumber = "NaN";
+
     private final ObjectMapper mapper = new ObjectMapper();
 
     public void setIdpDefinitions(List<IdentityProviderDefinition> idpDefinitions) {
@@ -159,96 +161,31 @@ public class SamlRemoteUaaController extends RemoteUaaController {
         return login;
     }
 
-    @RequestMapping(value = "/oauth/token", method = RequestMethod.POST, params = "grant_type=password")
-    @ResponseBody
-    public ResponseEntity<byte[]> tokenEndpoint(HttpServletRequest request, HttpEntity<byte[]> entity,
-                    @RequestParam Map<String, String> parameters, Map<String, Object> model, Principal principal)
-                    throws Exception {
-
-        // Request has a password. Owner password grant with a UAA password
-        if (null != request.getParameter("password")) {
-            return passthru(request, entity, model, false);
-        } else {
-            //
-            MultiValueMap<String, String> requestHeadersForClientInfo = new LinkedMaskingMultiValueMap<String, String>(
-                            AUTHORIZATION);
-            requestHeadersForClientInfo.add(AUTHORIZATION, request.getHeader(AUTHORIZATION));
-
-            ResponseEntity<byte[]> clientInfoResponse = getDefaultTemplate().exchange(getUaaBaseUrl() + "/clientinfo",
-                            HttpMethod.POST,
-                            new HttpEntity<MultiValueMap<String, String>>(null, requestHeadersForClientInfo),
-                            byte[].class);
-
-            if (clientInfoResponse.getStatusCode() == HttpStatus.OK) {
-                String path = extractPath(request);
-
-                MultiValueMap<String, String> map = new LinkedMaskingMultiValueMap<String, String>();
-                map.setAll(parameters);
-                if (principal != null) {
-                    map.set("source", "login");
-                    map.set("client_id", getClientId(clientInfoResponse.getBody()));
-                    map.setAll(getLoginCredentials(principal));
-                    map.remove("credentials"); // legacy cf might break otherwise
-                } else {
-                    throw new BadCredentialsException("No principal found in authorize endpoint");
-                }
-
-                HttpHeaders requestHeaders = new HttpHeaders();
-                requestHeaders.putAll(getRequestHeaders(requestHeaders));
-                requestHeaders.remove(AUTHORIZATION.toLowerCase());
-                requestHeaders.remove(ACCEPT.toLowerCase());
-                requestHeaders.remove(CONTENT_TYPE.toLowerCase());
-                requestHeaders.setContentType(APPLICATION_FORM_URLENCODED);
-                requestHeaders.setAccept(Arrays.asList(APPLICATION_JSON));
-                requestHeaders.remove(COOKIE);
-                requestHeaders.remove(COOKIE.toLowerCase());
-
-                ResponseEntity<byte[]> response = getAuthorizationTemplate().exchange(getUaaBaseUrl() + "/" + path,
-                                HttpMethod.POST, new HttpEntity<MultiValueMap<String, String>>(map, requestHeaders),
-                                byte[].class);
-
-                saveCookie(response.getHeaders(), model);
-
-                byte[] body = response.getBody();
-                if (body != null) {
-                    HttpHeaders outgoingHeaders = getResponseHeaders(response.getHeaders());
-                    return new ResponseEntity<byte[]>(response.getBody(), outgoingHeaders, response.getStatusCode());
-                }
-
-                throw new IllegalStateException("Neither a redirect nor a user approval");
-            }
-            else {
-                throw new BadCredentialsException(new String(clientInfoResponse.getBody()));
-            }
-        }
-    }
-
     @RequestMapping(value = { "/passcode" }, method = RequestMethod.GET)
     public String generatePasscode(@RequestHeader HttpHeaders headers, Map<String, Object> model, Principal principal)
-                    throws NoSuchAlgorithmException, IOException, JsonGenerationException, JsonMappingException {
-        String username = null;
+                    throws NoSuchAlgorithmException, IOException, JsonMappingException {
+        String username = null, origin = null;
         Map<String, Object> authorizationParameters = null;
 
         if (principal instanceof LoginSamlAuthenticationToken) {
             username = principal.getName();
+            origin = ((LoginSamlAuthenticationToken)principal).getIdpAlias();
             //TODO collect authorities here?
-            //and possible convert them into SamlAuthority
         } else if (principal instanceof ExpiringUsernameAuthenticationToken) {
-            username = ((SamlUserDetails) ((ExpiringUsernameAuthenticationToken) principal).getPrincipal())
-                            .getUsername();
-
+            username = ((SamlUserDetails) ((ExpiringUsernameAuthenticationToken) principal).getPrincipal()).getUsername();
+            origin = "login-saml";
             Collection<GrantedAuthority> authorities = ((SamlUserDetails) (((ExpiringUsernameAuthenticationToken) principal)
                             .getPrincipal())).getAuthorities();
             if (authorities != null) {
-                authorizationParameters = new LinkedHashMap<String, Object>();
+                authorizationParameters = new LinkedHashMap<>();
                 authorizationParameters.put("authorities", authorities);
             }
-        }
-        else {
+        } else {
             username = principal.getName();
+            origin = "passcode";
         }
 
-        PasscodeInformation pi = new PasscodeInformation(username, null, authorizationParameters);
+        PasscodeInformation pi = new PasscodeInformation(NotANumber, username, null, origin, authorizationParameters);
 
         ResponseEntity<ExpiringCode> response = doGenerateCode(pi);
         model.put("passcode", response.getBody().getCode());
