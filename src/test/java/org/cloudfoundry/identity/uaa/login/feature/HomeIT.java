@@ -79,13 +79,6 @@ public class HomeIT {
         Assert.assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), Matchers.containsString("Account Settings"));
     }
 
-    @Test
-    public void inviteUsersLink() throws Exception {
-        Assert.assertNotNull(asOnHomePage.getInviteUsersLink());
-        asOnHomePage.getInviteUsersLink().click();
-        Assert.assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), Matchers.containsString("Send an invite"));
-    }
-
     static class HomePagePerspective {
         private final WebDriver webDriver;
         private final String username;
@@ -97,10 +90,6 @@ public class HomeIT {
 
         public WebElement getUsernameElement() {
             return getWebElementWithText(username);
-        }
-
-        public WebElement getInviteUsersLink() {
-            return getWebElementWithText("Invite Users");
         }
 
         public WebElement getAccountSettingsElement() {
