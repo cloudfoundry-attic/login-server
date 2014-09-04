@@ -138,6 +138,7 @@
 		<property name="links" ref="links" />
 	</bean>
 
+    <oauth:rest-template id="notificationsTemplate" resource="uaa" />
 	<oauth:rest-template id="authorizationTemplate" resource="uaa" />
     <oauth:rest-template id="remoteAuthManagerAuthorizationTemplate" resource="uaa" />
 

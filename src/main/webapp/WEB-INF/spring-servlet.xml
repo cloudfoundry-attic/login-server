@@ -49,6 +49,10 @@
         <constructor-arg value="${uaa.url:http://localhost:8080/uaa}"/>
     </bean>
 
+    <bean id="notificationsUrl" class="java.lang.String">
+        <constructor-arg value="${notifications.url:http://localhost:3001/notifications}"/>
+    </bean>
+
     <!-- TODO: Move the autologin related beans from the login server and saml login server to login common -->
     <bean id="abstractRemoteUaaController" abstract="true">
         <constructor-arg ref="environment" />
@@ -249,6 +253,33 @@
 
 
     <import resource="classpath:/login-common.xml" />
+    <bean id="sendActivationCodeMap" class="java.util.HashMap">
+        <constructor-arg>
+            <map>
+            <entry key="description" value="Send activation code"/>
+            <entry key="id" value="16b1d8f3-3e04-438e-9e10-2f970b53baf7"/>
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <bean id="resetPasswordMap" class="java.util.HashMap">
+        <constructor-arg>
+            <map>
+                <entry key="description" value="Reset Password"/>
+                <entry key="id" value="7f8e6fb5-d18a-4b01-8827-c49fc9bc5b0b"/>
+            </map>
+        </constructor-arg>
+    </bean>
+
+
+    <bean id="notifications"
+          class="org.springframework.beans.factory.config.ListFactoryBean">
+        <property name="sourceList">
+            <list>
+                <ref bean="sendActivationCodeMap"/>
+            </list>
+        </property>
+    </bean>
 
     <mvc:annotation-driven>
         <mvc:message-converters>
