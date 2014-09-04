@@ -8720,9 +8720,14 @@ input {
   font-size: 11px;
   line-height: 18px;
   margin-bottom: 10px;
-  padding: 10px 0; }
-  .saml-login .saml-login-link {
-    font-weight: 700; }
+  padding: 10px 0;
+}
+
+.saml-login p {
+    color: #7f7f7f; }
+
+.saml-login .saml-login-link {
+font-weight: 700; }
 
 .nav {
   position: relative;

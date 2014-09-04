@@ -59,7 +59,6 @@ public class SamlLoginIT {
 
         webDriver.findElement(By.name("username"));
         webDriver.findElement(By.name("password"));
-        webDriver.findElement(By.xpath("//a[text()='Use your corporate credentials']"));
         webDriver.findElement(By.xpath("//a[text()='Okta Preview 1']"));
         webDriver.findElement(By.xpath("//a[text()='Okta Preview 2']"));
         webDriver.findElement(By.xpath("//a[text()='Log in with OpenAM']"));

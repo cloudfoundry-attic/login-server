@@ -23,6 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.xpath;
 
 import org.cloudfoundry.identity.uaa.authentication.login.Prompt;
+import org.cloudfoundry.identity.uaa.login.saml.IdentityProviderDefinition;
 import org.cloudfoundry.identity.uaa.login.test.ThymeleafConfig;
 import org.junit.Before;
 import org.junit.Test;
@@ -43,7 +44,9 @@ import org.springframework.web.servlet.config.annotation.DefaultServletHandlerCo
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
@@ -126,6 +129,7 @@ public class SamlRemoteUaaControllerMockMvcTests {
             Prompt second = new Prompt("passcode", "password", "This should be filtered out of the UI but not the API.");
             remoteUaaController.setPrompts(Arrays.asList(first, second));
             remoteUaaController.setAuthorizationTemplate(restTemplate);
+            remoteUaaController.setIdpDefinitions(new ArrayList<IdentityProviderDefinition>());
             return remoteUaaController;
         }
     }

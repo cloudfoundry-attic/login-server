@@ -88,6 +88,16 @@ public class SamlRemoteUaaController extends RemoteUaaController {
     @RequestMapping(value = { "/info", "/login" }, method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE, headers = "Accept=application/json")
     public String prompts(HttpServletRequest request, @RequestHeader HttpHeaders headers, Map<String, Object> model,
                     Principal principal) throws Exception {
+
+        // Entity ID to start the discovery
+        model.put("entityID", entityID);
+        model.put("idpDefinitions", idpDefinitions);
+        for (IdentityProviderDefinition idp : idpDefinitions) {
+            if(idp.isShowSamlLink()) {
+                model.put("showSamlLoginLinks", true);
+                break;
+            }
+        }
         return super.prompts(request, headers, model, principal);
     }
 
