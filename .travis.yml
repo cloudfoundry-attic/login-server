@@ -4,7 +4,6 @@ env:
     - secure: "J5DYxGOG/3MjrzoEJLla/GVq2Z5Nx2oCbYEDNRbAnIIol0Dj5JK1++mXpED3+4fJKkNQBhqMZn1t6P0s/OIng0pUpg9QB7tKAMdJ+N7FKRAM5Ko8g+XhWXWAmxbob3uy2qPIEGWDczskTBmwZus/Zv3N59qwNUGq3HRiCR5BR3g="
   matrix:
     - TESTENV=default
-    - TESTENV=default,saml
 cache:
   directories:
     - $HOME/.gradle
@@ -12,7 +11,7 @@ before_install:
   - cp $TRAVIS_BUILD_DIR/uaa/scripts/travis/init.gradle $HOME/.gradle
   - git pull --unshallow
 install:
-  - $TRAVIS_BUILD_DIR/.apply_spring_profiles_to_login_yaml.sh $TESTENV
+  - $TRAVIS_BUILD_DIR/scripts/travis/apply_spring_profiles_to_login_yaml.sh $TESTENV
   - cat src/main/resources/login.yml
 script:
   - ./gradlew -Dspring.profiles.active=$TESTENV :cobertura

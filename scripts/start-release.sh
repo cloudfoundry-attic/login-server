@@ -11,6 +11,11 @@ echo Creating Login Server release $1
 
 set -x
 
+if [[ -n $(git status -s --ignored) ]]; then
+    echo "ERROR: Release must be performed from a fresh clone of the repository."
+    exit 1
+fi
+
 git checkout develop
 git checkout -b releases/$1
 # Update submodule pointers; Clean out any submodule changes

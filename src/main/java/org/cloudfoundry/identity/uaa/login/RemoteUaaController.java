@@ -70,9 +70,11 @@ import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Controller that manages OAuth authorization via a remote UAA service. Use
@@ -108,7 +110,7 @@ public class RemoteUaaController extends AbstractControllerInfo {
 
     private static final String USER_AGENT = "user-agent";
 
-    private final Environment environment;
+    protected final Environment environment;
 
     private RestOperations defaultTemplate = new RestTemplate();
 
@@ -190,6 +192,7 @@ public class RemoteUaaController extends AbstractControllerInfo {
         String path = extractPath(request);
         model.putAll(getLoginInfo(getUaaBaseUrl() + "/" + path, getRequestHeaders(headers)));
         model.put("links", getLinksInfo());
+        setCommitInfo(model);
         if (principal == null) {
             String customSignupLink = environment.getProperty("links.signup");
             if (customSignupLink != null) {
@@ -330,12 +333,20 @@ public class RemoteUaaController extends AbstractControllerInfo {
     public ResponseEntity<byte[]> passwordGrant(HttpServletRequest request,
                                                 @RequestHeader("Authorization") String authorization,
                                                 @RequestHeader HttpHeaders headers,
-                                                @RequestBody MultiValueMap<String, String> body,
+                                                @RequestBody MultiValueMap<String, String> originalBody,
                                                 Map<String, Object> model,
                                                 Principal principal) throws Exception {
         logger.info("Passing through password grant token request for " + request.getServletPath());
-        body.setAll(getLoginCredentials(principal));
 
+        Set<String> maskedAttribute = new HashSet<>();
+        maskedAttribute.add("password");
+        maskedAttribute.add("client_secret");
+        LinkedMaskingMultiValueMap<String,String> body = new LinkedMaskingMultiValueMap<>(maskedAttribute);
+        for (Map.Entry<String, List<String>> entry : originalBody.entrySet()) {
+            body.put(entry.getKey(), entry.getValue());
+        }
+
+        body.setAll(getLoginCredentials(principal));
         //for grant_type=password, we want to do user authentication
         //in the login server rather than in UAA
         String[] basic = extractAndDecodeHeader(authorization);
@@ -347,8 +358,13 @@ public class RemoteUaaController extends AbstractControllerInfo {
         body.add("client_id", basic[0]);
         body.add("client_secret", basic[1]);
         body.add("source", "login");
-        Map<String,String> creds = getLoginCredentials(principal);
-        body.setAll(creds);
+
+        //remove multiple values as the UAA can't handle it
+        body.remove("grant_type");
+        if (!extractPath(request).contains("grant_type")) {
+            body.add("grant_type", "password");
+        }
+
         HttpEntity entity = new HttpEntity(body, headers);
         return passthru(request, entity, model, true);
     }

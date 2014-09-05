@@ -20,9 +20,12 @@
                        class="form-control"/>
                 <input type="submit" value="Sign in" class="island-button"/>
             </form>
-            <div th:if="${saml}" class="saml-login">
-                OR<br/>
-                <a href="" th:href="@{saml/discovery(returnIDParam=idp,entityID=${entityID})}" class="saml-login-link">Use your corporate credentials</a>
+
+            <div class="saml-login">
+                <p th:if="${showSamlLoginLinks}">or Sign in with: </p>
+                <div th:each="idp : ${idpDefinitions}" th:if="${idp.showSamlLink}">
+                    <a href="" th:href="@{saml/discovery(returnIDParam=idp,entityID=${entityID},idp=${idp.idpEntityAlias},isPassive=true)}" th:text="${idp.linkText}" class="saml-login-link">Use your corporate credentials</a>
+                </div>
             </div>
             <span class="left">
                 <a th:unless="${#strings.isEmpty(createAccountLink)}" href="/accounts/new" th:href="@{${createAccountLink}}" class="link-lowlight">Create account</a>

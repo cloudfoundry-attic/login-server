@@ -27,7 +27,7 @@ allprojects {
 }
 
 apply from: 'uaa/shared_versions.gradle'
-apply from: 'build_properties.gradle'
+apply from: 'uaa/uaa/build_properties.gradle'
 
 apply plugin: 'maven'
 group = 'org.cloudfoundry.identity'
@@ -68,6 +68,7 @@ dependencies {
   compile group: 'org.thymeleaf.extras', name: 'thymeleaf-extras-springsecurity3', version:'2.1.1.RELEASE'
   compile group: 'javax.mail', name: 'mail', version:'1.4.7'
   runtime group: 'org.springframework.security', name: 'spring-security-config', version:springSecurityVersion
+  providedCompile group: 'javax.servlet', name: 'javax.servlet-api', version:'3.0.1'
   testCompile identityCommon.sourceSets.test.output
   testCompile group: 'org.springframework', name: 'spring-test', version:springVersion
   testCompile group: 'junit', name: 'junit', version:'4.11'
@@ -172,7 +173,7 @@ cargo {
     }
 
     installer {
-      installUrl = 'http://archive.apache.org/dist/tomcat/tomcat-7/v7.0.52/bin/apache-tomcat-7.0.52.tar.gz'
+      installUrl = 'http://archive.apache.org/dist/tomcat/tomcat-7/v7.0.55/bin/apache-tomcat-7.0.55.tar.gz'
       downloadDir = file("$buildDir/download")
       extractDir = file("$buildDir/extract")
     }

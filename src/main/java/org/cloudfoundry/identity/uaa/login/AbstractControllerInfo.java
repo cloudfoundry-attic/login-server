@@ -15,15 +15,21 @@ package org.cloudfoundry.identity.uaa.login;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.cloudfoundry.identity.uaa.util.UaaStringUtils;
+import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.ui.Model;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -39,6 +45,10 @@ public abstract class AbstractControllerInfo {
     private static String DEFAULT_BASE_UAA_URL = "https://uaa.cloudfoundry.com";
     protected static final String HOST = "Host";
     protected static final String AUTHORIZATON = "Authorization";
+
+    private Properties gitProperties = new Properties();
+
+    private Properties buildProperties = new Properties();
 
     private String baseUrl;
 
@@ -57,6 +67,17 @@ public abstract class AbstractControllerInfo {
 
     protected void initProperties() {
         setUaaBaseUrl(DEFAULT_BASE_UAA_URL);
+        try {
+            gitProperties = PropertiesLoaderUtils.loadAllProperties("git.properties");
+        } catch (IOException e) {
+            // Ignore
+        }
+        try {
+            buildProperties = PropertiesLoaderUtils.loadAllProperties("build.properties");
+        } catch (IOException e) {
+            // Ignore
+        }
+
     }
 
     /**
@@ -127,5 +148,15 @@ public abstract class AbstractControllerInfo {
         attributes.put("links", getLinksInfo());
         model.addAllAttributes(attributes);
         model.addAttribute("links", getLinks());
+    }
+
+    protected void setCommitInfo(Map<String, Object> model) {
+        model.put("commit_id", gitProperties.getProperty("git.commit.id.abbrev", "UNKNOWN"));
+        model.put(
+            "timestamp",
+            gitProperties.getProperty("git.commit.time",
+                new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date())));
+        model.put("app", UaaStringUtils.getMapFromProperties(buildProperties, "build."));
+
     }
 }

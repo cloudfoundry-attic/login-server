@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -36,6 +37,8 @@ import org.cloudfoundry.identity.uaa.authentication.Origin;
 import org.cloudfoundry.identity.uaa.authentication.UaaAuthenticationDetails;
 import org.cloudfoundry.identity.uaa.client.SocialClientUserDetails;
 import org.cloudfoundry.identity.uaa.codestore.ExpiringCode;
+import org.cloudfoundry.identity.uaa.login.saml.IdentityProviderDefinition;
+import org.cloudfoundry.identity.uaa.login.saml.LoginSamlAuthenticationToken;
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -46,7 +49,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
@@ -65,9 +67,15 @@ public class SamlRemoteUaaController extends RemoteUaaController {
 
     private static final Log logger = LogFactory.getLog(SamlRemoteUaaController.class);
 
-    public static final String SAML_ORIGIN = "login-saml";
+    public static final String NotANumber = "NaN";
 
     private final ObjectMapper mapper = new ObjectMapper();
+
+    public void setIdpDefinitions(List<IdentityProviderDefinition> idpDefinitions) {
+        this.idpDefinitions = idpDefinitions;
+    }
+
+    private List<IdentityProviderDefinition> idpDefinitions;
 
     @Value("${login.entityID}")
     public String entityID = "";
@@ -80,9 +88,16 @@ public class SamlRemoteUaaController extends RemoteUaaController {
     @RequestMapping(value = { "/info", "/login" }, method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE, headers = "Accept=application/json")
     public String prompts(HttpServletRequest request, @RequestHeader HttpHeaders headers, Map<String, Object> model,
                     Principal principal) throws Exception {
+
         // Entity ID to start the discovery
         model.put("entityID", entityID);
-        model.put("saml", Boolean.TRUE);
+        model.put("idpDefinitions", idpDefinitions);
+        for (IdentityProviderDefinition idp : idpDefinitions) {
+            if(idp.isShowSamlLink()) {
+                model.put("showSamlLoginLinks", true);
+                break;
+            }
+        }
         return super.prompts(request, headers, model, principal);
     }
 
@@ -94,6 +109,9 @@ public class SamlRemoteUaaController extends RemoteUaaController {
 
         Map<String,Object> prompts = new LinkedHashMap<String, Object>((Map<String, Object>) model.get("prompts"));
         prompts.remove("passcode");
+        // Entity ID to start the discovery
+        model.put("entityID", entityID);
+        model.put("idpDefinitions", idpDefinitions);
         model.put("prompts", prompts);
 
         return logicalViewName;
@@ -102,14 +120,12 @@ public class SamlRemoteUaaController extends RemoteUaaController {
     @Override
     protected Map<String, String> getLoginCredentials(Principal principal) {
         Map<String, String> login = super.getLoginCredentials(principal);
-        if (!login.containsKey(Origin.ORIGIN)) {
-            appendField(login, Origin.ORIGIN, SAML_ORIGIN);
-            appendField(login, UaaAuthenticationDetails.ADD_NEW, "true");
-        }
         Collection<? extends GrantedAuthority> authorities = null;
 
-        if (principal instanceof ExpiringUsernameAuthenticationToken) {
-            ExpiringUsernameAuthenticationToken et = (ExpiringUsernameAuthenticationToken)principal;
+        if (principal instanceof LoginSamlAuthenticationToken) {
+            appendField(login, UaaAuthenticationDetails.ADD_NEW, "true");
+            LoginSamlAuthenticationToken et = (LoginSamlAuthenticationToken)principal;
+            appendField(login, Origin.ORIGIN, et.getIdpAlias());
             if (et.getPrincipal() instanceof String ) {
                 appendField(login, "username", et.getPrincipal());
                 authorities = et.getAuthorities();
@@ -120,8 +136,6 @@ public class SamlRemoteUaaController extends RemoteUaaController {
                 authorities = ((SamlUserDetails) (((ExpiringUsernameAuthenticationToken) principal).getPrincipal()))
                     .getAuthorities();
             }
-
-            
         }
 
         if (principal instanceof Authentication) {
@@ -157,92 +171,31 @@ public class SamlRemoteUaaController extends RemoteUaaController {
         return login;
     }
 
-    @RequestMapping(value = "/oauth/token", method = RequestMethod.POST, params = "grant_type=password")
-    @ResponseBody
-    public ResponseEntity<byte[]> tokenEndpoint(HttpServletRequest request, HttpEntity<byte[]> entity,
-                    @RequestParam Map<String, String> parameters, Map<String, Object> model, Principal principal)
-                    throws Exception {
-
-        // Request has a password. Owner password grant with a UAA password
-        if (null != request.getParameter("password")) {
-            return passthru(request, entity, model, false);
-        } else {
-            //
-            MultiValueMap<String, String> requestHeadersForClientInfo = new LinkedMaskingMultiValueMap<String, String>(
-                            AUTHORIZATION);
-            requestHeadersForClientInfo.add(AUTHORIZATION, request.getHeader(AUTHORIZATION));
-
-            ResponseEntity<byte[]> clientInfoResponse = getDefaultTemplate().exchange(getUaaBaseUrl() + "/clientinfo",
-                            HttpMethod.POST,
-                            new HttpEntity<MultiValueMap<String, String>>(null, requestHeadersForClientInfo),
-                            byte[].class);
-
-            if (clientInfoResponse.getStatusCode() == HttpStatus.OK) {
-                String path = extractPath(request);
-
-                MultiValueMap<String, String> map = new LinkedMaskingMultiValueMap<String, String>();
-                map.setAll(parameters);
-                if (principal != null) {
-                    map.set("source", "login");
-                    map.set("client_id", getClientId(clientInfoResponse.getBody()));
-                    map.setAll(getLoginCredentials(principal));
-                    map.remove("credentials"); // legacy cf might break otherwise
-                } else {
-                    throw new BadCredentialsException("No principal found in authorize endpoint");
-                }
-
-                HttpHeaders requestHeaders = new HttpHeaders();
-                requestHeaders.putAll(getRequestHeaders(requestHeaders));
-                requestHeaders.remove(AUTHORIZATION.toLowerCase());
-                requestHeaders.remove(ACCEPT.toLowerCase());
-                requestHeaders.remove(CONTENT_TYPE.toLowerCase());
-                requestHeaders.setContentType(APPLICATION_FORM_URLENCODED);
-                requestHeaders.setAccept(Arrays.asList(APPLICATION_JSON));
-                requestHeaders.remove(COOKIE);
-                requestHeaders.remove(COOKIE.toLowerCase());
-
-                ResponseEntity<byte[]> response = getAuthorizationTemplate().exchange(getUaaBaseUrl() + "/" + path,
-                                HttpMethod.POST, new HttpEntity<MultiValueMap<String, String>>(map, requestHeaders),
-                                byte[].class);
-
-                saveCookie(response.getHeaders(), model);
-
-                byte[] body = response.getBody();
-                if (body != null) {
-                    HttpHeaders outgoingHeaders = getResponseHeaders(response.getHeaders());
-                    return new ResponseEntity<byte[]>(response.getBody(), outgoingHeaders, response.getStatusCode());
-                }
-
-                throw new IllegalStateException("Neither a redirect nor a user approval");
-            }
-            else {
-                throw new BadCredentialsException(new String(clientInfoResponse.getBody()));
-            }
-        }
-    }
-
     @RequestMapping(value = { "/passcode" }, method = RequestMethod.GET)
     public String generatePasscode(@RequestHeader HttpHeaders headers, Map<String, Object> model, Principal principal)
-                    throws NoSuchAlgorithmException, IOException, JsonGenerationException, JsonMappingException {
-        String username = null;
+                    throws NoSuchAlgorithmException, IOException, JsonMappingException {
+        String username = null, origin = null;
         Map<String, Object> authorizationParameters = null;
 
-        if (principal instanceof ExpiringUsernameAuthenticationToken) {
-            username = ((SamlUserDetails) ((ExpiringUsernameAuthenticationToken) principal).getPrincipal())
-                            .getUsername();
-
+        if (principal instanceof LoginSamlAuthenticationToken) {
+            username = principal.getName();
+            origin = ((LoginSamlAuthenticationToken)principal).getIdpAlias();
+            //TODO collect authorities here?
+        } else if (principal instanceof ExpiringUsernameAuthenticationToken) {
+            username = ((SamlUserDetails) ((ExpiringUsernameAuthenticationToken) principal).getPrincipal()).getUsername();
+            origin = "login-saml";
             Collection<GrantedAuthority> authorities = ((SamlUserDetails) (((ExpiringUsernameAuthenticationToken) principal)
                             .getPrincipal())).getAuthorities();
             if (authorities != null) {
-                authorizationParameters = new LinkedHashMap<String, Object>();
+                authorizationParameters = new LinkedHashMap<>();
                 authorizationParameters.put("authorities", authorities);
             }
-        }
-        else {
+        } else {
             username = principal.getName();
+            origin = "passcode";
         }
 
-        PasscodeInformation pi = new PasscodeInformation(username, null, authorizationParameters);
+        PasscodeInformation pi = new PasscodeInformation(NotANumber, username, null, origin, authorizationParameters);
 
         ResponseEntity<ExpiringCode> response = doGenerateCode(pi);
         model.put("passcode", response.getBody().getCode());

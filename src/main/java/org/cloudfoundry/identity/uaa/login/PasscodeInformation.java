@@ -26,37 +26,51 @@ import org.codehaus.jackson.annotate.JsonProperty;
 public class PasscodeInformation {
 
     private String userId;
+    private String username;
     private String passcode;
     private Map<String, Object> authorizationParameters;
+    private String origin;
 
-    public PasscodeInformation(String userId,
-                    String passcode,
-                    Map<String, Object> authorizationParameters) {
+    public PasscodeInformation(
+        String userId,
+        String username,
+        String passcode,
+        String origin,
+        Map<String, Object> authorizationParameters) {
+
         setUserId(userId);
+        setUsername(username);
         setPasscode(passcode);
         setAuthorizationParameters(authorizationParameters);
+        setOrigin(origin);
     }
 
     @JsonCreator
-    public PasscodeInformation(@JsonProperty("userId") String userId,
-                    @JsonProperty("passcode") String passcode,
-                    @JsonProperty("samlAuthorities") ArrayList<SamlUserAuthority> authorities) {
+    public PasscodeInformation(
+        @JsonProperty("userId") String userId,
+        @JsonProperty("username") String username,
+        @JsonProperty("passcode") String passcode,
+        @JsonProperty("origin") String origin,
+        @JsonProperty("samlAuthorities") ArrayList<SamlUserAuthority> authorities) {
+
         setUserId(userId);
+        setUsername(username);
         setPasscode(passcode);
         authorizationParameters = new LinkedHashMap<String, Object>();
         setSamlAuthorities(authorities);
+        setOrigin(origin);
     }
 
-    public PasscodeInformation(String userId) {
-        this.userId = userId;
+    public PasscodeInformation(String username) {
+        this.username = username;
     }
 
-    public String getUserId() {
-        return userId;
+    public String getUsername() {
+        return username;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     @JsonProperty("samlAuthorities")
@@ -90,5 +104,21 @@ public class PasscodeInformation {
 
     public void setPasscode(String passcode) {
         this.passcode = passcode;
+    }
+
+    public String getOrigin() {
+        return origin;
+    }
+
+    public void setOrigin(String origin) {
+        this.origin = origin;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 }

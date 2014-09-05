@@ -12,6 +12,7 @@
  *******************************************************************************/
 package org.cloudfoundry.identity.uaa.login;
 
+import org.cloudfoundry.identity.uaa.error.UaaException;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -21,6 +22,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -63,7 +66,7 @@ public class ResetPasswordControllerTest {
                 .andExpect(status().isFound())
                 .andExpect(redirectedUrl("email_sent?code=reset_password"));
 
-        Mockito.verify(resetPasswordService).forgotPassword(eq("user@example.com"));
+        verify(resetPasswordService).forgotPassword(eq("user@example.com"));
     }
 
     @Test
@@ -76,7 +79,7 @@ public class ResetPasswordControllerTest {
             .andExpect(view().name("forgot_password"))
             .andExpect(model().attribute("message_code", "form_error"));
 
-        Mockito.verifyZeroInteractions(resetPasswordService);
+        verifyZeroInteractions(resetPasswordService);
     }
 
     @Test
@@ -108,7 +111,7 @@ public class ResetPasswordControllerTest {
                 .andExpect(model().attributeDoesNotExist("password"))
                 .andExpect(model().attributeDoesNotExist("password_confirmation"));
 
-        Mockito.verify(resetPasswordService).resetPassword("secret_code", "password");
+        verify(resetPasswordService).resetPassword("secret_code", "password");
     }
 
     @Test
@@ -127,6 +130,25 @@ public class ResetPasswordControllerTest {
                 .andExpect(model().attribute("email", "foo@example.com"))
                 .andExpect(model().attribute("code", "123456"));
 
-        Mockito.verifyZeroInteractions(resetPasswordService);
+        verifyZeroInteractions(resetPasswordService);
+    }
+
+    @Test
+    public void testResetPasswordFormWithInvalidCode() throws Exception {
+        Mockito.when(resetPasswordService.resetPassword("bad_code", "password")).thenThrow(new UaaException("Bad code!"));
+
+        MockHttpServletRequestBuilder post = post("/reset_password.do")
+                .contentType(APPLICATION_FORM_URLENCODED)
+                .param("code", "bad_code")
+                .param("email", "foo@example.com")
+                .param("password", "password")
+                .param("password_confirmation", "password");
+
+        mockMvc.perform(post)
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(view().name("forgot_password"))
+                .andExpect(model().attribute("message_code", "bad_code"));
+
+        verify(resetPasswordService).resetPassword("bad_code", "password");
     }
 }

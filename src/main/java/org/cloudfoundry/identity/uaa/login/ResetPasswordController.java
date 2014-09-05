@@ -14,6 +14,7 @@ package org.cloudfoundry.identity.uaa.login;
 
 import org.cloudfoundry.identity.uaa.authentication.Origin;
 import org.cloudfoundry.identity.uaa.authentication.UaaPrincipal;
+import org.cloudfoundry.identity.uaa.error.UaaException;
 import org.cloudfoundry.identity.uaa.user.UaaAuthority;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -84,12 +85,18 @@ public class ResetPasswordController {
             return "reset_password";
         }
 
-        Map<String,String> resetResponse = resetPasswordService.resetPassword(code, password);
+        try {
+            Map<String,String> resetResponse = resetPasswordService.resetPassword(code, password);
 
-        UaaPrincipal uaaPrincipal = new UaaPrincipal(resetResponse.get("user_id"), resetResponse.get("username"), resetResponse.get("username"), Origin.UAA, null);
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(uaaPrincipal, null, UaaAuthority.USER_AUTHORITIES);
-        SecurityContextHolder.getContext().setAuthentication(token);
+            UaaPrincipal uaaPrincipal = new UaaPrincipal(resetResponse.get("user_id"), resetResponse.get("username"), resetResponse.get("username"), Origin.UAA, null);
+            UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(uaaPrincipal, null, UaaAuthority.USER_AUTHORITIES);
+            SecurityContextHolder.getContext().setAuthentication(token);
 
-        return "redirect:home";
+            return "redirect:home";
+        } catch (UaaException e) {
+            model.addAttribute("message_code", "bad_code");
+            response.setStatus(HttpStatus.UNPROCESSABLE_ENTITY.value());
+            return "forgot_password";
+        }
     }
 }

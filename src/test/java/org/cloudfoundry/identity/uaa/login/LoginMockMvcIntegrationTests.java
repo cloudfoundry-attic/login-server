@@ -76,16 +76,7 @@ public class LoginMockMvcIntegrationTests {
 
         mockMvc.perform(get("/login"))
                 .andExpect(status().isOk())
-                .andExpect(model().attributeDoesNotExist("saml"));
-    }
-
-    @Test
-    public void testLoginSaml() throws Exception {
-        Assume.assumeTrue("Functionality is enabled by the saml profile", Arrays.asList(webApplicationContext.getEnvironment().getActiveProfiles()).contains("saml"));
-
-        mockMvc.perform(get("/login"))
-                .andExpect(status().isOk())
-                .andExpect(model().attributeExists("saml"));
+                .andExpect(model().attributeDoesNotExist("showSamlLoginLink"));
     }
 
     @Test

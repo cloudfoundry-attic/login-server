@@ -15,7 +15,8 @@ from the UAA and no data are stored locally).
 * Docs: [docs/](https://github.com/cloudfoundry/login-server/tree/master/docs)
 * API Documentation: [Login-APIs.md](https://github.com/cloudfoundry/login-server/tree/master/docs/Login-APIs.md)
 * Specification: [The Oauth 2 Authorization Framework](http://tools.ietf.org/html/rfc6749)
-* SAML: [OpenAM-README.md](https://github.com/cloudfoundry/login-server/tree/master/docs/OpenAM-README.md)
+* SAML: [OpenAM-README.md](https://github.com/cloudfoundry/login-server/tree/master/docs/OpenAM-README.md),
+        [Okta-README.md](https://github.com/cloudfoundry/login-server/tree/master/docs/Okta-README.md)
 
 ## Running and Testing the Login Server
 
@@ -25,6 +26,8 @@ build a war file and deploy it to any container you like (`./gradlew
 is also a Gradle task that will run the Login Server, the UAA and
 some sample apps all in the same container from the command line:
 
+    $ git clone https://github.com/cloudfoundry/login-server.git
+    $ cd login-server && ./update
     $ ./gradlew run
 
 You can run the Login Server tests using the command line as

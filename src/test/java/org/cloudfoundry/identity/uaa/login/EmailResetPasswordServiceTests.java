@@ -12,6 +12,7 @@
  *******************************************************************************/
 package org.cloudfoundry.identity.uaa.login;
 
+import org.cloudfoundry.identity.uaa.error.UaaException;
 import org.cloudfoundry.identity.uaa.login.test.ThymeleafConfig;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
@@ -65,7 +66,7 @@ public class EmailResetPasswordServiceTests {
     }
 
     @Test
-    public void testWhenAResetCodeIsReturnedByTheUaa() throws Exception {
+    public void testForgotPasswordWhenAResetCodeIsReturnedByTheUaa() throws Exception {
         mockUaaServer.expect(requestTo("http://uaa.example.com/uaa/password_resets"))
                 .andExpect(method(POST))
                 .andRespond(withSuccess("the_secret_code", APPLICATION_JSON));
@@ -87,7 +88,7 @@ public class EmailResetPasswordServiceTests {
     }
 
     @Test
-    public void testWhenConflictIsReturnedByTheUaa() throws Exception {
+    public void testForgotPasswordWhenConflictIsReturnedByTheUaa() throws Exception {
         mockUaaServer.expect(requestTo("http://uaa.example.com/uaa/password_resets"))
                 .andExpect(method(POST))
                 .andRespond(withStatus(HttpStatus.CONFLICT));
@@ -109,7 +110,7 @@ public class EmailResetPasswordServiceTests {
     }
 
     @Test
-    public void testWhenTheCodeIsDenied() throws Exception {
+    public void testForgotPasswordWhenTheCodeIsDenied() throws Exception {
         mockUaaServer.expect(requestTo("http://uaa.example.com/uaa/password_resets"))
                 .andExpect(method(POST))
                 .andRespond(withBadRequest());
@@ -122,7 +123,7 @@ public class EmailResetPasswordServiceTests {
     }
 
     @Test
-    public void testChangingAPassword() throws Exception {
+    public void testResetPassword() throws Exception {
         mockUaaServer.expect(requestTo("http://uaa.example.com/uaa/password_change"))
                 .andExpect(method(POST))
                 .andExpect(jsonPath("$.code").value("secret_code"))
@@ -138,5 +139,16 @@ public class EmailResetPasswordServiceTests {
 
         Assert.assertThat(userInfo, Matchers.hasEntry("user_id", "usermans-id"));
         Assert.assertThat(userInfo, Matchers.hasEntry("username", "userman"));
+    }
+
+    @Test(expected = UaaException.class)
+    public void testResetPasswordWhenTheCodeIsDenied() throws Exception {
+        mockUaaServer.expect(requestTo("http://uaa.example.com/uaa/password_change"))
+                .andExpect(method(POST))
+                .andRespond(withBadRequest());
+
+        emailResetPasswordService.resetPassword("b4d_k0d3z", "new_password");
+
+        mockUaaServer.verify();
     }
 }
