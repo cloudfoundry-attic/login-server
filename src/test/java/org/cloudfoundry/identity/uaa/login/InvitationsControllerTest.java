@@ -3,17 +3,14 @@ package org.cloudfoundry.identity.uaa.login;
 import junit.framework.Assert;
 import org.cloudfoundry.identity.uaa.authentication.Origin;
 import org.cloudfoundry.identity.uaa.authentication.UaaPrincipal;
-import org.cloudfoundry.identity.uaa.config.YamlServletProfileInitializer;
-import org.cloudfoundry.identity.uaa.login.test.TestClient;
 
+import org.cloudfoundry.identity.uaa.test.YamlServletProfileInitializerContextInitializer;
 import org.cloudfoundry.identity.uaa.user.UaaAuthority;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 
-import org.mockito.Mock;
 import org.springframework.mock.env.MockEnvironment;
 import org.springframework.mock.web.MockHttpSession;
-import org.springframework.mock.web.MockServletContext;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -29,25 +26,22 @@ import org.springframework.web.context.support.XmlWebApplicationContext;
 import static org.mockito.Mockito.mock;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 public class InvitationsControllerTest {
 
-    private static XmlWebApplicationContext webApplicationContext;
-    private static MockMvc mockMvc;
+    private MockMvc mockMvc;
 
-    @BeforeClass
-    public static void setUp() throws Exception {
-        webApplicationContext = new XmlWebApplicationContext();
-        webApplicationContext.setServletContext(new MockServletContext());
+    @Before
+    public void setUp() throws Exception {
+        XmlWebApplicationContext webApplicationContext = new XmlWebApplicationContext();
         webApplicationContext.setEnvironment(new MockEnvironment());
         ((MockEnvironment) webApplicationContext.getEnvironment()).setProperty("login.invitationsEnabled", "true");
-        new YamlServletProfileInitializer().initialize(webApplicationContext);
+        new YamlServletProfileInitializerContextInitializer().initializeContext(webApplicationContext, "login.yml");
         webApplicationContext.setConfigLocation("file:./src/main/webapp/WEB-INF/spring-servlet.xml");
         webApplicationContext.refresh();
-        FilterChainProxy springSecurityFilterChain = webApplicationContext.getBean(FilterChainProxy.class);
+        FilterChainProxy springSecurityFilterChain = webApplicationContext.getBean("springSecurityFilterChain", FilterChainProxy.class);
 
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).addFilter(springSecurityFilterChain)
             .build();
