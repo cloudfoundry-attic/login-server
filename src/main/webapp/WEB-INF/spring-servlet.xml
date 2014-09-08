@@ -382,6 +382,12 @@
         <constructor-arg value="${login.brand:oss}"/>
     </bean>
 
+    <bean id="invitationsService" class="org.cloudfoundry.identity.uaa.login.EmailInvitationsService">
+        <constructor-arg ref="mailTemplateEngine"/>
+        <constructor-arg ref="emailService"/>
+        <constructor-arg value="${login.brand:oss}"/>
+    </bean>
+
     <bean id="changePasswordService" class="org.cloudfoundry.identity.uaa.login.UaaChangePasswordService">
         <constructor-arg ref="authorizationTemplate"/>
         <constructor-arg ref="uaaUrl"/>

@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,14 +27,22 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 public class HomeController extends AbstractControllerInfo {
     private final Log logger = LogFactory.getLog(getClass());
-
+    protected final Environment environment;
     @Autowired
     private TileInfo tileInfo;
+
+    public HomeController(Environment environment) {
+        this.environment = environment;
+    }
 
     @RequestMapping(value = { "/", "/home" })
     public String home(Model model, Principal principal) {
         model.addAttribute("principal", principal);
         model.addAttribute("tiles", tileInfo.getLoginTiles());
+        boolean invitationsEnabled = "true".equalsIgnoreCase(environment.getProperty("login.invitationsEnabled"));
+        if (invitationsEnabled) {
+            model.addAttribute("invitationsLink", "/invitations/new");
+        }
         populateBuildAndLinkInfo(model);
         return "home";
     }

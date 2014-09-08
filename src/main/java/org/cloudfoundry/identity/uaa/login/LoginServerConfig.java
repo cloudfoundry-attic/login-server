@@ -18,4 +18,17 @@ public class LoginServerConfig {
             return !"false".equalsIgnoreCase(context.getEnvironment().getProperty("login.signupsEnabled"));
         }
     }
+
+    @Bean
+    @Conditional(InviteUsersCondition.class)
+    public InvitationsController invitationsController(InvitationsService invitationsService) {
+        return new InvitationsController(invitationsService);
+    }
+
+    public static class InviteUsersCondition implements Condition {
+        @Override
+        public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
+            return "true".equalsIgnoreCase(context.getEnvironment().getProperty("login.invitationsEnabled"));
+        }
+    }
 }
