@@ -182,7 +182,7 @@ public class IdentityProviderConfigurator {
             def.setMetaDataLocation(metaDataLocation);
             def.setNameID(nameID);
             def.setMetadataTrustCheck(trustCheck==null?true:trustCheck);
-            def.setShowSamlLink(showLink);
+            def.setShowSamlLink(showLink==null?true:showLink);
             def.setSocketFactoryClassName(socketFactoryClassName);
             def.setLinkText(linkText);
             def.setIconUrl(iconUrl);
