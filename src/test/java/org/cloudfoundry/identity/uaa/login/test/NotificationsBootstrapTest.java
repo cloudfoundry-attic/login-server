@@ -14,6 +14,8 @@
 package org.cloudfoundry.identity.uaa.login.test;
 
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.springframework.http.HttpMethod.PUT;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
@@ -26,12 +28,17 @@ import java.util.List;
 
 import org.cloudfoundry.identity.uaa.login.NotificationsBootstrap;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import org.springframework.core.env.Environment;
+import org.springframework.mock.env.MockEnvironment;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
+
+import javax.validation.constraints.AssertTrue;
 
 public class NotificationsBootstrapTest {
 
@@ -39,6 +46,7 @@ public class NotificationsBootstrapTest {
     private RestTemplate notificationsTemplate;
     private MockRestServiceServer mockNotificationsServer;
     private List<HashMap<String, Object>> notifications;
+    private MockEnvironment environment;
 
 
     @Before
@@ -60,8 +68,9 @@ public class NotificationsBootstrapTest {
             new ObjectMapper().readValue(notificationsString, HashMap.class);
         notifications = result.get("kinds");
         notificationsTemplate = new RestTemplate();
-
-        bootstrap = new NotificationsBootstrap(notifications, "http://notifications.example.com/notifications", notificationsTemplate);
+        environment = new MockEnvironment();
+        environment.setProperty("notifications.url", "example.com");
+        bootstrap = new NotificationsBootstrap("http://notifications.example.com/notifications", notificationsTemplate, environment);
         bootstrap.setNotificationsTemplate(notificationsTemplate);
         bootstrap.setNotifications(notifications);
     }
@@ -77,6 +86,7 @@ public class NotificationsBootstrapTest {
         bootstrap.afterPropertiesSet();
 
         mockNotificationsServer.verify();
+        assertTrue(bootstrap.getIsNotificationsRegistered());
     }
 
     @Test
@@ -86,6 +96,8 @@ public class NotificationsBootstrapTest {
         } catch (ResourceAccessException e) {
             fail("NotificationsBootstrap could not be created because notifications server is down");
         }
+        assertFalse(bootstrap.getIsNotificationsRegistered());
     }
+
 }
 

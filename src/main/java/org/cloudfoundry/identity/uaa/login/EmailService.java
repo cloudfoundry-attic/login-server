@@ -23,13 +23,15 @@ public class EmailService {
     private final String brand;
     private final RestTemplate notificationsTemplate;
     private final String notificationsUrl;
+    private final NotificationsBootstrap notificationsBootstrap;
 
-    public EmailService(JavaMailSender mailSender, String loginUrl, String brand, RestTemplate notificationsTemplate, String notificationsUrl) {
+    public EmailService(JavaMailSender mailSender, String loginUrl, String brand, RestTemplate notificationsTemplate, String notificationsUrl, NotificationsBootstrap notificationsBootstrap) {
         this.mailSender = mailSender;
         this.loginUrl = loginUrl;
         this.brand = brand;
         this.notificationsTemplate = notificationsTemplate;
         this.notificationsUrl = notificationsUrl;
+        this.notificationsBootstrap = notificationsBootstrap;
     }
 
     public void sendMimeMessage(String email, String subject, String htmlContent) throws MessagingException, UnsupportedEncodingException {
@@ -42,6 +44,9 @@ public class EmailService {
     }
 
     public void sendNotification(String userId, String kindId, String subject, String htmlContent) {
+        if(!notificationsBootstrap.getIsNotificationsRegistered())
+            notificationsBootstrap.registerNotifications();
+
         Map<String,String> request = new HashMap<>();
         request.put("kind_id", kindId);
         request.put("subject", subject);

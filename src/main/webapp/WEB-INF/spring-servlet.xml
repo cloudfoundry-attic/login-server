@@ -280,15 +280,24 @@
         </constructor-arg>
     </bean>
 
-    <bean id="notifications"
-          class="org.springframework.beans.factory.config.ListFactoryBean">
-        <property name="sourceList">
+    <bean id="notificationsBootstrap" class="org.cloudfoundry.identity.uaa.login.NotificationsBootstrap">
+        <property name ="notifications">
             <list>
-                <ref bean="sendActivationCodeMap"/>
-                <ref bean="resetPasswordMap"/>
+                <map>
+                    <entry key="description" value="Send activation code"/>
+                    <entry key="id" value="#{sendCodeNotificationKindId}"/>
+                </map>
+                <map>
+                    <entry key="description" value="Reset Password"/>
+                    <entry key="id" value="#{resetPasswordNotificationKindId}"/>
+                </map>
             </list>
         </property>
+        <constructor-arg ref="notificationsUrl"/>
+        <constructor-arg ref="notificationsTemplate"/>
+        <constructor-arg ref="environment"/>
     </bean>
+
 
     <mvc:annotation-driven>
         <mvc:message-converters>
@@ -411,6 +420,7 @@
         <constructor-arg value="${login.brand:oss}"/>
         <constructor-arg ref="notificationsTemplate"/>
         <constructor-arg ref="notificationsUrl"/>
+        <constructor-arg ref="notificationsBootstrap"/>
     </bean>
 
     <bean id="accountCreationService" class="org.cloudfoundry.identity.uaa.login.EmailAccountCreationService">
