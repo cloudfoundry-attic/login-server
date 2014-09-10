@@ -16,6 +16,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.cloudfoundry.identity.uaa.error.UaaException;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -41,21 +42,28 @@ public class EmailResetPasswordService implements ResetPasswordService {
     private final RestTemplate uaaTemplate;
     private final String uaaBaseUrl;
     private final String brand;
+    private final String notificationId;
+    private final Environment environment;
 
-    public EmailResetPasswordService(TemplateEngine templateEngine, EmailService emailService, RestTemplate uaaTemplate, String uaaBaseUrl, String brand) {
+    public EmailResetPasswordService(TemplateEngine templateEngine, EmailService emailService, RestTemplate uaaTemplate, String uaaBaseUrl, String brand, String notificationId, Environment environment) {
         this.templateEngine = templateEngine;
+        this.environment = environment;
         this.emailService = emailService;
         this.uaaTemplate = uaaTemplate;
         this.uaaBaseUrl = uaaBaseUrl;
         this.brand = brand;
+        this.notificationId = notificationId;
     }
 
     @Override
     public void forgotPassword(String email) {
         String subject = getSubjectText();
         String htmlContent = null;
+        String userId = null;
         try {
-            String code = uaaTemplate.postForObject(uaaBaseUrl + "/password_resets", email, String.class);
+            HashMap<String,String> response = uaaTemplate.postForObject(uaaBaseUrl + "/password_resets", email, HashMap.class);
+            String code = response.get("code");
+            userId = response.get("userId");
             htmlContent = getCodeSentEmailHtml(code, email);
         } catch (HttpClientErrorException e) {
             if (e.getStatusCode() == HttpStatus.CONFLICT) {
@@ -69,7 +77,12 @@ public class EmailResetPasswordService implements ResetPasswordService {
 
         if (htmlContent != null) {
             try {
-                emailService.sendMimeMessage(email, subject, htmlContent);
+                if(environment.getProperty("notifications.url") == null) {
+                    emailService.sendMimeMessage(email, subject, htmlContent);
+                }
+                else {
+                    emailService.sendNotification(userId, notificationId, subject, htmlContent);
+                }
             } catch (MessagingException e) {
                 logger.error("Exception raised while sending message to " + email, e);
             } catch (UnsupportedEncodingException e) {
