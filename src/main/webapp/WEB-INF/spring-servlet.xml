@@ -50,7 +50,7 @@
     </bean>
 
     <bean id="notificationsUrl" class="java.lang.String">
-        <constructor-arg value="${notifications.url:http://localhost:3001/notifications}"/>
+        <constructor-arg value="${notifications.url:}"/>
     </bean>
 
     <!-- TODO: Move the autologin related beans from the login server and saml login server to login common -->

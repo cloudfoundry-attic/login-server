@@ -23,26 +23,21 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.cloudfoundry.identity.uaa.login.MessageType;
 import org.cloudfoundry.identity.uaa.login.NotificationsBootstrap;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import org.springframework.core.env.Environment;
 import org.springframework.mock.env.MockEnvironment;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
-import javax.validation.constraints.AssertTrue;
 
 public class NotificationsBootstrapTest {
 
@@ -73,7 +68,7 @@ public class NotificationsBootstrapTest {
         HashMap<String, Object> forgotPasswordNotification = result.get("kinds").get(0);
         HashMap<String, Object> accountCreationNotification = result.get("kinds").get(1);
 
-        Map<MessageType, HashMap<String, Object>> notifications = new HashMap<>();
+        notifications = new HashMap<>();
         notifications.put(MessageType.PASSWORD_RESET, forgotPasswordNotification);
         notifications.put(MessageType.CREATE_ACCOUNT_CONFIRMATION, accountCreationNotification);
 
@@ -99,7 +94,7 @@ public class NotificationsBootstrapTest {
     }
 
     @Test
-    public void testRegisterNotificationsFailure() throws Exception {
+    public void testRegisterNotificationsFailureOnStartup() throws Exception {
         try {
             bootstrap.afterPropertiesSet();
         } catch (ResourceAccessException e) {

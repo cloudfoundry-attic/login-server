@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class NotificationsBootstrap implements InitializingBean {
 
-    private final Map<MessageType,HashMap<String, Object>> notifications;
+    private final Map<MessageType, HashMap<String, Object>> notifications;
     private final String notificationsUrl;
     private final RestTemplate notificationsTemplate;
     private Environment environment;
@@ -24,7 +24,7 @@ public class NotificationsBootstrap implements InitializingBean {
     private Boolean isNotificationsRegistered = false;
     private Logger logger = Logger.getLogger(NotificationsBootstrap.class);
 
-    public NotificationsBootstrap(Map<MessageType,HashMap<String, Object>> notifications, String notificationsUrl, RestTemplate notificationsTemplate, Environment environment) {
+    public NotificationsBootstrap(Map<MessageType, HashMap<String, Object>> notifications, String notificationsUrl, RestTemplate notificationsTemplate, Environment environment) {
         this.notificationsUrl = notificationsUrl;
         this.notificationsTemplate = notificationsTemplate;
         this.environment = environment;
@@ -33,22 +33,22 @@ public class NotificationsBootstrap implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        registerNotifications();
-    }
-
-    public void registerNotifications()
-    {
-        HashMap<String, Object> request = new HashMap<>();
-        request.put("source_description", "CF_Identity");
-        request.put("kinds", notifications.values());
         try {
-            if(environment.getProperty("notifications.url")!= null && environment.getProperty("notifications.url")!= "") {
-                notificationsTemplate.put(notificationsUrl + "/registration", request);
-                isNotificationsRegistered = true;
-            }
+            registerNotifications();
         } catch (ResourceAccessException e) {
             logger.warn("Notifications could not be registered because notifications server is down", e);
             isNotificationsRegistered = false;
+        }
+    }
+
+    public void registerNotifications() {
+        HashMap<String, Object> request = new HashMap<>();
+        request.put("source_description", "CF_Identity");
+        request.put("kinds", notifications.values());
+
+        if (environment.getProperty("notifications.url") != null && environment.getProperty("notifications.url") != "") {
+            notificationsTemplate.put(notificationsUrl + "/registration", request);
+            isNotificationsRegistered = true;
         }
     }
 }
