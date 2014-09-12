@@ -23,9 +23,13 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import org.cloudfoundry.identity.uaa.login.MessageType;
 import org.cloudfoundry.identity.uaa.login.NotificationsBootstrap;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Assert;
@@ -45,7 +49,7 @@ public class NotificationsBootstrapTest {
     private NotificationsBootstrap bootstrap;
     private RestTemplate notificationsTemplate;
     private MockRestServiceServer mockNotificationsServer;
-    private List<HashMap<String, Object>> notifications;
+    private Map<MessageType,HashMap<String, Object>> notifications;
     private MockEnvironment environment;
 
 
@@ -55,24 +59,29 @@ public class NotificationsBootstrapTest {
             "    \"kinds\": [\n" +
             "        {\n" +
             "            \"id\": \"16b1d8f3-3e04-438e-9e10-2f970b53baf7\",\n" +
-            "            \"description\": \"Invalid login attempt\"\n" +
+            "            \"description\": \"Password Reset\"\n" +
             "        },\n" +
             "        {\n" +
             "            \"id\": \"7f8e6fb5-d18a-4b01-8827-c49fc9bc5b0b\",\n" +
-            "            \"description\": \"Forgot password\",\n" +
+            "            \"description\": \"Account Creation\",\n" +
             "            \"critical\": true\n" +
             "        }\n" +
             "    ]\n" +
             "}";
         HashMap<String,List<HashMap<String,Object>>> result =
             new ObjectMapper().readValue(notificationsString, HashMap.class);
-        notifications = result.get("kinds");
+        HashMap<String, Object> forgotPasswordNotification = result.get("kinds").get(0);
+        HashMap<String, Object> accountCreationNotification = result.get("kinds").get(1);
+
+        Map<MessageType, HashMap<String, Object>> notifications = new HashMap<>();
+        notifications.put(MessageType.PASSWORD_RESET, forgotPasswordNotification);
+        notifications.put(MessageType.CREATE_ACCOUNT_CONFIRMATION, accountCreationNotification);
+
+
         notificationsTemplate = new RestTemplate();
         environment = new MockEnvironment();
         environment.setProperty("notifications.url", "example.com");
-        bootstrap = new NotificationsBootstrap("http://notifications.example.com/notifications", notificationsTemplate, environment);
-        bootstrap.setNotificationsTemplate(notificationsTemplate);
-        bootstrap.setNotifications(notifications);
+        bootstrap = new NotificationsBootstrap(notifications, "http://notifications.example.com/notifications", notificationsTemplate, environment);
     }
 
     @Test

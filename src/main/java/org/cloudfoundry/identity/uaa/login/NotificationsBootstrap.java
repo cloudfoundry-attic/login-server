@@ -8,12 +8,13 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class NotificationsBootstrap implements InitializingBean {
 
-    private List<HashMap<String, Object>> notifications;
+    private final Map<MessageType,HashMap<String, Object>> notifications;
     private final String notificationsUrl;
-    private RestTemplate notificationsTemplate;
+    private final RestTemplate notificationsTemplate;
     private Environment environment;
 
     public Boolean getIsNotificationsRegistered() {
@@ -23,20 +24,12 @@ public class NotificationsBootstrap implements InitializingBean {
     private Boolean isNotificationsRegistered = false;
     private Logger logger = Logger.getLogger(NotificationsBootstrap.class);
 
-    public NotificationsBootstrap(String notificationsUrl, RestTemplate notificationsTemplate, Environment environment) {
+    public NotificationsBootstrap(Map<MessageType,HashMap<String, Object>> notifications, String notificationsUrl, RestTemplate notificationsTemplate, Environment environment) {
         this.notificationsUrl = notificationsUrl;
         this.notificationsTemplate = notificationsTemplate;
         this.environment = environment;
-    }
-
-    public void setNotificationsTemplate(RestTemplate notificationsTemplate) {
-        this.notificationsTemplate = notificationsTemplate;
-    }
-
-    public void setNotifications(List<HashMap<String, Object>> notifications) {
         this.notifications = notifications;
     }
-
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -47,7 +40,7 @@ public class NotificationsBootstrap implements InitializingBean {
     {
         HashMap<String, Object> request = new HashMap<>();
         request.put("source_description", "CF_Identity");
-        request.put("kinds", notifications);
+        request.put("kinds", notifications.values());
         try {
             if(environment.getProperty("notifications.url")!= null && environment.getProperty("notifications.url")!= "") {
                 notificationsTemplate.put(notificationsUrl + "/registration", request);

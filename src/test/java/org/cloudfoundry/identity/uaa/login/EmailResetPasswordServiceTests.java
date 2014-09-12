@@ -12,6 +12,7 @@
  *******************************************************************************/
 package org.cloudfoundry.identity.uaa.login;
 
+import org.apache.http.HttpResponse;
 import org.cloudfoundry.identity.uaa.error.UaaException;
 import org.cloudfoundry.identity.uaa.login.test.ThymeleafConfig;
 import org.hamcrest.Matchers;
@@ -23,16 +24,21 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.client.ClientHttpRequest;
+import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.mock.env.MockEnvironment;
+import org.springframework.mock.http.client.MockClientHttpResponse;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.client.MockRestServiceServer;
+import org.springframework.test.web.client.ResponseCreator;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.thymeleaf.spring4.SpringTemplateEngine;
 
+import java.io.IOException;
 import java.util.Map;
 
 import static org.mockito.Matchers.contains;
@@ -53,7 +59,7 @@ public class EmailResetPasswordServiceTests {
     private EmailResetPasswordService emailResetPasswordService;
     private MockRestServiceServer mockUaaServer;
     private MockEnvironment mockEnvironment;
-    private EmailService emailService;
+    private MessageService messageService;
 
     @Autowired
     @Qualifier("mailTemplateEngine")
@@ -63,16 +69,16 @@ public class EmailResetPasswordServiceTests {
     public void setUp() throws Exception {
         RestTemplate uaaTemplate = new RestTemplate();
         mockUaaServer = MockRestServiceServer.createServer(uaaTemplate);
-        emailService = Mockito.mock(EmailService.class);
+        messageService = Mockito.mock(EmailService.class);
         mockEnvironment = new MockEnvironment();
-        emailResetPasswordService = new EmailResetPasswordService(templateEngine, emailService, uaaTemplate, "http://uaa.example.com/uaa", "pivotal", "reset_password_kind_id", mockEnvironment);
+        emailResetPasswordService = new EmailResetPasswordService(templateEngine, messageService, uaaTemplate, "http://uaa.example.com/uaa", "pivotal", "reset_password_kind_id", mockEnvironment);
     }
 
     @Test
     public void testForgotPasswordWhenAResetCodeIsReturnedByTheUaa() throws Exception {
         mockUaaServer.expect(requestTo("http://uaa.example.com/uaa/password_resets"))
                 .andExpect(method(POST))
-                .andRespond(withSuccess("{\"code\":\"the_secret_code\",\"userId\":\"id001\"}", APPLICATION_JSON));
+                .andRespond(withSuccess("the_secret_code", APPLICATION_JSON));
 
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.setProtocol("http");
@@ -83,10 +89,11 @@ public class EmailResetPasswordServiceTests {
 
         mockUaaServer.verify();
 
-        Mockito.verify(emailService).sendMimeMessage(
-                eq("user@example.com"),
-                eq("Pivotal account password reset request"),
-                contains("<a href=\"http://localhost/login/reset_password?code=the_secret_code&amp;email=user%40example.com\">Reset your password</a>")
+        Mockito.verify(messageService).sendMessage(
+            eq("user@example.com"),
+            eq(MessageType.PASSWORD_RESET),
+            eq("Pivotal account password reset request"),
+            contains("<a href=\"http://localhost/login/reset_password?code=the_secret_code&amp;email=user%40example.com\">Reset your password</a>")
         );
     }
 
@@ -105,8 +112,9 @@ public class EmailResetPasswordServiceTests {
 
         mockUaaServer.verify();
 
-        Mockito.verify(emailService).sendMimeMessage(
+        Mockito.verify(messageService).sendMessage(
             eq("user@example.com"),
+            eq(MessageType.PASSWORD_RESET),
             eq("Pivotal account password reset request"),
             contains("Your account credentials for localhost are managed by an external service. Please contact your administrator for password recovery requests.")
         );
@@ -122,32 +130,7 @@ public class EmailResetPasswordServiceTests {
 
         mockUaaServer.verify();
 
-        Mockito.verifyZeroInteractions(emailService);
-    }
-
-    @Test
-    public void testForgotPasswordUsingNotificationsService() throws Exception {
-        mockEnvironment.setProperty("notifications.url", "example.com");
-
-        mockUaaServer.expect(requestTo("http://uaa.example.com/uaa/password_resets"))
-            .andExpect(method(POST))
-            .andRespond(withSuccess("{\"code\":\"the_secret_code\",\"userId\":\"id001\"}", APPLICATION_JSON));
-
-        MockHttpServletRequest request = new MockHttpServletRequest();
-        request.setProtocol("http");
-        request.setContextPath("/login");
-        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
-
-        emailResetPasswordService.forgotPassword("user@example.com");
-
-        mockUaaServer.verify();
-
-        Mockito.verify(emailService).sendNotification(
-            eq("id001"),
-            eq("reset_password_kind_id"),
-            eq("Pivotal account password reset request"),
-            contains("<a href=\"http://localhost/login/reset_password?code=the_secret_code&amp;email=user%40example.com\">Reset your password</a>")
-        );
+        Mockito.verifyZeroInteractions(messageService);
     }
 
     @Test

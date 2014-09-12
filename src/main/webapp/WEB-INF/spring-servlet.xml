@@ -280,24 +280,27 @@
         </constructor-arg>
     </bean>
 
+    <util:map id="notifications" key-type="org.cloudfoundry.identity.uaa.login.MessageType">
+        <entry key="CREATE_ACCOUNT_CONFIRMATION">
+            <map>
+                <entry key="description" value="Send activation code"/>
+                <entry key="id" value="#{sendCodeNotificationKindId}"/>
+            </map>
+        </entry>
+        <entry key="PASSWORD_RESET">
+            <map>
+                <entry key="description" value="Reset Password"/>
+                <entry key="id" value="#{resetPasswordNotificationKindId}"/>
+            </map>
+        </entry>
+    </util:map>
+
     <bean id="notificationsBootstrap" class="org.cloudfoundry.identity.uaa.login.NotificationsBootstrap">
-        <property name ="notifications">
-            <list>
-                <map>
-                    <entry key="description" value="Send activation code"/>
-                    <entry key="id" value="#{sendCodeNotificationKindId}"/>
-                </map>
-                <map>
-                    <entry key="description" value="Reset Password"/>
-                    <entry key="id" value="#{resetPasswordNotificationKindId}"/>
-                </map>
-            </list>
-        </property>
+        <constructor-arg ref="notifications"/>
         <constructor-arg ref="notificationsUrl"/>
         <constructor-arg ref="notificationsTemplate"/>
         <constructor-arg ref="environment"/>
     </bean>
-
 
     <mvc:annotation-driven>
         <mvc:message-converters>
@@ -418,9 +421,15 @@
         </constructor-arg>
         <constructor-arg value="${login.url:http://localhost:8080/login}"/>
         <constructor-arg value="${login.brand:oss}"/>
-        <constructor-arg ref="notificationsTemplate"/>
+    </bean>
+
+    <bean id="notificationsService" class="org.cloudfoundry.identity.uaa.login.NotificationsService">
         <constructor-arg ref="notificationsUrl"/>
+        <constructor-arg ref="notificationsTemplate"/>
         <constructor-arg ref="notificationsBootstrap"/>
+        <constructor-arg ref="notifications"/>
+        <constructor-arg ref="authorizationTemplate"/>
+        <constructor-arg ref="uaaUrl"/>
     </bean>
 
     <bean id="accountCreationService" class="org.cloudfoundry.identity.uaa.login.EmailAccountCreationService">
@@ -451,7 +460,7 @@
 
     <bean id="resetPasswordService" class="org.cloudfoundry.identity.uaa.login.EmailResetPasswordService">
         <constructor-arg index="0" ref="mailTemplateEngine"/>
-        <constructor-arg index="1" ref="emailService"/>
+        <constructor-arg index="1" ref="messageService"/>
         <constructor-arg index="2" ref="authorizationTemplate"/>
         <constructor-arg index="3" ref="uaaUrl"/>
         <constructor-arg index="4" value="${login.brand:oss}"/>

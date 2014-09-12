@@ -1,9 +1,8 @@
 package org.cloudfoundry.identity.uaa.login;
 
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.mail.Address;
@@ -13,25 +12,18 @@ import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.io.UnsupportedEncodingException;
-import java.util.HashMap;
-import java.util.Map;
 
-public class EmailService {
+public class EmailService implements MessageService {
+    private final Log logger = LogFactory.getLog(getClass());
 
     private final JavaMailSender mailSender;
     private final String loginUrl;
     private final String brand;
-    private final RestTemplate notificationsTemplate;
-    private final String notificationsUrl;
-    private final NotificationsBootstrap notificationsBootstrap;
 
-    public EmailService(JavaMailSender mailSender, String loginUrl, String brand, RestTemplate notificationsTemplate, String notificationsUrl, NotificationsBootstrap notificationsBootstrap) {
+    public EmailService(JavaMailSender mailSender, String loginUrl, String brand) {
         this.mailSender = mailSender;
         this.loginUrl = loginUrl;
         this.brand = brand;
-        this.notificationsTemplate = notificationsTemplate;
-        this.notificationsUrl = notificationsUrl;
-        this.notificationsBootstrap = notificationsBootstrap;
     }
 
     public void sendMimeMessage(String email, String subject, String htmlContent) throws MessagingException, UnsupportedEncodingException {
@@ -43,22 +35,26 @@ public class EmailService {
         mailSender.send(message);
     }
 
-    public void sendNotification(String userId, String kindId, String subject, String htmlContent) {
-        if(!notificationsBootstrap.getIsNotificationsRegistered())
-            notificationsBootstrap.registerNotifications();
-
-        Map<String,String> request = new HashMap<>();
-        request.put("kind_id", kindId);
-        request.put("subject", subject);
-        request.put("text", htmlContent);
-        HttpEntity<Map<String,String>> requestEntity = new HttpEntity<>(request);
-        notificationsTemplate.exchange(notificationsUrl + "/users/" + userId, HttpMethod.POST, requestEntity, Void.class);
-    }
-
     private Address[] getSenderAddresses() throws AddressException, UnsupportedEncodingException {
         String host = UriComponentsBuilder.fromHttpUrl(loginUrl).build().getHost();
         String name = brand.equals("pivotal") ? "Pivotal" : "Cloud Foundry";
         return new Address[]{new InternetAddress("admin@" + host, name)};
     }
 
+    @Override
+    public void sendMessage(String email, MessageType messageType, String subject, String htmlContent) {
+        MimeMessage message = mailSender.createMimeMessage();
+        try {
+            message.addFrom(getSenderAddresses());
+            message.addRecipients(Message.RecipientType.TO, email);
+            message.setSubject(subject);
+            message.setContent(htmlContent, "text/html");
+        } catch (MessagingException e) {
+            logger.error("Exception raised while sending message to " + email, e);
+        } catch (UnsupportedEncodingException e) {
+            logger.error("Exception raised while sending message to " + email, e);
+        }
+
+        mailSender.send(message);
+    }
 }

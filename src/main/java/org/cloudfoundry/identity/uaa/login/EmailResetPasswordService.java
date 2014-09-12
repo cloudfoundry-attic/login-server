@@ -28,27 +28,25 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
-import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
-import javax.mail.MessagingException;
 
 public class EmailResetPasswordService implements ResetPasswordService {
 
     private final Log logger = LogFactory.getLog(getClass());
 
     private final TemplateEngine templateEngine;
-    private final EmailService emailService;
+    private final MessageService messageService;
     private final RestTemplate uaaTemplate;
     private final String uaaBaseUrl;
     private final String brand;
     private final String notificationId;
     private final Environment environment;
 
-    public EmailResetPasswordService(TemplateEngine templateEngine, EmailService emailService, RestTemplate uaaTemplate, String uaaBaseUrl, String brand, String notificationId, Environment environment) {
+    public EmailResetPasswordService(TemplateEngine templateEngine, MessageService messageService, RestTemplate uaaTemplate, String uaaBaseUrl, String brand, String notificationId, Environment environment) {
         this.templateEngine = templateEngine;
         this.environment = environment;
-        this.emailService = emailService;
+        this.messageService = messageService;
         this.uaaTemplate = uaaTemplate;
         this.uaaBaseUrl = uaaBaseUrl;
         this.brand = brand;
@@ -59,11 +57,8 @@ public class EmailResetPasswordService implements ResetPasswordService {
     public void forgotPassword(String email) {
         String subject = getSubjectText();
         String htmlContent = null;
-        String userId = null;
         try {
-            HashMap<String,String> response = uaaTemplate.postForObject(uaaBaseUrl + "/password_resets", email, HashMap.class);
-            String code = response.get("code");
-            userId = response.get("userId");
+            String code = uaaTemplate.postForObject(uaaBaseUrl + "/password_resets", email, String.class);
             htmlContent = getCodeSentEmailHtml(code, email);
         } catch (HttpClientErrorException e) {
             if (e.getStatusCode() == HttpStatus.CONFLICT) {
@@ -75,19 +70,8 @@ public class EmailResetPasswordService implements ResetPasswordService {
             logger.error("Exception raised while creating password reset for " + email, e);
         }
 
-        if (htmlContent != null) {
-            try {
-                if(environment.getProperty("notifications.url") == null) {
-                    emailService.sendMimeMessage(email, subject, htmlContent);
-                }
-                else {
-                    emailService.sendNotification(userId, notificationId, subject, htmlContent);
-                }
-            } catch (MessagingException e) {
-                logger.error("Exception raised while sending message to " + email, e);
-            } catch (UnsupportedEncodingException e) {
-                logger.error("Exception raised while sending message to " + email, e);
-            }
+        if(htmlContent != null) {
+            messageService.sendMessage(email, MessageType.PASSWORD_RESET, subject, htmlContent);
         }
     }
 
@@ -109,7 +93,8 @@ public class EmailResetPasswordService implements ResetPasswordService {
                 "{baseUrl}/password_change",
                 HttpMethod.POST,
                 new HttpEntity<>(formData),
-                new ParameterizedTypeReference<Map<String, String>>() {},
+                new ParameterizedTypeReference<Map<String, String>>() {
+                },
                 uriVariables
             );
             return responseEntity.getBody();
@@ -117,6 +102,7 @@ public class EmailResetPasswordService implements ResetPasswordService {
             throw new UaaException(e.getMessage());
         }
     }
+
 
     private String getCodeSentEmailHtml(String code, String email) {
         String resetUrl = ServletUriComponentsBuilder.fromCurrentContextPath().path("/reset_password").build().toUriString();
