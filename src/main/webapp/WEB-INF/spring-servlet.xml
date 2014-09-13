@@ -49,6 +49,10 @@
         <constructor-arg value="${uaa.url:http://localhost:8080/uaa}"/>
     </bean>
 
+    <bean id="notificationsUrl" class="java.lang.String">
+        <constructor-arg value="${notifications.url:}"/>
+    </bean>
+
     <!-- TODO: Move the autologin related beans from the login server and saml login server to login common -->
     <bean id="abstractRemoteUaaController" abstract="true">
         <constructor-arg ref="environment" />
@@ -250,6 +254,54 @@
 
     <import resource="classpath:/login-common.xml" />
 
+    <bean id="sendCodeNotificationKindId" class="java.lang.String" >
+        <constructor-arg value="f7a85fdc-d920-41f0-b3a4-55db08e408ce" />
+    </bean>
+
+    <bean id="sendActivationCodeMap" class="java.util.HashMap">
+        <constructor-arg>
+            <map>
+            <entry key="description" value="Send activation code"/>
+            <entry key="id" value="#{sendCodeNotificationKindId}"/>
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <bean id="resetPasswordNotificationKindId" class="java.lang.String" >
+        <constructor-arg value="141200f6-93bd-4761-a721-941ab511ba2c" />
+    </bean>
+
+    <bean id="resetPasswordMap" class="java.util.HashMap">
+        <constructor-arg>
+            <map>
+                <entry key="description" value="Reset Password"/>
+                <entry key="id" value="#{resetPasswordNotificationKindId}"/>
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <util:map id="notifications" key-type="org.cloudfoundry.identity.uaa.login.MessageType">
+        <entry key="CREATE_ACCOUNT_CONFIRMATION">
+            <map>
+                <entry key="description" value="Send activation code"/>
+                <entry key="id" value="#{sendCodeNotificationKindId}"/>
+            </map>
+        </entry>
+        <entry key="PASSWORD_RESET">
+            <map>
+                <entry key="description" value="Reset Password"/>
+                <entry key="id" value="#{resetPasswordNotificationKindId}"/>
+            </map>
+        </entry>
+    </util:map>
+
+    <bean id="notificationsBootstrap" class="org.cloudfoundry.identity.uaa.login.NotificationsBootstrap">
+        <constructor-arg ref="notifications"/>
+        <constructor-arg ref="notificationsUrl"/>
+        <constructor-arg ref="notificationsTemplate"/>
+        <constructor-arg ref="environment"/>
+    </bean>
+
     <mvc:annotation-driven>
         <mvc:message-converters>
             <bean class="org.cloudfoundry.identity.uaa.login.AutologinRequestConverter" />
@@ -359,7 +411,7 @@
     <bean id="tileInfo" class="org.cloudfoundry.identity.uaa.login.TileInfo" />
 
     <bean id="emailService" class="org.cloudfoundry.identity.uaa.login.EmailService">
-        <constructor-arg index="0">
+        <constructor-arg>
             <bean class="org.springframework.mail.javamail.JavaMailSenderImpl">
                 <property name="host" value="${smtp.host:localhost}"/>
                 <property name="port" value="${smtp.port:25}"/>
@@ -367,8 +419,17 @@
                 <property name="password" value="${smtp.password:}"/>
             </bean>
         </constructor-arg>
-        <constructor-arg index="1" value="${login.url:http://localhost:8080/login}"/>
-        <constructor-arg index="2" value="${login.brand:oss}"/>
+        <constructor-arg value="${login.url:http://localhost:8080/login}"/>
+        <constructor-arg value="${login.brand:oss}"/>
+    </bean>
+
+    <bean id="notificationsService" class="org.cloudfoundry.identity.uaa.login.NotificationsService">
+        <constructor-arg ref="notificationsUrl"/>
+        <constructor-arg ref="notificationsTemplate"/>
+        <constructor-arg ref="notificationsBootstrap"/>
+        <constructor-arg ref="notifications"/>
+        <constructor-arg ref="authorizationTemplate"/>
+        <constructor-arg ref="uaaUrl"/>
     </bean>
 
     <bean id="accountCreationService" class="org.cloudfoundry.identity.uaa.login.EmailAccountCreationService">
@@ -399,10 +460,12 @@
 
     <bean id="resetPasswordService" class="org.cloudfoundry.identity.uaa.login.EmailResetPasswordService">
         <constructor-arg index="0" ref="mailTemplateEngine"/>
-        <constructor-arg index="1" ref="emailService"/>
+        <constructor-arg index="1" ref="messageService"/>
         <constructor-arg index="2" ref="authorizationTemplate"/>
         <constructor-arg index="3" ref="uaaUrl"/>
         <constructor-arg index="4" value="${login.brand:oss}"/>
+        <constructor-arg index="5" ref="resetPasswordNotificationKindId"/>
+        <constructor-arg index="6" ref="environment"/>
     </bean>
 
     <bean id="resetPasswordController" class="org.cloudfoundry.identity.uaa.login.ResetPasswordController">
