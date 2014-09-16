@@ -8653,7 +8653,8 @@ input {
 
 .form-control {
   font-size: 16px;
-  height: 34px; }
+  height: 34px;
+  line-height: 1; }
 
 ::-webkit-input-placeholder {
   font-weight: 400; }
@@ -8720,14 +8721,11 @@ input {
   font-size: 11px;
   line-height: 18px;
   margin-bottom: 10px;
-  padding: 10px 0;
-}
-
-.saml-login p {
+  padding: 10px 0; }
+  .saml-login .saml-login-link {
+    font-weight: 700; }
+  .saml-login p {
     color: #7f7f7f; }
-
-.saml-login .saml-login-link {
-font-weight: 700; }
 
 .nav {
   position: relative;
