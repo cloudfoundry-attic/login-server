@@ -27,10 +27,10 @@ import org.mockito.Mockito;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.common.exceptions.OAuth2Exception;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 import java.util.Arrays;
@@ -99,20 +99,18 @@ public class ChangePasswordControllerTest {
     public void testChangePasswordWrongPassword() throws Exception {
         setupSecurityContext();
 
-        Mockito.doThrow(new OAuth2Exception("wrong password")).when(changePasswordService).changePassword("bob", "secret", "new secret");
+        Mockito.doThrow(new RestClientException("401 Unauthorized")).when(changePasswordService).changePassword("bob", "wrong", "new secret");
 
         MockHttpServletRequestBuilder post = post("/change_password.do")
                 .contentType(APPLICATION_FORM_URLENCODED)
-                .param("current_password", "secret")
+                .param("current_password", "wrong")
                 .param("new_password", "new secret")
                 .param("confirm_password", "new secret");
 
         mockMvc.perform(post)
                 .andExpect(status().isUnprocessableEntity())
                 .andExpect(view().name("change_password"))
-                .andExpect(model().attribute("message", "wrong password"));
-
-        Mockito.verify(changePasswordService).changePassword("bob", "secret", "new secret");
+                .andExpect(model().attribute("message_code", "unauthorized"));
     }
 
     private void setupSecurityContext() {
