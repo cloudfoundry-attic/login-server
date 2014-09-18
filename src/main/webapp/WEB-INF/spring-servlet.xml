@@ -295,13 +295,6 @@
         </entry>
     </util:map>
 
-    <bean id="notificationsBootstrap" class="org.cloudfoundry.identity.uaa.login.NotificationsBootstrap">
-        <constructor-arg ref="notifications"/>
-        <constructor-arg ref="notificationsUrl"/>
-        <constructor-arg ref="notificationsTemplate"/>
-        <constructor-arg ref="environment"/>
-    </bean>
-
     <mvc:annotation-driven>
         <mvc:message-converters>
             <bean class="org.cloudfoundry.identity.uaa.login.AutologinRequestConverter" />
@@ -424,9 +417,8 @@
     </bean>
 
     <bean id="notificationsService" class="org.cloudfoundry.identity.uaa.login.NotificationsService">
-        <constructor-arg ref="notificationsUrl"/>
         <constructor-arg ref="notificationsTemplate"/>
-        <constructor-arg ref="notificationsBootstrap"/>
+        <constructor-arg ref="notificationsUrl"/>
         <constructor-arg ref="notifications"/>
         <constructor-arg ref="authorizationTemplate"/>
         <constructor-arg ref="uaaUrl"/>

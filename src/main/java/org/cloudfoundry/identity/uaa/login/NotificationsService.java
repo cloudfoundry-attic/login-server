@@ -12,14 +12,17 @@ public class NotificationsService implements MessageService {
     private final RestTemplate notificationsTemplate;
     private final RestTemplate uaaTemplate;
     private final String notificationsUrl;
-    private final NotificationsBootstrap notificationsBootstrap;
     private final Map<MessageType,HashMap<String, Object>> notifications;
     private final String uaaUrl;
 
-    public NotificationsService(RestTemplate notificationsTemplate, String notificationsUrl, NotificationsBootstrap notificationsBootstrap, Map<MessageType, HashMap<String, Object>> notifications, RestTemplate uaaTemplate, String uaaUrl) {
+    private Boolean isNotificationsRegistered = false;
+    public Boolean getIsNotificationsRegistered() {
+        return isNotificationsRegistered;
+    }
+
+    public NotificationsService(RestTemplate notificationsTemplate, String notificationsUrl, Map<MessageType, HashMap<String, Object>> notifications, RestTemplate uaaTemplate, String uaaUrl) {
         this.notificationsTemplate = notificationsTemplate;
         this.notificationsUrl = notificationsUrl;
-        this.notificationsBootstrap = notificationsBootstrap;
         this.notifications = notifications;
         this.uaaTemplate = uaaTemplate;
         this.uaaUrl = uaaUrl;
@@ -27,8 +30,8 @@ public class NotificationsService implements MessageService {
 
     @Override
     public void sendMessage(String email, MessageType messageType, String subject, String htmlContent) {
-        if(!notificationsBootstrap.getIsNotificationsRegistered())
-            notificationsBootstrap.registerNotifications();
+        if(!getIsNotificationsRegistered())
+                registerNotifications();
         Map<String, Object> response = uaaTemplate.getForObject(uaaUrl + "/ids/Users?attributes=id&filter=userName eq \"" + email + "\"", Map.class);
         List<Map<String,String>> resources = (List<Map<String, String>>) response.get("resources");
         String userId = resources.get(0).get("id");
@@ -40,5 +43,14 @@ public class NotificationsService implements MessageService {
         request.put("text", htmlContent);
         HttpEntity<Map<String,String>> requestEntity = new HttpEntity<>(request);
         notificationsTemplate.exchange(notificationsUrl + "/users/" + userId, HttpMethod.POST, requestEntity, Void.class);
+    }
+
+    private void registerNotifications() {
+        HashMap<String, Object> request = new HashMap<>();
+        request.put("source_description", "CF_Identity");
+        request.put("kinds", notifications.values());
+
+        notificationsTemplate.put(notificationsUrl + "/registration", request);
+        isNotificationsRegistered = true;
     }
 }
