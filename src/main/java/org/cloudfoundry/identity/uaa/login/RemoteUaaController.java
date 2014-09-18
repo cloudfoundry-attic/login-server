@@ -447,7 +447,7 @@ public class RemoteUaaController extends AbstractControllerInfo {
         if (remoteAuthentication!=null && remoteAuthentication.getPrincipal() instanceof UaaPrincipal) {
             UaaPrincipal p = (UaaPrincipal)remoteAuthentication.getPrincipal();
             if (p!=null) {
-                details.put("origin", p.getOrigin());
+                details.put(Origin.ORIGIN, p.getOrigin());
                 details.put("user_id",p.getId());
             }
         }

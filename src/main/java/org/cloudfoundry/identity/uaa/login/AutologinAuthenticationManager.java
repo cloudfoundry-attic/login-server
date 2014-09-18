@@ -19,6 +19,7 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.cloudfoundry.identity.uaa.authentication.AuthzAuthenticationRequest;
+import org.cloudfoundry.identity.uaa.authentication.Origin;
 import org.cloudfoundry.identity.uaa.authentication.UaaAuthenticationDetails;
 import org.cloudfoundry.identity.uaa.authentication.UaaPrincipal;
 import org.cloudfoundry.identity.uaa.client.SocialClientUserDetails;
@@ -120,7 +121,7 @@ public class AutologinAuthenticationManager implements AuthenticationManager {
         } else if (user.getDetails() instanceof Map) {
             Map<String,String> map = (Map<String,String>)user.getDetails();
             clientId = map.get("client_id");
-            origin = map.get("origin");
+            origin = map.get(Origin.ORIGIN);
             userId = map.get("user_id");
             principal = new UaaPrincipal(userId,user.getUsername(),null,origin,null);
         }
