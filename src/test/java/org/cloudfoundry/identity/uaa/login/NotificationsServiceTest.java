@@ -72,7 +72,7 @@ public class NotificationsServiceTest {
             .andExpect(method(POST))
             .andExpect(jsonPath("$.kind_id").value("kind-id-01"))
             .andExpect(jsonPath("$.subject").value("First message"))
-            .andExpect(jsonPath("$.text").value("<p>Text</p>"))
+            .andExpect(jsonPath("$.html").value("<p>Text</p>"))
             .andRespond(withSuccess());
 
         mockNotificationsServer.expect(requestTo("http://notifications.example.com/users/user-id-01"))

@@ -40,7 +40,7 @@ public class NotificationsService implements MessageService {
         String kindId = (String)notifications.get(messageType).get("id");
         request.put("kind_id", kindId);
         request.put("subject", subject);
-        request.put("text", htmlContent);
+        request.put("html", htmlContent);
         HttpEntity<Map<String,String>> requestEntity = new HttpEntity<>(request);
         notificationsTemplate.exchange(notificationsUrl + "/users/" + userId, HttpMethod.POST, requestEntity, Void.class);
     }
