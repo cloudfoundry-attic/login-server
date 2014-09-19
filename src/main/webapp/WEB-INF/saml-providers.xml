@@ -117,6 +117,7 @@
             SAML messages -->
         <bean id="samlAuthenticationProvider" class="org.cloudfoundry.identity.uaa.login.saml.LoginSamlAuthenticationProvider">
             <property name="userDetails" ref="samlUserDetails" />
+            <property name="authenticationManager" ref="remoteAuthenticationManager"/>
         </bean>
 
         <bean id="samlUserDetails" class="org.cloudfoundry.identity.uaa.login.LoginServerSamlUserDetailsService" />
