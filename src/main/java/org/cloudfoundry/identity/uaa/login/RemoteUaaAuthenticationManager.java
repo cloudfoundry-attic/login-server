@@ -19,6 +19,7 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.cloudfoundry.identity.uaa.authentication.Origin;
+import org.cloudfoundry.identity.uaa.authentication.UaaAuthenticationDetails;
 import org.cloudfoundry.identity.uaa.authentication.UaaPrincipal;
 import org.cloudfoundry.identity.uaa.user.UaaAuthority;
 import org.springframework.http.HttpEntity;
@@ -105,12 +106,23 @@ public class RemoteUaaAuthenticationManager implements AuthenticationManager {
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         String username = authentication.getName();
         String password = (String) authentication.getCredentials();
+        MultiValueMap<String, Object> parameters = getParameters(username, password);
+
+        if (authentication.isAuthenticated() && authentication.getPrincipal() instanceof UaaPrincipal) {
+            UaaPrincipal principal = (UaaPrincipal) authentication.getPrincipal();
+            checkAndAddParameter(Origin.ORIGIN, principal.getOrigin(), parameters);
+            checkAndAddParameter("email", principal.getEmail(), parameters);
+            checkAndAddParameter("source", "login", parameters);
+            checkAndAddParameter(UaaAuthenticationDetails.ADD_NEW, Boolean.TRUE.toString(), parameters);
+        }
+
+
 
         HttpHeaders headers = getHeaders();
 
         @SuppressWarnings("rawtypes")
         ResponseEntity<Map> response = restTemplate.exchange(loginUrl, HttpMethod.POST,
-                        new HttpEntity<Object>(getParameters(username, password), headers), Map.class);
+                        new HttpEntity<>(parameters, headers), Map.class);
 
         if (response.getStatusCode() == HttpStatus.OK || response.getStatusCode() == HttpStatus.CREATED) {
             Authentication auth = evaluateResponse(authentication, response);
@@ -129,12 +141,18 @@ public class RemoteUaaAuthenticationManager implements AuthenticationManager {
         }
         throw new RuntimeException("Could not authenticate with remote server");
     }
+
+    protected void checkAndAddParameter(String name, String value, MultiValueMap<String, Object> map) {
+        if (StringUtils.hasText(value)) {
+            map.add(name, value);
+        }
+    }
     
     protected Authentication evaluateResponse(Authentication authentication, ResponseEntity<Map> response) {
         String userFromUaa = (String) response.getBody().get("username");
         String userId = (String)response.getBody().get("user_id");
         String origin = (String)response.getBody().get(Origin.ORIGIN);
-        if (userFromUaa.equalsIgnoreCase(authentication.getPrincipal().toString())) {
+        if (userFromUaa.equalsIgnoreCase(authentication.getName())) {
             if (StringUtils.hasText(userId) && StringUtils.hasText(origin)) {
                 UaaPrincipal principal = new UaaPrincipal(userId, userFromUaa, null, origin, null);
                 return new UsernamePasswordAuthenticationToken(principal, null, UaaAuthority.USER_AUTHORITIES);
@@ -147,7 +165,7 @@ public class RemoteUaaAuthenticationManager implements AuthenticationManager {
         }
     }
 
-    protected Object getParameters(String username, String password) {
+    protected MultiValueMap<String, Object> getParameters(String username, String password) {
         MultiValueMap<String, Object> parameters = new LinkedMaskingMultiValueMap<String, Object>("password");
         parameters.set("username", username);
         parameters.set("password", password);
