@@ -21,6 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.cloudfoundry.identity.uaa.authentication.Origin;
 import org.cloudfoundry.identity.uaa.authentication.UaaAuthenticationDetails;
 import org.cloudfoundry.identity.uaa.authentication.UaaPrincipal;
+import org.cloudfoundry.identity.uaa.oauth.UaaOauth2ErrorHandler;
 import org.cloudfoundry.identity.uaa.user.UaaAuthority;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -34,6 +35,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.oauth2.client.OAuth2RestTemplate;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.DefaultResponseErrorHandler;
@@ -94,12 +96,17 @@ public class RemoteUaaAuthenticationManager implements AuthenticationManager {
 
     private void initRestTemplateErrorHandler(RestTemplate restTemplate) {
         restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
-        restTemplate.setErrorHandler(new DefaultResponseErrorHandler() {
-            @Override
-            protected boolean hasError(HttpStatus statusCode) {
-                return statusCode.series() == HttpStatus.Series.SERVER_ERROR;
-            }
-        });
+        if (restTemplate instanceof OAuth2RestTemplate) {
+            OAuth2RestTemplate oAuth2RestTemplate = (OAuth2RestTemplate)restTemplate;
+            oAuth2RestTemplate.setErrorHandler(new UaaOauth2ErrorHandler(oAuth2RestTemplate.getResource(), HttpStatus.Series.SERVER_ERROR));
+        } else {
+            restTemplate.setErrorHandler(new DefaultResponseErrorHandler() {
+                @Override
+                protected boolean hasError(HttpStatus statusCode) {
+                    return statusCode.series() == HttpStatus.Series.SERVER_ERROR;
+                        }
+            });
+        }
     }
 
     @Override
@@ -107,12 +114,12 @@ public class RemoteUaaAuthenticationManager implements AuthenticationManager {
         String username = authentication.getName();
         String password = (String) authentication.getCredentials();
         MultiValueMap<String, Object> parameters = getParameters(username, password);
-
+        checkAndAddParameter("source", "login", parameters);
         if (authentication.isAuthenticated() && authentication.getPrincipal() instanceof UaaPrincipal) {
             UaaPrincipal principal = (UaaPrincipal) authentication.getPrincipal();
             checkAndAddParameter(Origin.ORIGIN, principal.getOrigin(), parameters);
             checkAndAddParameter("email", principal.getEmail(), parameters);
-            checkAndAddParameter("source", "login", parameters);
+
             checkAndAddParameter(UaaAuthenticationDetails.ADD_NEW, Boolean.TRUE.toString(), parameters);
         }
 
