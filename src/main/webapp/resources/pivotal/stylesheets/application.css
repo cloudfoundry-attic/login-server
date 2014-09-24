@@ -8915,6 +8915,35 @@ input {
   background-repeat: no-repeat;
   background-position: -99999px -99999px; }
 
+.alert {
+  font-weight: 600;
+  padding: 15px;
+  margin-bottom: 50px;
+  border: 1px solid transparent;
+  border-radius: 0px;
+  font-size: 13px;
+  text-align: left; }
+
+.alert-success {
+  background-color: #afd79b;
+  color: #165450; }
+
+.alert-error {
+  background-color: #febfc1;
+  border-color: #febfc1;
+  color: #ab2a2a; }
+
+.alert p:before {
+  font-family: FontAwesome;
+  padding-right: 5px;
+  font-size: 16px; }
+
+.alert-success p:before {
+  content: '\f058'; }
+
+.alert-error p:before {
+  content: '\f071'; }
+
 h1 {
   color: #01786e; }
 

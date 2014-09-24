@@ -27,6 +27,12 @@
 </div>
 <div class="panel-container" layout:fragment="page-content">
     <div class="panel">
+        <div th:if="${param.success_message_code}" class="alert alert-success">
+            <p th:text="#{${param.success_message_code[0]}}">Success Message</p>
+        </div>
+        <div th:if="${param.error_message_code}" class="alert alert-error">
+            <p th:text="#{${param.error_message_code[0]}}">Error Message</p>
+        </div>
         <h1>Account Settings</h1>
         <div class="panel-content">
             <h2>Profile</h2>

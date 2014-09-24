@@ -158,10 +158,11 @@ public class RemoteUaaAuthenticationManager implements AuthenticationManager {
     protected Authentication evaluateResponse(Authentication authentication, ResponseEntity<Map> response) {
         String userFromUaa = (String) response.getBody().get("username");
         String userId = (String)response.getBody().get("user_id");
+        String email = (String)response.getBody().get("email");
         String origin = (String)response.getBody().get(Origin.ORIGIN);
         if (userFromUaa.equalsIgnoreCase(authentication.getName())) {
             if (StringUtils.hasText(userId) && StringUtils.hasText(origin)) {
-                UaaPrincipal principal = new UaaPrincipal(userId, userFromUaa, null, origin, null);
+                UaaPrincipal principal = new UaaPrincipal(userId, userFromUaa, email, origin, null);
                 return new UsernamePasswordAuthenticationToken(principal, null, UaaAuthority.USER_AUTHORITIES);
             } else {
                 return new UsernamePasswordAuthenticationToken(userFromUaa, null, UaaAuthority.USER_AUTHORITIES);
