@@ -5,6 +5,9 @@
 <body>
     <div class="island" layout:fragment="page-content">
         <div class="island-content">
+            <div th:if="${error_message_code}" class="alert alert-error">
+                <p th:text="#{${error_message_code}}">Error Message</p>
+            </div>
             <img src="/resources/images/sad_cloud.png" th:src="@{/resources/images/sad_cloud.png}" role="presentation" />
         </div>
         <h2>

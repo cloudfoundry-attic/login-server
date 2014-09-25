@@ -3,10 +3,12 @@ package org.cloudfoundry.identity.uaa.login;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.cloudfoundry.identity.uaa.codestore.ExpiringCode;
+import org.cloudfoundry.identity.uaa.error.UaaException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.thymeleaf.TemplateEngine;
@@ -57,8 +59,13 @@ public class EmailChangeEmailService implements ChangeEmailService {
 
     @Override
     public Map<String, String> completeVerification(String code) {
-        ResponseEntity<Map<String, String>> responseEntity = uaaTemplate.exchange(uaaBaseUrl + "/email_changes", POST, new HttpEntity<>(code), new ParameterizedTypeReference<Map<String, String>>() {
-            });
+        ResponseEntity<Map<String, String>> responseEntity = null;
+        try {
+            responseEntity = uaaTemplate.exchange(uaaBaseUrl + "/email_changes", POST, new HttpEntity<>(code), new ParameterizedTypeReference<Map<String, String>>() {
+                });
+        } catch (HttpClientErrorException e) {
+            throw new UaaException(e.getStatusText(), e.getStatusCode().value());
+        }
         return responseEntity.getBody();
     }
 

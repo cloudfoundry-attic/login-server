@@ -3,12 +3,15 @@ package org.cloudfoundry.identity.uaa.login;
 import org.cloudfoundry.identity.uaa.authentication.Origin;
 import org.cloudfoundry.identity.uaa.authentication.UaaAuthentication;
 import org.cloudfoundry.identity.uaa.authentication.UaaPrincipal;
+import org.cloudfoundry.identity.uaa.error.UaaException;
 import org.cloudfoundry.identity.uaa.user.UaaAuthority;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -128,6 +131,31 @@ public class ChangeEmailControllerTest {
         Assert.assertEquals("user-id-001", principal.getId());
         Assert.assertEquals("new@example.com", principal.getName());
         Assert.assertEquals("new@example.com", principal.getEmail());
+    }
+
+    @Test
+    public void testVerifyEmailWithInvalidCode() throws Exception {
+        Authentication authentication = new AnonymousAuthenticationToken(
+            "anon",
+            "anonymousUser",
+            AuthorityUtils.createAuthorityList("ROLE_ANONYMOUS")
+        );
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        when(changeEmailService.completeVerification("the_secret_code")).thenThrow(new UaaException("Bad Request", 400));
+        MockHttpServletRequestBuilder get = get("/verify_email")
+            .contentType(APPLICATION_FORM_URLENCODED)
+            .param("code", "the_secret_code");
+
+        mockMvc.perform(get)
+            .andExpect(status().isUnprocessableEntity())
+            .andExpect(view().name("error"));
+
+        setupSecurityContext();
+
+        mockMvc.perform(get)
+            .andExpect(status().isFound())
+            .andExpect(redirectedUrl("profile?error_message_code=email_change.invalid_code"));
     }
 
     private void setupSecurityContext() {

@@ -2,9 +2,11 @@ package org.cloudfoundry.identity.uaa.login;
 
 import org.cloudfoundry.identity.uaa.authentication.Origin;
 import org.cloudfoundry.identity.uaa.authentication.UaaPrincipal;
+import org.cloudfoundry.identity.uaa.error.UaaException;
 import org.cloudfoundry.identity.uaa.user.UaaAuthority;
 import org.hibernate.validator.constraints.Email;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -63,8 +65,22 @@ public class ChangeEmailController {
     }
 
     @RequestMapping(value = "/verify_email", method = RequestMethod.GET)
-    public String verifyEmail(@RequestParam("code") String code, RedirectAttributes redirectAttributes) {
-        Map<String,String> response = changeEmailService.completeVerification(code);
+    public String verifyEmail(Model model, @RequestParam("code") String code, RedirectAttributes redirectAttributes, HttpServletResponse httpServletResponse) {
+        Map<String,String> response;
+
+        try {
+            response = changeEmailService.completeVerification(code);
+        } catch (UaaException e) {
+            if (SecurityContextHolder.getContext().getAuthentication() instanceof AnonymousAuthenticationToken) {
+                model.addAttribute("error_message_code", "email_change.invalid_code");
+                httpServletResponse.setStatus(422);
+                return "error";
+            }
+            else {
+                return "redirect:profile?error_message_code=email_change.invalid_code";
+            }
+        }
+
         UaaPrincipal uaaPrincipal = new UaaPrincipal(response.get("userId"), response.get("username"), response.get("email"), Origin.UAA, null);
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(uaaPrincipal, null, UaaAuthority.USER_AUTHORITIES);
         SecurityContextHolder.getContext().setAuthentication(token);

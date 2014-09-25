@@ -1,5 +1,6 @@
 package org.cloudfoundry.identity.uaa.login;
 
+import org.cloudfoundry.identity.uaa.error.UaaException;
 import org.cloudfoundry.identity.uaa.login.test.ThymeleafConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.hamcrest.Matchers;
@@ -30,6 +31,7 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withBadRequest;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 
@@ -82,6 +84,18 @@ public class EmailChangeEmailServiceTest {
                 "  \"username\":\"new@example.com\"," +
                 "  \"email\": \"new@example.com\" " +
                 "}", APPLICATION_JSON));
+
+        emailChangeEmailService.completeVerification("the_secret_code");
+
+        mockUaaServer.verify();
+    }
+
+    @Test(expected = UaaException.class)
+    public void testCompleteVerificationWithInvalidCode() throws Exception {
+        mockUaaServer.expect(requestTo("http://uaa.example.com/uaa/email_changes"))
+            .andExpect(method(POST))
+            .andExpect(content().string("the_secret_code"))
+            .andRespond(withBadRequest());
 
         emailChangeEmailService.completeVerification("the_secret_code");
 
