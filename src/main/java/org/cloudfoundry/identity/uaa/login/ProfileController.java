@@ -48,7 +48,7 @@ public class ProfileController {
     public String get(Authentication authentication, Model model) {
         Map<String, List<UaaApprovalsService.DescribedApproval>> approvals = approvalsService.getCurrentApprovalsByClientId();
         model.addAttribute("approvals", approvals);
-        model.addAttribute("showChangePasswordLink", showChangePasswordLink(authentication));
+        model.addAttribute("isUaaManagedUser", isUaaManagedUser(authentication));
         return "approvals";
     }
 
@@ -87,7 +87,7 @@ public class ProfileController {
         return "redirect:profile";
     }
 
-    private boolean showChangePasswordLink(Authentication authentication) {
+    private boolean isUaaManagedUser(Authentication authentication) {
         if (authentication.getPrincipal() instanceof UaaPrincipal) {
             UaaPrincipal principal = (UaaPrincipal) authentication.getPrincipal();
             return Origin.UAA.equals(principal.getOrigin());

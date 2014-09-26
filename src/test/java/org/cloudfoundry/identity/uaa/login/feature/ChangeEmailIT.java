@@ -63,7 +63,9 @@ public class ChangeEmailIT {
         signIn(userEmail, "secret");
         int receivedEmailSize = simpleSmtpServer.getReceivedEmailSize();
 
-        webDriver.get(baseUrl + "/change_email");
+        webDriver.get(baseUrl + "/profile");
+        assertEquals(userEmail, webDriver.findElement(By.cssSelector(".profile .email")).getText());
+        webDriver.findElement(By.linkText("Change Email")).click();
 
         assertEquals("Current Email Address: " + userEmail, webDriver.findElement(By.cssSelector(".email-display")).getText());
         String newEmail = userEmail.replace("user", "new");

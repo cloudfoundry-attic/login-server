@@ -107,7 +107,7 @@ public class ProfileControllerTests {
 
         mockMvc.perform(get("/profile").principal(authentication))
                 .andExpect(status().isOk())
-                .andExpect(model().attribute("showChangePasswordLink", true))
+                .andExpect(model().attribute("isUaaManagedUser", true))
                 .andExpect(model().attribute("approvals", hasKey("app")))
                 .andExpect(model().attribute("approvals", hasValue(hasSize(2))))
                 .andExpect(content().contentTypeCompatibleWith(TEXT_HTML))
@@ -137,7 +137,7 @@ public class ProfileControllerTests {
 
         mockMvc.perform(get("/profile").principal(authentication))
                 .andExpect(status().isOk())
-                .andExpect(model().attribute("showChangePasswordLink", false))
+                .andExpect(model().attribute("isUaaManagedUser", false))
                 .andExpect(content().string(not(containsString("Change Password"))));
     }
 
