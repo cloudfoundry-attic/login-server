@@ -112,6 +112,12 @@
         <security:anonymous enabled="true" />
     </security:http>
 
+    <security:http pattern="/verify_email" disable-url-rewriting="true"
+                   entry-point-ref="loginEntryPoint">
+        <security:intercept-url pattern="/verify_email" access="IS_AUTHENTICATED_ANONYMOUSLY" />
+        <security:anonymous enabled="true" />
+    </security:http>
+
     <security:http pattern="/accounts" disable-url-rewriting="true"
                    entry-point-ref="loginEntryPoint">
         <security:intercept-url pattern="/accounts" access="IS_AUTHENTICATED_ANONYMOUSLY" />
@@ -295,6 +301,12 @@
                 <entry key="id" value="#{resetPasswordNotificationKindId}"/>
             </map>
         </entry>
+        <entry key="CHANGE_EMAIL">
+            <map>
+                <entry key="description" value="Change Email"/>
+                <entry key="id" value="712de257-a7fa-44cb-b1ac-8a6588d1be23"/>
+            </map>
+        </entry>
     </util:map>
 
     <mvc:annotation-driven>
@@ -453,17 +465,32 @@
     </bean>
 
     <bean id="resetPasswordService" class="org.cloudfoundry.identity.uaa.login.EmailResetPasswordService">
-        <constructor-arg index="0" ref="mailTemplateEngine"/>
-        <constructor-arg index="1" ref="messageService"/>
-        <constructor-arg index="2" ref="authorizationTemplate"/>
-        <constructor-arg index="3" ref="uaaUrl"/>
-        <constructor-arg index="4" value="${login.brand:oss}"/>
-        <constructor-arg index="5" ref="resetPasswordNotificationKindId"/>
-        <constructor-arg index="6" ref="environment"/>
+        <constructor-arg ref="mailTemplateEngine"/>
+        <constructor-arg ref="messageService"/>
+        <constructor-arg ref="authorizationTemplate"/>
+        <constructor-arg ref="uaaUrl"/>
+        <constructor-arg value="${login.brand:oss}"/>
+        <constructor-arg ref="resetPasswordNotificationKindId"/>
+        <constructor-arg ref="environment"/>
+    </bean>
+
+    <bean id="changeEmailService" class="org.cloudfoundry.identity.uaa.login.EmailChangeEmailService">
+        <constructor-arg ref="mailTemplateEngine"/>
+        <constructor-arg ref="messageService"/>
+        <constructor-arg ref="authorizationTemplate"/>
+        <constructor-arg ref="uaaUrl"/>
+        <constructor-arg value="${login.brand:oss}"/>
+        <constructor-arg>
+            <bean class="org.codehaus.jackson.map.ObjectMapper"/>
+        </constructor-arg>
     </bean>
 
     <bean id="resetPasswordController" class="org.cloudfoundry.identity.uaa.login.ResetPasswordController">
         <constructor-arg ref="resetPasswordService"/>
+    </bean>
+
+    <bean id="changeEmailController" class="org.cloudfoundry.identity.uaa.login.ChangeEmailController">
+        <constructor-arg ref="changeEmailService"/>
     </bean>
 
     <import resource="saml-providers.xml"/>
