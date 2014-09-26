@@ -480,9 +480,6 @@
         <constructor-arg ref="authorizationTemplate"/>
         <constructor-arg ref="uaaUrl"/>
         <constructor-arg value="${login.brand:oss}"/>
-        <constructor-arg>
-            <bean class="org.codehaus.jackson.map.ObjectMapper"/>
-        </constructor-arg>
     </bean>
 
     <bean id="resetPasswordController" class="org.cloudfoundry.identity.uaa.login.ResetPasswordController">

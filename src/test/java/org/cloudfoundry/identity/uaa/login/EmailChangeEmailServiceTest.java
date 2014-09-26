@@ -2,7 +2,6 @@ package org.cloudfoundry.identity.uaa.login;
 
 import org.cloudfoundry.identity.uaa.error.UaaException;
 import org.cloudfoundry.identity.uaa.login.test.ThymeleafConfig;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -10,7 +9,6 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
-import org.springframework.mock.env.MockEnvironment;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -38,7 +36,6 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 public class EmailChangeEmailServiceTest {
     private EmailChangeEmailService emailChangeEmailService;
     private MockRestServiceServer mockUaaServer;
-    private MockEnvironment mockEnvironment;
     private MessageService messageService;
 
     @Autowired
@@ -50,8 +47,7 @@ public class EmailChangeEmailServiceTest {
         RestTemplate uaaTemplate = new RestTemplate();
         mockUaaServer = MockRestServiceServer.createServer(uaaTemplate);
         messageService = Mockito.mock(EmailService.class);
-        mockEnvironment = new MockEnvironment();
-        emailChangeEmailService = new EmailChangeEmailService(templateEngine, messageService, uaaTemplate, "http://uaa.example.com/uaa", "pivotal", new ObjectMapper());
+        emailChangeEmailService = new EmailChangeEmailService(templateEngine, messageService, uaaTemplate, "http://uaa.example.com/uaa", "pivotal");
 
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.setProtocol("http");
