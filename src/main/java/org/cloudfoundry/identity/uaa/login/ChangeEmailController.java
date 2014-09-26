@@ -59,7 +59,16 @@ public class ChangeEmailController {
         String userId = ((UaaPrincipal)securityContext.getAuthentication().getPrincipal()).getId();
         String userEmail = ((UaaPrincipal)securityContext.getAuthentication().getPrincipal()).getName();
 
-        changeEmailService.beginEmailChange(userId, userEmail, newEmail.getNewEmail());
+        try {
+            changeEmailService.beginEmailChange(userId, userEmail, newEmail.getNewEmail());
+        } catch (UaaException e) {
+            if (e.getHttpStatus() == 409) {
+                model.addAttribute("error_message_code", "username_exists");
+                model.addAttribute("email", ((UaaPrincipal)securityContext.getAuthentication().getPrincipal()).getEmail());
+                response.setStatus(HttpStatus.UNPROCESSABLE_ENTITY.value());
+                return "change_email";
+            }
+        }
 
         return "redirect:email_sent?code=email_change";
     }

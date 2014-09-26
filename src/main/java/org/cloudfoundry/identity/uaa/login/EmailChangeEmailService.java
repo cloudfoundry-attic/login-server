@@ -42,15 +42,17 @@ public class EmailChangeEmailService implements ChangeEmailService {
 
     @Override
     public void beginEmailChange(String userId, String email, String newEmail) {
-        ExpiringCode expiringCodeForPost = null;
+        Map<String,String> request = new HashMap<>();
+        request.put("userId", userId);
+        request.put("email", newEmail);
+        String expiringCode = null;
         try {
-            expiringCodeForPost = getExpiringCode(userId, newEmail);
-        } catch (IOException e) {
-            logger.info("Exception raised while creating account activation email for " + newEmail, e);
+            expiringCode = uaaTemplate.postForObject(uaaBaseUrl + "/email_verifications", request, String.class);
+        } catch (HttpClientErrorException e) {
+            throw new UaaException(e.getStatusText(), e.getStatusCode().value());
         }
-        ExpiringCode expiringCode = uaaTemplate.postForObject(uaaBaseUrl + "/Codes", expiringCodeForPost, ExpiringCode.class);
         String subject = getSubjectText();
-        String htmlContent = getEmailChangeEmailHtml(email, newEmail, expiringCode.getCode());
+        String htmlContent = getEmailChangeEmailHtml(email, newEmail, expiringCode);
 
         if(htmlContent != null) {
             messageService.sendMessage(newEmail, MessageType.CHANGE_EMAIL, subject, htmlContent);

@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -73,6 +74,23 @@ public class ChangeEmailControllerTest {
             .andExpect(redirectedUrl("email_sent?code=email_change"));
 
         Mockito.verify(changeEmailService).beginEmailChange("user-id-001", "bob", "new@example.com");
+    }
+
+    @Test
+    public void testChangeEmailWithUsernameConflict() throws Exception {
+        setupSecurityContext();
+
+        doThrow(new UaaException("username already exists", 409)).when(changeEmailService).beginEmailChange("user-id-001", "bob", "new@example.com");
+
+        MockHttpServletRequestBuilder post = post("/change_email.do")
+            .contentType(APPLICATION_FORM_URLENCODED)
+            .param("newEmail", "new@example.com");
+
+        mockMvc.perform(post)
+            .andExpect(status().isUnprocessableEntity())
+            .andExpect(view().name("change_email"))
+            .andExpect(model().attribute("error_message_code", "username_exists"))
+            .andExpect(model().attribute("email", "user@example.com"));
     }
 
     @Test
