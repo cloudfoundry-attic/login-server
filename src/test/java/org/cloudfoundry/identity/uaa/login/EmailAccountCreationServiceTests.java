@@ -144,7 +144,7 @@ public class EmailAccountCreationServiceTests {
             .andExpect(method(GET))
             .andRespond(withSuccess(clientDetails, APPLICATION_JSON));
 
-        AccountCreationService.AccountCreation accountCreation = emailAccountCreationService.completeActivation("the_secret_code", "secret");
+        AccountCreationService.AccountCreationResponse accountCreation = emailAccountCreationService.completeActivation("the_secret_code", "secret");
 
         mockUaaServer.verify();
 

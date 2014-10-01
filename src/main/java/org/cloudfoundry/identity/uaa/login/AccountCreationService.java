@@ -7,20 +7,22 @@ import java.io.IOException;
 public interface AccountCreationService {
     void beginActivation(String email, String password, String clientId);
 
-    AccountCreation completeActivation(String code, String password) throws IOException;
+    AccountCreationResponse completeActivation(String code, String password) throws IOException;
 
-    public static class AccountCreation {
+    public static class AccountCreationResponse {
         @JsonProperty("user_id")
         private String userId;
         private String username;
+        private String email;
         @JsonProperty("redirect_location")
         private String redirectLocation;
 
-        public AccountCreation() {}
+        public AccountCreationResponse() {}
 
-        public AccountCreation(String userId, String username, String redirectLocation) {
+        public AccountCreationResponse(String userId, String username, String email, String redirectLocation) {
             this.userId = userId;
             this.username = username;
+            this.email = email;
             this.redirectLocation = redirectLocation;
         }
 
@@ -44,8 +46,8 @@ public interface AccountCreationService {
             return redirectLocation;
         }
 
-        public void setRedirectLocation(String redirectLocation) {
-            this.redirectLocation = redirectLocation;
+        public String getEmail() {
+            return email;
         }
     }
 }

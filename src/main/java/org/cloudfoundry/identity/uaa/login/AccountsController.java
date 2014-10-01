@@ -93,7 +93,7 @@ public class AccountsController {
             return "accounts/new";
         }
 
-        AccountCreationService.AccountCreation accountCreation;
+        AccountCreationService.AccountCreationResponse accountCreation;
         try {
             accountCreation = accountCreationService.completeActivation(code, password);
         } catch (HttpClientErrorException e) {

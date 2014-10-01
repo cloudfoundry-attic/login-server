@@ -69,7 +69,7 @@ public class EmailAccountCreationService implements AccountCreationService {
     }
 
     @Override
-    public AccountCreation completeActivation(String code, String password) throws IOException{
+    public AccountCreationResponse completeActivation(String code, String password) throws IOException {
 
         ExpiringCode expiringCode = uaaTemplate.getForObject(uaaBaseUrl + "/Codes/"+ code, ExpiringCode.class);
         Map<String, String> data = objectMapper.readValue(expiringCode.getData(), new TypeReference<Map<String, String>>() {});
@@ -87,12 +87,8 @@ public class EmailAccountCreationService implements AccountCreationService {
 
         ClientDetails clientDetails = uaaTemplate.getForObject(uaaBaseUrl + "/oauth/clients/" + data.get("client_id"), BaseClientDetails.class);
         String redirectLocation = (String) clientDetails.getAdditionalInformation().get(SIGNUP_REDIRECT_URL);
-
-        AccountCreation accountCreation = new AccountCreation();
-        accountCreation.setUserId(userResponse.getId());
-        accountCreation.setUsername(userResponse.getUserName());
-        accountCreation.setRedirectLocation(redirectLocation);
-        return accountCreation;
+        
+        return new AccountCreationResponse(userResponse.getId(), userResponse.getUserName(), userResponse.getUserName(), redirectLocation);
     }
 
     private String getSubjectText() {
