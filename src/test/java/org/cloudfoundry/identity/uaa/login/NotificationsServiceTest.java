@@ -42,6 +42,7 @@ public class NotificationsServiceTest {
 
         passwordResetNotification.put("id", "kind-id-01");
         passwordResetNotification.put("description", "password reset");
+        passwordResetNotification.put("critical", true);
         notifications.put(MessageType.PASSWORD_RESET, passwordResetNotification);
 
         environment = new MockEnvironment();
@@ -66,6 +67,7 @@ public class NotificationsServiceTest {
             .andExpect(jsonPath("$.source_description").value("CF_Identity"))
             .andExpect(jsonPath("$.kinds[0].id").value("kind-id-01"))
             .andExpect(jsonPath("$.kinds[0].description").value("password reset"))
+            .andExpect(jsonPath("$.kinds[0].critical").value(true))
             .andRespond(withSuccess());
 
         mockNotificationsServer.expect(requestTo("http://notifications.example.com/users/user-id-01"))

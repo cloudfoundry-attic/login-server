@@ -293,18 +293,21 @@
             <map>
                 <entry key="description" value="Send activation code"/>
                 <entry key="id" value="#{sendCodeNotificationKindId}"/>
+                <entry key="critical" value="true" value-type="java.lang.Boolean"/>
             </map>
         </entry>
         <entry key="PASSWORD_RESET">
             <map>
                 <entry key="description" value="Reset Password"/>
                 <entry key="id" value="#{resetPasswordNotificationKindId}"/>
+                <entry key="critical" value="true" value-type="java.lang.Boolean"/>
             </map>
         </entry>
         <entry key="CHANGE_EMAIL">
             <map>
                 <entry key="description" value="Change Email"/>
                 <entry key="id" value="712de257-a7fa-44cb-b1ac-8a6588d1be23"/>
+                <entry key="critical" value="true" value-type="java.lang.Boolean"/>
             </map>
         </entry>
     </util:map>
