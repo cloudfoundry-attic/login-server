@@ -14,18 +14,23 @@ package org.cloudfoundry.identity.uaa.login;
 
 import org.cloudfoundry.identity.uaa.authentication.Origin;
 import org.cloudfoundry.identity.uaa.authentication.UaaPrincipal;
+import org.cloudfoundry.identity.uaa.error.UaaException;
 import org.cloudfoundry.identity.uaa.user.UaaAuthority;
+import org.hibernate.validator.constraints.Email;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.HttpClientErrorException;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 
 import java.io.IOException;
 
@@ -55,9 +60,23 @@ public class AccountsController {
     }
 
     @RequestMapping(method = POST, params = {"email", "client_id"})
-    public String sendActivationEmail(@RequestParam("email") String email,
-                                      @RequestParam("client_id") String clientId) {
-        accountCreationService.beginActivation(email, clientId);
+    public String sendActivationEmail(Model model, HttpServletResponse response,
+                                      @RequestParam("client_id") String clientId,
+                                      @Valid @ModelAttribute("email") ValidEmail email, BindingResult result,
+                                      @RequestParam("password") String password,
+                                      @RequestParam("password_confirmation") String passwordConfirmation) {
+        if(result.hasErrors()) {
+            return handleUnprocessableEntity(model, response, "invalid_email");
+        }
+        ChangePasswordValidation validation = new ChangePasswordValidation(password, passwordConfirmation);
+        if (!validation.valid()) {
+            return handleUnprocessableEntity(model, response, validation.getMessageCode());
+        }
+        try {
+            accountCreationService.beginActivation(email.getEmail(), password, clientId);
+        } catch (UaaException e) {
+            return handleUnprocessableEntity(model, response, "username_exists");
+        }
         return "redirect:accounts/email_sent";
     }
 
@@ -102,5 +121,24 @@ public class AccountsController {
             redirectLocation = "home";
         }
         return "redirect:" + redirectLocation;
+    }
+
+    private String handleUnprocessableEntity(Model model, HttpServletResponse response, String errorMessage) {
+        model.addAttribute("error_message_code", errorMessage);
+        response.setStatus(HttpStatus.UNPROCESSABLE_ENTITY.value());
+        return "accounts/new_activation_email";
+    }
+
+    public static class ValidEmail {
+        @Email
+        String email;
+
+        public String getEmail() {
+            return email;
+        }
+
+        public void setEmail(String email) {
+            this.email = email;
+        }
     }
 }

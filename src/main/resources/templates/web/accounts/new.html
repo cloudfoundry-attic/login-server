@@ -15,8 +15,6 @@
         <div th:text="|Email: ${param.email[0]}|" class="email-display">Email: user@example.com</div>
         <form th:action="@{/accounts(email=${param.email[0]},code=${param.code[0]})}" method="post" novalidate="novalidate">
             <div th:if="${message_code}" th:text="#{'account_activation.' + ${message_code}}" class="error-message"></div>
-            <input name="password" type="password" placeholder="Password" autocomplete="off" class="form-control"/>
-            <input name="password_confirmation" type="password" placeholder="Confirm" autocomplete="off" class="form-control"/>
             <input type="submit" th:value="${pivotal ? 'Create Pivotal ID' : 'Create account'}" class="island-button"/>
         </form>
     </div>

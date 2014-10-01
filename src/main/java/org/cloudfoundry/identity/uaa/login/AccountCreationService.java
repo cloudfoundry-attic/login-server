@@ -5,7 +5,7 @@ import org.codehaus.jackson.annotate.JsonProperty;
 import java.io.IOException;
 
 public interface AccountCreationService {
-    void beginActivation(String email, String clientId);
+    void beginActivation(String email, String password, String clientId);
 
     AccountCreation completeActivation(String code, String password) throws IOException;
 

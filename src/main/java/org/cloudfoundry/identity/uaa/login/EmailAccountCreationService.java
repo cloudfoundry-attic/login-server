@@ -44,7 +44,7 @@ public class EmailAccountCreationService implements AccountCreationService {
     }
 
     @Override
-    public void beginActivation(String email, String clientId) {
+    public void beginActivation(String email, String password, String clientId) {
         String subject = getSubjectText();
         try {
             Timestamp expiresAt = new Timestamp(System.currentTimeMillis() + (60 * 60 * 1000)); // 1 hour

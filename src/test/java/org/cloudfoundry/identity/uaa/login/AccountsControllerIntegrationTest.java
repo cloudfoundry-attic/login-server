@@ -183,6 +183,8 @@ public class AccountsControllerIntegrationTest {
 
         mockMvc.perform(post("/accounts")
                     .param("email", "user@example.com")
+                    .param("password", "secret")
+                    .param("password_confirmation", "secret")
                     .param("client_id", "login"))
                 .andExpect(status().isFound())
                 .andExpect(redirectedUrl("accounts/email_sent"));

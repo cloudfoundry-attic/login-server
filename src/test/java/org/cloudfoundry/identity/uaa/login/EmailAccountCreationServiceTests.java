@@ -1,7 +1,6 @@
 package org.cloudfoundry.identity.uaa.login;
 
 import org.cloudfoundry.identity.uaa.login.test.ThymeleafConfig;
-import org.cloudfoundry.identity.uaa.rest.QueryableResourceManager;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.hamcrest.Matchers;
 import org.junit.Before;
@@ -67,7 +66,7 @@ public class EmailAccountCreationServiceTests {
     public void testBeginActivation() throws Exception {
         setUpForSuccess();
 
-        emailAccountCreationService.beginActivation("user@example.com", "login");
+        emailAccountCreationService.beginActivation("user@example.com", "password", "login");
 
         mockUaaServer.verify();
 
@@ -90,7 +89,7 @@ public class EmailAccountCreationServiceTests {
 
         setUpForSuccess();
 
-        emailAccountCreationService.beginActivation("user@example.com", "login");
+        emailAccountCreationService.beginActivation("user@example.com", "password", "login");
 
         ArgumentCaptor<String> emailBodyArgument = ArgumentCaptor.forClass(String.class);
         verify(messageService).sendMessage((String) isNull(),
