@@ -123,7 +123,7 @@ public class RemoteUaaControllerMockMvcTests {
 
         mockMvc.perform(get("/login").accept(TEXT_HTML))
                 .andExpect(status().isOk())
-                .andExpect(model().attribute("createAccountLink", "/accounts/new"));
+                .andExpect(model().attribute("createAccountLink", "/create_account"));
     }
 
     @Test

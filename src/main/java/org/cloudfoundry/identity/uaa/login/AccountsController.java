@@ -38,7 +38,6 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 @Controller
-@RequestMapping("/accounts")
 public class AccountsController {
 
     private final AccountCreationService accountCreationService;
@@ -47,19 +46,14 @@ public class AccountsController {
         this.accountCreationService = accountCreationService;
     }
 
-    @RequestMapping(value = "/new", method = GET)
+    @RequestMapping(value = "/create_account", method = GET)
     public String activationEmail(Model model,
                                   @RequestParam(value = "client_id", defaultValue = "login") String clientId) {
         model.addAttribute("client_id", clientId);
         return "accounts/new_activation_email";
     }
 
-    @RequestMapping(value = "/new", method = GET, params = {"code", "email"})
-    public String newAccount() {
-        return "accounts/new";
-    }
-
-    @RequestMapping(method = POST, params = {"email", "client_id"})
+    @RequestMapping(value = "/create_account.do", method = POST)
     public String sendActivationEmail(Model model, HttpServletResponse response,
                                       @RequestParam("client_id") String clientId,
                                       @Valid @ModelAttribute("email") ValidEmail email, BindingResult result,
@@ -80,12 +74,12 @@ public class AccountsController {
         return "redirect:accounts/email_sent";
     }
 
-    @RequestMapping(value = "/email_sent", method = RequestMethod.GET)
+    @RequestMapping(value = "/accounts/email_sent", method = RequestMethod.GET)
     public String emailSent() {
         return "accounts/email_sent";
     }
 
-    @RequestMapping(method = POST, params = {"email", "code", "password", "password_confirmation"})
+    @RequestMapping(value = "/accounts", method = POST)
     public String createAccount(Model model,
                                 @RequestParam("code") String code,
                                 @RequestParam("password") String password,

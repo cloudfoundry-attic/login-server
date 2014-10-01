@@ -82,7 +82,7 @@ public class AccountsControllerIntegrationTest {
     public void testCreateActivationEmailPage() throws Exception {
         ((MockEnvironment) webApplicationContext.getEnvironment()).setProperty("login.brand", "oss");
 
-        mockMvc.perform(get("/accounts/new"))
+        mockMvc.perform(get("/create_account.do"))
                 .andExpect(content().string(containsString("Create your account")))
                 .andExpect(content().string(not(containsString("Pivotal ID"))));
     }
@@ -91,7 +91,7 @@ public class AccountsControllerIntegrationTest {
     public void testCreateActivationEmailPageWithPivotalBrand() throws Exception {
         ((MockEnvironment) webApplicationContext.getEnvironment()).setProperty("login.brand", "pivotal");
 
-        mockMvc.perform(get("/accounts/new"))
+        mockMvc.perform(get("/create_account.do"))
             .andExpect(content().string(containsString("Create your Pivotal ID")))
             .andExpect(content().string(not(containsString("Create your account"))));
     }
@@ -116,24 +116,6 @@ public class AccountsControllerIntegrationTest {
                 .andExpect(content().string(containsString("Create your Pivotal ID")))
                 .andExpect(xpath("//input[@disabled='disabled']/@value").string("Email successfully sent"))
                 .andExpect(content().string(not(containsString("Create your account"))));
-    }
-
-    @Test
-    public void testCreateAccountPage() throws Exception {
-        ((MockEnvironment) webApplicationContext.getEnvironment()).setProperty("login.brand", "oss");
-
-        mockMvc.perform(get("/accounts/new").param("code", "the_secret_code").param("email", "user@example.com"))
-            .andExpect(content().string(containsString("Create your account")))
-            .andExpect(content().string(not(containsString("Pivotal ID"))));
-    }
-
-    @Test
-    public void testCreateAccountPageWithPivotalBrand() throws Exception {
-        ((MockEnvironment) webApplicationContext.getEnvironment()).setProperty("login.brand", "pivotal");
-
-        mockMvc.perform(get("/accounts/new").param("code", "the_secret_code").param("email", "user@example.com"))
-            .andExpect(content().string(containsString("Create your Pivotal ID")))
-            .andExpect(content().string(not(containsString("Create account"))));
     }
 
     @Test
@@ -181,7 +163,7 @@ public class AccountsControllerIntegrationTest {
             .andExpect(method(GET))
             .andRespond(withSuccess(clientDetails, APPLICATION_JSON));
 
-        mockMvc.perform(post("/accounts")
+        mockMvc.perform(post("/create_account.do")
                     .param("email", "user@example.com")
                     .param("password", "secret")
                     .param("password_confirmation", "secret")

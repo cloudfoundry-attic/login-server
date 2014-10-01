@@ -116,7 +116,7 @@ public class CreateAccountIT {
     public void testClientInitiatedSignup() throws Exception {
         String userEmail = "user" + new SecureRandom().nextInt() + "@example.com";
 
-        webDriver.get(baseUrl + "/accounts/new?client_id=app");
+        webDriver.get(baseUrl + "/create_account?client_id=app");
 
         Assert.assertEquals("Create your account", webDriver.findElement(By.tagName("h1")).getText());
 

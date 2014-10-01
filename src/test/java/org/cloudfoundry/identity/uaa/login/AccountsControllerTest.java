@@ -65,7 +65,7 @@ public class AccountsControllerTest {
 
     @Test
     public void testNewAccountPage() throws Exception {
-        mockMvc.perform(get("/accounts/new").param("client_id", "app"))
+        mockMvc.perform(get("/create_account").param("client_id", "app"))
                 .andExpect(status().isOk())
                 .andExpect(model().attribute("client_id", "app"))
                 .andExpect(view().name("accounts/new_activation_email"));
@@ -73,7 +73,7 @@ public class AccountsControllerTest {
 
     @Test
     public void testSendActivationEmail() throws Exception {
-        MockHttpServletRequestBuilder post = post("/accounts")
+        MockHttpServletRequestBuilder post = post("/create_account.do")
             .param("email", "user1@example.com")
             .param("password", "password")
             .param("password_confirmation", "password")
@@ -90,7 +90,7 @@ public class AccountsControllerTest {
     public void testSendActivationEmailWithUserNameConflict() throws Exception {
         doThrow(new UaaException("username already exists", 409)).when(accountCreationService).beginActivation("user1@example.com", "password", "app");
 
-        MockHttpServletRequestBuilder post = post("/accounts")
+        MockHttpServletRequestBuilder post = post("/create_account.do")
             .param("email", "user1@example.com")
             .param("password", "password")
             .param("password_confirmation", "password")
@@ -106,7 +106,7 @@ public class AccountsControllerTest {
 
     @Test
     public void testInvalidEmail() throws Exception {
-        MockHttpServletRequestBuilder post = post("/accounts")
+        MockHttpServletRequestBuilder post = post("/create_account.do")
             .param("email", "wrong")
             .param("password", "password")
             .param("password_confirmation", "password")
@@ -120,7 +120,7 @@ public class AccountsControllerTest {
 
     @Test
     public void testPasswordMismatch() throws Exception {
-        MockHttpServletRequestBuilder post = post("/accounts")
+        MockHttpServletRequestBuilder post = post("/create_account.do")
             .param("email", "user1@example.com")
             .param("password", "pass")
             .param("password_confirmation", "word")

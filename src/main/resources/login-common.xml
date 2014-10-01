@@ -134,7 +134,7 @@
 
 	<util:map id="links">
         <entry key="passwd" value="${links.passwd:}" />
-        <entry key="register" value="${links.signup:/accounts/new}" />
+        <entry key="register" value="${links.signup:/create_account}" />
 	</util:map>
 
 	<bean id="homeController" class="org.cloudfoundry.identity.uaa.login.HomeController">
