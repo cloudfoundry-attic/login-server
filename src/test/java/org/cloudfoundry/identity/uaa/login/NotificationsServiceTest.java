@@ -56,11 +56,6 @@ public class NotificationsServiceTest {
         userDetails.put("id", "user-id-01");
         resources.add(userDetails);
         response.put("resources", resources);
-    }
-
-    @Test
-    public void testSendMessage() throws Exception {
-        when(uaaTemplate.getForObject("http://uaa.com/ids/Users?attributes=id&filter=userName eq \"user@example.com\"", Map.class)).thenReturn(response);
 
         mockNotificationsServer.expect(requestTo("http://notifications.example.com/registration"))
             .andExpect(method(PUT))
@@ -69,6 +64,11 @@ public class NotificationsServiceTest {
             .andExpect(jsonPath("$.kinds[0].description").value("password reset"))
             .andExpect(jsonPath("$.kinds[0].critical").value(true))
             .andRespond(withSuccess());
+    }
+
+    @Test
+    public void testSendMessage() throws Exception {
+        when(uaaTemplate.getForObject("http://uaa.com/ids/Users?attributes=id&filter=userName eq \"user@example.com\" and origin eq \"uaa\"", Map.class)).thenReturn(response);
 
         mockNotificationsServer.expect(requestTo("http://notifications.example.com/users/user-id-01"))
             .andExpect(method(POST))
@@ -82,11 +82,31 @@ public class NotificationsServiceTest {
             .andExpect(jsonPath("$.subject").value("Second message"))
             .andRespond(withSuccess());
 
-        notificationsService.sendMessage("user@example.com", MessageType.PASSWORD_RESET, "First message", "<p>Text</p>");
+        notificationsService.sendMessage("user@example.com", MessageType.PASSWORD_RESET, "First message", "<p>Text</p>", "uaa");
 
         assertTrue(notificationsService.getIsNotificationsRegistered());
 
-        notificationsService.sendMessage("user@example.com", MessageType.PASSWORD_RESET, "Second message", "<p>Text</p>");
+        notificationsService.sendMessage("user@example.com", MessageType.PASSWORD_RESET, "Second message", "<p>Text</p>", "uaa");
+
+        mockNotificationsServer.verify();
+    }
+
+    @Test
+    public void testSendMessageToUnknownOrigin() throws Exception {
+        Map<String,String> otherUser = new HashMap<>();
+        otherUser.put("id", "user-id-02");
+        ((List<Map<String, String>>) response.get("resources")).add(otherUser);
+
+        when(uaaTemplate.getForObject("http://uaa.com/ids/Users?attributes=id&filter=userName eq \"user@example.com\"", Map.class)).thenReturn(response);
+
+        mockNotificationsServer.expect(requestTo("http://notifications.example.com/users/user-id-01"))
+            .andExpect(method(POST))
+            .andExpect(jsonPath("$.kind_id").value("kind-id-01"))
+            .andExpect(jsonPath("$.subject").value("Sorry, we do not manage your account"))
+            .andExpect(jsonPath("$.html").value("<p>Sorry</p>"))
+            .andRespond(withSuccess());
+
+        notificationsService.sendMessage("user@example.com", MessageType.PASSWORD_RESET, "Sorry, we do not manage your account", "<p>Sorry</p>", null);
 
         mockNotificationsServer.verify();
     }

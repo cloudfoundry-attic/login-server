@@ -68,7 +68,8 @@ public class EmailChangeEmailServiceTest {
             eq("new@example.com"),
             eq(MessageType.CHANGE_EMAIL),
             eq("Email change verification"),
-            contains("<a href=\"http://localhost/login/verify_email?code=the_secret_code\">Verify your email</a>")
+            contains("<a href=\"http://localhost/login/verify_email?code=the_secret_code\">Verify your email</a>"),
+            eq("uaa")
         );
     }
 

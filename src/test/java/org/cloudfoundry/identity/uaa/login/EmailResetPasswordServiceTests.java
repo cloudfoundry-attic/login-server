@@ -12,7 +12,6 @@
  *******************************************************************************/
 package org.cloudfoundry.identity.uaa.login;
 
-import org.apache.http.HttpResponse;
 import org.cloudfoundry.identity.uaa.error.UaaException;
 import org.cloudfoundry.identity.uaa.login.test.ThymeleafConfig;
 import org.hamcrest.Matchers;
@@ -24,25 +23,21 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.client.ClientHttpRequest;
-import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.mock.env.MockEnvironment;
-import org.springframework.mock.http.client.MockClientHttpResponse;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.client.MockRestServiceServer;
-import org.springframework.test.web.client.ResponseCreator;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.thymeleaf.spring4.SpringTemplateEngine;
 
-import java.io.IOException;
 import java.util.Map;
 
 import static org.mockito.Matchers.contains;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isNull;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
@@ -93,7 +88,8 @@ public class EmailResetPasswordServiceTests {
             eq("user@example.com"),
             eq(MessageType.PASSWORD_RESET),
             eq("Pivotal account password reset request"),
-            contains("<a href=\"http://localhost/login/reset_password?code=the_secret_code&amp;email=user%40example.com\">Reset your password</a>")
+            contains("<a href=\"http://localhost/login/reset_password?code=the_secret_code&amp;email=user%40example.com\">Reset your password</a>"),
+            eq("uaa")
         );
     }
 
@@ -116,7 +112,8 @@ public class EmailResetPasswordServiceTests {
             eq("user@example.com"),
             eq(MessageType.PASSWORD_RESET),
             eq("Pivotal account password reset request"),
-            contains("Your account credentials for localhost are managed by an external service. Please contact your administrator for password recovery requests.")
+            contains("Your account credentials for localhost are managed by an external service. Please contact your administrator for password recovery requests."),
+            (String) isNull()
         );
     }
 

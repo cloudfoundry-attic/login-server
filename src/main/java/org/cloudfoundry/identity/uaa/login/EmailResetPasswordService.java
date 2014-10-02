@@ -14,6 +14,7 @@ package org.cloudfoundry.identity.uaa.login;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.cloudfoundry.identity.uaa.authentication.Origin;
 import org.cloudfoundry.identity.uaa.error.UaaException;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.env.Environment;
@@ -57,12 +58,14 @@ public class EmailResetPasswordService implements ResetPasswordService {
     public void forgotPassword(String email) {
         String subject = getSubjectText();
         String htmlContent = null;
+        String origin = Origin.UAA;
         try {
             String code = uaaTemplate.postForObject(uaaBaseUrl + "/password_resets", email, String.class);
             htmlContent = getCodeSentEmailHtml(code, email);
         } catch (HttpClientErrorException e) {
             if (e.getStatusCode() == HttpStatus.CONFLICT) {
                 htmlContent = getResetUnavailableEmailHtml(email);
+                origin = null;
             } else {
                 logger.info("Exception raised while creating password reset for " + email, e);
             }
@@ -71,7 +74,7 @@ public class EmailResetPasswordService implements ResetPasswordService {
         }
 
         if(htmlContent != null) {
-            messageService.sendMessage(email, MessageType.PASSWORD_RESET, subject, htmlContent);
+            messageService.sendMessage(email, MessageType.PASSWORD_RESET, subject, htmlContent, origin);
         }
     }
 

@@ -29,10 +29,11 @@ public class NotificationsService implements MessageService {
     }
 
     @Override
-    public void sendMessage(String email, MessageType messageType, String subject, String htmlContent) {
+    public void sendMessage(String email, MessageType messageType, String subject, String htmlContent, String origin) {
         if(!getIsNotificationsRegistered())
                 registerNotifications();
-        Map<String, Object> response = uaaTemplate.getForObject(uaaUrl + "/ids/Users?attributes=id&filter=userName eq \"" + email + "\"", Map.class);
+        String originClause = (origin != null)? " and origin eq \"" + origin + "\"" : "";
+        Map<String, Object> response = uaaTemplate.getForObject(uaaUrl + "/ids/Users?attributes=id&filter=userName eq \"" + email + "\"" + originClause, Map.class);
         List<Map<String,String>> resources = (List<Map<String, String>>) response.get("resources");
         String userId = resources.get(0).get("id");
 
