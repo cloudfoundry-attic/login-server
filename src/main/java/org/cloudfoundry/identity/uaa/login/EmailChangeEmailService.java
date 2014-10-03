@@ -1,6 +1,5 @@
 package org.cloudfoundry.identity.uaa.login;
 
-import org.cloudfoundry.identity.uaa.authentication.Origin;
 import org.cloudfoundry.identity.uaa.error.UaaException;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -47,7 +46,7 @@ public class EmailChangeEmailService implements ChangeEmailService {
         String htmlContent = getEmailChangeEmailHtml(email, newEmail, expiringCode);
 
         if(htmlContent != null) {
-            messageService.sendMessage(newEmail, MessageType.CHANGE_EMAIL, subject, htmlContent, Origin.UAA);
+            messageService.sendMessage(null, newEmail, MessageType.CHANGE_EMAIL, subject, htmlContent);
         }
     }
 

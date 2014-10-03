@@ -22,29 +22,32 @@ import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.client.ClientHttpRequest;
+import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.mock.env.MockEnvironment;
+import org.springframework.mock.http.client.MockClientHttpResponse;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.client.MockRestServiceServer;
+import org.springframework.test.web.client.ResponseCreator;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.thymeleaf.spring4.SpringTemplateEngine;
 
+import java.io.IOException;
 import java.util.Map;
 
 import static org.mockito.Matchers.contains;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.isNull;
 import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withBadRequest;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -53,7 +56,6 @@ public class EmailResetPasswordServiceTests {
 
     private EmailResetPasswordService emailResetPasswordService;
     private MockRestServiceServer mockUaaServer;
-    private MockEnvironment mockEnvironment;
     private MessageService messageService;
 
     @Autowired
@@ -65,15 +67,14 @@ public class EmailResetPasswordServiceTests {
         RestTemplate uaaTemplate = new RestTemplate();
         mockUaaServer = MockRestServiceServer.createServer(uaaTemplate);
         messageService = Mockito.mock(EmailService.class);
-        mockEnvironment = new MockEnvironment();
-        emailResetPasswordService = new EmailResetPasswordService(templateEngine, messageService, uaaTemplate, "http://uaa.example.com/uaa", "pivotal", "reset_password_kind_id", mockEnvironment);
+        emailResetPasswordService = new EmailResetPasswordService(templateEngine, messageService, uaaTemplate, "http://uaa.example.com/uaa", "pivotal");
     }
 
     @Test
     public void testForgotPasswordWhenAResetCodeIsReturnedByTheUaa() throws Exception {
         mockUaaServer.expect(requestTo("http://uaa.example.com/uaa/password_resets"))
                 .andExpect(method(POST))
-                .andRespond(withSuccess("the_secret_code", APPLICATION_JSON));
+                .andRespond(withSuccess("{\"code\":\"the_secret_code\",\"user_id\":\"user-id-001\"}", APPLICATION_JSON));
 
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.setProtocol("http");
@@ -84,12 +85,11 @@ public class EmailResetPasswordServiceTests {
 
         mockUaaServer.verify();
 
-        Mockito.verify(messageService).sendMessage(
+        Mockito.verify(messageService).sendMessage(eq("user-id-001"),
             eq("user@example.com"),
             eq(MessageType.PASSWORD_RESET),
             eq("Pivotal account password reset request"),
-            contains("<a href=\"http://localhost/login/reset_password?code=the_secret_code&amp;email=user%40example.com\">Reset your password</a>"),
-            eq("uaa")
+            contains("<a href=\"http://localhost/login/reset_password?code=the_secret_code&amp;email=user%40example.com\">Reset your password</a>")
         );
     }
 
@@ -97,7 +97,12 @@ public class EmailResetPasswordServiceTests {
     public void testForgotPasswordWhenConflictIsReturnedByTheUaa() throws Exception {
         mockUaaServer.expect(requestTo("http://uaa.example.com/uaa/password_resets"))
                 .andExpect(method(POST))
-                .andRespond(withStatus(HttpStatus.CONFLICT));
+                .andRespond(new ResponseCreator() {
+                    @Override
+                    public ClientHttpResponse createResponse(ClientHttpRequest request) throws IOException {
+                        return new MockClientHttpResponse("{\"user_id\":\"user-id-001\"}".getBytes(), CONFLICT);
+                    }
+                });
 
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.setProtocol("http");
@@ -108,12 +113,11 @@ public class EmailResetPasswordServiceTests {
 
         mockUaaServer.verify();
 
-        Mockito.verify(messageService).sendMessage(
+        Mockito.verify(messageService).sendMessage(eq("user-id-001"),
             eq("user@example.com"),
             eq(MessageType.PASSWORD_RESET),
             eq("Pivotal account password reset request"),
-            contains("Your account credentials for localhost are managed by an external service. Please contact your administrator for password recovery requests."),
-            (String) isNull()
+            contains("Your account credentials for localhost are managed by an external service. Please contact your administrator for password recovery requests.")
         );
     }
 

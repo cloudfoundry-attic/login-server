@@ -20,6 +20,7 @@ import org.thymeleaf.spring4.SpringTemplateEngine;
 
 import static org.mockito.Matchers.contains;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isNull;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
@@ -64,12 +65,11 @@ public class EmailChangeEmailServiceTest {
 
         mockUaaServer.verify();
 
-        Mockito.verify(messageService).sendMessage(
+        Mockito.verify(messageService).sendMessage((String) isNull(),
             eq("new@example.com"),
             eq(MessageType.CHANGE_EMAIL),
             eq("Email change verification"),
-            contains("<a href=\"http://localhost/login/verify_email?code=the_secret_code\">Verify your email</a>"),
-            eq("uaa")
+            contains("<a href=\"http://localhost/login/verify_email?code=the_secret_code\">Verify your email</a>")
         );
     }
 

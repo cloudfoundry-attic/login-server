@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpMethod.PUT;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
@@ -67,8 +66,7 @@ public class NotificationsServiceTest {
     }
 
     @Test
-    public void testSendMessage() throws Exception {
-        when(uaaTemplate.getForObject("http://uaa.com/ids/Users?attributes=id&filter=userName eq \"user@example.com\" and origin eq \"uaa\"", Map.class)).thenReturn(response);
+    public void testSendMessageToUserId() throws Exception {
 
         mockNotificationsServer.expect(requestTo("http://notifications.example.com/users/user-id-01"))
             .andExpect(method(POST))
@@ -82,31 +80,26 @@ public class NotificationsServiceTest {
             .andExpect(jsonPath("$.subject").value("Second message"))
             .andRespond(withSuccess());
 
-        notificationsService.sendMessage("user@example.com", MessageType.PASSWORD_RESET, "First message", "<p>Text</p>", "uaa");
+        notificationsService.sendMessage("user-id-01", "user@example.com", MessageType.PASSWORD_RESET, "First message", "<p>Text</p>");
 
         assertTrue(notificationsService.getIsNotificationsRegistered());
 
-        notificationsService.sendMessage("user@example.com", MessageType.PASSWORD_RESET, "Second message", "<p>Text</p>", "uaa");
+        notificationsService.sendMessage("user-id-01", null, MessageType.PASSWORD_RESET, "Second message", "<p>Text</p>");
 
         mockNotificationsServer.verify();
     }
 
     @Test
-    public void testSendMessageToUnknownOrigin() throws Exception {
-        Map<String,String> otherUser = new HashMap<>();
-        otherUser.put("id", "user-id-02");
-        ((List<Map<String, String>>) response.get("resources")).add(otherUser);
+    public void testSendingMessageToEmailAddress() throws Exception {
 
-        when(uaaTemplate.getForObject("http://uaa.com/ids/Users?attributes=id&filter=userName eq \"user@example.com\"", Map.class)).thenReturn(response);
-
-        mockNotificationsServer.expect(requestTo("http://notifications.example.com/users/user-id-01"))
+        mockNotificationsServer.expect(requestTo("http://notifications.example.com/emails"))
             .andExpect(method(POST))
-            .andExpect(jsonPath("$.kind_id").value("kind-id-01"))
-            .andExpect(jsonPath("$.subject").value("Sorry, we do not manage your account"))
-            .andExpect(jsonPath("$.html").value("<p>Sorry</p>"))
+            .andExpect(jsonPath("$.to").value("user@example.com"))
+            .andExpect(jsonPath("$.subject").value("First message"))
+            .andExpect(jsonPath("$.html").value("<p>Message</p>"))
             .andRespond(withSuccess());
 
-        notificationsService.sendMessage("user@example.com", MessageType.PASSWORD_RESET, "Sorry, we do not manage your account", "<p>Sorry</p>", null);
+        notificationsService.sendMessage(null, "user@example.com", MessageType.PASSWORD_RESET, "First message", "<p>Message</p>");
 
         mockNotificationsServer.verify();
     }
