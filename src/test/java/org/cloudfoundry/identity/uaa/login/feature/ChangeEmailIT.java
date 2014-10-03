@@ -13,15 +13,19 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.web.client.RestTemplate;
 
+import java.net.URI;
 import java.security.SecureRandom;
 import java.util.Iterator;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.springframework.http.HttpStatus.FOUND;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = DefaultIntegrationTestConfig.class)
@@ -89,6 +93,28 @@ public class ChangeEmailIT {
         assertThat(webDriver.findElement(By.cssSelector(".alert-success")).getText(), containsString("Email address successfully verified."));
         assertThat(webDriver.findElement(By.cssSelector(".nav")).getText(), containsString(newEmail));
         assertThat(webDriver.findElement(By.cssSelector(".profile")).getText(), containsString(newEmail));
+    }
+
+    @Test
+    public void testChangeEmailWithClientRedirect() throws Exception{
+        signIn(userEmail, "secret");
+
+        webDriver.get(baseUrl + "/change_email?client_id=app");
+
+        String newEmail = userEmail.replace("user", "new");
+        webDriver.findElement(By.name("newEmail")).sendKeys(newEmail);
+        webDriver.findElement(By.xpath("//input[@value='Send Verification Link']")).click();
+
+        Iterator receivedEmail = simpleSmtpServer.getReceivedEmail();
+        SmtpMessage message = (SmtpMessage) receivedEmail.next();
+        receivedEmail.remove();
+        String link = testClient.extractLink(message.getBody());
+
+        //rest template that does NOT follow redirects
+        RestTemplate restTemplate = new RestTemplate(new DefaultIntegrationTestConfig.HttpClientFactory());
+        ResponseEntity<String> responseEntity = restTemplate.getForEntity(link, String.class);
+        assertEquals(FOUND, responseEntity.getStatusCode());
+        assertEquals(new URI("http://localhost:8080/app/"), responseEntity.getHeaders().getLocation());
     }
 
     private void signIn(String userName, String password) {

@@ -62,29 +62,42 @@ public class ChangeEmailControllerTest {
     }
 
     @Test
+    public void testChangeEmailPageWithClientId() throws Exception {
+        setupSecurityContext();
+
+        mockMvc.perform(get("/change_email?client_id=app"))
+            .andExpect(status().isOk())
+            .andExpect(view().name("change_email"))
+            .andExpect(model().attribute("client_id", "app"))
+            .andExpect(model().attribute("email", "user@example.com"));
+    }
+
+    @Test
     public void testChangeEmail() throws Exception {
         setupSecurityContext();
 
         MockHttpServletRequestBuilder post = post("/change_email.do")
             .contentType(APPLICATION_FORM_URLENCODED)
-            .param("newEmail", "new@example.com");
+            .param("newEmail", "new@example.com")
+            .param("client_id", "app");
 
         mockMvc.perform(post)
             .andExpect(status().isFound())
             .andExpect(redirectedUrl("email_sent?code=email_change"));
 
-        Mockito.verify(changeEmailService).beginEmailChange("user-id-001", "bob", "new@example.com");
+        Mockito.verify(changeEmailService).beginEmailChange("user-id-001", "bob", "new@example.com", "app");
     }
 
     @Test
     public void testChangeEmailWithUsernameConflict() throws Exception {
         setupSecurityContext();
 
-        doThrow(new UaaException("username already exists", 409)).when(changeEmailService).beginEmailChange("user-id-001", "bob", "new@example.com");
+        doThrow(new UaaException("username already exists", 409)).when(changeEmailService).beginEmailChange("user-id-001", "bob", "new@example.com", "");
 
         MockHttpServletRequestBuilder post = post("/change_email.do")
             .contentType(APPLICATION_FORM_URLENCODED)
-            .param("newEmail", "new@example.com");
+            .param("newEmail", "new@example.com")
+            .param("client_id", "");
 
         mockMvc.perform(post)
             .andExpect(status().isUnprocessableEntity())
@@ -104,7 +117,8 @@ public class ChangeEmailControllerTest {
         SecurityContextHolder.getContext().setAuthentication(authentication);
         MockHttpServletRequestBuilder post = post("/change_email.do")
             .contentType(APPLICATION_FORM_URLENCODED)
-            .param("newEmail", "new@example.com");
+            .param("newEmail", "new@example.com")
+            .param("client_id", "app");
 
         mockMvc.perform(post)
             .andExpect(status().isFound())
@@ -120,7 +134,8 @@ public class ChangeEmailControllerTest {
 
         MockHttpServletRequestBuilder post = post("/change_email.do")
             .contentType(APPLICATION_FORM_URLENCODED)
-            .param("newEmail", "invalid");
+            .param("newEmail", "invalid")
+            .param("client_id", "app");
 
         mockMvc.perform(post)
             .andExpect(status().isUnprocessableEntity())
@@ -149,6 +164,30 @@ public class ChangeEmailControllerTest {
         Assert.assertEquals("user-id-001", principal.getId());
         Assert.assertEquals("new@example.com", principal.getName());
         Assert.assertEquals("new@example.com", principal.getEmail());
+    }
+
+    @Test
+    public void testVerifyEmailWithRedirectUrl() throws Exception {
+        Map<String,String> response = new HashMap<>();
+        response.put("userId", "user-id-001");
+        response.put("username", "new@example.com");
+        response.put("email", "new@example.com");
+        response.put("redirect_url", "//example.com/callback");
+        when(changeEmailService.completeVerification("the_secret_code")).thenReturn(response);
+
+        MockHttpServletRequestBuilder get = get("/verify_email")
+            .contentType(APPLICATION_FORM_URLENCODED)
+            .param("code", "the_secret_code");
+
+        mockMvc.perform(get)
+            .andExpect(status().isFound())
+            .andExpect(redirectedUrl("//example.com/callback"));
+
+        UaaPrincipal principal = ((UaaPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+        Assert.assertEquals("user-id-001", principal.getId());
+        Assert.assertEquals("new@example.com", principal.getName());
+        Assert.assertEquals("new@example.com", principal.getEmail());
+
     }
 
     @Test

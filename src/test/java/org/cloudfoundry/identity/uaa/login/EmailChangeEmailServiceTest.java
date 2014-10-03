@@ -61,7 +61,7 @@ public class EmailChangeEmailServiceTest {
     public void beginEmailChange() throws Exception {
         setUpForSuccess();
 
-        emailChangeEmailService.beginEmailChange("user-001", "user@example.com", "new@example.com");
+        emailChangeEmailService.beginEmailChange("user-001", "user@example.com", "new@example.com", "app");
 
         mockUaaServer.verify();
 
@@ -81,7 +81,7 @@ public class EmailChangeEmailServiceTest {
             .andExpect(jsonPath("$.email").value("new@example.com"))
             .andRespond(withStatus(HttpStatus.CONFLICT));
 
-        emailChangeEmailService.beginEmailChange("user-001", "user@example.com", "new@example.com");
+        emailChangeEmailService.beginEmailChange("user-001", "user@example.com", "new@example.com", null);
 
         mockUaaServer.verify();
 
@@ -121,6 +121,7 @@ public class EmailChangeEmailServiceTest {
             .andExpect(method(POST))
             .andExpect(jsonPath("$.userId").value("user-001"))
             .andExpect(jsonPath("$.email").value("new@example.com"))
+            .andExpect(jsonPath("$.client_id").value("app"))
             .andRespond(withSuccess("the_secret_code", APPLICATION_JSON));
     }
 }

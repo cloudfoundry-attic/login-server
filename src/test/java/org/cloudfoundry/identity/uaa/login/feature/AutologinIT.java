@@ -29,7 +29,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.LinkedMultiValueMap;
@@ -39,8 +38,6 @@ import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -129,7 +126,7 @@ public class AutologinIT {
             .build().toUriString();
 
         //rest template that does NOT follow redirects
-        RestTemplate template = new RestTemplate(new HttpClientFactory());
+        RestTemplate template = new RestTemplate(new DefaultIntegrationTestConfig.HttpClientFactory());
         headers.remove("Authorization");
         ResponseEntity<Map> authorizeResponse = template.exchange(authorizeUrl,
             HttpMethod.GET,
@@ -292,12 +289,5 @@ public class AutologinIT {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", testClient.getBasicAuthHeaderValue("app", "appclientsecret"));
         return headers;
-    }
-
-    private static class HttpClientFactory extends SimpleClientHttpRequestFactory {
-        protected void prepareConnection(HttpURLConnection connection, String httpMethod) throws IOException {
-            super.prepareConnection(connection, httpMethod);
-            connection.setInstanceFollowRedirects(false);
-        }
     }
 }

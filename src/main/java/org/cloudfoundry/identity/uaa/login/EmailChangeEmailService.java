@@ -32,10 +32,11 @@ public class EmailChangeEmailService implements ChangeEmailService {
     }
 
     @Override
-    public void beginEmailChange(String userId, String email, String newEmail) {
+    public void beginEmailChange(String userId, String email, String newEmail, String clientId) {
         Map<String,String> request = new HashMap<>();
         request.put("userId", userId);
         request.put("email", newEmail);
+        request.put("client_id", clientId);
         String expiringCode;
         try {
             expiringCode = uaaTemplate.postForObject(uaaBaseUrl + "/email_verifications", request, String.class);

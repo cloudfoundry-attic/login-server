@@ -13,7 +13,6 @@
 package org.cloudfoundry.identity.uaa.login.test;
 
 import org.cloudfoundry.identity.uaa.test.UaaTestAccounts;
-import org.cloudfoundry.identity.uaa.test.UrlHelper;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -23,10 +22,14 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.env.Environment;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.security.oauth2.client.test.TestAccounts;
 import org.springframework.web.client.RestTemplate;
 
 import com.dumbster.smtp.SimpleSmtpServer;
+
+import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.util.concurrent.TimeUnit;
 
 @Configuration
@@ -76,5 +79,12 @@ public class DefaultIntegrationTestConfig {
     public TestAccounts testAccounts(@Value("${integration.test.uaa_url}") String uaaUrl) {
         //TODO - actually USE the URL?
         return UaaTestAccounts.standard(null);
+    }
+
+    public static class HttpClientFactory extends SimpleClientHttpRequestFactory {
+        protected void prepareConnection(HttpURLConnection connection, String httpMethod) throws IOException {
+            super.prepareConnection(connection, httpMethod);
+            connection.setInstanceFollowRedirects(false);
+        }
     }
 }

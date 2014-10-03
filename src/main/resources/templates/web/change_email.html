@@ -17,6 +17,7 @@
             <div th:if="${error_message_code}" class="alert alert-error">
                 <p th:text="#{'email_change.' + ${error_message_code}}">Error Message</p>
             </div>
+            <input type="hidden" name="client_id" th:value="${client_id}"/>
             <input name="newEmail" type="email" placeholder="New Email Address" autocomplete="off" class="form-control"/>
             <input type="submit" value="Send Verification Link" class="island-button"/>
         </form>

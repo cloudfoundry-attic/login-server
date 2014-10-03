@@ -34,14 +34,15 @@ public class ChangeEmailController {
     }
 
     @RequestMapping(value = "/change_email", method = RequestMethod.GET)
-    public String changeEmailPage(Model model) {
+    public String changeEmailPage(Model model, @RequestParam(value = "client_id", required = false) String clientId) {
         SecurityContext securityContext = SecurityContextHolder.getContext();
         model.addAttribute("email", ((UaaPrincipal)securityContext.getAuthentication().getPrincipal()).getEmail());
+        model.addAttribute("client_id", clientId);
         return "change_email";
     }
 
     @RequestMapping(value = "/change_email.do", method = RequestMethod.POST)
-    public String changeEmail(Model model, @Valid @ModelAttribute("newEmail") ValidEmail newEmail, BindingResult result, RedirectAttributes redirectAttributes, HttpServletResponse response) {
+    public String changeEmail(Model model, @Valid @ModelAttribute("newEmail") ValidEmail newEmail, BindingResult result, @RequestParam("client_id") String clientId, RedirectAttributes redirectAttributes, HttpServletResponse response) {
         SecurityContext securityContext = SecurityContextHolder.getContext();
 
         if(result.hasErrors()) {
@@ -60,7 +61,7 @@ public class ChangeEmailController {
         String userEmail = ((UaaPrincipal)securityContext.getAuthentication().getPrincipal()).getName();
 
         try {
-            changeEmailService.beginEmailChange(userId, userEmail, newEmail.getNewEmail());
+            changeEmailService.beginEmailChange(userId, userEmail, newEmail.getNewEmail(), clientId);
         } catch (UaaException e) {
             if (e.getHttpStatus() == 409) {
                 model.addAttribute("error_message_code", "username_exists");
@@ -93,8 +94,13 @@ public class ChangeEmailController {
         UaaPrincipal uaaPrincipal = new UaaPrincipal(response.get("userId"), response.get("username"), response.get("email"), Origin.UAA, null);
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(uaaPrincipal, null, UaaAuthority.USER_AUTHORITIES);
         SecurityContextHolder.getContext().setAuthentication(token);
-        redirectAttributes.addAttribute("success_message_code", "email_change.success");
-        return "redirect:profile";
+
+        String redirectLocation = response.get("redirect_url");
+        if (redirectLocation == null) {
+            redirectLocation = "profile";
+            redirectAttributes.addAttribute("success_message_code", "email_change.success");
+        }
+        return "redirect:" + redirectLocation;
     }
 
     public static class ValidEmail {
