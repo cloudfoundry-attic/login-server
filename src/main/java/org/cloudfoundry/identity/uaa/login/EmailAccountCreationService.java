@@ -10,9 +10,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring4.SpringTemplateEngine;
 
-import javax.mail.MessagingException;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,16 +20,16 @@ public class EmailAccountCreationService implements AccountCreationService {
     private final Log logger = LogFactory.getLog(getClass());
 
     private final SpringTemplateEngine templateEngine;
-    private final EmailService emailService;
+    private final MessageService messageService;
     private final RestTemplate uaaTemplate;
     private final String uaaBaseUrl;
     private final String brand;
     private final ObjectMapper objectMapper;
 
-    public EmailAccountCreationService(ObjectMapper objectMapper, SpringTemplateEngine templateEngine, EmailService emailService, RestTemplate uaaTemplate, String uaaBaseUrl, String brand) {
+    public EmailAccountCreationService(ObjectMapper objectMapper, SpringTemplateEngine templateEngine, MessageService messageService, RestTemplate uaaTemplate, String uaaBaseUrl, String brand) {
         this.objectMapper = objectMapper;
         this.templateEngine = templateEngine;
-        this.emailService = emailService;
+        this.messageService = messageService;
         this.uaaTemplate = uaaTemplate;
         this.uaaBaseUrl = uaaBaseUrl;
         this.brand = brand;
@@ -46,13 +44,7 @@ public class EmailAccountCreationService implements AccountCreationService {
             ExpiringCode expiringCode = uaaTemplate.postForObject(uaaBaseUrl + "/Codes", expiringCodeForPost, ExpiringCode.class);
             String htmlContent = getEmailHtml(expiringCode.getCode(), email);
 
-            try {
-                emailService.sendMimeMessage(email, subject, htmlContent);
-            } catch (MessagingException e) {
-                logger.error("Exception raised while sending message to " + email, e);
-            } catch (UnsupportedEncodingException e) {
-                logger.error("Exception raised while sending message to " + email, e);
-            }
+            messageService.sendMessage(null, email, MessageType.CREATE_ACCOUNT_CONFIRMATION, subject, htmlContent);
         } catch (RestClientException e) {
             logger.info("Exception raised while creating account activation email for " + email, e);
         } catch (IOException e) {

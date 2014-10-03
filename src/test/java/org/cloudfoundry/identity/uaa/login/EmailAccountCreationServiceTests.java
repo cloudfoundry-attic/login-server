@@ -27,6 +27,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isNull;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CONFLICT;
@@ -44,7 +45,7 @@ public class EmailAccountCreationServiceTests {
 
     private EmailAccountCreationService emailAccountCreationService;
     private MockRestServiceServer mockUaaServer;
-    private EmailService emailService;
+    private MessageService messageService;
     private RestTemplate uaaTemplate;
 
     @Autowired
@@ -55,8 +56,8 @@ public class EmailAccountCreationServiceTests {
     public void setUp() throws Exception {
         uaaTemplate = new RestTemplate();
         mockUaaServer = MockRestServiceServer.createServer(uaaTemplate);
-        emailService = Mockito.mock(EmailService.class);
-        emailAccountCreationService = new EmailAccountCreationService(new ObjectMapper(), templateEngine, emailService, uaaTemplate, "http://uaa.example.com/uaa", "pivotal");
+        messageService = Mockito.mock(MessageService.class);
+        emailAccountCreationService = new EmailAccountCreationService(new ObjectMapper(), templateEngine, messageService, uaaTemplate, "http://uaa.example.com/uaa", "pivotal");
     }
 
     @Test
@@ -68,8 +69,9 @@ public class EmailAccountCreationServiceTests {
         mockUaaServer.verify();
 
         ArgumentCaptor<String> emailBodyArgument = ArgumentCaptor.forClass(String.class);
-        Mockito.verify(emailService).sendMimeMessage(
+        Mockito.verify(messageService).sendMessage((String) isNull(),
             eq("user@example.com"),
+            eq(MessageType.CREATE_ACCOUNT_CONFIRMATION),
             eq("Activate your Pivotal ID"),
             emailBodyArgument.capture()
         );
@@ -81,15 +83,16 @@ public class EmailAccountCreationServiceTests {
 
     @Test
     public void testBeginActivationWithOssBrand() throws Exception {
-        emailAccountCreationService = new EmailAccountCreationService(new ObjectMapper(), templateEngine, emailService, uaaTemplate, "http://uaa.example.com/uaa", "oss");
+        emailAccountCreationService = new EmailAccountCreationService(new ObjectMapper(), templateEngine, messageService, uaaTemplate, "http://uaa.example.com/uaa", "oss");
 
         setUpForSuccess();
 
         emailAccountCreationService.beginActivation("user@example.com", "login");
 
         ArgumentCaptor<String> emailBodyArgument = ArgumentCaptor.forClass(String.class);
-        Mockito.verify(emailService).sendMimeMessage(
+        Mockito.verify(messageService).sendMessage((String) isNull(),
             eq("user@example.com"),
+            eq(MessageType.CREATE_ACCOUNT_CONFIRMATION),
             eq("Activate your account"),
             emailBodyArgument.capture()
         );

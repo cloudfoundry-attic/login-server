@@ -262,44 +262,18 @@
 
     <import resource="classpath:/login-common.xml" />
 
-    <bean id="sendCodeNotificationKindId" class="java.lang.String" >
-        <constructor-arg value="f7a85fdc-d920-41f0-b3a4-55db08e408ce" />
-    </bean>
-
-    <bean id="sendActivationCodeMap" class="java.util.HashMap">
-        <constructor-arg>
-            <map>
-            <entry key="description" value="Send activation code"/>
-            <entry key="id" value="#{sendCodeNotificationKindId}"/>
-            </map>
-        </constructor-arg>
-    </bean>
-
-    <bean id="resetPasswordNotificationKindId" class="java.lang.String" >
-        <constructor-arg value="141200f6-93bd-4761-a721-941ab511ba2c" />
-    </bean>
-
-    <bean id="resetPasswordMap" class="java.util.HashMap">
-        <constructor-arg>
-            <map>
-                <entry key="description" value="Reset Password"/>
-                <entry key="id" value="#{resetPasswordNotificationKindId}"/>
-            </map>
-        </constructor-arg>
-    </bean>
-
     <util:map id="notifications" key-type="org.cloudfoundry.identity.uaa.login.MessageType">
         <entry key="CREATE_ACCOUNT_CONFIRMATION">
             <map>
                 <entry key="description" value="Send activation code"/>
-                <entry key="id" value="#{sendCodeNotificationKindId}"/>
+                <entry key="id" value="f7a85fdc-d920-41f0-b3a4-55db08e408ce"/>
                 <entry key="critical" value="true" value-type="java.lang.Boolean"/>
             </map>
         </entry>
         <entry key="PASSWORD_RESET">
             <map>
                 <entry key="description" value="Reset Password"/>
-                <entry key="id" value="#{resetPasswordNotificationKindId}"/>
+                <entry key="id" value="141200f6-93bd-4761-a721-941ab511ba2c"/>
                 <entry key="critical" value="true" value-type="java.lang.Boolean"/>
             </map>
         </entry>
@@ -446,7 +420,7 @@
             <bean class="org.codehaus.jackson.map.ObjectMapper"/>
         </constructor-arg>
         <constructor-arg ref="mailTemplateEngine"/>
-        <constructor-arg ref="emailService"/>
+        <constructor-arg ref="messageService"/>
         <constructor-arg ref="authorizationTemplate"/>
         <constructor-arg ref="uaaUrl"/>
         <constructor-arg value="${login.brand:oss}"/>
