@@ -5,6 +5,7 @@ import org.cloudfoundry.identity.uaa.login.test.ThymeleafConfig;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -18,6 +19,9 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.thymeleaf.spring4.SpringTemplateEngine;
 
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.contains;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isNull;
@@ -42,10 +46,11 @@ public class EmailChangeEmailServiceTest {
     @Autowired
     @Qualifier("mailTemplateEngine")
     SpringTemplateEngine templateEngine;
+    private RestTemplate uaaTemplate;
 
     @Before
     public void setUp() throws Exception {
-        RestTemplate uaaTemplate = new RestTemplate();
+        uaaTemplate = new RestTemplate();
         mockUaaServer = MockRestServiceServer.createServer(uaaTemplate);
         messageService = Mockito.mock(EmailService.class);
         emailChangeEmailService = new EmailChangeEmailService(templateEngine, messageService, uaaTemplate, "http://uaa.example.com/uaa", "pivotal");
@@ -71,6 +76,32 @@ public class EmailChangeEmailServiceTest {
             eq("Email change verification"),
             contains("<a href=\"http://localhost/login/verify_email?code=the_secret_code\">Verify your email</a>")
         );
+    }
+
+    @Test
+    public void testBeginEmailChangeWithOssBrand() throws Exception {
+        emailChangeEmailService = new EmailChangeEmailService(templateEngine, messageService, uaaTemplate, "http://uaa.example.com/uaa", "oss");
+
+        setUpForSuccess();
+
+        emailChangeEmailService.beginEmailChange("user-001", "user@example.com", "new@example.com", "app");
+
+        mockUaaServer.verify();
+
+        ArgumentCaptor<String> emailBodyArgument = ArgumentCaptor.forClass(String.class);
+        Mockito.verify(messageService).sendMessage((String) isNull(),
+            eq("new@example.com"),
+            eq(MessageType.CHANGE_EMAIL),
+            eq("Email change verification"),
+            emailBodyArgument.capture()
+        );
+
+        String emailBody = emailBodyArgument.getValue();
+
+        assertThat(emailBody, containsString("<a href=\"http://localhost/login/verify_email?code=the_secret_code\">Verify your email</a>"));
+        assertThat(emailBody, containsString("an account"));
+        assertThat(emailBody, containsString("Cloud Foundry"));
+        assertThat(emailBody, not(containsString("a Pivotal ID")));
     }
 
     @Test(expected = UaaException.class)
