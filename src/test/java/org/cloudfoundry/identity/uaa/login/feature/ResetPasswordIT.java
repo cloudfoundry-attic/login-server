@@ -104,7 +104,7 @@ public class ResetPasswordIT {
         assertEquals(userEmail, message.getHeaderValue("To"));
         assertThat(message.getBody(), containsString("Reset your password"));
 
-        assertEquals("Check your email for a reset password link.", webDriver.findElement(By.cssSelector(".instructions-sent")).getText());
+        assertEquals("Please check your email for a reset password link.", webDriver.findElement(By.cssSelector(".instructions-sent")).getText());
 
         // Click link in email
         String link = testClient.extractLink(message.getBody());
