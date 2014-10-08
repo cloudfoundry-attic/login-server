@@ -73,8 +73,13 @@
 
 	<authentication-manager xmlns="http://www.springframework.org/schema/security" />
 
-	<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
-		<property name="basename" value="messages" />
+	<bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+        <property name="basenames">
+            <list>
+              <value>#{systemEnvironment['CLOUD_FOUNDRY_CONFIG_PATH']!=null ? 'file:'+systemEnvironment['CLOUD_FOUNDRY_CONFIG_PATH']+'/messages':'classpath:messages'}</value>
+              <value>classpath:messages</value>
+            </list>
+        </property>
 	</bean>
 
 	<bean id="loginEntryPoint" class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
