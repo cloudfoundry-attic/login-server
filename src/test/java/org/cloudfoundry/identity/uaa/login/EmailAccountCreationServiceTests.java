@@ -1,14 +1,13 @@
 package org.cloudfoundry.identity.uaa.login;
 
 import org.cloudfoundry.identity.uaa.login.test.ThymeleafConfig;
+import org.cloudfoundry.identity.uaa.rest.QueryableResourceManager;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.hamcrest.Matchers;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -22,12 +21,17 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import org.thymeleaf.spring4.SpringTemplateEngine;
 
 import java.sql.Timestamp;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isNull;
+import static org.mockito.Mockito.*;
+import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CONFLICT;
@@ -35,7 +39,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withBadRequest;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
@@ -56,7 +59,7 @@ public class EmailAccountCreationServiceTests {
     public void setUp() throws Exception {
         uaaTemplate = new RestTemplate();
         mockUaaServer = MockRestServiceServer.createServer(uaaTemplate);
-        messageService = Mockito.mock(MessageService.class);
+        messageService = mock(MessageService.class);
         emailAccountCreationService = new EmailAccountCreationService(new ObjectMapper(), templateEngine, messageService, uaaTemplate, "http://uaa.example.com/uaa", "pivotal");
     }
 
@@ -69,7 +72,7 @@ public class EmailAccountCreationServiceTests {
         mockUaaServer.verify();
 
         ArgumentCaptor<String> emailBodyArgument = ArgumentCaptor.forClass(String.class);
-        Mockito.verify(messageService).sendMessage((String) isNull(),
+        verify(messageService).sendMessage((String) isNull(),
             eq("user@example.com"),
             eq(MessageType.CREATE_ACCOUNT_CONFIRMATION),
             eq("Activate your Pivotal ID"),
@@ -90,7 +93,7 @@ public class EmailAccountCreationServiceTests {
         emailAccountCreationService.beginActivation("user@example.com", "login");
 
         ArgumentCaptor<String> emailBodyArgument = ArgumentCaptor.forClass(String.class);
-        Mockito.verify(messageService).sendMessage((String) isNull(),
+        verify(messageService).sendMessage((String) isNull(),
             eq("user@example.com"),
             eq(MessageType.CREATE_ACCOUNT_CONFIRMATION),
             eq("Activate your account"),
@@ -104,50 +107,93 @@ public class EmailAccountCreationServiceTests {
 
     @Test
     public void testCompleteActivation() throws Exception {
-        String responseJson = "{\"user_id\":\"newly-created-user-id\",\"username\":\"user@example.com\",\"redirect_location\":\"/login-signup-callback\"}";
-        mockUaaServer.expect(requestTo("http://uaa.example.com/uaa/create_account"))
-                .andExpect(method(POST))
-                .andExpect(jsonPath("$.code").value("expiring_code"))
-                .andExpect(jsonPath("$.password").value("secret"))
-                .andRespond(withSuccess(responseJson, APPLICATION_JSON));    // *
-        // * uaa actually returns a created status, but MockRestServiceServer doesn't support the created code with a response body
+        Timestamp ts = new Timestamp(System.currentTimeMillis() + (60 * 60 * 1000)); // 1 hour
+        String uaaResponseJson = "{" +
+            "    \"code\":\"the_secret_code\"," +
+            "    \"expiresAt\":" + ts.getTime() + "," +
+            "    \"data\":\"{\\\"username\\\":\\\"user@example.com\\\",\\\"client_id\\\":\\\"app\\\"}\"" +
+            "}";
 
-        AccountCreationService.AccountCreation accountCreation = emailAccountCreationService.completeActivation("expiring_code", "secret");
+        mockUaaServer.expect(requestTo("http://uaa.example.com/uaa/Codes/the_secret_code"))
+            .andExpect(method(GET))
+            .andRespond(withSuccess(uaaResponseJson, APPLICATION_JSON));
+
+        String scimUserJSONString = "{" +
+            "\"userName\": \"user@example.com\"," +
+            "\"id\": \"newly-created-user-id\"," +
+            "\"emails\": [{\"value\":\"user@example.com\"}]" +
+            "}";
+
+
+        mockUaaServer.expect(requestTo("http://uaa.example.com/uaa/Users"))
+            .andExpect(method(POST))
+            .andExpect(jsonPath("$.userName").value("user@example.com"))
+            .andExpect(jsonPath("$.password").value("secret"))
+            .andExpect(jsonPath("$.origin").value("uaa"))
+            .andExpect(jsonPath("$.emails[0].value").value("user@example.com"))
+            .andRespond(withSuccess(scimUserJSONString, APPLICATION_JSON));
+
+        Map<String,Object> additionalInformation = new HashMap<>();
+        additionalInformation.put("signup_redirect_url", "http://example.com/redirect");
+
+        String clientDetails = "{" +
+                "\"client_id\": \"app\"," +
+                "\"signup_redirect_url\": \"http://example.com/redirect\"" +
+            "}";
+
+        mockUaaServer.expect(requestTo("http://uaa.example.com/uaa/oauth/clients/app"))
+            .andExpect(method(GET))
+            .andRespond(withSuccess(clientDetails, APPLICATION_JSON));
+
+        AccountCreationService.AccountCreation accountCreation = emailAccountCreationService.completeActivation("the_secret_code", "secret");
 
         mockUaaServer.verify();
 
-        Assert.assertEquals("user@example.com", accountCreation.getUsername());
-        Assert.assertEquals("newly-created-user-id", accountCreation.getUserId());
-        Assert.assertEquals("/login-signup-callback", accountCreation.getRedirectLocation());
+        assertEquals("user@example.com", accountCreation.getUsername());
+        assertEquals("newly-created-user-id", accountCreation.getUserId());
+        assertEquals("http://example.com/redirect", accountCreation.getRedirectLocation());
+        assertNotNull(accountCreation.getUserId());
     }
 
     @Test
     public void testCompleteActivationWithExpiredCode() throws Exception {
-        mockUaaServer.expect(requestTo("http://uaa.example.com/uaa/create_account"))
-                .andExpect(method(POST))
-                .andExpect(jsonPath("$.code").value("expiring_code"))
-                .andExpect(jsonPath("$.password").value("secret"))
-                .andRespond(withBadRequest());
+        mockUaaServer.expect(requestTo("http://uaa.example.com/uaa/Codes/expiring_code"))
+            .andExpect(method(GET))
+            .andRespond(withStatus(BAD_REQUEST));
 
         try {
             emailAccountCreationService.completeActivation("expiring_code", "secret");
-            Assert.fail();
-        } catch (HttpClientErrorException e) {
+            fail();
+        } catch(HttpClientErrorException e) {
             assertThat(e.getStatusCode(), Matchers.equalTo(BAD_REQUEST));
         }
     }
 
+
     @Test
     public void testCompleteActivationWithExistingUser() throws Exception {
-        mockUaaServer.expect(requestTo("http://uaa.example.com/uaa/create_account"))
-                .andExpect(method(POST))
-                .andExpect(jsonPath("$.code").value("expiring_code"))
-                .andExpect(jsonPath("$.password").value("secret"))
-                .andRespond(withStatus(CONFLICT));
+        Timestamp ts = new Timestamp(System.currentTimeMillis() + (60 * 60 * 1000)); // 1 hour
+        String uaaResponseJson = "{" +
+            "    \"code\":\"the_secret_code\"," +
+            "    \"expiresAt\":" + ts.getTime() + "," +
+            "    \"data\":\"{\\\"username\\\":\\\"user@example.com\\\",\\\"client_id\\\":\\\"login\\\"}\"" +
+            "}";
+
+        mockUaaServer.expect(requestTo("http://uaa.example.com/uaa/Codes/expiring_code"))
+            .andExpect(method(GET))
+            .andRespond(withSuccess(uaaResponseJson, APPLICATION_JSON));
+
+        mockUaaServer.expect(requestTo("http://uaa.example.com/uaa/Users"))
+            .andExpect(method(POST))
+            .andExpect(jsonPath("$.userName").value("user@example.com"))
+            .andExpect(jsonPath("$.password").value("secret"))
+            .andExpect(jsonPath("$.origin").value("uaa"))
+            .andExpect(jsonPath("$.emails[0].value").value("user@example.com"))
+            .andRespond(withStatus(CONFLICT));
 
         try {
             emailAccountCreationService.completeActivation("expiring_code", "secret");
-            Assert.fail();
+            fail();
         } catch (HttpClientErrorException e) {
             assertThat(e.getStatusCode(), Matchers.equalTo(CONFLICT));
         }

@@ -2,10 +2,12 @@ package org.cloudfoundry.identity.uaa.login;
 
 import org.codehaus.jackson.annotate.JsonProperty;
 
+import java.io.IOException;
+
 public interface AccountCreationService {
     void beginActivation(String email, String clientId);
 
-    AccountCreation completeActivation(String code, String password);
+    AccountCreation completeActivation(String code, String password) throws IOException;
 
     public static class AccountCreation {
         @JsonProperty("user_id")

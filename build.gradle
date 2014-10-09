@@ -54,10 +54,14 @@ repositories {
 
 dependencies {
   Project identityCommon = project(':cloudfoundry-identity-parent:cloudfoundry-identity-common')
+  compile (project(':cloudfoundry-identity-parent:cloudfoundry-identity-scim')) {
+    exclude(module: 'jna')
+  }
 
   compile(identityCommon) {
     exclude(module: 'jna')
   }
+
   compile group: 'org.springframework', name: 'spring-context-support', version:springVersion
   compile group: 'org.springframework.security', name: 'spring-security-openid', version:springSecurityVersion
   compile(group: 'org.springframework.security.extensions', name: 'spring-security-saml2-core', version:'1.0.0.RELEASE') {

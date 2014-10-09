@@ -23,10 +23,14 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.support.XmlWebApplicationContext;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.not;
+import static org.springframework.http.HttpMethod.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
@@ -136,18 +140,46 @@ public class AccountsControllerIntegrationTest {
     public void testCreatingAnAccount() throws Exception {
         mockUaaServer.expect(requestTo("http://localhost:8080/uaa/Codes"))
                 .andExpect(method(HttpMethod.POST))
-                .andRespond(withSuccess("{\"code\":\"rCvk9t\"," +
+                .andRespond(withSuccess("{\"code\":\"the_secret_code\"," +
                                 "\"expiresAt\":1406152741265," +
                                 "\"data\":\"{\\\"username\\\":\\\"user@example.com\\\",\\\"client_id\\\":\\\"login\\\"}\"}",
                         APPLICATION_JSON));
 
-        mockUaaServer.expect(requestTo("http://localhost:8080/uaa/create_account"))
-            .andExpect(jsonPath("$.code").value("the_secret_code"))
+        String uaaResponseJson = "{" +
+            "    \"code\":\"the_secret_code\"," +
+            "    \"expiresAt\":1406152741265," +
+            "    \"data\":\"{\\\"username\\\":\\\"user@example.com\\\",\\\"client_id\\\":\\\"login\\\"}\"" +
+            "}";
+
+        mockUaaServer.expect(requestTo("http://localhost:8080/uaa/Codes/the_secret_code"))
+            .andExpect(method(GET))
+            .andRespond(withSuccess(uaaResponseJson, APPLICATION_JSON));
+
+        String scimUserJSONString = "{" +
+            "\"userName\": \"user@example.com\"," +
+            "\"id\": \"newly-created-user-id\"," +
+            "\"emails\": [{\"value\":\"user@example.com\"}]" +
+            "}";
+
+        mockUaaServer.expect(requestTo("http://localhost:8080/uaa/Users"))
+            .andExpect(method(POST))
+            .andExpect(jsonPath("$.userName").value("user@example.com"))
             .andExpect(jsonPath("$.password").value("secret"))
-            .andRespond(withSuccess("{" +
-                    "\"user_id\":\"newly-created-user-id\"," +
-                    "\"username\":\"user@example.com\"" +
-                    "}", APPLICATION_JSON));
+            .andExpect(jsonPath("$.origin").value("uaa"))
+            .andExpect(jsonPath("$.emails[0].value").value("user@example.com"))
+            .andRespond(withSuccess(scimUserJSONString, APPLICATION_JSON));
+
+        Map<String,Object> additionalInformation = new HashMap<>();
+        additionalInformation.put("signup_redirect_url", "http://example.com/redirect");
+
+        String clientDetails = "{" +
+            "\"client_id\": \"login\"," +
+            "\"signup_redirect_url\": \"http://example.com/redirect\"" +
+            "}";
+
+        mockUaaServer.expect(requestTo("http://localhost:8080/uaa/oauth/clients/login"))
+            .andExpect(method(GET))
+            .andRespond(withSuccess(clientDetails, APPLICATION_JSON));
 
         mockMvc.perform(post("/accounts")
                     .param("email", "user@example.com")
@@ -161,7 +193,7 @@ public class AccountsControllerIntegrationTest {
                 .param("password", "secret")
                 .param("password_confirmation", "secret"))
             .andExpect(status().isFound())
-            .andExpect(redirectedUrl("home"))
+            .andExpect(redirectedUrl("http://example.com/redirect"))
             .andReturn();
 
         SecurityContext securityContext = (SecurityContext) mvcResult.getRequest().getSession().getAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY);

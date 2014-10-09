@@ -27,6 +27,8 @@ import org.springframework.web.client.HttpClientErrorException;
 
 import javax.servlet.http.HttpServletResponse;
 
+import java.io.IOException;
+
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
@@ -69,7 +71,7 @@ public class AccountsController {
                                 @RequestParam("code") String code,
                                 @RequestParam("password") String password,
                                 @RequestParam("password_confirmation") String passwordConfirmation,
-                                HttpServletResponse response) {
+                                HttpServletResponse response) throws IOException{
 
         ChangePasswordValidation validation = new ChangePasswordValidation(password, passwordConfirmation);
         if (!validation.valid()) {
