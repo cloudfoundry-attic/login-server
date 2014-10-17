@@ -63,12 +63,11 @@ public class EmailAccountCreationService implements AccountCreationService {
         } catch (HttpClientErrorException e) {
             String uaaResponse = e.getResponseBodyAsString();
             try {
-                ErrorResponse errorResponse = new ObjectMapper().readValue(uaaResponse, ErrorResponse.class);
-                UserDetails userDetails = new ObjectMapper().readValue(errorResponse.getMessage(), UserDetails.class);
-                if (userDetails.getVerified()) {
+                ExistingUserResponse existingUserResponse = new ObjectMapper().readValue(uaaResponse, ExistingUserResponse.class);
+                if (existingUserResponse.getVerified()) {
                     throw new UaaException(e.getStatusText(), e.getStatusCode().value());
                 }
-                generateAndSendCode(email, clientId, subject, userDetails.getUserId());
+                generateAndSendCode(email, clientId, subject, existingUserResponse.getUserId());
             } catch (IOException ioe) {
                 ioe.printStackTrace();
             }

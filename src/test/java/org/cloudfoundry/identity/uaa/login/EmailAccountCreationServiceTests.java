@@ -121,7 +121,7 @@ public class EmailAccountCreationServiceTests {
             .andRespond(new ResponseCreator() {
                 @Override
                 public ClientHttpResponse createResponse(ClientHttpRequest request) throws IOException {
-                    return new MockClientHttpResponse("{\"error\":\"invalid_user\",\"message\":\"{\\\"message\\\":\\\"error message\\\",\\\"user_id\\\":\\\"existing-user-id\\\",\\\"verified\\\":true,\\\"active\\\":true}\"}".getBytes(), CONFLICT);
+                    return new MockClientHttpResponse("{\"error\":\"invalid_user\",\"message\":\"error message\",\"user_id\":\"existing-user-id\",\"verified\":true,\"active\":true}".getBytes(), CONFLICT);
                 }
             });
         emailAccountCreationService.beginActivation("user@example.com", "password", "login");
@@ -138,7 +138,7 @@ public class EmailAccountCreationServiceTests {
             .andRespond(new ResponseCreator() {
                 @Override
                 public ClientHttpResponse createResponse(ClientHttpRequest request) throws IOException {
-                    return new MockClientHttpResponse("{\"error\":\"invalid_user\",\"message\":\"{\\\"message\\\":\\\"error message\\\",\\\"user_id\\\":\\\"existing-user-id\\\",\\\"verified\\\":false,\\\"active\\\":true}\"}".getBytes(), CONFLICT);
+                    return new MockClientHttpResponse("{\"error\":\"invalid_user\",\"message\":\"error message\",\"user_id\":\"existing-user-id\",\"verified\":false,\"active\":true}".getBytes(), CONFLICT);
                 }
             });
 

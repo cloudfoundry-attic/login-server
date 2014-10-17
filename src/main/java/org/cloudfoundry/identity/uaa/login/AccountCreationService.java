@@ -9,12 +9,21 @@ public interface AccountCreationService {
 
     AccountCreationResponse completeActivation(String code) throws IOException;
 
-    public static class ErrorResponse {
+    public static class ExistingUserResponse {
         @JsonProperty
         private String error;
 
         @JsonProperty
         private String message;
+
+        @JsonProperty("user_id")
+        private String userId;
+
+        @JsonProperty
+        private Boolean verified;
+
+        @JsonProperty
+        private Boolean active;
 
         public String getError() {
             return error;
@@ -31,20 +40,6 @@ public interface AccountCreationService {
         public void setMessage(String message) {
             this.message = message;
         }
-    }
-
-    public static class UserDetails {
-        @JsonProperty("user_id")
-        private String userId;
-
-        @JsonProperty
-        private Boolean verified;
-
-        @JsonProperty
-        private Boolean active;
-
-        @JsonProperty
-        private String message;
 
         public Boolean getVerified() {
             return verified;
@@ -69,15 +64,8 @@ public interface AccountCreationService {
         public void setUserId(String userId) {
             this.userId = userId;
         }
-
-        public String getMessage() {
-            return message;
-        }
-
-        public void setMessage(String message) {
-            this.message = message;
-        }
     }
+
     public static class AccountCreationResponse {
         @JsonProperty("user_id")
         private String userId;
