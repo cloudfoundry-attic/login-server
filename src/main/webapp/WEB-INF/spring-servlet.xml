@@ -118,9 +118,9 @@
         <security:anonymous enabled="true" />
     </security:http>
 
-    <security:http pattern="/accounts" disable-url-rewriting="true"
+    <security:http pattern="/verify_user" disable-url-rewriting="true"
                    entry-point-ref="loginEntryPoint">
-        <security:intercept-url pattern="/accounts" access="IS_AUTHENTICATED_ANONYMOUSLY" />
+        <security:intercept-url pattern="/**" access="IS_AUTHENTICATED_ANONYMOUSLY" />
         <security:anonymous enabled="true" />
     </security:http>
 

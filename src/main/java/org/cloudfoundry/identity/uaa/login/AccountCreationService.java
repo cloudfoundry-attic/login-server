@@ -7,8 +7,77 @@ import java.io.IOException;
 public interface AccountCreationService {
     void beginActivation(String email, String password, String clientId);
 
-    AccountCreationResponse completeActivation(String code, String password) throws IOException;
+    AccountCreationResponse completeActivation(String code) throws IOException;
 
+    public static class ErrorResponse {
+        @JsonProperty
+        private String error;
+
+        @JsonProperty
+        private String message;
+
+        public String getError() {
+            return error;
+        }
+
+        public void setError(String error) {
+            this.error = error;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        public void setMessage(String message) {
+            this.message = message;
+        }
+    }
+
+    public static class UserDetails {
+        @JsonProperty("user_id")
+        private String userId;
+
+        @JsonProperty
+        private Boolean verified;
+
+        @JsonProperty
+        private Boolean active;
+
+        @JsonProperty
+        private String message;
+
+        public Boolean getVerified() {
+            return verified;
+        }
+
+        public void setVerified(Boolean verified) {
+            this.verified = verified;
+        }
+
+        public Boolean getActive() {
+            return active;
+        }
+
+        public void setActive(Boolean active) {
+            this.active = active;
+        }
+
+        public String getUserId() {
+            return userId;
+        }
+
+        public void setUserId(String userId) {
+            this.userId = userId;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        public void setMessage(String message) {
+            this.message = message;
+        }
+    }
     public static class AccountCreationResponse {
         @JsonProperty("user_id")
         private String userId;

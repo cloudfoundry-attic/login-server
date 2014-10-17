@@ -12,8 +12,10 @@
  *******************************************************************************/
 package org.cloudfoundry.identity.uaa.login;
 
+import org.cloudfoundry.identity.uaa.authentication.UaaPrincipal;
 import org.cloudfoundry.identity.uaa.error.UaaException;
 import org.cloudfoundry.identity.uaa.login.test.ThymeleafConfig;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,6 +25,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.support.ResourceBundleMessageSource;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -35,6 +38,7 @@ import org.springframework.web.servlet.config.annotation.DefaultServletHandlerCo
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -131,6 +135,63 @@ public class AccountsControllerTest {
             .andExpect(view().name("accounts/new_activation_email"))
             .andExpect(model().attribute("error_message_code", "form_error"));
     }
+
+
+    @Test
+    public void testVerifyUser() throws Exception {
+        Mockito.when(accountCreationService.completeActivation("the_secret_code"))
+            .thenReturn(new AccountCreationService.AccountCreationResponse("newly-created-user-id", "username", "user@example.com", "//example.com/callback"));
+
+        MockHttpServletRequestBuilder get = get("/verify_user")
+                .param("code", "the_secret_code");
+
+        mockMvc.perform(get)
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("//example.com/callback"));
+
+        UaaPrincipal principal = ((UaaPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+        assertEquals("newly-created-user-id", principal.getId());
+        assertEquals("username", principal.getName());
+        assertEquals("user@example.com", principal.getEmail());
+    }
+
+    @Test
+    public void testCreateAccountWithNoRedirectUrl() throws Exception {
+        Mockito.when(accountCreationService.completeActivation("the_secret_code"))
+            .thenReturn(new AccountCreationService.AccountCreationResponse("newly-created-user-id", "username", "user@example.com", null));
+
+        MockHttpServletRequestBuilder get = get("/verify_user")
+            .param("code", "the_secret_code");
+
+        mockMvc.perform(get)
+            .andExpect(status().isFound())
+            .andExpect(redirectedUrl("home"));
+
+        UaaPrincipal principal = ((UaaPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+        assertEquals("newly-created-user-id", principal.getId());
+        assertEquals("username", principal.getName());
+        assertEquals("user@example.com", principal.getEmail());
+    }
+//
+//
+//    @Test
+//    public void testCreateAccountWithExpiredActivationCode() throws Exception {
+//        Mockito.when(accountCreationService.completeActivation("expired_code", "secret"))
+//                .thenThrow(new HttpClientErrorException(BAD_REQUEST));
+//
+//        MockHttpServletRequestBuilder post = post("/accounts")
+//                .param("email", "user@example.com")
+//                .param("code", "expired_code")
+//                .param("password", "secret")
+//                .param("password_confirmation", "secret");
+//
+//        mockMvc.perform(post)
+//                .andExpect(status().isUnprocessableEntity())
+//                .andExpect(model().attribute("message_code", "code_expired"))
+//                .andExpect(view().name("accounts/new"))
+//                .andExpect(xpath("//*[@class='error-message']").string("Your activation code has expired. Please request another."));
+//    }
+
 
     @Configuration
     @EnableWebMvc

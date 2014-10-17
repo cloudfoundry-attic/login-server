@@ -79,34 +79,21 @@ public class AccountsController {
         return "accounts/email_sent";
     }
 
-    @RequestMapping(value = "/accounts", method = POST)
-    public String createAccount(Model model,
+    @RequestMapping(value = "/verify_user", method = GET)
+    public String verifyUser(Model model,
                                 @RequestParam("code") String code,
-                                @RequestParam("password") String password,
-                                @RequestParam("password_confirmation") String passwordConfirmation,
-                                HttpServletResponse response) throws IOException{
-
-        ChangePasswordValidation validation = new ChangePasswordValidation(password, passwordConfirmation);
-        if (!validation.valid()) {
-            model.addAttribute("message_code", validation.getMessageCode());
-            response.setStatus(HttpStatus.UNPROCESSABLE_ENTITY.value());
-            return "accounts/new";
-        }
+                                HttpServletResponse response) throws IOException {
 
         AccountCreationService.AccountCreationResponse accountCreation;
         try {
-            accountCreation = accountCreationService.completeActivation(code, password);
+            accountCreation = accountCreationService.completeActivation(code);
         } catch (HttpClientErrorException e) {
-            if (e.getStatusCode().equals(HttpStatus.CONFLICT)) {
-                model.addAttribute("message_code", "email_already_taken");
-            } else {
-                model.addAttribute("message_code", "code_expired");
-            }
+            model.addAttribute("error_message_code", "code_expired");
             response.setStatus(HttpStatus.UNPROCESSABLE_ENTITY.value());
-            return "accounts/new";
+            return "accounts/new_activation_email";
         }
 
-        UaaPrincipal uaaPrincipal = new UaaPrincipal(accountCreation.getUserId(), accountCreation.getUsername(), accountCreation.getUsername(), Origin.UAA, null);
+        UaaPrincipal uaaPrincipal = new UaaPrincipal(accountCreation.getUserId(), accountCreation.getUsername(), accountCreation.getEmail(), Origin.UAA, null);
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(uaaPrincipal, null, UaaAuthority.USER_AUTHORITIES);
         SecurityContextHolder.getContext().setAuthentication(token);
 

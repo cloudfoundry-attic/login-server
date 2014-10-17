@@ -98,18 +98,17 @@ public class CreateAccountIT {
         String link = testClient.extractLink(message.getBody());
         assertFalse(isEmpty(link));
 
-//        webDriver.get(link);
+        webDriver.get(link);
+        Assert.assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), containsString("Where to?"));
 
-//        Assert.assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), containsString("Where to?"));
-//
-//        webDriver.findElement(By.xpath("//*[text()='"+userEmail+"']")).click();
-//        webDriver.findElement(By.linkText("Sign Out")).click();
-//
-//        webDriver.findElement(By.name("username")).sendKeys(userEmail);
-//        webDriver.findElement(By.name("password")).sendKeys("secret");
-//        webDriver.findElement(By.xpath("//input[@value='Sign in']")).click();
-//
-//        Assert.assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), containsString("Where to?"));
+        webDriver.findElement(By.xpath("//*[text()='"+userEmail+"']")).click();
+        webDriver.findElement(By.linkText("Sign Out")).click();
+
+        webDriver.findElement(By.name("username")).sendKeys(userEmail);
+        webDriver.findElement(By.name("password")).sendKeys("secret");
+        webDriver.findElement(By.xpath("//input[@value='Sign in']")).click();
+
+        Assert.assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), containsString("Where to?"));
     }
 
     @Test
@@ -139,12 +138,7 @@ public class CreateAccountIT {
         String link = testClient.extractLink(message.getBody());
         assertFalse(isEmpty(link));
 
-//        webDriver.get(link);
-//
-//        Assert.assertEquals("Create your account", webDriver.findElement(By.tagName("h1")).getText());
-//
-//        webDriver.findElement(By.xpath("//input[@value='Create account']")).click();
-//
-//        Assert.assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), not(containsString("Where to?")));
+        webDriver.get(link);
+        Assert.assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), not(containsString("Where to?")));
     }
 }

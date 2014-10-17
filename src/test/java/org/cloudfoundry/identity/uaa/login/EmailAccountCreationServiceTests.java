@@ -1,5 +1,6 @@
 package org.cloudfoundry.identity.uaa.login;
 
+import org.cloudfoundry.identity.uaa.error.UaaException;
 import org.cloudfoundry.identity.uaa.login.test.ThymeleafConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.hamcrest.Matchers;
@@ -9,16 +10,21 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.client.ClientHttpRequest;
+import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.mock.http.client.MockClientHttpResponse;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.client.MockRestServiceServer;
+import org.springframework.test.web.client.ResponseCreator;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.thymeleaf.spring4.SpringTemplateEngine;
 
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
@@ -79,7 +85,7 @@ public class EmailAccountCreationServiceTests {
         );
         String emailBody = emailBodyArgument.getValue();
         assertThat(emailBody, containsString("a Pivotal ID"));
-        assertThat(emailBody, containsString("<a href=\"http://localhost/login/accounts/new?code=the_secret_code&amp;email=user%40example.com\">Activate your account</a>"));
+        assertThat(emailBody, containsString("<a href=\"http://localhost/login/verify_user?code=the_secret_code&amp;email=user%40example.com\">Activate your account</a>"));
         assertThat(emailBody, not(containsString("Cloud Foundry")));
     }
 
@@ -100,8 +106,65 @@ public class EmailAccountCreationServiceTests {
         );
         String emailBody = emailBodyArgument.getValue();
         assertThat(emailBody, containsString("an account"));
-        assertThat(emailBody, containsString("<a href=\"http://localhost/login/accounts/new?code=the_secret_code&amp;email=user%40example.com\">Activate your account</a>"));
+        assertThat(emailBody, containsString("<a href=\"http://localhost/login/verify_user?code=the_secret_code&amp;email=user%40example.com\">Activate your account</a>"));
         assertThat(emailBody, not(containsString("Pivotal")));
+    }
+
+    @Test(expected = UaaException.class)
+    public void testBeginActivationWithExistingUser() throws Exception {
+        mockUaaServer.expect(requestTo("http://uaa.example.com/uaa/Users"))
+            .andExpect(method(POST))
+            .andExpect(jsonPath("$.userName").value("user@example.com"))
+            .andExpect(jsonPath("$.password").value("password"))
+            .andExpect(jsonPath("$.origin").value("uaa"))
+            .andExpect(jsonPath("$.emails[0].value").value("user@example.com"))
+            .andRespond(new ResponseCreator() {
+                @Override
+                public ClientHttpResponse createResponse(ClientHttpRequest request) throws IOException {
+                    return new MockClientHttpResponse("{\"error\":\"invalid_user\",\"message\":\"{\\\"message\\\":\\\"error message\\\",\\\"user_id\\\":\\\"existing-user-id\\\",\\\"verified\\\":true,\\\"active\\\":true}\"}".getBytes(), CONFLICT);
+                }
+            });
+        emailAccountCreationService.beginActivation("user@example.com", "password", "login");
+    }
+
+    @Test
+    public void testBeginActivationWithUnverifiedExistingUser() throws Exception {
+        mockUaaServer.expect(requestTo("http://uaa.example.com/uaa/Users"))
+            .andExpect(method(POST))
+            .andExpect(jsonPath("$.userName").value("user@example.com"))
+            .andExpect(jsonPath("$.password").value("password"))
+            .andExpect(jsonPath("$.origin").value("uaa"))
+            .andExpect(jsonPath("$.emails[0].value").value("user@example.com"))
+            .andRespond(new ResponseCreator() {
+                @Override
+                public ClientHttpResponse createResponse(ClientHttpRequest request) throws IOException {
+                    return new MockClientHttpResponse("{\"error\":\"invalid_user\",\"message\":\"{\\\"message\\\":\\\"error message\\\",\\\"user_id\\\":\\\"existing-user-id\\\",\\\"verified\\\":false,\\\"active\\\":true}\"}".getBytes(), CONFLICT);
+                }
+            });
+
+        String uaaResponseJson = "{" +
+            "    \"code\":\"the_secret_code\"," +
+            "    \"expiresAt\":9999999999," +
+            "    \"data\":\"{\\\"user_id\\\":\\\"existing-user-id\\\",\\\"client_id\\\":\\\"login\\\"}\"" +
+            "}";
+
+        mockUaaServer.expect(requestTo("http://uaa.example.com/uaa/Codes"))
+            .andExpect(method(POST))
+            .andExpect(jsonPath("$.data").value("{\"user_id\":\"existing-user-id\",\"client_id\":\"login\"}"))
+            .andRespond(withSuccess(uaaResponseJson, APPLICATION_JSON));
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setProtocol("http");
+        request.setContextPath("/login");
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
+
+        emailAccountCreationService.beginActivation("user@example.com", "password", "login");
+
+        verify(messageService).sendMessage((String) isNull(),
+            eq("user@example.com"),
+            eq(MessageType.CREATE_ACCOUNT_CONFIRMATION),
+            anyString(),
+            anyString()
+        );
     }
 
     @Test
@@ -110,7 +173,7 @@ public class EmailAccountCreationServiceTests {
         String uaaResponseJson = "{" +
             "    \"code\":\"the_secret_code\"," +
             "    \"expiresAt\":" + ts.getTime() + "," +
-            "    \"data\":\"{\\\"username\\\":\\\"user@example.com\\\",\\\"client_id\\\":\\\"app\\\"}\"" +
+            "    \"data\":\"{\\\"user_id\\\":\\\"newly-created-user-id\\\",\\\"client_id\\\":\\\"app\\\"}\"" +
             "}";
 
         mockUaaServer.expect(requestTo("http://uaa.example.com/uaa/Codes/the_secret_code"))
@@ -123,13 +186,8 @@ public class EmailAccountCreationServiceTests {
             "\"emails\": [{\"value\":\"user@example.com\"}]" +
             "}";
 
-
-        mockUaaServer.expect(requestTo("http://uaa.example.com/uaa/Users"))
-            .andExpect(method(POST))
-            .andExpect(jsonPath("$.userName").value("user@example.com"))
-            .andExpect(jsonPath("$.password").value("secret"))
-            .andExpect(jsonPath("$.origin").value("uaa"))
-            .andExpect(jsonPath("$.emails[0].value").value("user@example.com"))
+        mockUaaServer.expect(requestTo("http://uaa.example.com/uaa/Users/newly-created-user-id/verify"))
+            .andExpect(method(GET))
             .andRespond(withSuccess(scimUserJSONString, APPLICATION_JSON));
 
         Map<String,Object> additionalInformation = new HashMap<>();
@@ -144,7 +202,7 @@ public class EmailAccountCreationServiceTests {
             .andExpect(method(GET))
             .andRespond(withSuccess(clientDetails, APPLICATION_JSON));
 
-        AccountCreationService.AccountCreationResponse accountCreation = emailAccountCreationService.completeActivation("the_secret_code", "secret");
+        AccountCreationService.AccountCreationResponse accountCreation = emailAccountCreationService.completeActivation("the_secret_code");
 
         mockUaaServer.verify();
 
@@ -161,50 +219,36 @@ public class EmailAccountCreationServiceTests {
             .andRespond(withStatus(BAD_REQUEST));
 
         try {
-            emailAccountCreationService.completeActivation("expiring_code", "secret");
+            emailAccountCreationService.completeActivation("expiring_code");
             fail();
         } catch(HttpClientErrorException e) {
             assertThat(e.getStatusCode(), Matchers.equalTo(BAD_REQUEST));
         }
     }
 
-
-    @Test
-    public void testCompleteActivationWithExistingUser() throws Exception {
-        Timestamp ts = new Timestamp(System.currentTimeMillis() + (60 * 60 * 1000)); // 1 hour
-        String uaaResponseJson = "{" +
-            "    \"code\":\"the_secret_code\"," +
-            "    \"expiresAt\":" + ts.getTime() + "," +
-            "    \"data\":\"{\\\"username\\\":\\\"user@example.com\\\",\\\"client_id\\\":\\\"login\\\"}\"" +
+    private void setUpForSuccess() {
+        String scimUserJSONString = "{" +
+            "\"userName\": \"user@example.com\"," +
+            "\"id\": \"newly-created-user-id\"," +
+            "\"emails\": [{\"value\":\"user@example.com\"}]" +
             "}";
 
-        mockUaaServer.expect(requestTo("http://uaa.example.com/uaa/Codes/expiring_code"))
-            .andExpect(method(GET))
-            .andRespond(withSuccess(uaaResponseJson, APPLICATION_JSON));
 
         mockUaaServer.expect(requestTo("http://uaa.example.com/uaa/Users"))
             .andExpect(method(POST))
             .andExpect(jsonPath("$.userName").value("user@example.com"))
-            .andExpect(jsonPath("$.password").value("secret"))
+            .andExpect(jsonPath("$.password").value("password"))
             .andExpect(jsonPath("$.origin").value("uaa"))
+            .andExpect(jsonPath("$.active").value(true))
+            .andExpect(jsonPath("$.verified").value(false))
             .andExpect(jsonPath("$.emails[0].value").value("user@example.com"))
-            .andRespond(withStatus(CONFLICT));
+            .andRespond(withSuccess(scimUserJSONString, APPLICATION_JSON));
 
-        try {
-            emailAccountCreationService.completeActivation("expiring_code", "secret");
-            fail();
-        } catch (HttpClientErrorException e) {
-            assertThat(e.getStatusCode(), Matchers.equalTo(CONFLICT));
-        }
-    }
-
-    private void setUpForSuccess() {
         Timestamp ts = new Timestamp(System.currentTimeMillis() + (60 * 60 * 1000)); // 1 hour
-
         String uaaResponseJson = "{" +
             "    \"code\":\"the_secret_code\"," +
             "    \"expiresAt\":" + ts.getTime() + "," +
-            "    \"data\":\"{\\\"username\\\":\\\"user@example.com\\\",\\\"client_id\\\":\\\"login\\\"}\"" +
+            "    \"data\":\"{\\\"user_id\\\":\\\"newly-created-user-id\\\",\\\"client_id\\\":\\\"login\\\"}\"" +
             "}";
 
         mockUaaServer.expect(requestTo("http://uaa.example.com/uaa/Codes"))
