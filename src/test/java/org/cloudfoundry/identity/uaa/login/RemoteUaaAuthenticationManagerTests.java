@@ -25,6 +25,8 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.cloudfoundry.identity.uaa.authentication.Origin;
+import org.cloudfoundry.identity.uaa.authentication.UaaPrincipal;
 import org.cloudfoundry.identity.uaa.test.UaaTestAccounts;
 import org.junit.Before;
 import org.junit.Test;
@@ -61,6 +63,9 @@ public class RemoteUaaAuthenticationManagerTests {
         responseHeaders.setLocation(new URI("https://uaa.cloudfoundry.com/"));
         Map<String, String> response = new HashMap<String, String>();
         response.put("username", testAccounts.getUserName());
+        response.put("email", testAccounts.getEmail());
+        response.put("origin", Origin.UAA);
+        response.put("user_id", "user-id-001");
         @SuppressWarnings("rawtypes")
         ResponseEntity<Map> expectedResponse = new ResponseEntity<Map>(response, responseHeaders, HttpStatus.OK);
         when(
@@ -70,6 +75,7 @@ public class RemoteUaaAuthenticationManagerTests {
         Authentication result = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(testAccounts.getUserName(),
                         "foo"));
         assertEquals(testAccounts.getUserName(), result.getName());
+        assertEquals(testAccounts.getEmail(), ((UaaPrincipal)result.getPrincipal()).getEmail());
         assertTrue(result.isAuthenticated());
     }
 

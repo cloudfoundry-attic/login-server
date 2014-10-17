@@ -18,11 +18,11 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.common.exceptions.OAuth2Exception;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.client.RestClientException;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -61,8 +61,8 @@ public class ChangePasswordController {
         try {
             changePasswordService.changePassword(username, currentPassword, newPassword);
             return "redirect:profile";
-        } catch (OAuth2Exception e) {
-            model.addAttribute("message", e.getMessage());
+        } catch (RestClientException e) {
+            model.addAttribute("message_code", "unauthorized");
         }
         response.setStatus(HttpStatus.UNPROCESSABLE_ENTITY.value());
         return "change_password";

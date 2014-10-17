@@ -13,23 +13,19 @@
 package org.cloudfoundry.identity.uaa.login;
 
 import org.apache.commons.httpclient.contrib.ssl.EasySSLProtocolSocketFactory;
-import org.apache.commons.httpclient.contrib.ssl.StrictSSLProtocolSocketFactory;
 import org.apache.commons.httpclient.protocol.DefaultProtocolSocketFactory;
 import org.cloudfoundry.identity.uaa.config.YamlPropertiesFactoryBean;
 import org.cloudfoundry.identity.uaa.login.saml.IdentityProviderConfigurator;
 import org.cloudfoundry.identity.uaa.login.saml.IdentityProviderDefinition;
-import org.cloudfoundry.identity.uaa.login.ssl.FixedHttpMetaDataProvider;
 import org.junit.After;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
-import org.opensaml.saml2.metadata.provider.FilesystemMetadataProvider;
 import org.springframework.context.support.GenericXmlApplicationContext;
 import org.springframework.core.env.PropertiesPropertySource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.security.saml.log.SAMLDefaultLogger;
-import org.springframework.security.saml.metadata.ExtendedMetadataDelegate;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.ViewResolver;
 
@@ -42,6 +38,7 @@ import java.util.Set;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 /**
  * @author Dave Syer
@@ -156,6 +153,26 @@ public class BootstrapTests {
             IdentityProviderDefinition.MetadataLocation.URL,
             context.getBean(IdentityProviderConfigurator.class).getIdentityProviderDefinitions().get(0).getType()
         );
+    }
+
+    @Test
+    public void testMessageService() throws Exception {
+        context = getServletContext("default", "./src/main/resources/login.yml", "file:./src/main/webapp/WEB-INF/spring-servlet.xml");
+        Object messageService = context.getBean("messageService");
+        assertNotNull(messageService);
+        assertEquals(EmailService.class, messageService.getClass());
+
+        System.setProperty("notifications.url", "");
+        context = getServletContext("default", "./src/main/resources/login.yml", "file:./src/main/webapp/WEB-INF/spring-servlet.xml");
+        messageService = context.getBean("messageService");
+        assertNotNull(messageService);
+        assertEquals(EmailService.class, messageService.getClass());
+
+        System.setProperty("notifications.url", "example.com");
+        context = getServletContext("default", "./src/main/resources/login.yml", "file:./src/main/webapp/WEB-INF/spring-servlet.xml");
+        messageService = context.getBean("messageService");
+        assertNotNull(messageService);
+        assertEquals(NotificationsService.class, messageService.getClass());
     }
 
     private GenericXmlApplicationContext getServletContext(String profiles, String loginYmlPath, String... resources) {

@@ -126,7 +126,7 @@ public class PasscodeMockMvcTests {
                 HttpStatus.CREATED)
         );
 
-        PasscodeInformation pi = new PasscodeInformation("user_id", "username", "passcode", "origin", (Map)null);
+        PasscodeInformation pi = new PasscodeInformation("user_id", "username", "passcode", Origin.ORIGIN, (Map)null);
         when(
             restTemplate.exchange(
                 anyString(),
@@ -216,7 +216,7 @@ public class PasscodeMockMvcTests {
         assertTrue(authentication instanceof UsernamePasswordAuthenticationToken);
         assertTrue(authentication.getPrincipal() instanceof SocialClientUserDetails);
         SocialClientUserDetails details = (SocialClientUserDetails)authentication.getPrincipal();
-        assertEquals("origin", details.getSource());
+        assertEquals(Origin.ORIGIN, details.getSource());
 
     }
 

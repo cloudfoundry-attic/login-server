@@ -14,8 +14,12 @@ package org.cloudfoundry.identity.uaa.login;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.cloudfoundry.identity.uaa.authentication.Origin;
 import org.cloudfoundry.identity.uaa.error.UaaException;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.type.TypeReference;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -27,24 +31,23 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
-import java.io.UnsupportedEncodingException;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import javax.mail.MessagingException;
 
 public class EmailResetPasswordService implements ResetPasswordService {
 
     private final Log logger = LogFactory.getLog(getClass());
 
     private final TemplateEngine templateEngine;
-    private final EmailService emailService;
+    private final MessageService messageService;
     private final RestTemplate uaaTemplate;
     private final String uaaBaseUrl;
     private final String brand;
 
-    public EmailResetPasswordService(TemplateEngine templateEngine, EmailService emailService, RestTemplate uaaTemplate, String uaaBaseUrl, String brand) {
+    public EmailResetPasswordService(TemplateEngine templateEngine, MessageService messageService, RestTemplate uaaTemplate, String uaaBaseUrl, String brand) {
         this.templateEngine = templateEngine;
-        this.emailService = emailService;
+        this.messageService = messageService;
         this.uaaTemplate = uaaTemplate;
         this.uaaBaseUrl = uaaBaseUrl;
         this.brand = brand;
@@ -54,12 +57,23 @@ public class EmailResetPasswordService implements ResetPasswordService {
     public void forgotPassword(String email) {
         String subject = getSubjectText();
         String htmlContent = null;
+        String userId = null;
         try {
-            String code = uaaTemplate.postForObject(uaaBaseUrl + "/password_resets", email, String.class);
-            htmlContent = getCodeSentEmailHtml(code, email);
+            ResponseEntity<Map<String,String>> response = uaaTemplate.exchange(uaaBaseUrl + "/password_resets", HttpMethod.POST, new HttpEntity<>(email), new ParameterizedTypeReference<Map<String, String>>() {
+            });
+            htmlContent = getCodeSentEmailHtml(response.getBody().get("code"), email);
+            userId = response.getBody().get("user_id");
         } catch (HttpClientErrorException e) {
             if (e.getStatusCode() == HttpStatus.CONFLICT) {
                 htmlContent = getResetUnavailableEmailHtml(email);
+                try {
+                    Map<String, String> body = new ObjectMapper().readValue(e.getResponseBodyAsString(), new TypeReference<Map<String, String>>() {
+                    });
+                    userId = body.get("user_id");
+                } catch (IOException ioe) {
+                    logger.error("Bad response from UAA", ioe);
+                }
+
             } else {
                 logger.info("Exception raised while creating password reset for " + email, e);
             }
@@ -67,14 +81,8 @@ public class EmailResetPasswordService implements ResetPasswordService {
             logger.error("Exception raised while creating password reset for " + email, e);
         }
 
-        if (htmlContent != null) {
-            try {
-                emailService.sendMimeMessage(email, subject, htmlContent);
-            } catch (MessagingException e) {
-                logger.error("Exception raised while sending message to " + email, e);
-            } catch (UnsupportedEncodingException e) {
-                logger.error("Exception raised while sending message to " + email, e);
-            }
+        if (htmlContent != null && userId != null) {
+            messageService.sendMessage(userId, email, MessageType.PASSWORD_RESET, subject, htmlContent);
         }
     }
 
@@ -96,7 +104,8 @@ public class EmailResetPasswordService implements ResetPasswordService {
                 "{baseUrl}/password_change",
                 HttpMethod.POST,
                 new HttpEntity<>(formData),
-                new ParameterizedTypeReference<Map<String, String>>() {},
+                new ParameterizedTypeReference<Map<String, String>>() {
+                },
                 uriVariables
             );
             return responseEntity.getBody();
@@ -104,6 +113,7 @@ public class EmailResetPasswordService implements ResetPasswordService {
             throw new UaaException(e.getMessage());
         }
     }
+
 
     private String getCodeSentEmailHtml(String code, String email) {
         String resetUrl = ServletUriComponentsBuilder.fromCurrentContextPath().path("/reset_password").build().toUriString();

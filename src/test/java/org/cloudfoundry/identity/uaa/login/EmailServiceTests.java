@@ -3,14 +3,26 @@ package org.cloudfoundry.identity.uaa.login;
 import org.cloudfoundry.identity.uaa.login.test.FakeJavaMailSender;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
+import org.springframework.http.HttpEntity;
+import org.springframework.web.client.RestTemplate;
 
 import javax.mail.Address;
 import javax.mail.Message;
 import javax.mail.internet.InternetAddress;
 
+import java.util.Map;
+
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpMethod.POST;
 
 public class EmailServiceTests {
 
@@ -50,4 +62,6 @@ public class EmailServiceTests {
         assertThat(fromAddress.getAddress(), equalTo("admin@login.example.com"));
         assertThat(fromAddress.getPersonal(), equalTo("Pivotal"));
     }
+
+
 }

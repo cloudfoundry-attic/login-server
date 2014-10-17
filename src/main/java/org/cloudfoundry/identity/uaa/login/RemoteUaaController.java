@@ -27,6 +27,7 @@ import org.cloudfoundry.identity.uaa.authentication.UaaPrincipal;
 import org.cloudfoundry.identity.uaa.authentication.login.Prompt;
 import org.cloudfoundry.identity.uaa.client.SocialClientUserDetails;
 import org.cloudfoundry.identity.uaa.codestore.ExpiringCode;
+import org.cloudfoundry.identity.uaa.oauth.UaaOauth2ErrorHandler;
 import org.cloudfoundry.identity.uaa.user.UaaAuthority;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.core.env.Environment;
@@ -41,6 +42,7 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.client.OAuth2RestTemplate;
 import org.springframework.security.oauth2.common.exceptions.OAuth2Exception;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.MultiValueMap;
@@ -174,13 +176,18 @@ public class RemoteUaaController extends AbstractControllerInfo {
                 return HttpClientBuilder.create().useSystemProperties().disableCookieManagement().build();
             }
         });
-        restTemplate.setErrorHandler(new DefaultResponseErrorHandler() {
-            @Override
-            public boolean hasError(ClientHttpResponse response) throws IOException {
-                HttpStatus statusCode = response.getStatusCode();
-                return statusCode.series() == HttpStatus.Series.SERVER_ERROR;
-            }
-        });
+        if (restTemplate instanceof OAuth2RestTemplate) {
+            OAuth2RestTemplate oAuth2RestTemplate = (OAuth2RestTemplate)restTemplate;
+            oAuth2RestTemplate.setErrorHandler(new UaaOauth2ErrorHandler(oAuth2RestTemplate.getResource(), HttpStatus.Series.SERVER_ERROR));
+        } else {
+            restTemplate.setErrorHandler(new DefaultResponseErrorHandler() {
+                @Override
+                public boolean hasError(ClientHttpResponse response) throws IOException {
+                    HttpStatus statusCode = response.getStatusCode();
+                    return statusCode.series() == HttpStatus.Series.SERVER_ERROR;
+                }
+            });
+        }
         this.environment = environment;
         defaultTemplate = restTemplate;
         initProperties();
@@ -447,7 +454,7 @@ public class RemoteUaaController extends AbstractControllerInfo {
         if (remoteAuthentication!=null && remoteAuthentication.getPrincipal() instanceof UaaPrincipal) {
             UaaPrincipal p = (UaaPrincipal)remoteAuthentication.getPrincipal();
             if (p!=null) {
-                details.put("origin", p.getOrigin());
+                details.put(Origin.ORIGIN, p.getOrigin());
                 details.put("user_id",p.getId());
             }
         }

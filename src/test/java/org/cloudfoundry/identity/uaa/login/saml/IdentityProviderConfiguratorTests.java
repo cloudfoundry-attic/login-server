@@ -80,7 +80,9 @@ public class IdentityProviderConfiguratorTests {
         "      signMetaData: false\n" +
         "      signRequest: false\n" +
         "      showSamlLoginLink: true\n" +
-        "      linkText: 'Log in with OpenAM'\n";
+        "      linkText: 'Log in with OpenAM'\n" +
+        "    incomplete-provider:\n" +
+        "      idpMetadata: http://localhost:8081/openam/saml2/jsp/exportmetadata.jsp?entityid=http://localhost:8081/openam\n";
 
     @Before
     public void setUp() throws Exception {
@@ -104,7 +106,7 @@ public class IdentityProviderConfiguratorTests {
 
     @Test
     public void testGetIdentityProviderDefinitions() throws Exception {
-        testGetIdentityProviderDefinitions(4);
+        testGetIdentityProviderDefinitions(5);
     }
 
     protected void testGetIdentityProviderDefinitions(int count) throws Exception {
@@ -168,6 +170,9 @@ public class IdentityProviderConfiguratorTests {
                     assertTrue(idp.isMetadataTrustCheck());
                     assertEquals("org.apache.commons.httpclient.protocol.DefaultProtocolSocketFactory", idp.getSocketFactoryClassName());
                     break;
+                case "incomplete-provider" :
+                    assertTrue(idp.isShowSamlLink());
+                    break;
                 default:
                     fail();
             }
@@ -179,7 +184,7 @@ public class IdentityProviderConfiguratorTests {
         conf.setLegacyIdpMetaData("http://win2012-sso2.localdomain:7444/websso/SAML2/Metadata/vsphere.local");
         conf.setLegacyIdpIdentityAlias("vsphere.local.legacy");
         conf.setLegacyNameId("urn:oasis:names:tc:SAML:2.0:nameid-format:persistent");
-        testGetIdentityProviderDefinitions(5);
+        testGetIdentityProviderDefinitions(6);
     }
 
     @Test
@@ -189,7 +194,7 @@ public class IdentityProviderConfiguratorTests {
         conf.setLegacyNameId("urn:oasis:names:tc:SAML:2.0:nameid-format:persistent");
         conf.setMetadataFetchingHttpClientTimer(new Timer());
         conf.setHttpClient(new HttpClient());
-        testGetIdentityProviderDefinitions(5);
+        testGetIdentityProviderDefinitions(6);
         conf.getIdentityProviders();
     }
 

@@ -13,6 +13,9 @@
 package org.cloudfoundry.identity.uaa.login.saml;
 
 
+import org.cloudfoundry.identity.uaa.authentication.UaaPrincipal;
+import org.cloudfoundry.identity.uaa.login.RemoteUaaAuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.providers.ExpiringUsernameAuthenticationToken;
@@ -22,17 +25,29 @@ import org.springframework.security.saml.context.SAMLMessageContext;
 
 public class LoginSamlAuthenticationProvider extends SAMLAuthenticationProvider {
 
+    private RemoteUaaAuthenticationManager authenticationManager;
+
+    public RemoteUaaAuthenticationManager getAuthenticationManager() {
+        return authenticationManager;
+    }
+
+    public void setAuthenticationManager(RemoteUaaAuthenticationManager authenticationManager) {
+        this.authenticationManager = authenticationManager;
+    }
+
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-
         if (!supports(authentication.getClass())) {
             throw new IllegalArgumentException("Only SAMLAuthenticationToken is supported, " + authentication.getClass() + " was attempted");
         }
-
         SAMLAuthenticationToken token = (SAMLAuthenticationToken) authentication;
         SAMLMessageContext context = token.getCredentials();
         String alias = context.getPeerExtendedMetadata().getAlias();
         ExpiringUsernameAuthenticationToken result = (ExpiringUsernameAuthenticationToken)super.authenticate(authentication);
-        return new LoginSamlAuthenticationToken(result, alias);
+        LoginSamlAuthenticationToken samlAuthenticationToken = new LoginSamlAuthenticationToken(result, alias);
+        UaaPrincipal principal = new UaaPrincipal("NaN", result.getName(), null, alias, result.getName());
+        getAuthenticationManager().authenticate(new UsernamePasswordAuthenticationToken(principal, null, result.getAuthorities()));
+        //TODO - Consolidate the different authentication objects we actually store in memory
+        return samlAuthenticationToken;
     }
 }

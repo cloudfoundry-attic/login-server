@@ -3,9 +3,9 @@
 [![Build Status](https://travis-ci.org/cloudfoundry/login-server.svg?branch=develop)](https://travis-ci.org/cloudfoundry/login-server)
 [![Coverage Status](https://coveralls.io/repos/cloudfoundry/login-server/badge.png?branch=develop)](https://coveralls.io/r/cloudfoundry/login-server?branch=develop)
 
-Handles authentication on `run.pivotal.io` and delegates all other
+Handles authentication in Cloud Foundry and delegates all other
 identity management tasks to the UAA.  Also provides OAuth2 endpoints
-issuing tokens to client apps for `run.pivotal.io` (the tokens come
+issuing tokens to client apps for Cloud Foundry (the tokens come
 from the UAA and no data are stored locally).
 
 ## Co-ordinates

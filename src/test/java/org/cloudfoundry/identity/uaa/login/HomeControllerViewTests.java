@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.mock.env.MockEnvironment;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -55,6 +56,12 @@ public class HomeControllerViewTests {
                 .andExpect(xpath("//head/style[2]").string(".tile-2 {background-image: url(//other.example.com/image)} .tile-2:hover {background-image: url(//other.example.com/hover)}"));
     }
 
+    @Test
+    public void testInviteLink() throws Exception {
+        mockMvc.perform(get("/home"))
+            .andExpect(xpath("//*[text()='Invite Users']").exists());
+    }
+
     @Configuration
     @EnableWebMvc
     @Import(ThymeleafConfig.class)
@@ -90,8 +97,14 @@ public class HomeControllerViewTests {
         }
 
         @Bean
-        HomeController homeController() {
-            HomeController homeController = new HomeController();
+        MockEnvironment environment() {
+            return new MockEnvironment();
+        }
+
+        @Bean
+        HomeController homeController(MockEnvironment environment) {
+            environment.setProperty("login.invitationsEnabled","true");
+            HomeController homeController = new HomeController(environment);
             homeController.setUaaBaseUrl("http://uaa.example.com");
             return homeController;
         }
