@@ -102,9 +102,18 @@
         <security:intercept-url pattern="/logout.do" access="IS_AUTHENTICATED_ANONYMOUSLY" />
         <security:anonymous enabled="true" />
         <security:form-login login-page="/login" username-parameter="username" password-parameter="password"
-            login-processing-url="/login.do" authentication-failure-url="/login?error=true" />
+            login-processing-url="/login.do" authentication-failure-handler-ref="loginAuthenticationFailureHandler" />
         <security:logout logout-url="/logout.do" success-handler-ref="logoutHandler" />
     </security:http>
+
+    <bean id="loginAuthenticationFailureHandler" class="org.springframework.security.web.authentication.ExceptionMappingAuthenticationFailureHandler">
+        <property name="exceptionMappings">
+            <map>
+                <entry key="org.cloudfoundry.identity.uaa.authentication.AccountNotVerifiedException" value="/login?error=account_not_verified" />
+            </map>
+        </property>
+        <property name="defaultFailureUrl" value="/login?error=login_failure" />
+    </bean>
 
     <security:http pattern="/reset_password.do" disable-url-rewriting="true"
                    entry-point-ref="loginEntryPoint">

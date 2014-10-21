@@ -14,6 +14,7 @@ package org.cloudfoundry.identity.uaa.login.feature;
 
 import org.cloudfoundry.identity.uaa.login.test.DefaultIntegrationTestConfig;
 import org.cloudfoundry.identity.uaa.login.test.IntegrationTestRule;
+import org.cloudfoundry.identity.uaa.login.test.TestClient;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -33,6 +34,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import java.security.SecureRandom;
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = DefaultIntegrationTestConfig.class)
 public class LoginIT {
@@ -49,8 +52,11 @@ public class LoginIT {
     @Autowired
     TestAccounts testAccounts;
 
+    @Autowired
+    TestClient testClient;
+
     @Test
-    public void testLoggingIn() throws Exception {
+    public void testSuccessfulLogin() throws Exception {
         webDriver.get(baseUrl + "/login");
         Assert.assertEquals("Cloud Foundry", webDriver.getTitle());
 
@@ -62,7 +68,7 @@ public class LoginIT {
     }
 
     @Test
-    public void testLoggingInFailure() throws Exception {
+    public void testFailedLogin() throws Exception {
         webDriver.get(baseUrl + "/login");
         Assert.assertEquals("Cloud Foundry", webDriver.getTitle());
 
@@ -74,7 +80,7 @@ public class LoginIT {
     }
 
     @Test
-    public void testFailedLogin() throws Exception {
+    public void testRedirectAfterFailedLogin() throws Exception {
         RestTemplate template = new RestTemplate();
         LinkedMultiValueMap<String,String> body = new LinkedMultiValueMap<>();
         body.add("username", testAccounts.getUserName());
@@ -84,7 +90,37 @@ public class LoginIT {
             new HttpEntity<>(body, null),
             Void.class);
         Assert.assertEquals(HttpStatus.FOUND, loginResponse.getStatusCode());
+    }
 
+    @Test
+    public void testUnverifiedUserLogin() throws Exception {
+        String userEmail = createUnverifiedUser();
+
+        webDriver.get(baseUrl + "/login");
+        Assert.assertEquals("Cloud Foundry", webDriver.getTitle());
+
+        webDriver.findElement(By.name("username")).sendKeys(userEmail);
+        webDriver.findElement(By.name("password")).sendKeys("secret");
+        webDriver.findElement(By.xpath("//input[@value='Sign in']")).click();
+
+        Assert.assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), Matchers.containsString("Welcome!"));
+        Assert.assertThat(webDriver.findElement(By.cssSelector(".alert-error")).getText(), Matchers.containsString("Your account is not verified"));
+    }
+
+    private String createUnverifiedUser() throws Exception {
+        int randomInt = new SecureRandom().nextInt();
+
+        String adminAccessToken = testClient.getOAuthAccessToken("admin", "adminsecret", "client_credentials", "clients.read clients.write clients.secret");
+
+        String scimClientId = "scim" + randomInt;
+        testClient.createScimClient(adminAccessToken, scimClientId);
+
+        String scimAccessToken = testClient.getOAuthAccessToken(scimClientId, "scimsecret", "client_credentials", "scim.read scim.write password.write");
+
+        String userEmail = "user" + randomInt + "@example.com";
+        testClient.createUser(scimAccessToken, userEmail, userEmail, "secret", false);
+
+        return userEmail;
     }
 
     @Test

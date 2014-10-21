@@ -18,6 +18,7 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.cloudfoundry.identity.uaa.authentication.AccountNotVerifiedException;
 import org.cloudfoundry.identity.uaa.authentication.Origin;
 import org.cloudfoundry.identity.uaa.authentication.UaaAuthenticationDetails;
 import org.cloudfoundry.identity.uaa.authentication.UaaPrincipal;
@@ -140,6 +141,9 @@ public class RemoteUaaAuthenticationManager implements AuthenticationManager {
         } else if (response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
             logger.info("Failed authentication request");
             throw new BadCredentialsException("Authentication failed");
+        } else if (response.getStatusCode() == HttpStatus.FORBIDDEN) {
+            logger.info("Account not verified");
+            throw new AccountNotVerifiedException("Account not verified");
         } else if (response.getStatusCode() == HttpStatus.INTERNAL_SERVER_ERROR) {
             logger.info("Internal error from UAA. Please Check the UAA logs.");
         } else {

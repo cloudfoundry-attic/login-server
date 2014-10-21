@@ -25,6 +25,7 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.cloudfoundry.identity.uaa.authentication.AccountNotVerifiedException;
 import org.cloudfoundry.identity.uaa.authentication.Origin;
 import org.cloudfoundry.identity.uaa.authentication.UaaPrincipal;
 import org.cloudfoundry.identity.uaa.test.UaaTestAccounts;
@@ -37,6 +38,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestOperations;
 
 /**
@@ -79,4 +81,12 @@ public class RemoteUaaAuthenticationManagerTests {
         assertTrue(result.isAuthenticated());
     }
 
+    @Test(expected = AccountNotVerifiedException.class)
+    public void testUnverifiedUserAuthenticationFailure() throws Exception {
+        ResponseEntity<Map> expectedResponse = new ResponseEntity<>(null, null, HttpStatus.FORBIDDEN);
+        when(restTemplate.exchange(endsWith("/authenticate"), eq(HttpMethod.POST), any(HttpEntity.class), eq(Map.class)))
+            .thenReturn(expectedResponse);
+
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(testAccounts.getUserName(), "foo"));
+    }
 }
