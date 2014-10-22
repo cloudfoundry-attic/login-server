@@ -65,6 +65,12 @@ public class RemoteUaaAuthenticationManager implements AuthenticationManager {
 
     private String loginUrl = DEFAULT_LOGIN_URL;
 
+    public void setAccountCreationService(AccountCreationService accountCreationService) {
+        this.accountCreationService = accountCreationService;
+    }
+
+    private AccountCreationService accountCreationService;
+
     /**
      * @param loginUrl the login url to set
      */
@@ -124,8 +130,6 @@ public class RemoteUaaAuthenticationManager implements AuthenticationManager {
             checkAndAddParameter(UaaAuthenticationDetails.ADD_NEW, Boolean.TRUE.toString(), parameters);
         }
 
-
-
         HttpHeaders headers = getHeaders();
 
         @SuppressWarnings("rawtypes")
@@ -142,7 +146,9 @@ public class RemoteUaaAuthenticationManager implements AuthenticationManager {
             logger.info("Failed authentication request");
             throw new BadCredentialsException("Authentication failed");
         } else if (response.getStatusCode() == HttpStatus.FORBIDDEN) {
-            logger.info("Account not verified");
+            // Assumes username is the same as email
+            accountCreationService.resendVerificationCode(username);
+            logger.info("Account not verified - verification code resent");
             throw new AccountNotVerifiedException("Account not verified");
         } else if (response.getStatusCode() == HttpStatus.INTERNAL_SERVER_ERROR) {
             logger.info("Internal error from UAA. Please Check the UAA logs.");

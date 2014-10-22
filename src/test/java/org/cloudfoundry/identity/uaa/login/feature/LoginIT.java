@@ -12,6 +12,8 @@
  *******************************************************************************/
 package org.cloudfoundry.identity.uaa.login.feature;
 
+import com.dumbster.smtp.SimpleSmtpServer;
+import com.dumbster.smtp.SmtpMessage;
 import org.cloudfoundry.identity.uaa.login.test.DefaultIntegrationTestConfig;
 import org.cloudfoundry.identity.uaa.login.test.IntegrationTestRule;
 import org.cloudfoundry.identity.uaa.login.test.TestClient;
@@ -35,6 +37,11 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.security.SecureRandom;
+import java.util.Iterator;
+
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = DefaultIntegrationTestConfig.class)
@@ -55,28 +62,31 @@ public class LoginIT {
     @Autowired
     TestClient testClient;
 
+    @Autowired
+    SimpleSmtpServer simpleSmtpServer;
+
     @Test
     public void testSuccessfulLogin() throws Exception {
         webDriver.get(baseUrl + "/login");
-        Assert.assertEquals("Cloud Foundry", webDriver.getTitle());
+        assertEquals("Cloud Foundry", webDriver.getTitle());
 
         webDriver.findElement(By.name("username")).sendKeys(testAccounts.getUserName());
         webDriver.findElement(By.name("password")).sendKeys(testAccounts.getPassword());
         webDriver.findElement(By.xpath("//input[@value='Sign in']")).click();
 
-        Assert.assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), Matchers.containsString("Where to?"));
+        assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), Matchers.containsString("Where to?"));
     }
 
     @Test
     public void testFailedLogin() throws Exception {
         webDriver.get(baseUrl + "/login");
-        Assert.assertEquals("Cloud Foundry", webDriver.getTitle());
+        assertEquals("Cloud Foundry", webDriver.getTitle());
 
         webDriver.findElement(By.name("username")).sendKeys(testAccounts.getUserName());
         webDriver.findElement(By.name("password")).sendKeys("invalidpassword");
         webDriver.findElement(By.xpath("//input[@value='Sign in']")).click();
 
-        Assert.assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), Matchers.containsString("Welcome!"));
+        assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), Matchers.containsString("Welcome!"));
     }
 
     @Test
@@ -89,7 +99,7 @@ public class LoginIT {
             HttpMethod.POST,
             new HttpEntity<>(body, null),
             Void.class);
-        Assert.assertEquals(HttpStatus.FOUND, loginResponse.getStatusCode());
+        assertEquals(HttpStatus.FOUND, loginResponse.getStatusCode());
     }
 
     @Test
@@ -97,14 +107,23 @@ public class LoginIT {
         String userEmail = createUnverifiedUser();
 
         webDriver.get(baseUrl + "/login");
-        Assert.assertEquals("Cloud Foundry", webDriver.getTitle());
+        assertEquals("Cloud Foundry", webDriver.getTitle());
+
+        int receivedEmailSize = simpleSmtpServer.getReceivedEmailSize();
 
         webDriver.findElement(By.name("username")).sendKeys(userEmail);
         webDriver.findElement(By.name("password")).sendKeys("secret");
         webDriver.findElement(By.xpath("//input[@value='Sign in']")).click();
 
-        Assert.assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), Matchers.containsString("Welcome!"));
-        Assert.assertThat(webDriver.findElement(By.cssSelector(".alert-error")).getText(), Matchers.containsString("Your account is not verified"));
+        assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), Matchers.containsString("Welcome!"));
+        assertThat(webDriver.findElement(By.cssSelector(".alert-error")).getText(), Matchers.containsString("Your account is not verified"));
+
+        assertEquals(receivedEmailSize + 1, simpleSmtpServer.getReceivedEmailSize());
+        Iterator receivedEmail = simpleSmtpServer.getReceivedEmail();
+        SmtpMessage message = (SmtpMessage) receivedEmail.next();
+        receivedEmail.remove();
+        assertEquals(userEmail, message.getHeaderValue("To"));
+        assertThat(message.getBody(), containsString("Activate your account"));
     }
 
     private String createUnverifiedUser() throws Exception {

@@ -8,19 +8,21 @@ import org.cloudfoundry.identity.uaa.error.UaaException;
 import org.cloudfoundry.identity.uaa.scim.ScimUser;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.provider.ClientDetails;
 import org.springframework.security.oauth2.provider.client.BaseClientDetails;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring4.SpringTemplateEngine;
 
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class EmailAccountCreationService implements AccountCreationService {
@@ -35,14 +37,16 @@ public class EmailAccountCreationService implements AccountCreationService {
     private final String uaaBaseUrl;
     private final String brand;
     private final ObjectMapper objectMapper;
+    private final String baseUrl;
 
-    public EmailAccountCreationService(ObjectMapper objectMapper, SpringTemplateEngine templateEngine, MessageService messageService, RestTemplate uaaTemplate, String uaaBaseUrl, String brand) {
+    public EmailAccountCreationService(ObjectMapper objectMapper, SpringTemplateEngine templateEngine, MessageService messageService, RestTemplate uaaTemplate, String uaaBaseUrl, String brand, String baseUrl) {
         this.objectMapper = objectMapper;
         this.templateEngine = templateEngine;
         this.messageService = messageService;
         this.uaaTemplate = uaaTemplate;
         this.uaaBaseUrl = uaaBaseUrl;
         this.brand = brand;
+        this.baseUrl = baseUrl;
     }
 
     @Override
@@ -72,9 +76,9 @@ public class EmailAccountCreationService implements AccountCreationService {
                 ioe.printStackTrace();
             }
         } catch (RestClientException e) {
-            logger.info("Exception raised while creating account activation email for " + email, e);
+            logger.error("Exception raised while creating account activation email for " + email, e);
         } catch (IOException e) {
-            logger.info("Exception raised while creating account activation email for " + email, e);
+            logger.error("Exception raised while creating account activation email for " + email, e);
         }
     }
 
@@ -84,7 +88,7 @@ public class EmailAccountCreationService implements AccountCreationService {
         ExpiringCode expiringCode = uaaTemplate.postForObject(uaaBaseUrl + "/Codes", expiringCodeForPost, ExpiringCode.class);
         String htmlContent = getEmailHtml(expiringCode.getCode(), email);
 
-        messageService.sendMessage(null, email, MessageType.CREATE_ACCOUNT_CONFIRMATION, subject, htmlContent);
+        messageService.sendMessage(userId, email, MessageType.CREATE_ACCOUNT_CONFIRMATION, subject, htmlContent);
     }
 
     private ExpiringCode getExpiringCode(String userId, String clientId, Timestamp expiresAt) throws IOException {
@@ -110,12 +114,27 @@ public class EmailAccountCreationService implements AccountCreationService {
         return new AccountCreationResponse(user.getId(), user.getUserName(), user.getUserName(), redirectLocation);
     }
 
+    @Override
+    public void resendVerificationCode(String email) {
+        String url = uaaBaseUrl + "/ids/Users?attributes=id&filter=userName eq \"" + email + "\" and origin eq \"" + Origin.UAA + "\"";
+        Map<String,Object> response = uaaTemplate.getForObject(url, Map.class);
+        List<Map<String,String>> resources = (ArrayList)response.get("resources");
+        String userId = resources.get(0).get("id");
+
+        try {
+            // TODO: get the right clientId to redirect to
+            generateAndSendCode(email, "login", getSubjectText(), userId);
+        } catch (IOException e) {
+            logger.error("Exception raised while resending activation email for " + email, e);
+        }
+    }
+
     private String getSubjectText() {
         return brand.equals("pivotal") ? "Activate your Pivotal ID" : "Activate your account";
     }
 
     private String getEmailHtml(String code, String email) {
-        String accountsUrl = ServletUriComponentsBuilder.fromCurrentContextPath().path("/verify_user").build().toUriString();
+        String accountsUrl = baseUrl + "/verify_user";
 
         final Context ctx = new Context();
         ctx.setVariable("serviceName", brand.equals("pivotal") ? "Pivotal" : "Cloud Foundry");

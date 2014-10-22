@@ -9,6 +9,8 @@ public interface AccountCreationService {
 
     AccountCreationResponse completeActivation(String code) throws IOException;
 
+    void resendVerificationCode(String email);
+
     public static class ExistingUserResponse {
         @JsonProperty
         private String error;

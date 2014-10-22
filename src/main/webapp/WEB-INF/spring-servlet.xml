@@ -433,6 +433,7 @@
         <constructor-arg ref="authorizationTemplate"/>
         <constructor-arg ref="uaaUrl"/>
         <constructor-arg value="${login.brand:oss}"/>
+        <constructor-arg value="${login.url:http://localhost:8080/login}"/>
     </bean>
 
     <bean id="invitationsService" class="org.cloudfoundry.identity.uaa.login.EmailInvitationsService">

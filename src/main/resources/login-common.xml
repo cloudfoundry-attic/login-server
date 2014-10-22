@@ -173,6 +173,7 @@
     <bean id="remoteAuthenticationManager" class="org.cloudfoundry.identity.uaa.login.RemoteUaaAuthenticationManager" >
         <property name="loginUrl" value="${uaa.login.url:http://localhost:8080/uaa/authenticate}" />
         <property name="restTemplate" ref="remoteAuthManagerAuthorizationTemplate"/>
+        <property name="accountCreationService" ref="accountCreationService"/>
 	</bean>
 
 </beans>

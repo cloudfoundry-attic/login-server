@@ -15,10 +15,12 @@ package org.cloudfoundry.identity.uaa.login;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.endsWith;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.net.URI;
@@ -38,7 +40,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestOperations;
 
 /**
@@ -54,10 +55,13 @@ public class RemoteUaaAuthenticationManagerTests {
     private HttpHeaders responseHeaders = new HttpHeaders();
     
     private UaaTestAccounts testAccounts = UaaTestAccounts.standard(null);
+    private AccountCreationService accountCreationService;
 
     @Before
     public void start() {
         authenticationManager.setRestTemplate(restTemplate);
+        accountCreationService = mock(AccountCreationService.class);
+        authenticationManager.setAccountCreationService(accountCreationService);
     }
 
     @Test
@@ -81,12 +85,17 @@ public class RemoteUaaAuthenticationManagerTests {
         assertTrue(result.isAuthenticated());
     }
 
-    @Test(expected = AccountNotVerifiedException.class)
+    @Test
     public void testUnverifiedUserAuthenticationFailure() throws Exception {
         ResponseEntity<Map> expectedResponse = new ResponseEntity<>(null, null, HttpStatus.FORBIDDEN);
         when(restTemplate.exchange(endsWith("/authenticate"), eq(HttpMethod.POST), any(HttpEntity.class), eq(Map.class)))
             .thenReturn(expectedResponse);
 
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(testAccounts.getUserName(), "foo"));
+        try {
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken("user@example.com", "foo"));
+            fail();
+        } catch (AccountNotVerifiedException e) {
+            verify(accountCreationService).resendVerificationCode(eq("user@example.com"));
+        }
     }
 }
