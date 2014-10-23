@@ -267,7 +267,7 @@ public class EmailAccountCreationServiceTests {
         request.setContextPath("/login");
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
 
-        emailAccountCreationService.resendVerificationCode("user@example.com");
+        emailAccountCreationService.resendVerificationCode("user@example.com", "login");
 
         mockUaaServer.verify();
 

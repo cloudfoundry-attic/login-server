@@ -8,7 +8,6 @@ import org.cloudfoundry.identity.uaa.error.UaaException;
 import org.cloudfoundry.identity.uaa.scim.ScimUser;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.provider.ClientDetails;
 import org.springframework.security.oauth2.provider.client.BaseClientDetails;
 import org.springframework.web.client.HttpClientErrorException;
@@ -115,7 +114,7 @@ public class EmailAccountCreationService implements AccountCreationService {
     }
 
     @Override
-    public void resendVerificationCode(String email) {
+    public void resendVerificationCode(String email, String clientId) {
         String url = uaaBaseUrl + "/ids/Users?attributes=id&filter=userName eq \"" + email + "\" and origin eq \"" + Origin.UAA + "\"";
         Map<String,Object> response = uaaTemplate.getForObject(url, Map.class);
         List<Map<String,String>> resources = (ArrayList)response.get("resources");
@@ -123,7 +122,7 @@ public class EmailAccountCreationService implements AccountCreationService {
 
         try {
             // TODO: get the right clientId to redirect to
-            generateAndSendCode(email, "login", getSubjectText(), userId);
+            generateAndSendCode(email, clientId, getSubjectText(), userId);
         } catch (IOException e) {
             logger.error("Exception raised while resending activation email for " + email, e);
         }

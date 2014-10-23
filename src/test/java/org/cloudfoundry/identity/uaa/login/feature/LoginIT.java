@@ -19,6 +19,7 @@ import org.cloudfoundry.identity.uaa.login.test.IntegrationTestRule;
 import org.cloudfoundry.identity.uaa.login.test.TestClient;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -36,12 +37,16 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import java.net.URI;
 import java.security.SecureRandom;
 import java.util.Iterator;
 
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
+import static org.springframework.http.HttpStatus.FOUND;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = DefaultIntegrationTestConfig.class)
@@ -64,6 +69,11 @@ public class LoginIT {
 
     @Autowired
     SimpleSmtpServer simpleSmtpServer;
+
+    @Before
+    public void setUp() throws Exception {
+        webDriver.get(baseUrl + "/logout.do");
+    }
 
     @Test
     public void testSuccessfulLogin() throws Exception {
@@ -103,10 +113,10 @@ public class LoginIT {
     }
 
     @Test
-    public void testUnverifiedUserLogin() throws Exception {
+    public void testUnverifiedUserLoginResendsVerificationLink() throws Exception {
         String userEmail = createUnverifiedUser();
 
-        webDriver.get(baseUrl + "/login");
+        webDriver.get(baseUrl + "/oauth/authorize?client_id=app&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Fapp&response_type=code&state=6pOfRa");
         assertEquals("Cloud Foundry", webDriver.getTitle());
 
         int receivedEmailSize = simpleSmtpServer.getReceivedEmailSize();
@@ -124,6 +134,14 @@ public class LoginIT {
         receivedEmail.remove();
         assertEquals(userEmail, message.getHeaderValue("To"));
         assertThat(message.getBody(), containsString("Activate your account"));
+
+        String link = testClient.extractLink(message.getBody());
+        assertFalse(isEmpty(link));
+
+        RestTemplate restTemplate = new RestTemplate(new DefaultIntegrationTestConfig.HttpClientFactory());
+        ResponseEntity<String> responseEntity = restTemplate.getForEntity(link, String.class);
+        assertEquals(FOUND, responseEntity.getStatusCode());
+        assertEquals(new URI("http://localhost:8080/app/"), responseEntity.getHeaders().getLocation());
     }
 
     private String createUnverifiedUser() throws Exception {

@@ -102,9 +102,11 @@
         <security:intercept-url pattern="/logout.do" access="IS_AUTHENTICATED_ANONYMOUSLY" />
         <security:anonymous enabled="true" />
         <security:form-login login-page="/login" username-parameter="username" password-parameter="password"
-            login-processing-url="/login.do" authentication-failure-handler-ref="loginAuthenticationFailureHandler" />
+            login-processing-url="/login.do" authentication-failure-handler-ref="loginAuthenticationFailureHandler" authentication-details-source-ref="savedRequestAwareAuthenticationDetailsSource"/>
         <security:logout logout-url="/logout.do" success-handler-ref="logoutHandler" />
     </security:http>
+
+    <bean id="savedRequestAwareAuthenticationDetailsSource" class="org.cloudfoundry.identity.uaa.login.SavedRequestAwareAuthenticationDetailsSource"/>
 
     <bean id="loginAuthenticationFailureHandler" class="org.springframework.security.web.authentication.ExceptionMappingAuthenticationFailureHandler">
         <property name="exceptionMappings">

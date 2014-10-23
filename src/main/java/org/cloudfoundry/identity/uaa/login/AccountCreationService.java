@@ -9,7 +9,7 @@ public interface AccountCreationService {
 
     AccountCreationResponse completeActivation(String code) throws IOException;
 
-    void resendVerificationCode(String email);
+    void resendVerificationCode(String email, String clientId);
 
     public static class ExistingUserResponse {
         @JsonProperty

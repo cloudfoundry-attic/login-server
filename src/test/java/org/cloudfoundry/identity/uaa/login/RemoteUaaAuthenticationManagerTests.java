@@ -38,8 +38,10 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.web.savedrequest.DefaultSavedRequest;
 import org.springframework.web.client.RestOperations;
 
 /**
@@ -87,15 +89,53 @@ public class RemoteUaaAuthenticationManagerTests {
 
     @Test
     public void testUnverifiedUserAuthenticationFailure() throws Exception {
+        final SavedRequestAwareAuthenticationDetails details = new SavedRequestAwareAuthenticationDetails(new MockHttpServletRequest());
+        DefaultSavedRequest savedRequest = mock(DefaultSavedRequest.class);
+        when(savedRequest.getParameterValues("client_id")).thenReturn(null);
+        details.setSavedRequest(savedRequest);
+
+        Authentication authentication = new UsernamePasswordAuthenticationToken("user@example.com", "foo") {
+            @Override
+            public Object getDetails() {
+                return details;
+            }
+        };
+
         ResponseEntity<Map> expectedResponse = new ResponseEntity<>(null, null, HttpStatus.FORBIDDEN);
         when(restTemplate.exchange(endsWith("/authenticate"), eq(HttpMethod.POST), any(HttpEntity.class), eq(Map.class)))
             .thenReturn(expectedResponse);
 
         try {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken("user@example.com", "foo"));
+            authenticationManager.authenticate(authentication);
             fail();
         } catch (AccountNotVerifiedException e) {
-            verify(accountCreationService).resendVerificationCode(eq("user@example.com"));
+            verify(accountCreationService).resendVerificationCode(eq("user@example.com"), eq("login"));
+        }
+    }
+
+    @Test
+    public void testUnverifiedUserAuthenticationFailureWithClientIdInRequest() throws Exception {
+        final SavedRequestAwareAuthenticationDetails details = new SavedRequestAwareAuthenticationDetails(new MockHttpServletRequest());
+        DefaultSavedRequest savedRequest = mock(DefaultSavedRequest.class);
+        when(savedRequest.getParameterValues("client_id")).thenReturn(new String[]{"app"});
+        details.setSavedRequest(savedRequest);
+
+        Authentication authentication = new UsernamePasswordAuthenticationToken("user@example.com", "foo") {
+            @Override
+            public Object getDetails() {
+                return details;
+            }
+        };
+
+        ResponseEntity<Map> expectedResponse = new ResponseEntity<>(null, null, HttpStatus.FORBIDDEN);
+        when(restTemplate.exchange(endsWith("/authenticate"), eq(HttpMethod.POST), any(HttpEntity.class), eq(Map.class)))
+            .thenReturn(expectedResponse);
+
+        try {
+            authenticationManager.authenticate(authentication);
+            fail();
+        } catch (AccountNotVerifiedException e) {
+            verify(accountCreationService).resendVerificationCode(eq("user@example.com"), eq("app"));
         }
     }
 }
