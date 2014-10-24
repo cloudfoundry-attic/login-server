@@ -18,6 +18,7 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.cloudfoundry.identity.uaa.authentication.AccountNotVerifiedException;
 import org.cloudfoundry.identity.uaa.authentication.Origin;
 import org.cloudfoundry.identity.uaa.authentication.UaaAuthenticationDetails;
 import org.cloudfoundry.identity.uaa.authentication.UaaPrincipal;
@@ -36,6 +37,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
+import org.springframework.security.web.savedrequest.SavedRequest;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.DefaultResponseErrorHandler;
@@ -63,6 +65,12 @@ public class RemoteUaaAuthenticationManager implements AuthenticationManager {
     private static String DEFAULT_LOGIN_URL = "http://uaa.cloudfoundry.com/authenticate";
 
     private String loginUrl = DEFAULT_LOGIN_URL;
+
+    public void setAccountCreationService(AccountCreationService accountCreationService) {
+        this.accountCreationService = accountCreationService;
+    }
+
+    private AccountCreationService accountCreationService;
 
     /**
      * @param loginUrl the login url to set
@@ -123,8 +131,6 @@ public class RemoteUaaAuthenticationManager implements AuthenticationManager {
             checkAndAddParameter(UaaAuthenticationDetails.ADD_NEW, Boolean.TRUE.toString(), parameters);
         }
 
-
-
         HttpHeaders headers = getHeaders();
 
         @SuppressWarnings("rawtypes")
@@ -140,6 +146,18 @@ public class RemoteUaaAuthenticationManager implements AuthenticationManager {
         } else if (response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
             logger.info("Failed authentication request");
             throw new BadCredentialsException("Authentication failed");
+        } else if (response.getStatusCode() == HttpStatus.FORBIDDEN) {
+            SavedRequestAwareAuthenticationDetails details = (SavedRequestAwareAuthenticationDetails) authentication.getDetails();
+            SavedRequest savedRequest = (SavedRequest) details.getSavedRequest();
+            String clientId = "login";
+            if (savedRequest != null && savedRequest.getParameterValues("client_id") != null) {
+                clientId = savedRequest.getParameterValues("client_id")[0];
+            }
+
+            // Assumes username is the same as email
+            accountCreationService.resendVerificationCode(username, clientId);
+            logger.info("Account not verified - verification code resent");
+            throw new AccountNotVerifiedException("Account not verified");
         } else if (response.getStatusCode() == HttpStatus.INTERNAL_SERVER_ERROR) {
             logger.info("Internal error from UAA. Please Check the UAA logs.");
         } else {

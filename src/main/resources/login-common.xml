@@ -134,7 +134,7 @@
 
 	<util:map id="links">
         <entry key="passwd" value="${links.passwd:}" />
-        <entry key="register" value="${links.signup:/accounts/new}" />
+        <entry key="register" value="${links.signup:/create_account}" />
 	</util:map>
 
 	<bean id="homeController" class="org.cloudfoundry.identity.uaa.login.HomeController">
@@ -173,6 +173,7 @@
     <bean id="remoteAuthenticationManager" class="org.cloudfoundry.identity.uaa.login.RemoteUaaAuthenticationManager" >
         <property name="loginUrl" value="${uaa.login.url:http://localhost:8080/uaa/authenticate}" />
         <property name="restTemplate" ref="remoteAuthManagerAuthorizationTemplate"/>
+        <property name="accountCreationService" ref="accountCreationService"/>
 	</bean>
 
 </beans>

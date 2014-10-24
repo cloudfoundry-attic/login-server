@@ -53,7 +53,7 @@ public class EmailInvitationsServiceTests {
         String emailBody = emailBodyArgument.getValue();
         assertThat(emailBody, containsString("current-user"));
         assertThat(emailBody, containsString("Pivotal"));
-        assertThat(emailBody, containsString("<a href=\"http://localhost/login/accounts/new\">Create an Account</a>"));
+        assertThat(emailBody, containsString("<a href=\"http://localhost/login/create_account\">Create an Account</a>"));
         assertThat(emailBody, not(containsString("Cloud Foundry")));
     }
 }

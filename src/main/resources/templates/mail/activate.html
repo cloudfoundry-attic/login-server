@@ -8,7 +8,7 @@
     A request has been made to activate <th:block th:text="${servicePhrase}">an ExampleService</th:block> for: <th:block th:text="${email}">user@example.com</th:block>
 </p>
 <p>
-    <a href="http://login.example.com/login/accounts?code=some_code&amp;email=user%40example.com"
+    <a href="http://login.example.com/accounts?code=some_code&amp;email=user%40example.com"
        th:href="@{${accountsUrl}(code=${code},email=${email})}">Activate your account</a>
     to continue the registration process.
 </p>

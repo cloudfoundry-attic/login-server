@@ -207,7 +207,7 @@ public class RemoteUaaController extends AbstractControllerInfo {
             } else {
                 boolean localSignupsEnabled = !"false".equalsIgnoreCase(environment.getProperty("login.signupsEnabled"));
                 if (localSignupsEnabled) {
-                    model.put("createAccountLink", "/accounts/new");
+                    model.put("createAccountLink", "/create_account");
                 }
             }
             return "login";

@@ -45,7 +45,7 @@ public class EmailInvitationsService implements InvitationsService {
     }
 
     private String getEmailHtml(String email, String currentUser) {
-        String accountsUrl = ServletUriComponentsBuilder.fromCurrentContextPath().path("/accounts/new").build().toUriString();
+        String accountsUrl = ServletUriComponentsBuilder.fromCurrentContextPath().path("/create_account").build().toUriString();
 
         final Context ctx = new Context();
         ctx.setVariable("serviceName", brand.equals("pivotal") ? "Pivotal" : "Cloud Foundry");
