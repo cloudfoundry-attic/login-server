@@ -82,12 +82,13 @@ public class InvitationsIT {
         SmtpMessage message = (SmtpMessage) receivedEmail.next();
         receivedEmail.remove();
         Assert.assertEquals(userEmail, message.getHeaderValue("To"));
-        Assert.assertThat(message.getBody(), containsString("Accept invite"));
+        Assert.assertThat(message.getBody(), containsString("Create an Account"));
 
         String link = testClient.extractLink(message.getBody());
+        Assert.assertTrue(link.contains("/invitations/accept"));
         webDriver.get(link);
 
-        Assert.assertEquals("Choose your password", webDriver.findElement(By.tagName("h1")).getText());
+        Assert.assertEquals("Create your account", webDriver.findElement(By.tagName("h1")).getText());
 
         webDriver.findElement(By.name("password")).sendKeys("secret");
         webDriver.findElement(By.name("password_confirmation")).sendKeys("secret");

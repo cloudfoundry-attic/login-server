@@ -101,10 +101,8 @@ public class EmailAccountCreationService implements AccountCreationService {
     @Override
     public AccountCreationResponse completeActivation(String code) throws IOException {
 
-        ExpiringCode expiringCode = uaaTemplate.getForObject(uaaBaseUrl + "/Codes/" + code, ExpiringCode.class);
-        Map<String, String> data = objectMapper.readValue(expiringCode.getData(), new TypeReference<Map<String, String>>() {
-        });
-
+        ExpiringCode expiringCode = uaaTemplate.getForObject(uaaBaseUrl + "/Codes/"+ code, ExpiringCode.class);
+        Map<String, String> data = objectMapper.readValue(expiringCode.getData(), new TypeReference<Map<String, String>>() {});
         ScimUser user = uaaTemplate.getForObject(uaaBaseUrl + "/Users/" + data.get("user_id") + "/verify", ScimUser.class);
 
         ClientDetails clientDetails = uaaTemplate.getForObject(uaaBaseUrl + "/oauth/clients/" + data.get("client_id"), BaseClientDetails.class);
@@ -127,7 +125,22 @@ public class EmailAccountCreationService implements AccountCreationService {
             logger.error("Exception raised while resending activation email for " + email, e);
         }
     }
-
+    
+    
+    @Override
+    public ScimUser createUser(String username, String password) {
+        ScimUser scimUser = new ScimUser();
+        scimUser.setUserName(username);
+        ScimUser.Email email = new ScimUser.Email();
+        email.setPrimary(true);
+        email.setValue(username);
+        scimUser.setEmails(Arrays.asList(email));
+        scimUser.setOrigin(Origin.UAA);
+        scimUser.setPassword(password);
+        ScimUser userResponse = uaaTemplate.postForObject(uaaBaseUrl + "/Users", scimUser, ScimUser.class);
+        return userResponse;
+    }
+    
     private String getSubjectText() {
         return brand.equals("pivotal") ? "Activate your Pivotal ID" : "Activate your account";
     }

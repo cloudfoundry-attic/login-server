@@ -1,5 +1,6 @@
 package org.cloudfoundry.identity.uaa.login;
 
+import org.cloudfoundry.identity.uaa.scim.ScimUser;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 import java.io.IOException;
@@ -109,4 +110,6 @@ public interface AccountCreationService {
             return email;
         }
     }
+
+    ScimUser createUser(String username, String password);
 }

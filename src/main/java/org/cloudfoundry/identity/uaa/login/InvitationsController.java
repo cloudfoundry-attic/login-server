@@ -1,5 +1,6 @@
 package org.cloudfoundry.identity.uaa.login;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,6 +23,8 @@ public class InvitationsController {
         this.invitationsService = invitationsService;
     }
 
+    @Autowired
+    private AccountCreationService accountCreationService;
     private InvitationsService invitationsService;
 
     public InvitationsController(InvitationsService invitationsService) {
@@ -32,12 +35,19 @@ public class InvitationsController {
     public String newInvitePage(Model model) {
         return "new_invite";
     }
+    
+    @RequestMapping(value = "/accept", method = GET, params = {"code"})
+    public String acceptInvitePage() {
+        return "accounts/accept_invite";
+    }
+
+    
 
     @RequestMapping(method = POST, params = {"email"})
-    public String sendInvitationEmail(@RequestParam("email") String email,
+    public String sendInvitationEmail(@RequestParam("email") String email,@RequestParam(value="client_id",defaultValue="login") String clientId,
                                       Principal principal) {
         String currentUser = principal.getName();
-        invitationsService.sendInviteEmail(email, currentUser);
+        invitationsService.inviteUser(email,currentUser,clientId);
         return "invite_sent";
     }
 }

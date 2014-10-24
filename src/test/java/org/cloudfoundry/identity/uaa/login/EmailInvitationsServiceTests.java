@@ -42,7 +42,7 @@ public class EmailInvitationsServiceTests {
         request.setProtocol("http");
         request.setContextPath("/login");
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
-        emailInvitationsService.sendInviteEmail("user@example.com", "current-user");
+        emailInvitationsService.inviteUser("user@example.com", "current-user","login");
 
         ArgumentCaptor<String> emailBodyArgument = ArgumentCaptor.forClass(String.class);
         Mockito.verify(emailService).sendMimeMessage(

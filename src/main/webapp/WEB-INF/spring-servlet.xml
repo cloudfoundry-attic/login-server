@@ -476,6 +476,8 @@
     <bean id="changeEmailController" class="org.cloudfoundry.identity.uaa.login.ChangeEmailController">
         <constructor-arg ref="changeEmailService"/>
     </bean>
+    
+    <bean class="org.cloudfoundry.identity.uaa.login.UaaExpiringCodeService"/>
 
     <import resource="saml-providers.xml"/>
 </beans>
