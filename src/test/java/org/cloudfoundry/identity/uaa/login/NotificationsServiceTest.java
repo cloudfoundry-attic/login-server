@@ -23,7 +23,6 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 public class NotificationsServiceTest {
 
     private RestTemplate notificationsTemplate;
-    private MockEnvironment environment;
     private MockRestServiceServer mockNotificationsServer;
     private RestTemplate uaaTemplate;
     private Map<MessageType, HashMap<String, Object>> notifications;
@@ -43,9 +42,6 @@ public class NotificationsServiceTest {
         passwordResetNotification.put("description", "password reset");
         passwordResetNotification.put("critical", true);
         notifications.put(MessageType.PASSWORD_RESET, passwordResetNotification);
-
-        environment = new MockEnvironment();
-        environment.setProperty("notifications.url", "http://notifications.example.com/notifications");
 
         notificationsService = new NotificationsService(notificationsTemplate, "http://notifications.example.com", notifications, uaaTemplate, "http://uaa.com");
 
