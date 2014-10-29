@@ -8,8 +8,8 @@
    <th:block th:text="${currentUser}"></th:block> has invited you to join <th:block th:text="${serviceName}"></th:block>
 </p>
 <p>
-    <a href="http://login.example.com/login/accounts"
-       th:href="@{${accountsUrl}}">Create an Account</a>
+    <a href="http://login.example.com/invitations/accept"
+       th:href="@{${accountsUrl}(code=${code},email=${email})}">Accept Invite</a>
     to continue the registration process.
 </p>
 <p>

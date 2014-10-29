@@ -1,5 +1,6 @@
 package org.cloudfoundry.identity.uaa.login;
 
+import org.cloudfoundry.identity.uaa.scim.ScimUser;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 import java.io.IOException;
@@ -10,6 +11,8 @@ public interface AccountCreationService {
     AccountCreationResponse completeActivation(String code) throws IOException;
 
     void resendVerificationCode(String email, String clientId);
+
+    ScimUser createUser(String username, String password);
 
     public static class ExistingUserResponse {
         @JsonProperty
