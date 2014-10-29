@@ -2,9 +2,13 @@ package org.cloudfoundry.identity.uaa.login;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.cloudfoundry.identity.uaa.error.UaaException;
+import org.cloudfoundry.identity.uaa.login.AccountCreationService.ExistingUserResponse;
 import org.cloudfoundry.identity.uaa.message.PasswordChangeRequest;
 import org.cloudfoundry.identity.uaa.scim.ScimUser;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -89,6 +93,20 @@ public class EmailInvitationsService implements InvitationsService {
             data.put("user_id", user.getId());
             String code = expiringCodeService.generateCode(data, 30, TimeUnit.DAYS);
             sendInvitationEmail(email, currentUser, code);
+        } catch (HttpClientErrorException e) {
+            String uaaResponse = e.getResponseBodyAsString();
+            try {
+                ExistingUserResponse existingUserResponse = new ObjectMapper().readValue(uaaResponse, ExistingUserResponse.class);
+                if (existingUserResponse.getVerified()) {
+                    throw new UaaException(e.getStatusText(), e.getStatusCode().value());
+                }
+                Map<String,String> data = new HashMap<>();
+                data.put("user_id", existingUserResponse.getUserId());
+                String code = expiringCodeService.generateCode(data, 30, TimeUnit.DAYS);
+                sendInvitationEmail(email, currentUser, code);
+            } catch (IOException ioe) {
+            	logger.warn("couldn't invite user",ioe);
+            }
         } catch (IOException e) {
             logger.warn("couldn't invite user",e);
         }

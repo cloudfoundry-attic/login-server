@@ -2,12 +2,11 @@ package org.cloudfoundry.identity.uaa.login;
 
 import org.cloudfoundry.identity.uaa.authentication.Origin;
 import org.cloudfoundry.identity.uaa.authentication.UaaPrincipal;
-
+import org.cloudfoundry.identity.uaa.error.UaaException;
 import org.cloudfoundry.identity.uaa.login.test.ThymeleafConfig;
 import org.cloudfoundry.identity.uaa.user.UaaAuthority;
 import org.junit.Before;
 import org.junit.Test;
-
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +36,6 @@ import static junit.framework.Assert.*;
 import static org.cloudfoundry.identity.uaa.login.ExpiringCodeService.*;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
@@ -87,13 +85,36 @@ public class InvitationsControllerTest {
             mockSecurityContext
         );
 
-        MockHttpServletRequestBuilder post = post("/invitations")
+        MockHttpServletRequestBuilder post = post("/invitations/new.do")
             .param("email", "user1@example.com");
 
         mockMvc.perform(post)
-            .andExpect(status().isOk())
-            .andExpect(view().name("invitations/invite_sent"));
+            .andExpect(status().isFound())
+            .andExpect(redirectedUrl("sent"));
         verify(invitationsService).inviteUser("user1@example.com", "marissa");
+    }
+    
+    @Test
+    public void testSendInvitationEmailToExistingVerifiedUser() throws Exception {
+        UaaPrincipal p = new UaaPrincipal("123","marissa","marissa@test.org", Origin.UAA,"");
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(p, "", UaaAuthority.USER_AUTHORITIES);
+        assertTrue(auth.isAuthenticated());
+        MockSecurityContext mockSecurityContext = new MockSecurityContext(auth);
+        SecurityContextHolder.setContext(mockSecurityContext);
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute(
+            HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
+            mockSecurityContext
+        );
+
+        MockHttpServletRequestBuilder post = post("/invitations/new.do")
+            .param("email", "user1@example.com");
+
+        doThrow(new UaaException("",409)).when(invitationsService).inviteUser("user1@example.com", "marissa");
+        mockMvc.perform(post)
+            .andExpect(status().isUnprocessableEntity())
+            .andExpect(view().name("invitations/new_invite"))
+            .andExpect(model().attribute("error_message_code", "existing_user"));
     }
 
     @Test
@@ -109,7 +130,7 @@ public class InvitationsControllerTest {
             mockSecurityContext
         );
 
-        MockHttpServletRequestBuilder post = post("/invitations")
+        MockHttpServletRequestBuilder post = post("/invitations/new.do")
             .param("email", "not_a_real_email");
 
         mockMvc.perform(post)

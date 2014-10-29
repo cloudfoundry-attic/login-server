@@ -2,6 +2,7 @@ package org.cloudfoundry.identity.uaa.login;
 
 import org.cloudfoundry.identity.uaa.authentication.Origin;
 import org.cloudfoundry.identity.uaa.authentication.UaaPrincipal;
+import org.cloudfoundry.identity.uaa.error.UaaException;
 import org.cloudfoundry.identity.uaa.user.UaaAuthority;
 import org.hibernate.validator.constraints.Email;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+
 import java.io.IOException;
 
 import static org.cloudfoundry.identity.uaa.login.ExpiringCodeService.*;
@@ -42,7 +44,7 @@ public class InvitationsController {
         return "invitations/accept_invite";
     }
 
-    @RequestMapping(method = POST, params = {"email"})
+    @RequestMapping(value = "/new.do", method = POST, params = {"email"})
     public String sendInvitationEmail(@Valid @ModelAttribute("email") ValidEmail email, BindingResult result, Model model, HttpServletResponse response) {
         if (result.hasErrors()) {
             return handleUnprocessableEntity(model, response, "invalid_email", "invitations/new_invite");
@@ -50,9 +52,19 @@ public class InvitationsController {
 
         UaaPrincipal p = ((UaaPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         String currentUser = p.getName();
-        invitationsService.inviteUser(email.getEmail(), currentUser);
+        try {
+        	invitationsService.inviteUser(email.getEmail(), currentUser);
+        } catch (UaaException e) {
+        	return handleUnprocessableEntity(model, response, "existing_user", "invitations/new_invite");
+        }
+        return "redirect:sent";
+    }
+    
+    @RequestMapping(value = "sent", method = GET)
+    public String inviteSentPage(Model model) {
         return "invitations/invite_sent";
     }
+    
 
     @RequestMapping(value = "/accept.do", method = POST, params = {"email", "code"})
     public String acceptInvitation(@RequestParam("email") String email,

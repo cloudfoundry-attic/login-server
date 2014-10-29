@@ -1,23 +1,31 @@
 package org.cloudfoundry.identity.uaa.login;
 
+import org.cloudfoundry.identity.uaa.error.UaaException;
 import org.cloudfoundry.identity.uaa.login.test.ThymeleafConfig;
 import org.cloudfoundry.identity.uaa.scim.ScimUser;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpStatus;
+import org.springframework.mock.http.client.MockClientHttpResponse;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.ConfigurableWebApplicationContext;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -27,6 +35,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.thymeleaf.spring4.SpringTemplateEngine;
 
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -40,6 +49,7 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.PUT;
+import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
@@ -49,6 +59,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
 @ContextConfiguration(classes = EmailInvitationsServiceTests.ContextConfiguration.class)
+@DirtiesContext(classMode=ClassMode.AFTER_EACH_TEST_METHOD)
 public class EmailInvitationsServiceTests {
 
     private MockRestServiceServer mockUaaServer;
@@ -98,6 +109,50 @@ public class EmailInvitationsServiceTests {
 
         Map<String,String> data = captor.getValue();
         assertEquals("user-id-001", data.get("user_id"));
+
+        ArgumentCaptor<String> emailBodyArgument = ArgumentCaptor.forClass(String.class);
+        Mockito.verify(emailService).sendMimeMessage(
+            eq("user@example.com"),
+            eq("Invitation to join Pivotal"),
+            emailBodyArgument.capture()
+        );
+        String emailBody = emailBodyArgument.getValue();
+        assertThat(emailBody, containsString("current-user"));
+        assertThat(emailBody, containsString("Pivotal"));
+        assertThat(emailBody, containsString("<a href=\"http://localhost/login/invitations/accept?code=the_secret_code&amp;email=user%40example.com\">Accept Invite</a>"));
+        assertThat(emailBody, not(containsString("Cloud Foundry")));
+    }
+    
+    @Test(expected = UaaException.class)
+    public void testSendInviteEmailToUserThatIsAlreadyVerified() throws Exception {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setProtocol("http");
+        request.setContextPath("/login");
+
+        byte[] errorResponse = "{\"error\":\"invalid_user\",\"message\":\"error message\",\"user_id\":\"existing-user-id\",\"verified\":true,\"active\":true}".getBytes();
+        when(accountCreationService.createUser("user@example.com", null)).thenThrow(new HttpClientErrorException(HttpStatus.CONFLICT,"invalid user",errorResponse,Charset.forName("UTF-8")));
+
+        emailInvitationsService.inviteUser("user@example.com", "current-user");
+    }
+    
+    @Test
+    public void testSendInviteEmailToUnverifiedUser() throws Exception {
+    	
+		MockHttpServletRequest request = new MockHttpServletRequest();
+		request.setProtocol("http");
+		request.setContextPath("/login");
+		RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
+		
+		byte[] errorResponse = "{\"error\":\"invalid_user\",\"message\":\"error message\",\"user_id\":\"existing-user-id\",\"verified\":false,\"active\":true}".getBytes();
+		when(accountCreationService.createUser("user@example.com", null)).thenThrow(new HttpClientErrorException(HttpStatus.CONFLICT,"invalid user",errorResponse,Charset.forName("UTF-8")));
+
+        ArgumentCaptor<Map<String,String>> captor = ArgumentCaptor.forClass((Class)Map.class);
+
+        when(expiringCodeService.generateCode(captor.capture(), anyInt(), eq(TimeUnit.DAYS))).thenReturn("the_secret_code");
+        emailInvitationsService.inviteUser("user@example.com", "current-user");
+
+        Map<String,String> data = captor.getValue();
+        assertEquals("existing-user-id", data.get("user_id"));
 
         ArgumentCaptor<String> emailBodyArgument = ArgumentCaptor.forClass(String.class);
         Mockito.verify(emailService).sendMimeMessage(
