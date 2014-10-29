@@ -9,7 +9,7 @@
 </p>
 <p>
     <a href="http://login.example.com/invitations/accept"
-       th:href="@{${accountsUrl}}">Create an Account</a>
+       th:href="@{${accountsUrl}(code=${code},email=${email})}">Accept Invite</a>
     to continue the registration process.
 </p>
 <p>

@@ -50,19 +50,11 @@ public class EmailAccountCreationService implements AccountCreationService {
 
     @Override
     public void beginActivation(String email, String password, String clientId) {
-        ScimUser scimUser = new ScimUser();
-        scimUser.setUserName(email);
-        ScimUser.Email primaryEmail = new ScimUser.Email();
-        primaryEmail.setPrimary(true);
-        primaryEmail.setValue(email);
-        scimUser.setEmails(Arrays.asList(primaryEmail));
-        scimUser.setOrigin(Origin.UAA);
-        scimUser.setPassword(password);
 
         String subject = getSubjectText();
         try {
-            ScimUser userResponse = uaaTemplate.postForObject(uaaBaseUrl + "/Users", scimUser, ScimUser.class);
-            generateAndSendCode(email, clientId, subject, userResponse.getId());
+            ScimUser scimUser = createUser(email, password);
+            generateAndSendCode(email, clientId, subject, scimUser.getId());
         } catch (HttpClientErrorException e) {
             String uaaResponse = e.getResponseBodyAsString();
             try {

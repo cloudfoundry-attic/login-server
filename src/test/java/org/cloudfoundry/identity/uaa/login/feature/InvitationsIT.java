@@ -82,7 +82,7 @@ public class InvitationsIT {
         SmtpMessage message = (SmtpMessage) receivedEmail.next();
         receivedEmail.remove();
         Assert.assertEquals(userEmail, message.getHeaderValue("To"));
-        Assert.assertThat(message.getBody(), containsString("Create an Account"));
+        Assert.assertThat(message.getBody(), containsString("Accept Invite"));
 
         String link = testClient.extractLink(message.getBody());
         Assert.assertTrue(link.contains("/invitations/accept"));

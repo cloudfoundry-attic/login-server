@@ -13,8 +13,10 @@
     </div>
     <div class="island-content">
         <div th:text="|Email: ${param.email[0]}|" class="email-display">Email: user@example.com</div>
-        <form th:action="@{/accounts(email=${param.email[0]},code=${param.code[0]})}" method="post" novalidate="novalidate">
-            <div th:if="${message_code}" th:text="#{'account_activation.' + ${message_code}}" class="error-message"></div>
+        <form th:action="@{/invitations/accept.do(email=${param.email[0]},code=${param.code[0]})}" method="post" novalidate="novalidate">
+            <div th:if="${error_message_code}" class="alert alert-error">
+                <p th:text="#{'account_activation.' + ${error_message_code}}">Error Message</p>
+            </div>
             <input name="password" type="password" placeholder="Password" autocomplete="off" class="form-control"/>
             <input name="password_confirmation" type="password" placeholder="Confirm" autocomplete="off" class="form-control"/>
             <input type="submit" th:value="${pivotal ? 'Create Pivotal ID' : 'Create account'}" class="island-button"/>

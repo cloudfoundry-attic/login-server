@@ -2,8 +2,11 @@ package org.cloudfoundry.identity.uaa.login;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.cloudfoundry.identity.uaa.message.PasswordChangeRequest;
+import org.cloudfoundry.identity.uaa.scim.ScimUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring4.SpringTemplateEngine;
@@ -16,23 +19,36 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import static org.cloudfoundry.identity.uaa.login.ExpiringCodeService.*;
+
 public class EmailInvitationsService implements InvitationsService {
     private final Log logger = LogFactory.getLog(getClass());
 
     private final SpringTemplateEngine templateEngine;
     private final EmailService emailService;
-    private final String brand;
+    private final String uaaBaseUrl;
 
-    public EmailInvitationsService(SpringTemplateEngine templateEngine, EmailService emailService, String brand) {
+    private String brand;
+
+    public EmailInvitationsService(SpringTemplateEngine templateEngine, EmailService emailService, String brand, String uaaBaseUrl) {
         this.templateEngine = templateEngine;
         this.emailService = emailService;
+        this.brand = brand;
+        this.uaaBaseUrl = uaaBaseUrl;
+    }
+
+    public void setBrand(String brand) {
         this.brand = brand;
     }
     
     @Autowired
     private AccountCreationService accountCreationService;
+
     @Autowired
     private ExpiringCodeService expiringCodeService;
+
+    @Autowired
+    private RestTemplate authorizationTemplate;
 
     private void sendInvitationEmail(String email, String currentUser, String code) {
         String subject = getSubjectText();
@@ -55,28 +71,38 @@ public class EmailInvitationsService implements InvitationsService {
     }
 
     private String getEmailHtml(String email, String currentUser, String code) {
-        // TODO - queryParam is not generating the query parameters in the URL correctly - fix please!
-        String accountsUrl = ServletUriComponentsBuilder.fromCurrentContextPath().path("/invitations/accept").queryParam("code",code).queryParam("email",email).build().toUriString();
+        String accountsUrl = ServletUriComponentsBuilder.fromCurrentContextPath().path("/invitations/accept").build().toUriString();
         final Context ctx = new Context();
         ctx.setVariable("serviceName", brand.equals("pivotal") ? "Pivotal" : "Cloud Foundry");
         ctx.setVariable("email", email);
+        ctx.setVariable("code", code);
         ctx.setVariable("currentUser", currentUser);
         ctx.setVariable("accountsUrl", accountsUrl);
         return templateEngine.process("invite", ctx);
     }
 
     @Override
-    public void inviteUser(String email, String currentUser,String clientId) {
-        // generate a code
+    public void inviteUser(String email, String currentUser) {
         try {
+            ScimUser user = accountCreationService.createUser(email, null);
             Map<String,String> data = new HashMap<>();
-            data.put("username", email);
-            data.put("client_id",clientId);
-            String code = expiringCodeService.generateCode(data, 365, TimeUnit.DAYS);
-            accountCreationService.createUser(email, null);
+            data.put("user_id", user.getId());
+            String code = expiringCodeService.generateCode(data, 30, TimeUnit.DAYS);
             sendInvitationEmail(email, currentUser, code);
         } catch (IOException e) {
             logger.warn("couldn't invite user",e);
         }
+    }
+
+    @Override
+    public InvitationAcceptanceResponse acceptInvitation(String email, String password, String code) throws CodeNotFoundException, IOException {
+        Map<String,String> codeData = expiringCodeService.verifyCode(code);
+        ScimUser user = authorizationTemplate.getForObject(uaaBaseUrl + "/Users/" + codeData.get("user_id") + "/verify", ScimUser.class);
+
+        PasswordChangeRequest request = new PasswordChangeRequest();
+        request.setPassword(password);
+        authorizationTemplate.put(uaaBaseUrl + "/Users/" + codeData.get("user_id") + "/password", request);
+        InvitationAcceptanceResponse response = new InvitationAcceptanceResponse(codeData.get("user_id"), user.getUserName(), user.getPrimaryEmail());
+        return response;
     }
 }
