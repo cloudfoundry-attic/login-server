@@ -22,6 +22,8 @@ import javax.validation.Valid;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
@@ -45,19 +47,33 @@ public class InvitationsController {
     
 
     @RequestMapping(value = "/new.do", method = POST, params = {"email"})
-    public String sendInvitationEmail(@Valid @ModelAttribute("email") ValidEmail email, BindingResult result, Model model, HttpServletResponse response) {
-        if (result.hasErrors()) {
-            return handleUnprocessableEntity(model, response, "invalid_email", "invitations/new_invite");
-        }
-
+    public String sendInvitationEmail(@RequestParam String email, Model model, HttpServletResponse response) throws IOException {
+        
         UaaPrincipal p = ((UaaPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         String currentUser = p.getName();
-        try {
-        	invitationsService.inviteUser(email.getEmail(), currentUser);
-        } catch (UaaException e) {
-        	return handleUnprocessableEntity(model, response, "existing_user", "invitations/new_invite");
+        String[] emails = email.split("[, ]");
+        MultipleInvitationErrors errors = new MultipleInvitationErrors();
+        for (String emailAddress : emails) {
+        	if (!EmailValidator.isValid(emailAddress)) {
+        		errors.invalidEmails.add(emailAddress);
+        		continue;
+        	}
+            try {
+            	invitationsService.inviteUser(emailAddress, currentUser);
+            } catch (UaaException e) {
+            	errors.existingEmails.add(emailAddress);
+        		continue;
+            }
+        }
+        if (!errors.existingEmails.isEmpty() || !errors.existingEmails.isEmpty()) {
+        	 return handleUnprocessableEntity(model, response, "existing_user", "invitations/new_invite");
         }
         return "redirect:sent";
+    }
+    
+    public static class MultipleInvitationErrors {
+    	public List<String> invalidEmails = new ArrayList<String>();
+    	public List<String> existingEmails = new ArrayList<String>();
     }
     
     @RequestMapping(value = "sent", method = GET)

@@ -14,6 +14,7 @@ package org.cloudfoundry.identity.uaa.login.feature;
 
 import com.dumbster.smtp.SimpleSmtpServer;
 import com.dumbster.smtp.SmtpMessage;
+
 import org.cloudfoundry.identity.uaa.login.test.DefaultIntegrationTestConfig;
 import org.cloudfoundry.identity.uaa.login.test.IntegrationTestRule;
 import org.cloudfoundry.identity.uaa.login.test.TestClient;
@@ -31,7 +32,9 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
@@ -63,8 +66,17 @@ public class InvitationsIT {
 
     @Test
     public void testSendInvite() throws Exception {
-        int randomInt = new SecureRandom().nextInt();
-        String userEmail = "user" + randomInt + "@example.com";
+        sendInvite(1);
+    }
+    
+    public void sendInvite(int numUsers) throws Exception {
+    	List<String> userEmailList = new ArrayList<String>();
+    	for (int i = 0; i < numUsers; i++) {
+	        int randomInt = new SecureRandom().nextInt();
+	        userEmailList.add("user" + randomInt + "@example.com");
+    	}
+    	String userEmails = userEmailList.toString().replaceAll("[\\[\\]]", "");
+    	
         int receivedEmailSize = simpleSmtpServer.getReceivedEmailSize();
 
         signIn(testAccounts.getUserName(), testAccounts.getPassword());
@@ -72,39 +84,51 @@ public class InvitationsIT {
         webDriver.findElement(By.linkText("Invite Users")).click();
         Assert.assertEquals("Send an invite", webDriver.findElement(By.tagName("h1")).getText());
 
-        webDriver.findElement(By.name("email")).sendKeys(userEmail);
+        webDriver.findElement(By.name("email")).sendKeys(userEmails);
         webDriver.findElement(By.xpath("//input[@value='Send invite']")).click();
 
         Assert.assertEquals("Invite sent", webDriver.findElement(By.tagName("h1")).getText());
-
-        Assert.assertEquals(receivedEmailSize + 1, simpleSmtpServer.getReceivedEmailSize());
-        Iterator receivedEmail = simpleSmtpServer.getReceivedEmail();
-        SmtpMessage message = (SmtpMessage) receivedEmail.next();
-        receivedEmail.remove();
-        Assert.assertEquals(userEmail, message.getHeaderValue("To"));
-        Assert.assertThat(message.getBody(), containsString("Accept Invite"));
-
-        String link = testClient.extractLink(message.getBody());
-        Assert.assertTrue(link.contains("/invitations/accept"));
-        webDriver.get(link);
-
-        Assert.assertEquals("Create your account", webDriver.findElement(By.tagName("h1")).getText());
-
-        webDriver.findElement(By.name("password")).sendKeys("secret");
-        webDriver.findElement(By.name("password_confirmation")).sendKeys("secret");
-
-        webDriver.findElement(By.xpath("//input[@value='Create account']")).click();
-
-        Assert.assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), containsString("Where to?"));
-
-        webDriver.findElement(By.xpath("//*[text()='"+userEmail+"']")).click();
-        webDriver.findElement(By.linkText("Sign Out")).click();
-
-        webDriver.findElement(By.name("username")).sendKeys(userEmail);
-        webDriver.findElement(By.name("password")).sendKeys("secret");
-        webDriver.findElement(By.xpath("//input[@value='Sign in']")).click();
-
-        Assert.assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), containsString("Where to?"));
+        
+        Assert.assertEquals(receivedEmailSize + numUsers, simpleSmtpServer.getReceivedEmailSize());
+        for (int i = 0; i < numUsers; i++) {
+        	
+	        Iterator receivedEmail = simpleSmtpServer.getReceivedEmail();
+	        SmtpMessage message = (SmtpMessage) receivedEmail.next();
+	        receivedEmail.remove();
+	        String userEmail = message.getHeaderValue("To");
+	        
+	        Assert.assertTrue(userEmailList.remove(userEmail));
+	        Assert.assertThat(message.getBody(), containsString("Accept Invite"));
+	
+	        String link = testClient.extractLink(message.getBody());
+	        Assert.assertTrue(link.contains("/invitations/accept"));
+	        webDriver.get(link);
+	
+	        Assert.assertEquals("Create your account", webDriver.findElement(By.tagName("h1")).getText());
+	
+	        webDriver.findElement(By.name("password")).sendKeys("secret");
+	        webDriver.findElement(By.name("password_confirmation")).sendKeys("secret");
+	
+	        webDriver.findElement(By.xpath("//input[@value='Create account']")).click();
+	
+	        Assert.assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), containsString("Where to?"));
+	
+	        webDriver.findElement(By.xpath("//*[text()='"+userEmail+"']")).click();
+	        webDriver.findElement(By.linkText("Sign Out")).click();
+	
+	        webDriver.findElement(By.name("username")).sendKeys(userEmail);
+	        webDriver.findElement(By.name("password")).sendKeys("secret");
+	        webDriver.findElement(By.xpath("//input[@value='Sign in']")).click();
+	
+	        Assert.assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), containsString("Where to?"));
+	        webDriver.findElement(By.xpath("//*[text()='"+userEmail+"']")).click();
+	        webDriver.findElement(By.linkText("Sign Out")).click();
+        }
+    }
+    
+    @Test
+    public void testSendInviteToMultipleUsers() throws Exception {
+    	sendInvite(5);
     }
 
     private void signIn(String userName, String password) {

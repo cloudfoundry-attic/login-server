@@ -111,6 +111,29 @@ public class InvitationsControllerTest {
     }
     
     @Test
+    public void testSendMultipleInvitationEmail() throws Exception {
+        UaaPrincipal p = new UaaPrincipal("123","marissa","marissa@test.org", Origin.UAA,"");
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(p, "", UaaAuthority.USER_AUTHORITIES);
+        assertTrue(auth.isAuthenticated());
+        MockSecurityContext mockSecurityContext = new MockSecurityContext(auth);
+        SecurityContextHolder.setContext(mockSecurityContext);
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute(
+            HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
+            mockSecurityContext
+        );
+
+        MockHttpServletRequestBuilder post = post("/invitations/new.do")
+            .param("email", "user1@example.com,user2@example.com");
+
+        mockMvc.perform(post)
+            .andExpect(status().isFound())
+            .andExpect(redirectedUrl("sent"));
+        verify(invitationsService).inviteUser("user1@example.com", "marissa");
+        verify(invitationsService).inviteUser("user2@example.com", "marissa");
+    }
+    
+    @Test
     public void testSendInvitationEmailToExistingVerifiedUser() throws Exception {
         UaaPrincipal p = new UaaPrincipal("123","marissa","marissa@test.org", Origin.UAA,"");
         UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(p, "", UaaAuthority.USER_AUTHORITIES);
