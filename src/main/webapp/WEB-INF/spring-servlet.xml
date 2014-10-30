@@ -40,7 +40,6 @@
     <security:http pattern="/email_sent" security="none" />
     <security:http pattern="/create_account*" security="none" />
     <security:http pattern="/accounts/email_sent" security="none" />
-    <security:http pattern="/invitations/accept" security="none" />
 
     <bean id="config" class="org.cloudfoundry.identity.uaa.config.EnvironmentMapFactoryBean" />
 
@@ -136,7 +135,7 @@
         <security:anonymous enabled="true" />
     </security:http>
 
-    <security:http pattern="/invitations/accept.do" disable-url-rewriting="true"
+    <security:http pattern="/invitations/accept" disable-url-rewriting="true"
                    entry-point-ref="loginEntryPoint">
         <security:intercept-url pattern="/**" access="IS_AUTHENTICATED_ANONYMOUSLY" />
         <security:anonymous enabled="true" />
