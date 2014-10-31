@@ -185,6 +185,7 @@ cargo {
   port = 8080
   
   local {
+//    jvmArgs = "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005"
     systemProperties {
       property 'UAA_PROFILE', 'local'
       property 'net.sourceforge.cobertura.datafile', integrationCoverageFile
