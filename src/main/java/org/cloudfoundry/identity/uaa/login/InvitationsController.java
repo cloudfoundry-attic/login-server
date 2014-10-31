@@ -3,8 +3,10 @@ package org.cloudfoundry.identity.uaa.login;
 import org.cloudfoundry.identity.uaa.authentication.Origin;
 import org.cloudfoundry.identity.uaa.authentication.UaaPrincipal;
 import org.cloudfoundry.identity.uaa.error.UaaException;
+import org.cloudfoundry.identity.uaa.login.ExpiringCodeService.CodeNotFoundException;
 import org.cloudfoundry.identity.uaa.user.UaaAuthority;
 import org.hibernate.validator.constraints.Email;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,8 +21,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import java.io.IOException;
+import java.util.Map;
 
-import static org.cloudfoundry.identity.uaa.login.ExpiringCodeService.*;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
@@ -29,6 +31,8 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 @RequestMapping("/invitations")
 public class InvitationsController {
     private InvitationsService invitationsService;
+    @Autowired
+    private ExpiringCodeService expiringCodeService;
 
     public InvitationsController(InvitationsService invitationsService) {
         this.invitationsService = invitationsService;
@@ -39,10 +43,6 @@ public class InvitationsController {
         return "invitations/new_invite";
     }
     
-    @RequestMapping(value = "/accept", method = GET, params = {"code", "email"})
-    public String acceptInvitePage() {
-        return "invitations/accept_invite";
-    }
 
     @RequestMapping(value = "/new.do", method = POST, params = {"email"})
     public String sendInvitationEmail(@Valid @ModelAttribute("email") ValidEmail email, BindingResult result, Model model, HttpServletResponse response) {
@@ -65,11 +65,23 @@ public class InvitationsController {
         return "invitations/invite_sent";
     }
     
+    @RequestMapping(value = "/accept", method = GET, params = {"code"})
+    public String acceptInvitePage(@RequestParam String code, Model model, HttpServletResponse response) throws IOException {
+    	
+		try {
+			Map<String, String> codeData = expiringCodeService.verifyCode(code);
+	        UaaPrincipal uaaPrincipal = new UaaPrincipal(codeData.get("user_id"), codeData.get("email"), codeData.get("email"), Origin.UAA, null);
+	        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(uaaPrincipal, null, UaaAuthority.USER_AUTHORITIES);
+	        SecurityContextHolder.getContext().setAuthentication(token);
+	    	model.addAllAttributes(codeData);
+	    	return "invitations/accept_invite";
+        } catch (CodeNotFoundException e) {
+            return handleUnprocessableEntity(model, response, "code_expired", "invitations/accept_invite");
+		}
+    }
 
-    @RequestMapping(value = "/accept.do", method = POST, params = {"email", "code"})
-    public String acceptInvitation(@RequestParam("email") String email,
-                                   @RequestParam("code") String code,
-                                   @RequestParam("password") String password,
+    @RequestMapping(value = "/accept.do", method = POST)
+    public String acceptInvitation(@RequestParam("password") String password,
                                    @RequestParam("password_confirmation") String passwordConfirmation, Model model,
                                    HttpServletResponse servletResponse) throws IOException {
 
@@ -77,17 +89,10 @@ public class InvitationsController {
         if (!validation.valid()) {
             return handleUnprocessableEntity(model, servletResponse, validation.getMessageCode(), "invitations/accept_invite");
         }
-
-        InvitationsService.InvitationAcceptanceResponse response = null;
-        try {
-            response = invitationsService.acceptInvitation(email, password, code);
-        } catch (CodeNotFoundException e) {
-            return handleUnprocessableEntity(model, servletResponse, "code_expired", "invitations/accept_invite");
-        }
-
-        UaaPrincipal uaaPrincipal = new UaaPrincipal(response.getUserId(), response.getUsername(), response.getEmail(), Origin.UAA, null);
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(uaaPrincipal, null, UaaAuthority.USER_AUTHORITIES);
-        SecurityContextHolder.getContext().setAuthentication(token);
+        UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        UaaPrincipal principal =  (UaaPrincipal) token.getPrincipal();
+        
+        invitationsService.acceptInvitation(principal.getId(), principal.getEmail(), password);
 
         return "redirect:/home";
     }

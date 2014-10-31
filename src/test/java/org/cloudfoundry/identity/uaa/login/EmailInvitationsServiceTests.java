@@ -7,8 +7,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -16,7 +14,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
-import org.springframework.mock.http.client.MockClientHttpResponse;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
@@ -36,7 +33,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 import org.thymeleaf.spring4.SpringTemplateEngine;
 
 import java.nio.charset.Charset;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -49,7 +45,6 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.PUT;
-import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
@@ -119,7 +114,7 @@ public class EmailInvitationsServiceTests {
         String emailBody = emailBodyArgument.getValue();
         assertThat(emailBody, containsString("current-user"));
         assertThat(emailBody, containsString("Pivotal"));
-        assertThat(emailBody, containsString("<a href=\"http://localhost/login/invitations/accept?code=the_secret_code&amp;email=user%40example.com\">Accept Invite</a>"));
+        assertThat(emailBody, containsString("<a href=\"http://localhost/login/invitations/accept?code=the_secret_code\">Accept Invite</a>"));
         assertThat(emailBody, not(containsString("Cloud Foundry")));
     }
     
@@ -163,7 +158,7 @@ public class EmailInvitationsServiceTests {
         String emailBody = emailBodyArgument.getValue();
         assertThat(emailBody, containsString("current-user"));
         assertThat(emailBody, containsString("Pivotal"));
-        assertThat(emailBody, containsString("<a href=\"http://localhost/login/invitations/accept?code=the_secret_code&amp;email=user%40example.com\">Accept Invite</a>"));
+        assertThat(emailBody, containsString("<a href=\"http://localhost/login/invitations/accept?code=the_secret_code\">Accept Invite</a>"));
         assertThat(emailBody, not(containsString("Cloud Foundry")));
     }
 
@@ -195,38 +190,27 @@ public class EmailInvitationsServiceTests {
         );
         String emailBody = emailBodyArgument.getValue();
         assertThat(emailBody, containsString("current-user"));
-        assertThat(emailBody, containsString("<a href=\"http://localhost/login/invitations/accept?code=the_secret_code&amp;email=user%40example.com\">Accept Invite</a>"));
+        assertThat(emailBody, containsString("<a href=\"http://localhost/login/invitations/accept?code=the_secret_code\">Accept Invite</a>"));
         assertThat(emailBody, containsString("Cloud Foundry"));
         assertThat(emailBody, not(containsString("Pivotal")));
     }
 
     @Test
     public void testAcceptInvitation() throws Exception {
-        Map<String,String> codeData = new HashMap<>();
-        codeData.put("user_id", "user-id-001");
-        when(expiringCodeService.verifyCode("the_secret_code")).thenReturn(codeData);
-
-        String scimUserJSONString = "{" +
-            "\"userName\": \"user@example.com\"," +
-            "\"id\": \"user-id-001\"," +
-            "\"emails\": [{\"value\":\"user@example.com\"}]" +
-            "}";
 
         mockUaaServer.expect(requestTo("http://uaa.example.com/Users/user-id-001/verify"))
             .andExpect(method(GET))
-            .andRespond(withSuccess(scimUserJSONString, APPLICATION_JSON));
+            .andRespond(withSuccess("{}",APPLICATION_JSON));
 
         mockUaaServer.expect(requestTo("http://uaa.example.com/Users/user-id-001/password"))
             .andExpect(method(PUT))
             .andExpect(jsonPath("$.password").value("secret"))
             .andRespond(withSuccess());
 
-        InvitationsService.InvitationAcceptanceResponse response = emailInvitationsService.acceptInvitation("user@example.com", "secret", "the_secret_code");
+        emailInvitationsService.acceptInvitation("user-id-001", "user@example.com", "secret");
 
         mockUaaServer.verify();
-        assertEquals("user-id-001", response.getUserId());
-        assertEquals("user@example.com", response.getUsername());
-        assertEquals("user@example.com", response.getEmail());
+        Mockito.verifyZeroInteractions(expiringCodeService);
     }
 
     @Configuration

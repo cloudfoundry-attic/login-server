@@ -231,7 +231,13 @@ project.gradle.taskGraph.whenReady { TaskExecutionGraph graph ->
       if (runningWithCoverage()) {
         extraClasspath = files(configurations.coberturaJar.files)
       }
+      if (graph.hasTask(integrationTest)) {
+        systemProperties {
+          property  'login.invitationsEnabled', 'true'
+        }
+      }
     }
+
   }
 
   project.tasks.withType(Test).each {

@@ -23,8 +23,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import static org.cloudfoundry.identity.uaa.login.ExpiringCodeService.*;
-
 public class EmailInvitationsService implements InvitationsService {
     private final Log logger = LogFactory.getLog(getClass());
 
@@ -57,7 +55,7 @@ public class EmailInvitationsService implements InvitationsService {
     private void sendInvitationEmail(String email, String currentUser, String code) {
         String subject = getSubjectText();
         try {
-            String htmlContent = getEmailHtml(email, currentUser, code);
+            String htmlContent = getEmailHtml(currentUser, code);
             try {
                 emailService.sendMimeMessage(email, subject, htmlContent);
             } catch (MessagingException e) {
@@ -74,11 +72,10 @@ public class EmailInvitationsService implements InvitationsService {
         return brand.equals("pivotal") ? "Invitation to join Pivotal" : "Invitation to join Cloud Foundry";
     }
 
-    private String getEmailHtml(String email, String currentUser, String code) {
+    private String getEmailHtml(String currentUser, String code) {
         String accountsUrl = ServletUriComponentsBuilder.fromCurrentContextPath().path("/invitations/accept").build().toUriString();
         final Context ctx = new Context();
         ctx.setVariable("serviceName", brand.equals("pivotal") ? "Pivotal" : "Cloud Foundry");
-        ctx.setVariable("email", email);
         ctx.setVariable("code", code);
         ctx.setVariable("currentUser", currentUser);
         ctx.setVariable("accountsUrl", accountsUrl);
@@ -91,6 +88,7 @@ public class EmailInvitationsService implements InvitationsService {
             ScimUser user = accountCreationService.createUser(email, null);
             Map<String,String> data = new HashMap<>();
             data.put("user_id", user.getId());
+            data.put("email", email);
             String code = expiringCodeService.generateCode(data, 30, TimeUnit.DAYS);
             sendInvitationEmail(email, currentUser, code);
         } catch (HttpClientErrorException e) {
@@ -102,6 +100,7 @@ public class EmailInvitationsService implements InvitationsService {
                 }
                 Map<String,String> data = new HashMap<>();
                 data.put("user_id", existingUserResponse.getUserId());
+                data.put("email", email);
                 String code = expiringCodeService.generateCode(data, 30, TimeUnit.DAYS);
                 sendInvitationEmail(email, currentUser, code);
             } catch (IOException ioe) {
@@ -113,14 +112,10 @@ public class EmailInvitationsService implements InvitationsService {
     }
 
     @Override
-    public InvitationAcceptanceResponse acceptInvitation(String email, String password, String code) throws CodeNotFoundException, IOException {
-        Map<String,String> codeData = expiringCodeService.verifyCode(code);
-        ScimUser user = authorizationTemplate.getForObject(uaaBaseUrl + "/Users/" + codeData.get("user_id") + "/verify", ScimUser.class);
-
+    public void acceptInvitation(String userId, String email, String password) {
+        authorizationTemplate.getForEntity(uaaBaseUrl + "/Users/" + userId + "/verify",Object.class);
         PasswordChangeRequest request = new PasswordChangeRequest();
         request.setPassword(password);
-        authorizationTemplate.put(uaaBaseUrl + "/Users/" + codeData.get("user_id") + "/password", request);
-        InvitationAcceptanceResponse response = new InvitationAcceptanceResponse(codeData.get("user_id"), user.getUserName(), user.getPrimaryEmail());
-        return response;
+        authorizationTemplate.put(uaaBaseUrl + "/Users/" + userId + "/password", request);
     }
 }
