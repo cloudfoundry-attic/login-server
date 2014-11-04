@@ -1,6 +1,5 @@
 package org.cloudfoundry.identity.uaa.login;
 
-import junit.framework.Assert;
 import org.cloudfoundry.identity.uaa.error.UaaException;
 import org.cloudfoundry.identity.uaa.login.test.ThymeleafConfig;
 import org.cloudfoundry.identity.uaa.scim.ScimUser;
@@ -74,7 +73,7 @@ public class EmailInvitationsServiceTests {
     AccountCreationService accountCreationService;
 
     @Autowired
-    EmailService emailService;
+    MessageService messageService;
 
     @Autowired
     RestTemplate authorizationTemplate;
@@ -108,8 +107,10 @@ public class EmailInvitationsServiceTests {
         assertEquals("user-id-001", data.get("user_id"));
 
         ArgumentCaptor<String> emailBodyArgument = ArgumentCaptor.forClass(String.class);
-        Mockito.verify(emailService).sendMimeMessage(
+        Mockito.verify(messageService).sendMessage(
+            eq("user-id-001"),
             eq("user@example.com"),
+            eq(MessageType.INVITATION),
             eq("Invitation to join Pivotal"),
             emailBodyArgument.capture()
         );
@@ -152,8 +153,10 @@ public class EmailInvitationsServiceTests {
         assertEquals("existing-user-id", data.get("user_id"));
 
         ArgumentCaptor<String> emailBodyArgument = ArgumentCaptor.forClass(String.class);
-        Mockito.verify(emailService).sendMimeMessage(
+        Mockito.verify(messageService).sendMessage(
+            eq("existing-user-id"),
             eq("user@example.com"),
+            eq(MessageType.INVITATION),
             eq("Invitation to join Pivotal"),
             emailBodyArgument.capture()
         );
@@ -185,8 +188,10 @@ public class EmailInvitationsServiceTests {
         assertEquals("user-id-001", data.get("user_id"));
 
         ArgumentCaptor<String> emailBodyArgument = ArgumentCaptor.forClass(String.class);
-        Mockito.verify(emailService).sendMimeMessage(
+        Mockito.verify(messageService).sendMessage(
+            eq("user-id-001"),
             eq("user@example.com"),
+            eq(MessageType.INVITATION),
             eq("Invitation to join Cloud Foundry"),
             emailBodyArgument.capture()
         );
@@ -262,8 +267,8 @@ public class EmailInvitationsServiceTests {
         ExpiringCodeService expiringCodeService() { return Mockito.mock(ExpiringCodeService.class); }
 
         @Bean
-        EmailService emailService() {
-            return Mockito.mock(EmailService.class);
+        MessageService messageService() {
+            return Mockito.mock(MessageService.class);
         }
 
         @Bean
@@ -273,7 +278,7 @@ public class EmailInvitationsServiceTests {
 
         @Bean
         EmailInvitationsService emailInvitationsService() {
-            return new EmailInvitationsService(templateEngine, emailService(), "pivotal", "http://uaa.example.com");
+            return new EmailInvitationsService(templateEngine, messageService(), "pivotal", "http://uaa.example.com");
         }
 
         @Bean

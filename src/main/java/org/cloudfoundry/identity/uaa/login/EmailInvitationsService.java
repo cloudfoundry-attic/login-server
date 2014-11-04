@@ -18,10 +18,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring4.SpringTemplateEngine;
 
-import javax.mail.MessagingException;
-
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -34,14 +31,14 @@ public class EmailInvitationsService implements InvitationsService {
     public static final int INVITATION_EXPIRY_DAYS = 365;
 
     private final SpringTemplateEngine templateEngine;
-    private final EmailService emailService;
+    private final MessageService messageService;
     private final String uaaBaseUrl;
 
     private String brand;
 
-    public EmailInvitationsService(SpringTemplateEngine templateEngine, EmailService emailService, String brand, String uaaBaseUrl) {
+    public EmailInvitationsService(SpringTemplateEngine templateEngine, MessageService messageService, String brand, String uaaBaseUrl) {
         this.templateEngine = templateEngine;
-        this.emailService = emailService;
+        this.messageService = messageService;
         this.brand = brand;
         this.uaaBaseUrl = uaaBaseUrl;
     }
@@ -59,17 +56,11 @@ public class EmailInvitationsService implements InvitationsService {
     @Autowired
     private RestTemplate authorizationTemplate;
 
-    private void sendInvitationEmail(String email, String currentUser, String code) {
+    private void sendInvitationEmail(String email, String userId, String currentUser, String code) {
         String subject = getSubjectText();
         try {
             String htmlContent = getEmailHtml(currentUser, code);
-            try {
-                emailService.sendMimeMessage(email, subject, htmlContent);
-            } catch (MessagingException e) {
-                logger.error("Exception raised while sending message to " + email, e);
-            } catch (UnsupportedEncodingException e) {
-                logger.error("Exception raised while sending message to " + email, e);
-            }
+                messageService.sendMessage(userId, email, MessageType.INVITATION, subject, htmlContent);
         } catch (RestClientException e) {
             logger.info("Exception raised while creating invitation email from " + email, e);
         }
@@ -97,7 +88,7 @@ public class EmailInvitationsService implements InvitationsService {
             data.put("user_id", user.getId());
             data.put("email", email);
             String code = expiringCodeService.generateCode(data, INVITATION_EXPIRY_DAYS, TimeUnit.DAYS);
-            sendInvitationEmail(email, currentUser, code);
+            sendInvitationEmail(email, user.getId(), currentUser, code);
         } catch (HttpClientErrorException e) {
             String uaaResponse = e.getResponseBodyAsString();
             try {
@@ -109,7 +100,7 @@ public class EmailInvitationsService implements InvitationsService {
                 data.put("user_id", existingUserResponse.getUserId());
                 data.put("email", email);
                 String code = expiringCodeService.generateCode(data, INVITATION_EXPIRY_DAYS, TimeUnit.DAYS);
-                sendInvitationEmail(email, currentUser, code);
+                sendInvitationEmail(email, existingUserResponse.getUserId(), currentUser, code);
             } catch (IOException ioe) {
             	logger.warn("couldn't invite user",ioe);
             }
