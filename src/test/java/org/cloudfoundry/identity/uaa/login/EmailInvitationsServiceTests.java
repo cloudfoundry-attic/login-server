@@ -39,6 +39,7 @@ import java.util.concurrent.TimeUnit;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.eq;
@@ -72,7 +73,7 @@ public class EmailInvitationsServiceTests {
     AccountCreationService accountCreationService;
 
     @Autowired
-    EmailService emailService;
+    MessageService messageService;
 
     @Autowired
     RestTemplate authorizationTemplate;
@@ -106,8 +107,10 @@ public class EmailInvitationsServiceTests {
         assertEquals("user-id-001", data.get("user_id"));
 
         ArgumentCaptor<String> emailBodyArgument = ArgumentCaptor.forClass(String.class);
-        Mockito.verify(emailService).sendMimeMessage(
+        Mockito.verify(messageService).sendMessage(
+            eq("user-id-001"),
             eq("user@example.com"),
+            eq(MessageType.INVITATION),
             eq("Invitation to join Pivotal"),
             emailBodyArgument.capture()
         );
@@ -150,8 +153,10 @@ public class EmailInvitationsServiceTests {
         assertEquals("existing-user-id", data.get("user_id"));
 
         ArgumentCaptor<String> emailBodyArgument = ArgumentCaptor.forClass(String.class);
-        Mockito.verify(emailService).sendMimeMessage(
+        Mockito.verify(messageService).sendMessage(
+            eq("existing-user-id"),
             eq("user@example.com"),
+            eq(MessageType.INVITATION),
             eq("Invitation to join Pivotal"),
             emailBodyArgument.capture()
         );
@@ -183,8 +188,10 @@ public class EmailInvitationsServiceTests {
         assertEquals("user-id-001", data.get("user_id"));
 
         ArgumentCaptor<String> emailBodyArgument = ArgumentCaptor.forClass(String.class);
-        Mockito.verify(emailService).sendMimeMessage(
+        Mockito.verify(messageService).sendMessage(
+            eq("user-id-001"),
             eq("user@example.com"),
+            eq(MessageType.INVITATION),
             eq("Invitation to join Cloud Foundry"),
             emailBodyArgument.capture()
         );
@@ -202,15 +209,44 @@ public class EmailInvitationsServiceTests {
             .andExpect(method(GET))
             .andRespond(withSuccess("{}",APPLICATION_JSON));
 
+        String clientDetails = "{" +
+            "\"client_id\": \"app\"," +
+            "\"invitation_redirect_url\": \"http://example.com/redirect\"" +
+            "}";
+
         mockUaaServer.expect(requestTo("http://uaa.example.com/Users/user-id-001/password"))
             .andExpect(method(PUT))
             .andExpect(jsonPath("$.password").value("secret"))
             .andRespond(withSuccess());
 
-        emailInvitationsService.acceptInvitation("user-id-001", "user@example.com", "secret");
+        mockUaaServer.expect(requestTo("http://uaa.example.com/oauth/clients/app"))
+            .andExpect(method(GET))
+            .andRespond(withSuccess(clientDetails, APPLICATION_JSON));
+
+        String redirectLocation = emailInvitationsService.acceptInvitation("user-id-001", "user@example.com", "secret", "app");
 
         mockUaaServer.verify();
         Mockito.verifyZeroInteractions(expiringCodeService);
+        assertEquals("http://example.com/redirect", redirectLocation);
+    }
+
+    @Test
+    public void testAcceptInvitationWithNoClientRedirect() throws Exception {
+
+        mockUaaServer.expect(requestTo("http://uaa.example.com/Users/user-id-001/verify"))
+            .andExpect(method(GET))
+            .andRespond(withSuccess("{}",APPLICATION_JSON));
+
+        mockUaaServer.expect(requestTo("http://uaa.example.com/Users/user-id-001/password"))
+            .andExpect(method(PUT))
+            .andExpect(jsonPath("$.password").value("secret"))
+            .andRespond(withSuccess());
+
+        String redirectLocation = emailInvitationsService.acceptInvitation("user-id-001", "user@example.com", "secret", "");
+
+        mockUaaServer.verify();
+        Mockito.verifyZeroInteractions(expiringCodeService);
+        assertNull(redirectLocation);
     }
 
     @Configuration
@@ -231,8 +267,8 @@ public class EmailInvitationsServiceTests {
         ExpiringCodeService expiringCodeService() { return Mockito.mock(ExpiringCodeService.class); }
 
         @Bean
-        EmailService emailService() {
-            return Mockito.mock(EmailService.class);
+        MessageService messageService() {
+            return Mockito.mock(MessageService.class);
         }
 
         @Bean
@@ -242,7 +278,7 @@ public class EmailInvitationsServiceTests {
 
         @Bean
         EmailInvitationsService emailInvitationsService() {
-            return new EmailInvitationsService(templateEngine, emailService(), "pivotal", "http://uaa.example.com");
+            return new EmailInvitationsService(templateEngine, messageService(), "pivotal", "http://uaa.example.com");
         }
 
         @Bean

@@ -111,7 +111,6 @@ public class EmailAccountCreationService implements AccountCreationService {
         String userId = resources.get(0).get("id");
 
         try {
-            // TODO: get the right clientId to redirect to
             generateAndSendCode(email, clientId, getSubjectText(), userId);
         } catch (IOException e) {
             logger.error("Exception raised while resending activation email for " + email, e);
