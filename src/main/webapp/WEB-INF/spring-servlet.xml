@@ -301,6 +301,13 @@
                 <entry key="critical" value="true" value-type="java.lang.Boolean"/>
             </map>
         </entry>
+        <entry key="INVITATION">
+            <map>
+                <entry key="description" value="Invitation"/>
+                <entry key="id" value="e6722687-3f0f-4e7a-9925-839a04712cea"/>
+                <entry key="critical" value="true" value-type="java.lang.Boolean"/>
+            </map>
+        </entry>
     </util:map>
 
     <mvc:annotation-driven>
