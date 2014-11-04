@@ -26,15 +26,6 @@ public class EmailService implements MessageService {
         this.brand = brand;
     }
 
-    public void sendMimeMessage(String email, String subject, String htmlContent) throws MessagingException, UnsupportedEncodingException {
-        MimeMessage message = mailSender.createMimeMessage();
-        message.addFrom(getSenderAddresses());
-        message.addRecipients(Message.RecipientType.TO, email);
-        message.setSubject(subject);
-        message.setContent(htmlContent, "text/html");
-        mailSender.send(message);
-    }
-
     private Address[] getSenderAddresses() throws AddressException, UnsupportedEncodingException {
         String host = UriComponentsBuilder.fromHttpUrl(loginUrl).build().getHost();
         String name = brand.equals("pivotal") ? "Pivotal" : "Cloud Foundry";
