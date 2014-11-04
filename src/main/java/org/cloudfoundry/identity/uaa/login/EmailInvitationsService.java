@@ -8,6 +8,9 @@ import org.cloudfoundry.identity.uaa.message.PasswordChangeRequest;
 import org.cloudfoundry.identity.uaa.scim.ScimUser;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.oauth2.provider.ClientDetails;
+import org.springframework.security.oauth2.provider.client.BaseClientDetails;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -23,8 +26,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+@Service
 public class EmailInvitationsService implements InvitationsService {
     private final Log logger = LogFactory.getLog(getClass());
+
+    public static final String INVITATION_REDIRECT_URL = "invitation_redirect_url";
+    public static final int INVITATION_EXPIRY_DAYS = 365;
 
     private final SpringTemplateEngine templateEngine;
     private final EmailService emailService;
@@ -89,7 +96,7 @@ public class EmailInvitationsService implements InvitationsService {
             Map<String,String> data = new HashMap<>();
             data.put("user_id", user.getId());
             data.put("email", email);
-            String code = expiringCodeService.generateCode(data, 30, TimeUnit.DAYS);
+            String code = expiringCodeService.generateCode(data, INVITATION_EXPIRY_DAYS, TimeUnit.DAYS);
             sendInvitationEmail(email, currentUser, code);
         } catch (HttpClientErrorException e) {
             String uaaResponse = e.getResponseBodyAsString();
@@ -101,7 +108,7 @@ public class EmailInvitationsService implements InvitationsService {
                 Map<String,String> data = new HashMap<>();
                 data.put("user_id", existingUserResponse.getUserId());
                 data.put("email", email);
-                String code = expiringCodeService.generateCode(data, 30, TimeUnit.DAYS);
+                String code = expiringCodeService.generateCode(data, INVITATION_EXPIRY_DAYS, TimeUnit.DAYS);
                 sendInvitationEmail(email, currentUser, code);
             } catch (IOException ioe) {
             	logger.warn("couldn't invite user",ioe);
@@ -112,10 +119,19 @@ public class EmailInvitationsService implements InvitationsService {
     }
 
     @Override
-    public void acceptInvitation(String userId, String email, String password) {
+    public String acceptInvitation(String userId, String email, String password, String clientId) {
         authorizationTemplate.getForEntity(uaaBaseUrl + "/Users/" + userId + "/verify",Object.class);
+
         PasswordChangeRequest request = new PasswordChangeRequest();
         request.setPassword(password);
         authorizationTemplate.put(uaaBaseUrl + "/Users/" + userId + "/password", request);
+
+        String redirectLocation = null;
+        if (clientId != null && !clientId.equals("")) {
+            ClientDetails clientDetails = authorizationTemplate.getForObject(uaaBaseUrl + "/oauth/clients/" + clientId, BaseClientDetails.class);
+            redirectLocation = (String) clientDetails.getAdditionalInformation().get(INVITATION_REDIRECT_URL);
+        }
+
+        return redirectLocation;
     }
 }

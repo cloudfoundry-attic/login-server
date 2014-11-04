@@ -1,5 +1,6 @@
 package org.cloudfoundry.identity.uaa.login;
 
+import junit.framework.Assert;
 import org.cloudfoundry.identity.uaa.error.UaaException;
 import org.cloudfoundry.identity.uaa.login.test.ThymeleafConfig;
 import org.cloudfoundry.identity.uaa.scim.ScimUser;
@@ -39,6 +40,7 @@ import java.util.concurrent.TimeUnit;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.eq;
@@ -202,15 +204,44 @@ public class EmailInvitationsServiceTests {
             .andExpect(method(GET))
             .andRespond(withSuccess("{}",APPLICATION_JSON));
 
+        String clientDetails = "{" +
+            "\"client_id\": \"app\"," +
+            "\"invitation_redirect_url\": \"http://example.com/redirect\"" +
+            "}";
+
         mockUaaServer.expect(requestTo("http://uaa.example.com/Users/user-id-001/password"))
             .andExpect(method(PUT))
             .andExpect(jsonPath("$.password").value("secret"))
             .andRespond(withSuccess());
 
-        emailInvitationsService.acceptInvitation("user-id-001", "user@example.com", "secret");
+        mockUaaServer.expect(requestTo("http://uaa.example.com/oauth/clients/app"))
+            .andExpect(method(GET))
+            .andRespond(withSuccess(clientDetails, APPLICATION_JSON));
+
+        String redirectLocation = emailInvitationsService.acceptInvitation("user-id-001", "user@example.com", "secret", "app");
 
         mockUaaServer.verify();
         Mockito.verifyZeroInteractions(expiringCodeService);
+        assertEquals("http://example.com/redirect", redirectLocation);
+    }
+
+    @Test
+    public void testAcceptInvitationWithNoClientRedirect() throws Exception {
+
+        mockUaaServer.expect(requestTo("http://uaa.example.com/Users/user-id-001/verify"))
+            .andExpect(method(GET))
+            .andRespond(withSuccess("{}",APPLICATION_JSON));
+
+        mockUaaServer.expect(requestTo("http://uaa.example.com/Users/user-id-001/password"))
+            .andExpect(method(PUT))
+            .andExpect(jsonPath("$.password").value("secret"))
+            .andRespond(withSuccess());
+
+        String redirectLocation = emailInvitationsService.acceptInvitation("user-id-001", "user@example.com", "secret", "");
+
+        mockUaaServer.verify();
+        Mockito.verifyZeroInteractions(expiringCodeService);
+        assertNull(redirectLocation);
     }
 
     @Configuration

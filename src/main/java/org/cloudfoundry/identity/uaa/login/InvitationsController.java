@@ -67,7 +67,6 @@ public class InvitationsController {
     
     @RequestMapping(value = "/accept", method = GET, params = {"code"})
     public String acceptInvitePage(@RequestParam String code, Model model, HttpServletResponse response) throws IOException {
-    	
 		try {
 			Map<String, String> codeData = expiringCodeService.verifyCode(code);
 	        UaaPrincipal uaaPrincipal = new UaaPrincipal(codeData.get("user_id"), codeData.get("email"), codeData.get("email"), Origin.UAA, null);
@@ -82,8 +81,9 @@ public class InvitationsController {
 
     @RequestMapping(value = "/accept.do", method = POST)
     public String acceptInvitation(@RequestParam("password") String password,
-                                   @RequestParam("password_confirmation") String passwordConfirmation, Model model,
-                                   HttpServletResponse servletResponse) throws IOException {
+                                   @RequestParam("password_confirmation") String passwordConfirmation,
+                                   @RequestParam("client_id") String clientId,
+                                   Model model, HttpServletResponse servletResponse) throws IOException {
 
         ChangePasswordValidation validation = new ChangePasswordValidation(password, passwordConfirmation);
         if (!validation.valid()) {
@@ -92,8 +92,11 @@ public class InvitationsController {
         UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         UaaPrincipal principal =  (UaaPrincipal) token.getPrincipal();
         
-        invitationsService.acceptInvitation(principal.getId(), principal.getEmail(), password);
+        String redirectLocation = invitationsService.acceptInvitation(principal.getId(), principal.getEmail(), password, clientId);
 
+        if (redirectLocation != null) {
+            return "redirect:" + redirectLocation;
+        }
         return "redirect:/home";
     }
 

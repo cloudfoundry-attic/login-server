@@ -195,20 +195,38 @@ public class InvitationsControllerTest {
 
     @Test
     public void testAcceptInvite() throws Exception {
-    	
         UaaPrincipal uaaPrincipal = new UaaPrincipal("user-id-001", "user@example.com", "user@example.com", Origin.UAA, null);
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(uaaPrincipal, null, UaaAuthority.USER_AUTHORITIES);
         SecurityContextHolder.getContext().setAuthentication(token);
         
         MockHttpServletRequestBuilder post = post("/invitations/accept.do")
             .param("password", "password")
-            .param("password_confirmation", "password");
+            .param("password_confirmation", "password")
+            .param("client_id", "");
 
         mockMvc.perform(post)
             .andExpect(status().isFound())
             .andExpect(redirectedUrl("/home"));
         
-        verify(invitationsService).acceptInvitation("user-id-001","user@example.com", "password");
+        verify(invitationsService).acceptInvitation("user-id-001","user@example.com", "password", "");
+    }
+
+    @Test
+    public void testAcceptInviteWithClientRedirect() throws Exception {
+        UaaPrincipal uaaPrincipal = new UaaPrincipal("user-id-001", "user@example.com", "user@example.com", Origin.UAA, null);
+        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(uaaPrincipal, null, UaaAuthority.USER_AUTHORITIES);
+        SecurityContextHolder.getContext().setAuthentication(token);
+
+        when(invitationsService.acceptInvitation("user-id-001", "user@example.com", "password", "app")).thenReturn("http://localhost:8080/app");
+
+        MockHttpServletRequestBuilder post = post("/invitations/accept.do")
+            .param("password", "password")
+            .param("password_confirmation", "password")
+            .param("client_id", "app");
+
+        mockMvc.perform(post)
+            .andExpect(status().isFound())
+            .andExpect(redirectedUrl("http://localhost:8080/app"));
     }
 
     @Test
@@ -219,7 +237,8 @@ public class InvitationsControllerTest {
         
         MockHttpServletRequestBuilder post = post("/invitations/accept.do")
             .param("password", "password")
-            .param("password_confirmation", "does not match");
+            .param("password_confirmation", "does not match")
+            .param("client_id", "");
 
         mockMvc.perform(post)
             .andExpect(status().isUnprocessableEntity())
