@@ -13,6 +13,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.xpath;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -180,15 +181,14 @@ public class InvitationsControllerTest {
     
     @Test
     public void testAcceptInvitePageWithExpiredCode() throws Exception {
-    	Map<String,String> codeData = new HashMap<>();
-    	codeData.put("user_id", "user-id-001");
-    	codeData.put("email", "user@example.com");
     	doThrow(new CodeNotFoundException("code expired")).when(expiringCodeService).verifyCode("the_secret_code");
         MockHttpServletRequestBuilder get = get("/invitations/accept").param("code", "the_secret_code");
         mockMvc.perform(get)
             .andExpect(status().isUnprocessableEntity())
             .andExpect(model().attribute("error_message_code", "code_expired"))
-            .andExpect(view().name("invitations/accept_invite"));
+            .andExpect(view().name("invitations/accept_invite"))
+            .andExpect(xpath("//*[@class='email-display']").doesNotExist())
+            .andExpect(xpath("//form").doesNotExist());
         assertNull(SecurityContextHolder.getContext().getAuthentication());
     }
 
@@ -243,6 +243,7 @@ public class InvitationsControllerTest {
         mockMvc.perform(post)
             .andExpect(status().isUnprocessableEntity())
             .andExpect(model().attribute("error_message_code", "form_error"))
+            .andExpect(model().attribute("email", "user@example.com"))
             .andExpect(view().name("invitations/accept_invite"));
 
         verifyZeroInteractions(invitationsService);

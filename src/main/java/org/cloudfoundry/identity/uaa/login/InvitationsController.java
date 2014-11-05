@@ -86,12 +86,13 @@ public class InvitationsController {
                                    Model model, HttpServletResponse servletResponse) throws IOException {
 
         ChangePasswordValidation validation = new ChangePasswordValidation(password, passwordConfirmation);
+
+        UaaPrincipal principal =  (UaaPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
         if (!validation.valid()) {
+            model.addAttribute("email", principal.getEmail());
             return handleUnprocessableEntity(model, servletResponse, validation.getMessageCode(), "invitations/accept_invite");
         }
-        UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-        UaaPrincipal principal =  (UaaPrincipal) token.getPrincipal();
-        
         String redirectLocation = invitationsService.acceptInvitation(principal.getId(), principal.getEmail(), password, clientId);
 
         if (redirectLocation != null) {
