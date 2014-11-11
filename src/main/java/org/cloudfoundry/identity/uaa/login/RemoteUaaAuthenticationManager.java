@@ -147,15 +147,17 @@ public class RemoteUaaAuthenticationManager implements AuthenticationManager {
             logger.info("Failed authentication request");
             throw new BadCredentialsException("Authentication failed");
         } else if (response.getStatusCode() == HttpStatus.FORBIDDEN) {
-            SavedRequestAwareAuthenticationDetails details = (SavedRequestAwareAuthenticationDetails) authentication.getDetails();
-            SavedRequest savedRequest = (SavedRequest) details.getSavedRequest();
-            String clientId = "login";
-            if (savedRequest != null && savedRequest.getParameterValues("client_id") != null) {
-                clientId = savedRequest.getParameterValues("client_id")[0];
-            }
+            if (authentication.getDetails() instanceof  SavedRequestAwareAuthenticationDetails) {
+                SavedRequestAwareAuthenticationDetails details = (SavedRequestAwareAuthenticationDetails) authentication.getDetails();
+                SavedRequest savedRequest = (SavedRequest) details.getSavedRequest();
+                String clientId = "login";
+                if (savedRequest != null && savedRequest.getParameterValues("client_id") != null) {
+                    clientId = savedRequest.getParameterValues("client_id")[0];
+                }
 
-            // Assumes username is the same as email
-            accountCreationService.resendVerificationCode(username, clientId);
+                // Assumes username is the same as email
+                accountCreationService.resendVerificationCode(username, clientId);
+            }
             logger.info("Account not verified - verification code resent");
             throw new AccountNotVerifiedException("Account not verified");
         } else if (response.getStatusCode() == HttpStatus.INTERNAL_SERVER_ERROR) {

@@ -107,7 +107,8 @@ public class RemoteUaaAuthenticationManagerTests {
 
         try {
             authenticationManager.authenticate(authentication);
-            fail();
+
+            fail("Expected AccountNotVerifiedException");
         } catch (AccountNotVerifiedException e) {
             verify(accountCreationService).resendVerificationCode(eq("user@example.com"), eq("login"));
         }
@@ -133,7 +134,8 @@ public class RemoteUaaAuthenticationManagerTests {
 
         try {
             authenticationManager.authenticate(authentication);
-            fail();
+
+            fail("Expected AccountNotVerifiedException");
         } catch (AccountNotVerifiedException e) {
             verify(accountCreationService).resendVerificationCode(eq("user@example.com"), eq("app"));
         }

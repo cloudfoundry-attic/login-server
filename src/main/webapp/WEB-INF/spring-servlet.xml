@@ -173,7 +173,7 @@
         entry-point-ref="basicAuthenticationEntryPoint" authentication-manager-ref="remoteAuthenticationManager"
         xmlns="http://www.springframework.org/schema/security">
         <intercept-url pattern="/**" access="IS_AUTHENTICATED_FULLY" />
-        <custom-filter ref="authzAuthenticationFilter" position="FORM_LOGIN_FILTER" />
+        <custom-filter ref="basicAuthenticationFilter" position="FORM_LOGIN_FILTER" />
         <anonymous enabled="false" />
         <access-denied-handler ref="oauthAccessDeniedHandler" />
     </http>
