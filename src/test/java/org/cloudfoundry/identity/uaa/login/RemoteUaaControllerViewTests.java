@@ -130,11 +130,43 @@ public class RemoteUaaControllerViewTests {
     }
 
     @Test
-    public void testSignupsDisabled() throws Exception {
-        environment.setProperty("login.signupsEnabled", "false");
+    public void testSignupsAndResetPasswordEnabled() throws Exception {
+        environment.setProperty("login.selfServiceLinksEnabled", "true");
 
         mockMvc.perform(MockMvcRequestBuilders.get("/login"))
-            .andExpect(xpath("//a[text()='Create account']").doesNotExist());
+            .andExpect(xpath("//a[text()='Create account']").exists())
+            .andExpect(xpath("//a[text()='Reset password']").exists());
+    }
+
+    @Test
+    public void testSignupsAndResetPasswordDisabledWithNoLinksConfigured() throws Exception {
+        environment.setProperty("login.selfServiceLinksEnabled", "false");
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/login"))
+            .andExpect(xpath("//a[text()='Create account']").doesNotExist())
+            .andExpect(xpath("//a[text()='Reset password']").doesNotExist());
+    }
+
+    @Test
+    public void testSignupsAndResetPasswordDisabledWithSomeLinksConfigured() throws Exception {
+        environment.setProperty("login.selfServiceLinksEnabled", "false");
+        environment.setProperty("links.signup", "http://example.com/signup");
+        environment.setProperty("links.passwd", "http://example.com/reset_passwd");
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/login"))
+            .andExpect(xpath("//a[text()='Create account']").doesNotExist())
+            .andExpect(xpath("//a[text()='Reset password']").doesNotExist());
+    }
+    
+    @Test
+    public void testSignupsAndResetPasswordEnabledWithCustomLinks() throws Exception {
+        environment.setProperty("login.selfServiceLinksEnabled", "true");
+        environment.setProperty("links.signup", "http://example.com/signup");
+        environment.setProperty("links.passwd", "http://example.com/reset_passwd");
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/login"))
+            .andExpect(xpath("//a[text()='Create account']/@href").string("http://example.com/signup"))
+            .andExpect(xpath("//a[text()='Reset password']/@href").string("http://example.com/reset_passwd"));
     }
 
     @Configuration

@@ -201,13 +201,19 @@ public class RemoteUaaController extends AbstractControllerInfo {
         model.put("links", getLinksInfo());
         setCommitInfo(model);
         if (principal == null) {
-            String customSignupLink = environment.getProperty("links.signup");
-            if (customSignupLink != null) {
-                model.put("createAccountLink", customSignupLink);
-            } else {
-                boolean localSignupsEnabled = !"false".equalsIgnoreCase(environment.getProperty("login.signupsEnabled"));
-                if (localSignupsEnabled) {
+            boolean selfServiceLinksEnabled = !"false".equalsIgnoreCase(environment.getProperty("login.selfServiceLinksEnabled"));
+            if (selfServiceLinksEnabled) {
+                String customSignupLink = environment.getProperty("links.signup");
+                String customPasswordLink = environment.getProperty("links.passwd");
+                if (StringUtils.hasText(customSignupLink)) {
+                    model.put("createAccountLink", customSignupLink);
+                } else {
                     model.put("createAccountLink", "/create_account");
+                }
+                if (StringUtils.hasText(customPasswordLink)) {
+                    model.put("forgotPasswordLink", customPasswordLink);
+                } else {
+                    model.put("forgotPasswordLink", "/forgot_password");
                 }
             }
             return "login";

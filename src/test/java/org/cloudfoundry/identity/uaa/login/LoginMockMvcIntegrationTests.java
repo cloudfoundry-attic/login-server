@@ -65,7 +65,7 @@ public class LoginMockMvcIntegrationTests {
         mockMvc.perform(get("/login"))
                         .andExpect(status().isOk())
                         .andExpect(view().name("login"))
-                        .andExpect(model().attribute("links", hasEntry("passwd", "http://localhost:8080/login/forgot_password")))
+                        .andExpect(model().attribute("links", hasEntry("passwd", "/forgot_password")))
                         .andExpect(model().attribute("links", hasEntry("register", "/create_account")))
                         .andExpect(model().attributeExists("prompts"));
     }
@@ -77,17 +77,6 @@ public class LoginMockMvcIntegrationTests {
         mockMvc.perform(get("/login"))
                 .andExpect(status().isOk())
                 .andExpect(model().attributeDoesNotExist("showSamlLoginLink"));
-    }
-
-    @Test
-    public void testLoginWithEmptyLinks() throws Exception {
-        Map<String, String> links = (Map<String, String>) webApplicationContext.getBean("links", Map.class);
-        links.put("passwd", "");
-
-        mockMvc.perform(get("/login").accept(TEXT_HTML))
-                .andExpect(status().isOk())
-                .andExpect(model().attribute("links", hasEntry("passwd", "")))
-                .andExpect(xpath("//a[text()='Reset password']").doesNotExist());
     }
 
     @Test
