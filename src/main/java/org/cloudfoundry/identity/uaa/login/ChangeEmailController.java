@@ -5,6 +5,7 @@ import org.cloudfoundry.identity.uaa.authentication.UaaPrincipal;
 import org.cloudfoundry.identity.uaa.error.UaaException;
 import org.cloudfoundry.identity.uaa.user.UaaAuthority;
 import org.hibernate.validator.constraints.Email;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -105,6 +106,7 @@ public class ChangeEmailController {
 
     public static class ValidEmail {
         @Email
+        @NotEmpty
         String newEmail;
 
         public String getNewEmail() {
