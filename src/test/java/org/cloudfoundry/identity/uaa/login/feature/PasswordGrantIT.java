@@ -7,8 +7,8 @@ import org.cloudfoundry.identity.uaa.test.UaaTestAccounts;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
-import org.openqa.selenium.WebDriver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -27,15 +27,14 @@ import org.springframework.web.client.RestOperations;
 import java.security.SecureRandom;
 import java.util.Arrays;
 
+import static org.cloudfoundry.identity.uaa.test.HasStatusCode.hasStatusCode;
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = DefaultIntegrationTestConfig.class)
 public class PasswordGrantIT {
     @Autowired
     @Rule
     public IntegrationTestRule integrationTestRule;
-
-    @Autowired
-    WebDriver webDriver;
 
     @Value("${integration.test.base_url}")
     String baseUrl;
@@ -71,6 +70,9 @@ public class PasswordGrantIT {
         Assert.assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
     }
 
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
+
     @Test
     public void testUnverifiedUserLoginViaPasswordGrant() throws Exception {
         String userEmail = createUnverifiedUser();
@@ -84,15 +86,13 @@ public class PasswordGrantIT {
         postBody.add("username", userEmail);
         postBody.add("password", "secret");
 
-        try {
-            restOperations.exchange(baseUrl + "/oauth/token",
-                HttpMethod.POST,
-                new HttpEntity<>(postBody, headers),
-                Void.class);
-        } catch (HttpClientErrorException e) {
-            Assert.assertEquals(HttpStatus.FORBIDDEN, e.getStatusCode());
-        }
+        expectedException.expect(HttpClientErrorException.class);
+        expectedException.expect(hasStatusCode(HttpStatus.FORBIDDEN));
 
+        restOperations.exchange(baseUrl + "/oauth/token",
+            HttpMethod.POST,
+            new HttpEntity<>(postBody, headers),
+            Void.class);
     }
 
     private String createUnverifiedUser() throws Exception {

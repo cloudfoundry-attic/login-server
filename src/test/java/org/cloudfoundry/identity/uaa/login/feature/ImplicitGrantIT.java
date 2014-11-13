@@ -130,7 +130,7 @@ public class ImplicitGrantIT {
         Assert.assertThat(((List<String>) claims.get("scope")), containsInAnyOrder(scopes));
 
         Assert.assertThat(((List<String>) claims.get("aud")), containsInAnyOrder(
-                "scim", "openid", "cloud_controller", "password"));
+                "cf", "scim", "openid", "cloud_controller", "password"));
     }
 
     @Test

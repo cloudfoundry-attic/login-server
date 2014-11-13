@@ -91,7 +91,7 @@
 		<property name="realmName" value="UAA/oauth" />
     </bean>
 
-    <bean id="accountNotVerifiedExceptionTranslator" class="org.cloudfoundry.identity.uaa.login.AccountNotVerifiedExceptionTranslator"/>
+    <bean id="accountNotVerifiedExceptionTranslator" class="org.cloudfoundry.identity.uaa.authentication.AccountNotVerifiedExceptionTranslator"/>
 
 	<bean id="oauthAccessDeniedHandler" class="org.springframework.security.oauth2.provider.error.OAuth2AccessDeniedHandler" />
 
