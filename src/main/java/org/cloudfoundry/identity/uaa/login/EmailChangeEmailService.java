@@ -1,5 +1,6 @@
 package org.cloudfoundry.identity.uaa.login;
 
+import org.cloudfoundry.identity.uaa.CodeGenerationActivityType;
 import org.cloudfoundry.identity.uaa.error.UaaException;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -37,6 +38,7 @@ public class EmailChangeEmailService implements ChangeEmailService {
         request.put("userId", userId);
         request.put("email", newEmail);
         request.put("client_id", clientId);
+        request.put("source_activity", CodeGenerationActivityType.CHANGE_EMAIL.toString());
         String expiringCode;
         try {
             expiringCode = uaaTemplate.postForObject(uaaBaseUrl + "/email_verifications", request, String.class);

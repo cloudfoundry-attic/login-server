@@ -149,6 +149,7 @@ public class EmailChangeEmailServiceTest {
             .andExpect(jsonPath("$.userId").value("user-001"))
             .andExpect(jsonPath("$.email").value("new@example.com"))
             .andExpect(jsonPath("$.client_id").value("app"))
+            .andExpect(jsonPath("$.source_activity").value("change_email"))
             .andRespond(withSuccess("the_secret_code", APPLICATION_JSON));
     }
 }

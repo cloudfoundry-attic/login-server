@@ -2,6 +2,7 @@ package org.cloudfoundry.identity.uaa.login;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.cloudfoundry.identity.uaa.CodeGenerationActivityType;
 import org.cloudfoundry.identity.uaa.authentication.Origin;
 import org.cloudfoundry.identity.uaa.codestore.ExpiringCode;
 import org.cloudfoundry.identity.uaa.error.UaaException;
@@ -86,6 +87,7 @@ public class EmailAccountCreationService implements AccountCreationService {
         Map<String, String> codeData = new HashMap<>();
         codeData.put("user_id", userId);
         codeData.put("client_id", clientId);
+        codeData.put("source_activity", CodeGenerationActivityType.CREATE_ACCOUNT.toString());
         String codeDataString = objectMapper.writeValueAsString(codeData);
         return new ExpiringCode(null, expiresAt, codeDataString);
     }

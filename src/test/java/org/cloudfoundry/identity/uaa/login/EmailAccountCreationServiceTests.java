@@ -1,5 +1,6 @@
 package org.cloudfoundry.identity.uaa.login;
 
+import org.cloudfoundry.identity.uaa.CodeGenerationActivityType;
 import org.cloudfoundry.identity.uaa.error.UaaException;
 import org.cloudfoundry.identity.uaa.login.test.ThymeleafConfig;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -40,6 +41,7 @@ import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
@@ -304,13 +306,14 @@ public class EmailAccountCreationServiceTests {
         String uaaResponseJson = "{" +
             "    \"code\":\"the_secret_code\"," +
             "    \"expiresAt\":" + ts.getTime() + "," +
-            "    \"data\":\"{\\\"user_id\\\":\\\"newly-created-user-id\\\",\\\"client_id\\\":\\\"login\\\"}\"" +
+            "    \"data\":\"{\\\"user_id\\\":\\\"newly-created-user-id\\\",\\\"client_id\\\":\\\"login\\\",\\\"source_activity\\\":\\\"create_account\\\"}\"" +
             "}";
         mockUaaServer.expect(requestTo("http://uaa.example.com/Codes"))
             .andExpect(method(POST))
             .andExpect(jsonPath("$.expiresAt").value(Matchers.greaterThan(ts.getTime() - 5000)))
             .andExpect(jsonPath("$.expiresAt").value(Matchers.lessThan(ts.getTime() + 5000)))
-            .andExpect(jsonPath("$.data").exists()) // we can't tell what order the json keys will take in the serialized json, so exists is the best we can do
+            .andExpect(jsonPath("$.data").exists()) // we can't tell what order the json keys will take in the serialized json, so exists is the best we can do.andRespond(withSuccess(uaaResponseJson, APPLICATION_JSON))
+            .andExpect(content().string(containsString("\\\"source_activity\\\":\\\"create_account\\\"")))
             .andRespond(withSuccess(uaaResponseJson, APPLICATION_JSON));
 
         MockHttpServletRequest request = new MockHttpServletRequest();
