@@ -296,7 +296,7 @@ public class EmailAccountCreationServiceTests {
             .andExpect(jsonPath("$.password").value("password"))
             .andExpect(jsonPath("$.origin").value("uaa"))
             .andExpect(jsonPath("$.active").value(true))
-            .andExpect(jsonPath("$.verified").value(true))
+            .andExpect(jsonPath("$.verified").value(false))
             .andExpect(jsonPath("$.emails[0].value").value("user@example.com"))
             .andRespond(withSuccess(scimUserJSONString, APPLICATION_JSON));
 
