@@ -85,6 +85,7 @@ dependencies {
   compile group: 'nz.net.ultraq.thymeleaf', name: 'thymeleaf-layout-dialect', version:'1.2.3'
   compile group: 'org.thymeleaf.extras', name: 'thymeleaf-extras-springsecurity3', version:'2.1.1.RELEASE'
   compile group: 'javax.mail', name: 'mail', version:'1.4.7'
+  compile group: 'com.google.guava', name: 'guava', version:'18.0'
   runtime group: 'org.springframework.security', name: 'spring-security-config', version:springSecurityVersion
   providedCompile group: 'javax.servlet', name: 'javax.servlet-api', version:'3.0.1'
   testCompile identityCommon.sourceSets.test.output

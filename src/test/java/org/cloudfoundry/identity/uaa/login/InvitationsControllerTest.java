@@ -15,6 +15,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.xpath;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -91,43 +92,40 @@ public class InvitationsControllerTest {
 
     @Test
     public void testSendInvitationEmail() throws Exception {
-        UaaPrincipal p = new UaaPrincipal("123","marissa","marissa@test.org", Origin.UAA,"");
-        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(p, "", UaaAuthority.USER_AUTHORITIES);
-        assertTrue(auth.isAuthenticated());
-        MockSecurityContext mockSecurityContext = new MockSecurityContext(auth);
-        SecurityContextHolder.setContext(mockSecurityContext);
-        MockHttpSession session = new MockHttpSession();
-        session.setAttribute(
-            HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
-            mockSecurityContext
-        );
+        signIn();
 
         MockHttpServletRequestBuilder post = post("/invitations/new.do")
-            .param("email", "user1@example.com");
+            .param("emails", "user1@example.com");
 
         mockMvc.perform(post)
             .andExpect(status().isFound())
             .andExpect(redirectedUrl("sent"));
-        verify(invitationsService).inviteUser("user1@example.com", "marissa");
+
+        verify(invitationsService).inviteUsers(Arrays.asList("user1@example.com"), "marissa");
     }
-    
+
     @Test
-    public void testSendInvitationEmailToExistingVerifiedUser() throws Exception {
-        UaaPrincipal p = new UaaPrincipal("123","marissa","marissa@test.org", Origin.UAA,"");
-        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(p, "", UaaAuthority.USER_AUTHORITIES);
-        assertTrue(auth.isAuthenticated());
-        MockSecurityContext mockSecurityContext = new MockSecurityContext(auth);
-        SecurityContextHolder.setContext(mockSecurityContext);
-        MockHttpSession session = new MockHttpSession();
-        session.setAttribute(
-            HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
-            mockSecurityContext
-        );
+    public void testSendMultipleInvitationEmail() throws Exception {
+        signIn();
 
         MockHttpServletRequestBuilder post = post("/invitations/new.do")
-            .param("email", "user1@example.com");
+            .param("emails", "user1@example.com,user2@example.com,user3@example.com");
 
-        doThrow(new UaaException("",409)).when(invitationsService).inviteUser("user1@example.com", "marissa");
+        mockMvc.perform(post)
+            .andExpect(status().isFound())
+            .andExpect(redirectedUrl("sent"));
+
+        verify(invitationsService).inviteUsers(Arrays.asList("user1@example.com", "user2@example.com", "user3@example.com"), "marissa");
+    }
+
+    @Test
+    public void testSendInvitationEmailToExistingVerifiedUser() throws Exception {
+        signIn();
+
+        MockHttpServletRequestBuilder post = post("/invitations/new.do")
+            .param("emails", "user1@example.com");
+
+        doThrow(new UaaException("",409)).when(invitationsService).inviteUsers(Arrays.asList("user1@example.com"), "marissa");
         mockMvc.perform(post)
             .andExpect(status().isUnprocessableEntity())
             .andExpect(view().name("invitations/new_invite"))
@@ -136,19 +134,10 @@ public class InvitationsControllerTest {
 
     @Test
     public void testSendInvitationWithInvalidEmail() throws Exception {
-        UaaPrincipal p = new UaaPrincipal("123","marissa","marissa@test.org", Origin.UAA,"");
-        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(p, "", UaaAuthority.USER_AUTHORITIES);
-        assertTrue(auth.isAuthenticated());
-        MockSecurityContext mockSecurityContext = new MockSecurityContext(auth);
-        SecurityContextHolder.setContext(mockSecurityContext);
-        MockHttpSession session = new MockHttpSession();
-        session.setAttribute(
-            HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
-            mockSecurityContext
-        );
+        signIn();
 
         MockHttpServletRequestBuilder post = post("/invitations/new.do")
-            .param("email", "not_a_real_email");
+            .param("emails", "not_a_real_email");
 
         mockMvc.perform(post)
             .andExpect(status().isUnprocessableEntity())
@@ -249,6 +238,18 @@ public class InvitationsControllerTest {
         verifyZeroInteractions(invitationsService);
     }
 
+    private void signIn() {
+        UaaPrincipal p = new UaaPrincipal("123","marissa","marissa@test.org", Origin.UAA,"");
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(p, "", UaaAuthority.USER_AUTHORITIES);
+        assertTrue(auth.isAuthenticated());
+        MockSecurityContext mockSecurityContext = new MockSecurityContext(auth);
+        SecurityContextHolder.setContext(mockSecurityContext);
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute(
+            HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
+            mockSecurityContext
+        );
+    }
 
     public static class MockSecurityContext implements SecurityContext {
 

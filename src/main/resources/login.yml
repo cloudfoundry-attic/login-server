@@ -42,7 +42,7 @@ login:
   # Enable create account and forgot password links on the Login Server (enabled by default)
   #selfServiceLinksEnabled: true
   # Enable sending invitations on the Login Server (disabled by default)
-  # invitationsEnabled: true
+  invitationsEnabled: true
   # the brand to use for password reset emails and page titles
   # (defaults to oss)
   #brand: pivotal

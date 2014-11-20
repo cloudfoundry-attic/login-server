@@ -14,6 +14,7 @@ package org.cloudfoundry.identity.uaa.login.feature;
 
 import com.dumbster.smtp.SimpleSmtpServer;
 import com.dumbster.smtp.SmtpMessage;
+import org.apache.commons.lang3.StringUtils;
 import org.cloudfoundry.identity.uaa.authentication.Origin;
 import org.cloudfoundry.identity.uaa.codestore.ExpiringCode;
 import org.cloudfoundry.identity.uaa.login.test.DefaultIntegrationTestConfig;
@@ -43,6 +44,7 @@ import java.security.SecureRandom;
 import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static junit.framework.TestCase.assertNotNull;
@@ -82,8 +84,7 @@ public class InvitationsIT {
 
     @Test
     public void testSendInvite() throws Exception {
-        int randomInt = new SecureRandom().nextInt();
-        String userEmail = "user" + randomInt + "@example.com";
+        String userEmail = generateUserEmail();
         int receivedEmailSize = simpleSmtpServer.getReceivedEmailSize();
 
         signIn(testAccounts.getUserName(), testAccounts.getPassword());
@@ -91,7 +92,7 @@ public class InvitationsIT {
         webDriver.findElement(By.linkText("Invite Users")).click();
         assertEquals("Send an invite", webDriver.findElement(By.tagName("h1")).getText());
 
-        webDriver.findElement(By.name("email")).sendKeys(userEmail);
+        webDriver.findElement(By.name("emails")).sendKeys(userEmail);
         webDriver.findElement(By.xpath("//input[@value='Send invite']")).click();
 
         assertEquals("Invite sent", webDriver.findElement(By.tagName("h1")).getText());
@@ -127,6 +128,33 @@ public class InvitationsIT {
     }
 
     @Test
+    public void testInvitingMultipleUsers() throws Exception {
+        List<String> emails = Arrays.asList(generateUserEmail(), generateUserEmail(), generateUserEmail());
+        String inputEmails = StringUtils.join(emails, ",");
+
+        int receivedEmailSize = simpleSmtpServer.getReceivedEmailSize();
+
+        signIn(testAccounts.getUserName(), testAccounts.getPassword());
+
+        webDriver.findElement(By.linkText("Invite Users")).click();
+        assertEquals("Send an invite", webDriver.findElement(By.tagName("h1")).getText());
+
+        webDriver.findElement(By.name("emails")).sendKeys(inputEmails);
+        webDriver.findElement(By.xpath("//input[@value='Send invite']")).click();
+
+        assertEquals(receivedEmailSize + 3, simpleSmtpServer.getReceivedEmailSize());
+        Iterator receivedEmail = simpleSmtpServer.getReceivedEmail();
+        int emailCount = 0;
+        while (receivedEmail.hasNext()) {
+            SmtpMessage message = (SmtpMessage) receivedEmail.next();
+            receivedEmail.remove();
+
+            assertEquals(emails.get(emailCount++), message.getHeaderValue("To"));
+            assertThat(message.getBody(), containsString("Accept Invite"));
+        }
+    }
+
+    @Test
     public void testClientRedirectInviteUser() throws Exception {
         String code = generateCode();
         webDriver.get(baseUrl + "/invitations/accept?code=" + code);
@@ -137,6 +165,11 @@ public class InvitationsIT {
 
         webDriver.findElement(By.xpath("//input[@value='Create account']")).click();
         Assert.assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), not(containsString("Where to?")));
+    }
+
+    private String generateUserEmail() {
+        int randomInt = new SecureRandom().nextInt();
+        return "user" + randomInt + "@example.com";
     }
 
     private String generateCode() {

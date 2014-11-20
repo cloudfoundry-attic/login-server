@@ -33,6 +33,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 import org.thymeleaf.spring4.SpringTemplateEngine;
 
 import java.nio.charset.Charset;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -42,6 +44,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.contains;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpMethod.GET;
@@ -101,7 +104,7 @@ public class EmailInvitationsServiceTests {
         ArgumentCaptor<Map<String,String>> captor = ArgumentCaptor.forClass((Class)Map.class);
 
         when(expiringCodeService.generateCode(captor.capture(), anyInt(), eq(TimeUnit.DAYS))).thenReturn("the_secret_code");
-        emailInvitationsService.inviteUser("user@example.com", "current-user");
+        emailInvitationsService.inviteUsers(Arrays.asList("user@example.com"), "current-user");
 
         Map<String,String> data = captor.getValue();
         assertEquals("user-id-001", data.get("user_id"));
@@ -120,7 +123,54 @@ public class EmailInvitationsServiceTests {
         assertThat(emailBody, containsString("<a href=\"http://localhost/login/invitations/accept?code=the_secret_code\">Accept Invite</a>"));
         assertThat(emailBody, not(containsString("Cloud Foundry")));
     }
-    
+
+    @Test
+    public void testSendMultipleInviteEmails() throws Exception {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setProtocol("http");
+        request.setContextPath("/login");
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
+
+        ScimUser user1 = new ScimUser();
+        user1.setId("user-id-001");
+
+        ScimUser user2 = new ScimUser();
+        user2.setId("user-id-002");
+
+        when(accountCreationService.createUser("user1@example.com", null)).thenReturn(user1);
+        when(accountCreationService.createUser("user2@example.com", null)).thenReturn(user2);
+
+        ArgumentCaptor<Map<String,String>> captor = ArgumentCaptor.forClass((Class)Map.class);
+
+        Map<String,String> data1 = new HashMap<>();
+        data1.put("user_id", "user-id-001");
+        data1.put("email", "user1@example.com");
+
+        Map<String,String> data2 = new HashMap<>();
+        data2.put("user_id", "user-id-002");
+        data2.put("email", "user2@example.com");
+
+        when(expiringCodeService.generateCode(eq(data1), anyInt(), eq(TimeUnit.DAYS))).thenReturn("secret_code_1");
+        when(expiringCodeService.generateCode(eq(data2), anyInt(), eq(TimeUnit.DAYS))).thenReturn("secret_code_2");
+
+        emailInvitationsService.inviteUsers(Arrays.asList("user1@example.com", "user2@example.com"), "current-user");
+
+        Mockito.verify(messageService).sendMessage(
+            eq("user-id-001"),
+            eq("user1@example.com"),
+            eq(MessageType.INVITATION),
+            eq("Invitation to join Pivotal"),
+            contains("<a href=\"http://localhost/login/invitations/accept?code=secret_code_1\">Accept Invite</a>")
+        );
+        Mockito.verify(messageService).sendMessage(
+            eq("user-id-002"),
+            eq("user2@example.com"),
+            eq(MessageType.INVITATION),
+            eq("Invitation to join Pivotal"),
+            contains("<a href=\"http://localhost/login/invitations/accept?code=secret_code_2\">Accept Invite</a>")
+        );
+    }
+
     @Test(expected = UaaException.class)
     public void testSendInviteEmailToUserThatIsAlreadyVerified() throws Exception {
         MockHttpServletRequest request = new MockHttpServletRequest();
@@ -130,7 +180,7 @@ public class EmailInvitationsServiceTests {
         byte[] errorResponse = "{\"error\":\"invalid_user\",\"message\":\"error message\",\"user_id\":\"existing-user-id\",\"verified\":true,\"active\":true}".getBytes();
         when(accountCreationService.createUser("user@example.com", null)).thenThrow(new HttpClientErrorException(HttpStatus.CONFLICT,"invalid user",errorResponse,Charset.forName("UTF-8")));
 
-        emailInvitationsService.inviteUser("user@example.com", "current-user");
+        emailInvitationsService.inviteUsers(Arrays.asList("user@example.com"), "current-user");
     }
     
     @Test
@@ -147,7 +197,7 @@ public class EmailInvitationsServiceTests {
         ArgumentCaptor<Map<String,String>> captor = ArgumentCaptor.forClass((Class)Map.class);
 
         when(expiringCodeService.generateCode(captor.capture(), anyInt(), eq(TimeUnit.DAYS))).thenReturn("the_secret_code");
-        emailInvitationsService.inviteUser("user@example.com", "current-user");
+        emailInvitationsService.inviteUsers(Arrays.asList("user@example.com"), "current-user");
 
         Map<String,String> data = captor.getValue();
         assertEquals("existing-user-id", data.get("user_id"));
@@ -182,7 +232,7 @@ public class EmailInvitationsServiceTests {
         ArgumentCaptor<Map<String,String>> captor = ArgumentCaptor.forClass((Class)Map.class);
 
         when(expiringCodeService.generateCode(captor.capture(), anyInt(), eq(TimeUnit.DAYS))).thenReturn("the_secret_code");
-        emailInvitationsService.inviteUser("user@example.com", "current-user");
+        emailInvitationsService.inviteUsers(Arrays.asList("user@example.com"), "current-user");
 
         Map<String,String> data = captor.getValue();
         assertEquals("user-id-001", data.get("user_id"));

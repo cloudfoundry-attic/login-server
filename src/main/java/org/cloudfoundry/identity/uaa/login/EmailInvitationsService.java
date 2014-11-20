@@ -6,6 +6,7 @@ import org.cloudfoundry.identity.uaa.error.UaaException;
 import org.cloudfoundry.identity.uaa.login.AccountCreationService.ExistingUserResponse;
 import org.cloudfoundry.identity.uaa.message.PasswordChangeRequest;
 import org.cloudfoundry.identity.uaa.scim.ScimUser;
+import org.cloudfoundry.identity.uaa.scim.exception.ScimResourceAlreadyExistsException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.provider.ClientDetails;
@@ -20,6 +21,7 @@ import org.thymeleaf.spring4.SpringTemplateEngine;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -81,7 +83,19 @@ public class EmailInvitationsService implements InvitationsService {
     }
 
     @Override
-    public void inviteUser(String email, String currentUser) {
+    public List<String> inviteUsers(List<String> emails, String currentUser) {
+        String email = emails.get(0);
+
+        try {
+            inviteUser(currentUser, email);
+        } catch (ScimResourceAlreadyExistsException e) {
+
+        }
+
+        return null;
+    }
+
+    private void inviteUser(String currentUser, String email) throws ScimResourceAlreadyExistsException {
         try {
             ScimUser user = accountCreationService.createUser(email, null);
             Map<String,String> data = new HashMap<>();
@@ -94,7 +108,7 @@ public class EmailInvitationsService implements InvitationsService {
             try {
                 ExistingUserResponse existingUserResponse = new ObjectMapper().readValue(uaaResponse, ExistingUserResponse.class);
                 if (existingUserResponse.getVerified()) {
-                    throw new UaaException(e.getStatusText(), e.getStatusCode().value());
+                    throw new ScimResourceAlreadyExistsException(e.getStatusText());
                 }
                 Map<String,String> data = new HashMap<>();
                 data.put("user_id", existingUserResponse.getUserId());

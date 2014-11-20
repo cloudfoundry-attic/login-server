@@ -16,6 +16,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import scala.actors.threadpool.Arrays;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -44,16 +45,16 @@ public class InvitationsController {
     }
     
 
-    @RequestMapping(value = "/new.do", method = POST, params = {"email"})
-    public String sendInvitationEmail(@Valid @ModelAttribute("email") ValidEmail email, BindingResult result, Model model, HttpServletResponse response) {
-        if (result.hasErrors()) {
-            return handleUnprocessableEntity(model, response, "invalid_email", "invitations/new_invite");
-        }
+    @RequestMapping(value = "/new.do", method = POST, params = {"emails"})
+    public String sendInvitationEmail(@RequestParam String[] emails, Model model, HttpServletResponse response) {
+//        if (result.hasErrors()) {
+//            return handleUnprocessableEntity(model, response, "invalid_email", "invitations/new_invite");
+//        }
 
         UaaPrincipal p = ((UaaPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         String currentUser = p.getName();
         try {
-        	invitationsService.inviteUser(email.getEmail(), currentUser);
+        	invitationsService.inviteUsers(Arrays.asList(emails), currentUser);
         } catch (UaaException e) {
         	return handleUnprocessableEntity(model, response, "existing_user", "invitations/new_invite");
         }
@@ -117,6 +118,19 @@ public class InvitationsController {
 
         public void setEmail(String email) {
             this.email = email;
+        }
+    }
+
+    public static class ValidEmailList {
+        @Valid
+        ValidEmail[] emails;
+
+        public ValidEmail[] getEmails() {
+            return emails;
+        }
+
+        public void setEmails(ValidEmail[] emails) {
+            this.emails = emails;
         }
     }
 }
