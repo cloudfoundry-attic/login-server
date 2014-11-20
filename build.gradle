@@ -234,6 +234,7 @@ project.gradle.taskGraph.whenReady { TaskExecutionGraph graph ->
       if (graph.hasTask(integrationTest)) {
         systemProperties {
           property  'login.invitationsEnabled', 'true'
+          property  'uaa.allowUnverifiedUsers', 'false'
         }
       }
     }
