@@ -6,16 +6,20 @@ import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.web.client.RestTemplate;
 
+/**
+ * Replaces the named bean with a standard RestTemplate for
+ * compatibility with MockRestServiceServer
+ */
 public class UaaRestTemplateBeanFactoryPostProcessor implements BeanFactoryPostProcessor {
+    private String beanName;
 
-    /*
-     * Replaces the authorizationTemplate with a standard RestTemplate for
-     * compatibility with MockRestServiceServer
-     */
+    public UaaRestTemplateBeanFactoryPostProcessor(String beanName) {
+        this.beanName = beanName;
+    }
 
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory configurableListableBeanFactory) throws BeansException {
-        BeanDefinition beanDefinition = configurableListableBeanFactory.getBeanDefinition("authorizationTemplate");
+        BeanDefinition beanDefinition = configurableListableBeanFactory.getBeanDefinition(beanName);
         beanDefinition.setBeanClassName(RestTemplate.class.getCanonicalName());
         beanDefinition.getConstructorArgumentValues().clear();
     }

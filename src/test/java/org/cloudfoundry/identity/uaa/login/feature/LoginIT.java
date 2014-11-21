@@ -113,35 +113,18 @@ public class LoginIT {
     }
 
     @Test
-    public void testUnverifiedUserLoginResendsVerificationLink() throws Exception {
+    public void testUnverifiedUserLoginSuccess() throws Exception {
         String userEmail = createUnverifiedUser();
 
-        webDriver.get(baseUrl + "/oauth/authorize?client_id=app&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Fapp&response_type=code&state=6pOfRa");
+        webDriver.get(baseUrl + "/login");
         assertEquals("Cloud Foundry", webDriver.getTitle());
-
-        int receivedEmailSize = simpleSmtpServer.getReceivedEmailSize();
 
         webDriver.findElement(By.name("username")).sendKeys(userEmail);
         webDriver.findElement(By.name("password")).sendKeys("secret");
         webDriver.findElement(By.xpath("//input[@value='Sign in']")).click();
 
-        assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), Matchers.containsString("Welcome!"));
-        assertThat(webDriver.findElement(By.cssSelector(".alert-error")).getText(), Matchers.containsString("Your account is not verified"));
+        assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), Matchers.containsString("Where to?"));
 
-        assertEquals(receivedEmailSize + 1, simpleSmtpServer.getReceivedEmailSize());
-        Iterator receivedEmail = simpleSmtpServer.getReceivedEmail();
-        SmtpMessage message = (SmtpMessage) receivedEmail.next();
-        receivedEmail.remove();
-        assertEquals(userEmail, message.getHeaderValue("To"));
-        assertThat(message.getBody(), containsString("Activate your account"));
-
-        String link = testClient.extractLink(message.getBody());
-        assertFalse(isEmpty(link));
-
-        RestTemplate restTemplate = new RestTemplate(new DefaultIntegrationTestConfig.HttpClientFactory());
-        ResponseEntity<String> responseEntity = restTemplate.getForEntity(link, String.class);
-        assertEquals(FOUND, responseEntity.getStatusCode());
-        assertEquals(new URI("http://localhost:8080/app/"), responseEntity.getHeaders().getLocation());
     }
 
     private String createUnverifiedUser() throws Exception {
