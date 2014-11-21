@@ -37,7 +37,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.util.Arrays;
-import java.util.Map;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
