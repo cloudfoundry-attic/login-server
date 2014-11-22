@@ -31,7 +31,8 @@
 	<bean id="basicAuthenticationEntryPoint" class="org.springframework.security.oauth2.provider.error.OAuth2AuthenticationEntryPoint">
 		<property name="realmName" value="UAA/client" />
 		<property name="typeName" value="Basic" />
-	</bean>
+        <property name="exceptionTranslator" ref="accountNotVerifiedExceptionTranslator" />
+    </bean>
 
 	<bean id="clientAuthenticationFilter" class="org.cloudfoundry.identity.uaa.login.ClientInfoAuthenticationFilter">
 		<property name="clientInfoUrl" value="${uaa.clientinfo.url:http://localhost:8080/uaa/clientinfo}" />
@@ -73,8 +74,13 @@
 
 	<authentication-manager xmlns="http://www.springframework.org/schema/security" />
 
-	<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
-		<property name="basename" value="messages" />
+	<bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+        <property name="basenames">
+            <list>
+              <value>#{systemEnvironment['CLOUD_FOUNDRY_CONFIG_PATH']!=null ? 'file:'+systemEnvironment['CLOUD_FOUNDRY_CONFIG_PATH']+'/messages':'classpath:messages'}</value>
+              <value>classpath:messages</value>
+            </list>
+        </property>
 	</bean>
 
 	<bean id="loginEntryPoint" class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
@@ -83,7 +89,9 @@
 
 	<bean id="oauthAuthenticationEntryPoint" class="org.springframework.security.oauth2.provider.error.OAuth2AuthenticationEntryPoint">
 		<property name="realmName" value="UAA/oauth" />
-	</bean>
+    </bean>
+
+    <bean id="accountNotVerifiedExceptionTranslator" class="org.cloudfoundry.identity.uaa.authentication.AccountNotVerifiedExceptionTranslator"/>
 
 	<bean id="oauthAccessDeniedHandler" class="org.springframework.security.oauth2.provider.error.OAuth2AccessDeniedHandler" />
 
@@ -100,6 +108,20 @@
 		</property>
 	</bean>
 	
+	<bean id="basicAuthenticationFilter" class="org.cloudfoundry.identity.uaa.authentication.AuthzAuthenticationFilter">
+		<constructor-arg ref="remoteAuthenticationManager" />
+        <property name="authenticationEntryPoint" ref="basicAuthenticationEntryPoint" />
+		<property name="parameterNames">
+			<list>
+				<value>username</value>
+				<value>password</value>
+				<value>credentials</value>
+                <value>user_id</value>
+                <value>origin</value>
+            </list>
+		</property>
+	</bean>
+
 	<bean id="logoutHandler" class="org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler">
 		<property name="targetUrlParameter" value="redirect" />
 		<property name="defaultTargetUrl" value="/login" />
@@ -128,8 +150,8 @@
 	</bean>
 
 	<util:map id="links">
-        <entry key="passwd" value="${links.passwd:}" />
-        <entry key="register" value="${links.signup:/accounts/new}" />
+        <entry key="passwd" value="${links.passwd:/forgot_password}" />
+        <entry key="register" value="${links.signup:/create_account}" />
 	</util:map>
 
 	<bean id="homeController" class="org.cloudfoundry.identity.uaa.login.HomeController">
@@ -168,6 +190,7 @@
     <bean id="remoteAuthenticationManager" class="org.cloudfoundry.identity.uaa.login.RemoteUaaAuthenticationManager" >
         <property name="loginUrl" value="${uaa.login.url:http://localhost:8080/uaa/authenticate}" />
         <property name="restTemplate" ref="remoteAuthManagerAuthorizationTemplate"/>
+        <property name="accountCreationService" ref="accountCreationService"/>
 	</bean>
 
 </beans>

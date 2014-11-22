@@ -12,6 +12,7 @@ buildscript {
     classpath group: 'org.jfrog.buildinfo', name: 'build-info-extractor-gradle', version: '2.2.4'
     classpath group: 'net.saliman', name: 'gradle-cobertura-plugin', version: '2.2.2'
     classpath group: 'org.kt3k.gradle.plugin', name: 'coveralls-gradle-plugin', version: '0.4.1'
+    classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.7'
   }
 }
 
@@ -22,6 +23,12 @@ ext {
 allprojects {
   /* http://issues.gradle.org/browse/GRADLE-2470 */
   apply plugin: 'java'
+  apply plugin: 'eclipse-wtp'
+  apply plugin: 'propdeps'
+  apply plugin: 'propdeps-maven'
+  apply plugin: 'propdeps-idea'
+  apply plugin: 'propdeps-eclipse'
+  configurations.provided.transitive = false
   sourceCompatibility = 1.7
   targetCompatibility = 1.7
 }
@@ -35,6 +42,13 @@ group = 'org.cloudfoundry.identity'
 apply plugin: 'war'
 description = 'Cloud Foundry Login Server'
 
+eclipse {
+	wtp {
+	    component {
+	      contextPath = 'login'
+	    }
+	}
+}
 task packageSources(type: Jar) {
   classifier = 'sources'
   from sourceSets.main.allSource
@@ -54,10 +68,14 @@ repositories {
 
 dependencies {
   Project identityCommon = project(':cloudfoundry-identity-parent:cloudfoundry-identity-common')
+  compile (project(':cloudfoundry-identity-parent:cloudfoundry-identity-scim')) {
+    exclude(module: 'jna')
+  }
 
   compile(identityCommon) {
     exclude(module: 'jna')
   }
+
   compile group: 'org.springframework', name: 'spring-context-support', version:springVersion
   compile group: 'org.springframework.security', name: 'spring-security-openid', version:springSecurityVersion
   compile(group: 'org.springframework.security.extensions', name: 'spring-security-saml2-core', version:'1.0.0.RELEASE') {
@@ -167,6 +185,7 @@ cargo {
   port = 8080
   
   local {
+//    jvmArgs = "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005"
     systemProperties {
       property 'UAA_PROFILE', 'local'
       property 'net.sourceforge.cobertura.datafile', integrationCoverageFile
@@ -212,7 +231,13 @@ project.gradle.taskGraph.whenReady { TaskExecutionGraph graph ->
       if (runningWithCoverage()) {
         extraClasspath = files(configurations.coberturaJar.files)
       }
+      if (graph.hasTask(integrationTest)) {
+        systemProperties {
+          property  'login.invitationsEnabled', 'true'
+        }
+      }
     }
+
   }
 
   project.tasks.withType(Test).each {

@@ -38,7 +38,7 @@
     <security:http pattern="/forgot_password*" security="none" />
     <security:http pattern="/reset_password" security="none" />
     <security:http pattern="/email_sent" security="none" />
-    <security:http pattern="/accounts/new" security="none" />
+    <security:http pattern="/create_account*" security="none" />
     <security:http pattern="/accounts/email_sent" security="none" />
 
     <bean id="config" class="org.cloudfoundry.identity.uaa.config.EnvironmentMapFactoryBean" />
@@ -102,9 +102,20 @@
         <security:intercept-url pattern="/logout.do" access="IS_AUTHENTICATED_ANONYMOUSLY" />
         <security:anonymous enabled="true" />
         <security:form-login login-page="/login" username-parameter="username" password-parameter="password"
-            login-processing-url="/login.do" authentication-failure-url="/login?error=true" />
+            login-processing-url="/login.do" authentication-failure-handler-ref="loginAuthenticationFailureHandler" authentication-details-source-ref="savedRequestAwareAuthenticationDetailsSource"/>
         <security:logout logout-url="/logout.do" success-handler-ref="logoutHandler" />
     </security:http>
+
+    <bean id="savedRequestAwareAuthenticationDetailsSource" class="org.cloudfoundry.identity.uaa.login.SavedRequestAwareAuthenticationDetailsSource"/>
+
+    <bean id="loginAuthenticationFailureHandler" class="org.springframework.security.web.authentication.ExceptionMappingAuthenticationFailureHandler">
+        <property name="exceptionMappings">
+            <map>
+                <entry key="org.cloudfoundry.identity.uaa.authentication.AccountNotVerifiedException" value="/login?error=account_not_verified" />
+            </map>
+        </property>
+        <property name="defaultFailureUrl" value="/login?error=login_failure" />
+    </bean>
 
     <security:http pattern="/reset_password.do" disable-url-rewriting="true"
                    entry-point-ref="loginEntryPoint">
@@ -118,9 +129,15 @@
         <security:anonymous enabled="true" />
     </security:http>
 
-    <security:http pattern="/accounts" disable-url-rewriting="true"
+    <security:http pattern="/verify_user" disable-url-rewriting="true"
                    entry-point-ref="loginEntryPoint">
-        <security:intercept-url pattern="/accounts" access="IS_AUTHENTICATED_ANONYMOUSLY" />
+        <security:intercept-url pattern="/**" access="IS_AUTHENTICATED_ANONYMOUSLY" />
+        <security:anonymous enabled="true" />
+    </security:http>
+
+    <security:http pattern="/invitations/accept" disable-url-rewriting="true"
+                   entry-point-ref="loginEntryPoint">
+        <security:intercept-url pattern="/**" access="IS_AUTHENTICATED_ANONYMOUSLY" />
         <security:anonymous enabled="true" />
     </security:http>
 
@@ -156,7 +173,7 @@
         entry-point-ref="basicAuthenticationEntryPoint" authentication-manager-ref="remoteAuthenticationManager"
         xmlns="http://www.springframework.org/schema/security">
         <intercept-url pattern="/**" access="IS_AUTHENTICATED_FULLY" />
-        <custom-filter ref="authzAuthenticationFilter" position="FORM_LOGIN_FILTER" />
+        <custom-filter ref="basicAuthenticationFilter" position="FORM_LOGIN_FILTER" />
         <anonymous enabled="false" />
         <access-denied-handler ref="oauthAccessDeniedHandler" />
     </http>
@@ -281,6 +298,13 @@
             <map>
                 <entry key="description" value="Change Email"/>
                 <entry key="id" value="712de257-a7fa-44cb-b1ac-8a6588d1be23"/>
+                <entry key="critical" value="true" value-type="java.lang.Boolean"/>
+            </map>
+        </entry>
+        <entry key="INVITATION">
+            <map>
+                <entry key="description" value="Invitation"/>
+                <entry key="id" value="e6722687-3f0f-4e7a-9925-839a04712cea"/>
                 <entry key="critical" value="true" value-type="java.lang.Boolean"/>
             </map>
         </entry>
@@ -424,12 +448,14 @@
         <constructor-arg ref="authorizationTemplate"/>
         <constructor-arg ref="uaaUrl"/>
         <constructor-arg value="${login.brand:oss}"/>
+        <constructor-arg value="${login.url:http://localhost:8080/login}"/>
     </bean>
 
     <bean id="invitationsService" class="org.cloudfoundry.identity.uaa.login.EmailInvitationsService">
         <constructor-arg ref="mailTemplateEngine"/>
-        <constructor-arg ref="emailService"/>
+        <constructor-arg ref="messageService"/>
         <constructor-arg value="${login.brand:oss}"/>
+        <constructor-arg value="${uaa.url:http://localhost:8080/uaa}"/>
     </bean>
 
     <bean id="changePasswordService" class="org.cloudfoundry.identity.uaa.login.UaaChangePasswordService">
@@ -463,6 +489,11 @@
 
     <bean id="changeEmailController" class="org.cloudfoundry.identity.uaa.login.ChangeEmailController">
         <constructor-arg ref="changeEmailService"/>
+    </bean>
+    
+    <bean class="org.cloudfoundry.identity.uaa.login.UaaExpiringCodeService">
+        <constructor-arg ref="authorizationTemplate"/>
+        <constructor-arg value="${uaa.url:http://localhost:8080/uaa}"/>
     </bean>
 
     <import resource="saml-providers.xml"/>

@@ -23,10 +23,14 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.support.XmlWebApplicationContext;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.not;
+import static org.springframework.http.HttpMethod.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
@@ -58,7 +62,7 @@ public class AccountsControllerIntegrationTest {
         webApplicationContext.setEnvironment(new MockEnvironment());
         new YamlServletProfileInitializerContextInitializer().initializeContext(webApplicationContext, "login.yml");
         webApplicationContext.setConfigLocation("file:./src/main/webapp/WEB-INF/spring-servlet.xml");
-        webApplicationContext.addBeanFactoryPostProcessor(new UaaRestTemplateBeanFactoryPostProcessor());
+        webApplicationContext.addBeanFactoryPostProcessor(new UaaRestTemplateBeanFactoryPostProcessor("authorizationTemplate"));
         webApplicationContext.refresh();
         FilterChainProxy springSecurityFilterChain = webApplicationContext.getBean("springSecurityFilterChain", FilterChainProxy.class);
 
@@ -78,7 +82,7 @@ public class AccountsControllerIntegrationTest {
     public void testCreateActivationEmailPage() throws Exception {
         ((MockEnvironment) webApplicationContext.getEnvironment()).setProperty("login.brand", "oss");
 
-        mockMvc.perform(get("/accounts/new"))
+        mockMvc.perform(get("/create_account.do"))
                 .andExpect(content().string(containsString("Create your account")))
                 .andExpect(content().string(not(containsString("Pivotal ID"))));
     }
@@ -87,7 +91,7 @@ public class AccountsControllerIntegrationTest {
     public void testCreateActivationEmailPageWithPivotalBrand() throws Exception {
         ((MockEnvironment) webApplicationContext.getEnvironment()).setProperty("login.brand", "pivotal");
 
-        mockMvc.perform(get("/accounts/new"))
+        mockMvc.perform(get("/create_account.do"))
             .andExpect(content().string(containsString("Create your Pivotal ID")))
             .andExpect(content().string(not(containsString("Create your account"))));
     }
@@ -115,53 +119,64 @@ public class AccountsControllerIntegrationTest {
     }
 
     @Test
-    public void testCreateAccountPage() throws Exception {
-        ((MockEnvironment) webApplicationContext.getEnvironment()).setProperty("login.brand", "oss");
-
-        mockMvc.perform(get("/accounts/new").param("code", "the_secret_code").param("email", "user@example.com"))
-            .andExpect(content().string(containsString("Create your account")))
-            .andExpect(content().string(not(containsString("Pivotal ID"))));
-    }
-
-    @Test
-    public void testCreateAccountPageWithPivotalBrand() throws Exception {
-        ((MockEnvironment) webApplicationContext.getEnvironment()).setProperty("login.brand", "pivotal");
-
-        mockMvc.perform(get("/accounts/new").param("code", "the_secret_code").param("email", "user@example.com"))
-            .andExpect(content().string(containsString("Create your Pivotal ID")))
-            .andExpect(content().string(not(containsString("Create account"))));
-    }
-
-    @Test
     public void testCreatingAnAccount() throws Exception {
+        String scimUserJSONString = "{" +
+            "\"userName\": \"user@example.com\"," +
+            "\"id\": \"newly-created-user-id\"," +
+            "\"emails\": [{\"value\":\"user@example.com\"}]" +
+            "}";
+        mockUaaServer.expect(requestTo("http://localhost:8080/uaa/Users"))
+            .andExpect(method(POST))
+            .andExpect(jsonPath("$.userName").value("user@example.com"))
+            .andExpect(jsonPath("$.password").value("secret"))
+            .andExpect(jsonPath("$.origin").value("uaa"))
+            .andExpect(jsonPath("$.verified").value(false))
+            .andExpect(jsonPath("$.emails[0].value").value("user@example.com"))
+            .andRespond(withSuccess(scimUserJSONString, APPLICATION_JSON));
+
         mockUaaServer.expect(requestTo("http://localhost:8080/uaa/Codes"))
                 .andExpect(method(HttpMethod.POST))
-                .andRespond(withSuccess("{\"code\":\"rCvk9t\"," +
+                .andRespond(withSuccess("{\"code\":\"the_secret_code\"," +
                                 "\"expiresAt\":1406152741265," +
-                                "\"data\":\"{\\\"username\\\":\\\"user@example.com\\\",\\\"client_id\\\":\\\"login\\\"}\"}",
+                                "\"data\":\"{\\\"user_id\\\":\\\"newly-created-user-id\\\",\\\"client_id\\\":\\\"app\\\"}\"}",
                         APPLICATION_JSON));
 
-        mockUaaServer.expect(requestTo("http://localhost:8080/uaa/create_account"))
-            .andExpect(jsonPath("$.code").value("the_secret_code"))
-            .andExpect(jsonPath("$.password").value("secret"))
-            .andRespond(withSuccess("{" +
-                    "\"user_id\":\"newly-created-user-id\"," +
-                    "\"username\":\"user@example.com\"" +
-                    "}", APPLICATION_JSON));
+        String uaaResponseJson = "{" +
+            "    \"code\":\"the_secret_code\"," +
+            "    \"expiresAt\":1406152741265," +
+            "    \"data\":\"{\\\"user_id\\\":\\\"newly-created-user-id\\\",\\\"client_id\\\":\\\"app\\\"}\"" +
+            "}";
+        mockUaaServer.expect(requestTo("http://localhost:8080/uaa/Codes/the_secret_code"))
+            .andExpect(method(GET))
+            .andRespond(withSuccess(uaaResponseJson, APPLICATION_JSON));
 
-        mockMvc.perform(post("/accounts")
+        mockUaaServer.expect(requestTo("http://localhost:8080/uaa/Users/newly-created-user-id/verify"))
+            .andExpect(method(GET))
+            .andRespond(withSuccess(scimUserJSONString, APPLICATION_JSON));
+
+        Map<String,Object> additionalInformation = new HashMap<>();
+        additionalInformation.put("signup_redirect_url", "http://example.com/redirect");
+
+        String clientDetails = "{" +
+            "\"client_id\": \"app\"," +
+            "\"signup_redirect_url\": \"http://example.com/redirect\"" +
+            "}";
+        mockUaaServer.expect(requestTo("http://localhost:8080/uaa/oauth/clients/app"))
+            .andExpect(method(GET))
+            .andRespond(withSuccess(clientDetails, APPLICATION_JSON));
+
+        mockMvc.perform(post("/create_account.do")
                     .param("email", "user@example.com")
-                    .param("client_id", "login"))
+                    .param("password", "secret")
+                    .param("password_confirmation", "secret")
+                    .param("client_id", "app"))
                 .andExpect(status().isFound())
                 .andExpect(redirectedUrl("accounts/email_sent"));
 
-        MvcResult mvcResult = mockMvc.perform(post("/accounts")
-                .param("email", "user@example.com")
-                .param("code", "the_secret_code")
-                .param("password", "secret")
-                .param("password_confirmation", "secret"))
+        MvcResult mvcResult = mockMvc.perform(get("/verify_user")
+                .param("code", "the_secret_code"))
             .andExpect(status().isFound())
-            .andExpect(redirectedUrl("home"))
+            .andExpect(redirectedUrl("http://example.com/redirect"))
             .andReturn();
 
         SecurityContext securityContext = (SecurityContext) mvcResult.getRequest().getSession().getAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY);

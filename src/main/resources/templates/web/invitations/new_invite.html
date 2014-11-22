@@ -15,7 +15,10 @@
         <h1>Send an invite</h1>
     </div>
     <div class="island-content">
-        <form th:action="@{/invitations}" method="post" novalidate="novalidate">
+        <form th:action="@{/invitations/new.do}" method="post" novalidate="novalidate">
+            <div th:if="${error_message_code}" class="alert alert-error">
+                <p th:text="#{'new_invite.' + ${error_message_code}}">Error Message</p>
+            </div>
             <input name="email" type="email" placeholder="Enter email" autofocus="autofocus" class="form-control"/>
             <input type="submit" value="Send invite" class="island-button"/>
         </form>

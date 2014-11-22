@@ -113,10 +113,6 @@ public class EmailChangeEmailServiceTest {
             .andRespond(withStatus(HttpStatus.CONFLICT));
 
         emailChangeEmailService.beginEmailChange("user-001", "user@example.com", "new@example.com", null);
-
-        mockUaaServer.verify();
-
-        Mockito.verifyZeroInteractions(messageService);
     }
 
     @Test

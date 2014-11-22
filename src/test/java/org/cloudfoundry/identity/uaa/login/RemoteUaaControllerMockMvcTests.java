@@ -123,7 +123,7 @@ public class RemoteUaaControllerMockMvcTests {
 
         mockMvc.perform(get("/login").accept(TEXT_HTML))
                 .andExpect(status().isOk())
-                .andExpect(model().attribute("createAccountLink", "/accounts/new"));
+                .andExpect(model().attribute("createAccountLink", "/create_account"));
     }
 
     @Test
@@ -146,7 +146,7 @@ public class RemoteUaaControllerMockMvcTests {
     @Test
     public void testLocalSignupDisabled() throws Exception {
         MockEnvironment environment = new MockEnvironment();
-        environment.setProperty("login.signupsEnabled", "false");
+        environment.setProperty("login.selfServiceLinksEnabled", "false");
 
         RemoteUaaController controller = new RemoteUaaController(environment, new RestTemplate());
         Prompt first = new Prompt("how", "text", "How did I get here?");
@@ -163,8 +163,9 @@ public class RemoteUaaControllerMockMvcTests {
     @Test
     public void testCustomSignupLinkWithLocalSignupDisabled() throws Exception {
         MockEnvironment environment = new MockEnvironment();
-        environment.setProperty("login.signupsEnabled", "false");
+        environment.setProperty("login.selfServiceLinksEnabled", "false");
         environment.setProperty("links.signup", "http://www.example.com/signup");
+        environment.setProperty("links.passwd", "http://www.example.com/passwd");
 
         RemoteUaaController controller = new RemoteUaaController(environment, new RestTemplate());
         Prompt first = new Prompt("how", "text", "How did I get here?");
@@ -175,7 +176,8 @@ public class RemoteUaaControllerMockMvcTests {
 
         mockMvc.perform(get("/login").accept(TEXT_HTML))
                 .andExpect(status().isOk())
-                .andExpect(model().attribute("createAccountLink", "http://www.example.com/signup"));
+                .andExpect(model().attribute("createAccountLink", nullValue()))
+                .andExpect(model().attribute("forgotPasswordLink", nullValue()));
     }
 
     private MockMvc getMockMvc(RemoteUaaController controller) {

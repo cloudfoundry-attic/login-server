@@ -145,6 +145,22 @@ public class ChangeEmailControllerTest {
     }
 
     @Test
+    public void testBlankEmail() throws Exception {
+        setupSecurityContext();
+
+        MockHttpServletRequestBuilder post = post("/change_email.do")
+            .contentType(APPLICATION_FORM_URLENCODED)
+            .param("newEmail", "")
+            .param("client_id", "app");
+
+        mockMvc.perform(post)
+            .andExpect(status().isUnprocessableEntity())
+            .andExpect(view().name("change_email"))
+            .andExpect(model().attribute("error_message_code", "invalid_email"))
+            .andExpect(model().attribute("email", "user@example.com"));
+    }
+
+    @Test
     public void testVerifyEmail() throws Exception {
         Map<String,String> response = new HashMap<>();
         response.put("userId", "user-id-001");

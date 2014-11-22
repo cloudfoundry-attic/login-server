@@ -15,9 +15,14 @@
         </p>
     </div>
     <div class="island-content">
-        <form th:action="@{/accounts}" method="post" novalidate="novalidate">
+        <form th:action="@{/create_account.do}" method="post" novalidate="novalidate">
+            <div th:if="${error_message_code}" class="alert alert-error">
+                <p th:text="#{'create_account.' + ${error_message_code}}">Error Message</p>
+            </div>
             <input type="hidden" name="client_id" th:value="${client_id}"/>
-            <input name="email" type="email" placeholder="Enter your email" autofocus="autofocus" class="form-control"/>
+            <input name="email" type="email" placeholder="Enter your email" autofocus="autofocus" required="required" class="form-control"/>
+            <input name="password" type="password" required="required" placeholder="Password" autocomplete="off" class="form-control"/>
+            <input name="password_confirmation" type="password" required="required" placeholder="Confirm" autocomplete="off" class="form-control"/>
             <input type="submit" value="Send activation link" class="island-button"/>
         </form>
     </div>

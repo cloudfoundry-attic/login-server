@@ -55,7 +55,7 @@ public class ResetPasswordControllerIntegrationTests {
         webApplicationContext = new XmlWebApplicationContext();
         new YamlServletProfileInitializerContextInitializer().initializeContext(webApplicationContext, "login.yml");
         webApplicationContext.setConfigLocation("file:./src/main/webapp/WEB-INF/spring-servlet.xml");
-        webApplicationContext.addBeanFactoryPostProcessor(new UaaRestTemplateBeanFactoryPostProcessor());
+        webApplicationContext.addBeanFactoryPostProcessor(new UaaRestTemplateBeanFactoryPostProcessor("authorizationTemplate"));
         webApplicationContext.refresh();
         FilterChainProxy springSecurityFilterChain = webApplicationContext.getBean("springSecurityFilterChain", FilterChainProxy.class);
 

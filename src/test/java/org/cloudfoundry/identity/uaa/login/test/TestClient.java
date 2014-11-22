@@ -75,7 +75,7 @@ public class TestClient {
         );
     }
 
-    public void createUser(String scimAccessToken, String userName, String email, String password) throws Exception {
+    public void createUser(String scimAccessToken, String userName, String email, String password, Boolean verified) throws Exception {
 
         restfulCreate(
                 scimAccessToken,
@@ -86,7 +86,7 @@ public class TestClient {
                         "\"emails\":[{\"value\":\"" + email + "\"}]," +
                         "\"password\":\"" + password + "\"," +
                         "\"active\":true," +
-                        "\"verified\":false," +
+                        "\"verified\":" + verified + "," +
                         "\"schemas\":[\"urn:scim:schemas:core:1.0\"]" +
                         "}",
                 uaaUrl + "/Users"
