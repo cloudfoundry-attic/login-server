@@ -3,6 +3,7 @@ package org.cloudfoundry.identity.uaa.login;
 import com.dumbster.smtp.SimpleSmtpServer;
 import org.cloudfoundry.identity.uaa.login.test.UaaRestTemplateBeanFactoryPostProcessor;
 import org.cloudfoundry.identity.uaa.test.YamlServletProfileInitializerContextInitializer;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -67,6 +68,11 @@ public class UnverifiedUserLoginMockMvcTests {
 
         remoteAuthUaaServer = MockRestServiceServer.createServer(webApplicationContext.getBean("remoteAuthManagerAuthorizationTemplate", RestTemplate.class));
         uaaServer = MockRestServiceServer.createServer(webApplicationContext.getBean("authorizationTemplate", RestTemplate.class));
+    }
+
+    @AfterClass
+    public static void stopMailServer() throws Exception {
+        mailServer.stop();
     }
 
     @Test
