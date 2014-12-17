@@ -35,6 +35,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.cloudfoundry.identity.uaa.authentication.Origin;
 import org.cloudfoundry.identity.uaa.authentication.UaaAuthenticationDetails;
+import org.cloudfoundry.identity.uaa.authentication.UaaPrincipal;
 import org.cloudfoundry.identity.uaa.client.SocialClientUserDetails;
 import org.cloudfoundry.identity.uaa.codestore.ExpiringCode;
 import org.cloudfoundry.identity.uaa.login.saml.IdentityProviderDefinition;
@@ -128,6 +129,11 @@ public class SamlRemoteUaaController extends RemoteUaaController {
             appendField(login, Origin.ORIGIN, et.getIdpAlias());
             if (et.getPrincipal() instanceof String ) {
                 appendField(login, "username", et.getPrincipal());
+                authorities = et.getAuthorities();
+            } else if (et.getPrincipal() instanceof UaaPrincipal) {
+                appendField(login, "username", ((UaaPrincipal)et.getPrincipal()).getName());
+                appendField(login, "email", ((UaaPrincipal)et.getPrincipal()).getEmail());
+                appendField(login, "external_id", ((UaaPrincipal)et.getPrincipal()).getExternalId());
                 authorities = et.getAuthorities();
             } else {
                 appendField(login, "username",
