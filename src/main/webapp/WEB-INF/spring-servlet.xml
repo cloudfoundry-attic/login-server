@@ -26,6 +26,7 @@
 
     <context:annotation-config />
 
+    <security:http pattern="/favicon.ico" security="none" />
     <security:http pattern="/saml/web/**" security="none" />
     <security:http pattern="/resources/**" security="none" />
     <security:http pattern="/vendor/**" security="none" />

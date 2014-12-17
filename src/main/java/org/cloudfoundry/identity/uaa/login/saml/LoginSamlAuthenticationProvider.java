@@ -44,10 +44,15 @@ public class LoginSamlAuthenticationProvider extends SAMLAuthenticationProvider 
         SAMLMessageContext context = token.getCredentials();
         String alias = context.getPeerExtendedMetadata().getAlias();
         ExpiringUsernameAuthenticationToken result = (ExpiringUsernameAuthenticationToken)super.authenticate(authentication);
-        LoginSamlAuthenticationToken samlAuthenticationToken = new LoginSamlAuthenticationToken(result, alias);
-        UaaPrincipal principal = new UaaPrincipal("NaN", result.getName(), null, alias, result.getName());
-        getAuthenticationManager().authenticate(new UsernamePasswordAuthenticationToken(principal, null, result.getAuthorities()));
+        UaaPrincipal principal = new UaaPrincipal("NaN", result.getName(), result.getName(), alias, result.getName());
+        result = new ExpiringUsernameAuthenticationToken(result.getTokenExpiration(), principal, result.getCredentials(), result.getAuthorities());
+        Authentication auth = getAuthenticationManager().authenticate(new UsernamePasswordAuthenticationToken(principal, null, result.getAuthorities()));
         //TODO - Consolidate the different authentication objects we actually store in memory
+        if (auth.getPrincipal() instanceof UaaPrincipal) {
+            principal = new UaaPrincipal(((UaaPrincipal)auth.getPrincipal()).getId(), result.getName(), result.getName(), alias, result.getName());
+        }
+        result = new ExpiringUsernameAuthenticationToken(result.getTokenExpiration(), principal, result.getCredentials(), result.getAuthorities());
+        LoginSamlAuthenticationToken samlAuthenticationToken = new LoginSamlAuthenticationToken(result, alias);
         return samlAuthenticationToken;
     }
 }
