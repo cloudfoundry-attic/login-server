@@ -1,4 +1,10 @@
-# Cloud Foundry Login Server
+# Cloud Foundry Login Server (Deprecated)
+
+## Retirement / Deprecation
+The Cloud Foundry Login Server project has been retired. The functionality of the Login Server have been merged into the
+[Cloud Foundry UAA](https://github.com/cloudfoundry/uaa/)
+
+## Login Server
 
 [![Build Status](https://travis-ci.org/cloudfoundry/login-server.svg?branch=develop)](https://travis-ci.org/cloudfoundry/login-server)
 [![Coverage Status](https://coveralls.io/repos/cloudfoundry/login-server/badge.png?branch=develop)](https://coveralls.io/r/cloudfoundry/login-server?branch=develop)
