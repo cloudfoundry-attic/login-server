@@ -26,6 +26,7 @@ import org.springframework.core.env.PropertiesPropertySource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.security.saml.log.SAMLDefaultLogger;
+import org.springframework.security.saml.metadata.ExtendedMetadata;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.ViewResolver;
 
@@ -86,6 +87,20 @@ public class BootstrapTests {
         assertNotNull(context.getBean("samlLogger", SAMLDefaultLogger.class));
         assertFalse(context.getBean(IdentityProviderConfigurator.class).isLegacyMetadataTrustCheck());
         assertEquals(0, context.getBean(IdentityProviderConfigurator.class).getIdentityProviderDefinitions().size());
+    }
+
+    @Test
+    public void testSamlProfileEntityIDisURL() throws Exception {
+        System.setProperty("login.entityID", "http://localhost:8080/login");
+        context = getServletContext("default", "./src/main/resources/login.yml", "file:./src/main/webapp/WEB-INF/spring-servlet.xml");
+        assertEquals("localhost", context.getBean(ExtendedMetadata.class).getAlias());
+    }
+
+    @Test
+    public void testSamlProfileManuallySettingAlias() throws Exception {
+        System.setProperty("login.entityID", "entityid-alias");
+        context = getServletContext("default", "./src/main/resources/login.yml", "file:./src/main/webapp/WEB-INF/spring-servlet.xml");
+        assertEquals("entityid-alias", context.getBean(ExtendedMetadata.class).getAlias());
     }
 
     @Test
