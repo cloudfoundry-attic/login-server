@@ -66,12 +66,12 @@ Configure Okta to have login-server as a service that wishes to authenticate
 
   - a) Go to your Okta application and click on the 'General' tab
   - b) Edit the SAML settings
-  - c) Fill in the 'SingleSignOnURL' field  with 'http://localhost:8080/login/saml/SSO/alias/cloudfoundry-saml-login-local' (this URL can also be derived from the metadata generated at http://localhost:8080/login/saml/metadata)
+  - c) Fill in the 'SingleSignOnURL' field  with 'http://localhost:8080/login/saml/SSO/alias/cloudfoundry-saml-login' (this URL can also be derived from the metadata generated at http://localhost:8080/login/saml/metadata)
        and select 'Use this for Recipient URL and Destination URL'
-  - d) Fill in the 'Audience URI' field with 'cloudfoundry-saml-login-local' which is the entityID for the login-server
+  - d) Fill in the 'Audience URI' field with 'cloudfoundry-saml-login' which is the entityID for the login-server
   - e) Change the 'Request Compression' to Uncompressed
   - f) Click Next and then Finish
-
+The alias is the entityID unless the entityID is a URL, at that point it is the hostname of the URL
 ###Step 4
 Test SAML authentication
 
