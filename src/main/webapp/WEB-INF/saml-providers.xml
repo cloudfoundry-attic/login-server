@@ -53,13 +53,16 @@
 
         <!-- Entry point to initialize authentication, default values taken from
             properties file -->
-        <bean id="samlEntryPoint" class="org.springframework.security.saml.SAMLEntryPoint">
+        <bean id="samlEntryPoint" class="org.cloudfoundry.identity.uaa.login.saml.LoginSamlEntryPoint">
             <property name="defaultProfileOptions">
                 <bean class="org.springframework.security.saml.websso.WebSSOProfileOptions">
                     <property name="includeScoping" value="false" />
                     <property name="nameID" value="${login.saml.nameID:urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified}" />
                     <property name="assertionConsumerIndex" value="${login.saml.assertionConsumerIndex:0}" />
                 </bean>
+            </property>
+            <property name="providerDefinitionList">
+                <bean factory-bean="metaDataProviders" factory-method="getIdentityProviderDefinitions"/>
             </property>
         </bean>
 
